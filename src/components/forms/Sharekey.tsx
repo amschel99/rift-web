@@ -6,6 +6,7 @@ import { ShareKeyWithOtherUser } from "../../utils/api/keys";
 import { Loading } from "../../assets/animations";
 import { Share } from "../../assets/icons";
 import { colors } from "../../constants";
+import sharekey from "../../assets/images/sharekey.png";
 import "../../styles/components/forms.css";
 
 export const ShareKey = ({
@@ -44,6 +45,8 @@ export const ShareKey = ({
 
   return (
     <div id="authorise">
+      <img src={sharekey} alt="share key" />
+
       <p>Share Your Key(s) by entering the other user's telegram username</p>
 
       <TextField
