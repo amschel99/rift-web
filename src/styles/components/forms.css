@@ -5,6 +5,19 @@
 #authorise {
   width: 95%;
   margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sendeth img,
+#sendethfromtoken img,
+#sharewalletaccess img,
+#importkey img,
+#authorise img {
+  margin-top: 1rem;
+  width: 3rem;
+  height: 3rem;
 }
 
 #sendeth p,
@@ -13,10 +26,11 @@
 #importkey p,
 #authorise p {
   text-align: center;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   padding-left: 2rem;
   padding-right: 2rem;
-  color: var(--textprimary);
+  font-size: 1rem;
+  color: var(--textsecondary);
 }
 
 #sharewalletaccess p {
@@ -51,7 +65,7 @@
   font-size: medium;
   font-weight: 400;
   color: var(--primary);
-  background-color: var(--accent);
+  background-color: var(--success);
   border-radius: 0.25rem;
   cursor: pointer;
 }
@@ -64,6 +78,7 @@
 }
 
 #authorise .keyshare {
+  width: 100%;
   margin-top: 1rem;
   padding: unset;
   text-align: left;

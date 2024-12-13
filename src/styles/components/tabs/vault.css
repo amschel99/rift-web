@@ -3,85 +3,46 @@
   padding: 0 1rem;
 }
 
+#vaulttab .bal-actions {
+  border-radius: 0.5rem;
+  border: 1px solid var(--divider);
+}
+
 #vaulttab .actions {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: no-wrap;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  border-top: 1px solid var(--divider);
 }
 
-#vaulttab .actions01 {
-  margin-top: 2rem;
-}
-
-#vaulttab .actions01 button {
+#vaulttab .actions button {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 30%;
-  padding: 1rem;
+  width: 50%;
+  padding: 0.75rem;
   background-color: transparent;
   border: 1px solid var(--divider);
-  border-radius: 0.125rem;
-}
-
-#vaulttab .actions02 {
-  margin-top: 1rem;
-  padding: 0.875rem;
-  border: 1px solid var(--divider);
   border-radius: 0.25rem;
-}
-
-#vaulttab .actions02 button {
-  width: 48%;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background-color: var(--divider);
-  border: 0;
-  outline: none;
-  outline-color: transparent;
-  border-radius: 0.25rem;
-}
-
-#vaulttab .actions01 button span {
-  font-weight: 600;
-}
-
-#vaulttab .actions div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: fit-content;
-}
-
-#vaulttab .actions div button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  border: 0;
-  border-radius: 50%;
-  outline: none;
-  outline-color: transparent;
-  background-color: var(--accent);
-  cursor: pointer;
-}
-
-#vaulttab .actions div p {
   color: var(--textprimary);
-  font-weight: 400;
-  font-size: small;
+}
+
+#vaulttab .actions .send {
+  color: var(--accent);
+}
+
+#vaulttab .actions .receive {
+  color: var(--success);
+}
+
+#vaulttab .actions button span {
+  font-weight: 600;
 }
 
 #vaulttab .actions #share button {
@@ -90,4 +51,44 @@
 
 #vaulttab .actions #sendfromtoken button {
   background-color: var(--divider);
+}
+
+#vaulttab #share {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--danger);
+  outline: none;
+  outline-color: transparent;
+  border-radius: 0.25rem;
+  background-color: transparent;
+}
+
+#vaulttab #secrets_import {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+}
+
+#vaulttab #secrets_import p {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#vaulttab #secrets_import .importsecret {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 0;
 }
