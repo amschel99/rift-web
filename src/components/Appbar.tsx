@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar } from "@mui/material";
 import { useSnackbar } from "../hooks/snackbar";
 import { Copy } from "../assets/icons";
+import { colors } from "../constants";
 import "../styles/components/appbar.css";
 
 interface AppBarProps {
@@ -30,16 +31,16 @@ export const ResponsiveAppBar: React.FC<AppBarProps> = ({
         src={profileImage}
         alt={username}
         sx={{
-          width: { xs: 42, md: 48 },
-          height: { xs: 42, md: 48 },
+          width: 120,
+          height: 120,
         }}
       />
 
       <div className="uname">
-        <p>Welcome {username}</p>
+        <p style={{ color: colors.textprimary }}>Hi, {username}</p>
         <button onClick={onCopyAddr}>
           {walletAddress?.substring(0, 3)}...{walletAddress?.substring(4, 7)}
-          <Copy width={14} height={16} />
+          <Copy width={14} height={16} color={colors.textsecondary} />
         </button>
       </div>
     </div>
