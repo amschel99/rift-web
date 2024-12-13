@@ -20,7 +20,6 @@ export const BottomTabNavigation = () => {
         position: "fixed",
         bottom: 0,
         left: 0,
-        borderTop: `1px solid ${colors.divider}`,
       }}
     >
       <BottomNavigationAction
