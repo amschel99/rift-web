@@ -10,9 +10,9 @@ import "../styles/constants.css";
 import "../styles/pages/auth.css";
 
 export default function Authentication(): JSX.Element {
+  const { initData } = useLaunchParams();
   const navigate = useNavigate();
   const { showsuccesssnack } = useSnackbar();
-  const { initData } = useLaunchParams();
 
   const details = {
     email: initData?.user?.username,

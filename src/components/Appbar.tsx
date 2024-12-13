@@ -10,7 +10,7 @@ interface AppBarProps {
   walletAddress: string;
 }
 
-const ResponsiveAppBar: React.FC<AppBarProps> = ({
+export const ResponsiveAppBar: React.FC<AppBarProps> = ({
   username,
   profileImage,
   walletAddress,
@@ -45,5 +45,3 @@ const ResponsiveAppBar: React.FC<AppBarProps> = ({
     </div>
   );
 };
-
-export default ResponsiveAppBar;

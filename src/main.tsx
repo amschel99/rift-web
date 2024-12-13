@@ -7,17 +7,20 @@ import Authentication from "./pages/Auth.tsx";
 import "./styles/constants.css";
 import "./styles/index.css";
 import Logout from "./pages/Logout.tsx";
+import { TabsProvider } from "./hooks/tabs.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <SnackBarProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="" element={<App />} />
-          <Route path="/signup" element={<Authentication />} />
-            <Route path="/logout" element={<Logout/>} />
-        </Routes>
-      </BrowserRouter>
+      <TabsProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="" element={<App />} />
+            <Route path="/signup" element={<Authentication />} />
+            <Route path="/logout" element={<Logout />} />
+          </Routes>
+        </BrowserRouter>
+      </TabsProvider>
     </SnackBarProvider>
   </StrictMode>
 );

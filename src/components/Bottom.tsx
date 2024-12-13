@@ -1,15 +1,12 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
+import { useTabs } from "../hooks/tabs";
 import { Vault, Market, Labs, Security, Earn } from "../assets/icons";
 import { colors } from "../constants";
 
-export type tabsType = "vault" | "market" | "labs" | "security" | "earn";
+export const BottomTabNavigation = () => {
+  const { currTab, switchtab } = useTabs();
 
-export const BottomTabNavigation = ({
-  setTab,
-}: {
-  setTab: Dispatch<SetStateAction<tabsType>>;
-}) => {
   const [value, setValue] = useState(0);
 
   return (
@@ -28,21 +25,27 @@ export const BottomTabNavigation = ({
     >
       <BottomNavigationAction
         onClick={() => {
-          setTab("vault");
+          switchtab("vault");
         }}
         label="Vault"
-        icon={<Vault color={value == 0 ? colors.accent : colors.textprimary} />}
+        icon={
+          <Vault
+            color={currTab == "vault" ? colors.accent : colors.textprimary}
+          />
+        }
         sx={{ color: colors.textprimary, gap: "0.25rem" }}
         disableTouchRipple
       />
 
       <BottomNavigationAction
         onClick={() => {
-          setTab("market");
+          switchtab("market");
         }}
         label="Market"
         icon={
-          <Market color={value == 1 ? colors.accent : colors.textprimary} />
+          <Market
+            color={currTab == "market" ? colors.accent : colors.textprimary}
+          />
         }
         sx={{ color: colors.textprimary, gap: "0.25rem" }}
         disableTouchRipple
@@ -50,21 +53,27 @@ export const BottomTabNavigation = ({
 
       <BottomNavigationAction
         onClick={() => {
-          setTab("labs");
+          switchtab("labs");
         }}
         label="Labs"
-        icon={<Labs color={value == 2 ? colors.accent : colors.textprimary} />}
+        icon={
+          <Labs
+            color={currTab == "labs" ? colors.accent : colors.textprimary}
+          />
+        }
         sx={{ color: colors.textprimary, gap: "0.25rem" }}
         disableTouchRipple
       />
 
       <BottomNavigationAction
         onClick={() => {
-          setTab("security");
+          switchtab("security");
         }}
         label="Security"
         icon={
-          <Security color={value == 3 ? colors.accent : colors.textprimary} />
+          <Security
+            color={currTab == "security" ? colors.accent : colors.textprimary}
+          />
         }
         sx={{ color: colors.textprimary, gap: "0.25rem" }}
         disableTouchRipple
@@ -72,10 +81,14 @@ export const BottomTabNavigation = ({
 
       <BottomNavigationAction
         onClick={() => {
-          setTab("earn");
+          switchtab("earn");
         }}
         label="Earn"
-        icon={<Earn color={value == 4 ? colors.accent : colors.textprimary} />}
+        icon={
+          <Earn
+            color={currTab == "earn" ? colors.accent : colors.textprimary}
+          />
+        }
         sx={{ color: colors.textprimary, gap: "0.25rem" }}
         disableTouchRipple
       />
