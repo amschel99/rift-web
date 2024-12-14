@@ -5,6 +5,7 @@ export type keyType = {
   type: string; // "own" | "foreign";
   value: string;
   owner: string;
+  token:string;
 };
 
 export type getkeysType = {

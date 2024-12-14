@@ -1,5 +1,5 @@
 import { JSX, useState } from "react";
-import { SHA256 } from "crypto-js";
+
 import { keyType } from "../utils/api/keys";
 import { AppDrawer } from "./global/AppDrawer";
 import { Share, User } from "../assets/icons";
@@ -77,7 +77,8 @@ export const SharedSecrets = ({
           <div className="metadata">
             <p className="hash">Hash</p>
             <p className="value">
-              {SHA256(secret?.value).toString().substring(0, 30)}...
+              {secret?.token?.substring(0,14)}...
+             
             </p>
           </div>
         </div>
