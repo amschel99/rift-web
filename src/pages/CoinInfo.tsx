@@ -107,7 +107,8 @@ export default function CoinInfo(): JSX.Element {
               Circulation Supply
               <span>
                 {numberFormat(coinDetails?.market_data?.circulating_supply)}
-                {coinDetails.symbol}
+                &nbsp;
+                <em className="sym">{coinDetails.symbol}</em>
               </span>
             </p>
             <p>
@@ -121,8 +122,8 @@ export default function CoinInfo(): JSX.Element {
             <p>
               Total Supply
               <span>
-                {numberFormat(coinDetails?.market_data?.total_supply)}
-                {coinDetails.symbol}
+                {numberFormat(coinDetails?.market_data?.total_supply)}&nbsp;
+                <em className="sym"> {coinDetails.symbol}</em>
               </span>
             </p>
             <p>
