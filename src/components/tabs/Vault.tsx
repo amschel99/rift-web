@@ -7,7 +7,7 @@ import { AppDrawer, draweraction } from "../../components/global/AppDrawer";
 import { MySecrets, SharedSecrets } from "../../components/Secrets";
 import { WalletBalance } from "../WalletBalance";
 import { ResponsiveAppBar } from "../Appbar";
-import { Receive, Send, Share, Add } from "../../assets/icons";
+import { Receive, Send, Share, Add, SendFromToken } from "../../assets/icons";
 import { colors } from "../../constants";
 import "../../styles/components/tabs/vault.css";
 
@@ -30,6 +30,11 @@ export const VaultTab = (): JSX.Element => {
 
   const onShare = () => {
     setAction("share");
+    setAppDrawerOpen(true);
+  };
+
+  const onSpendOnBehalf = () => {
+    setAction("sendfromtoken");
     setAppDrawerOpen(true);
   };
 
@@ -109,9 +114,15 @@ export const VaultTab = (): JSX.Element => {
         <SharedSecrets secretsLs={sharedsecrets} />
       )}
 
-      <button id="share" onClick={onShare}>
-        <Share width={16} height={18} color={colors.danger} />
-      </button>
+      <div id="share">
+        <button onClick={onShare}>
+          <Share width={16} height={18} color={colors.danger} />
+        </button>
+        <div className="divider" />
+        <button onClick={onSpendOnBehalf}>
+          <SendFromToken width={16} height={18} color={colors.danger} />
+        </button>
+      </div>
 
       <AppDrawer
         action={action}
