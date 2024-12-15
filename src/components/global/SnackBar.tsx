@@ -20,7 +20,7 @@ export const SnackBar = (): JSX.Element => {
     <Fragment>
       <IconButton size="small" aria-label="close">
         {snacksuccess ? (
-          <Check color={colors.primary} />
+          <Check width={24} height={24} color={colors.success} />
         ) : (
           <Warning color={colors.danger} />
         )}
