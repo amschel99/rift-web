@@ -77,10 +77,7 @@ export const SharedSecrets = ({
 
           <div className="metadata">
             <p className="hash">Token</p>
-            <p className="value">
-              {secret?.token?.substring(0,14)}...
-             
-            </p>
+            <p className="value">{secret?.token}</p>
           </div>
         </div>
       ))}
