@@ -33,6 +33,11 @@
   color: var(--textprimary);
 }
 
+#sendethfromtoken p {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
 #sharewalletaccess p {
   padding-left: unset;
   padding-right: unset;
