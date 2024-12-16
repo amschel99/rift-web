@@ -98,7 +98,7 @@ export const spendOnBehalf = async (
   accessToken: string,
   to: string,
   id: string
-): Promise<{ spendOnBehalfSuccess: boolean }> => {
+): Promise<{ spendOnBehalfSuccess: boolean; status: number }> => {
   let URL = BASEURL + ENDPOINTS.spendwithtoken + `?id=${id}`;
 
   let res: Response = await fetch(URL, {
@@ -110,6 +110,7 @@ export const spendOnBehalf = async (
     },
   });
 
-  if (res.status == 200) return { spendOnBehalfSuccess: true };
-  else return { spendOnBehalfSuccess: false };
+  if (res.status == 200)
+    return { spendOnBehalfSuccess: true, status: res?.status };
+  else return { spendOnBehalfSuccess: false, status: res?.status };
 };

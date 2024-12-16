@@ -38,10 +38,13 @@ export const Send = (): JSX.Element => {
         ethAmnt
       );
 
-      if (spendSuccess) sethttpSuccess(true);
-      else {
-        showerrorsnack("An unexpected error occurred, please try again");
+      if (spendSuccess) {
+        sethttpSuccess(true);
+      } else {
+        showerrorsnack("An unexpected error occurred");
       }
+
+      setProcessing(false);
     }
   };
 
