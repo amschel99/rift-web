@@ -17,7 +17,7 @@ export const ImportKey = (): JSX.Element => {
 
   const onImportKey = async () => {
     if (importedKey == "") {
-      showerrorsnack("Enter your key/secret");
+      showerrorsnack("Enter your key/secret to import");
     } else {
       setProcessing(true);
       let token: string | null = localStorage.getItem("token");

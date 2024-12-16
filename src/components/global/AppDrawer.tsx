@@ -36,7 +36,7 @@ export const AppDrawer = (): JSX.Element => {
         className="close"
         onClick={() => closeAppDrawer()}
       >
-        <Cancel width={24} height={24} color={colors.textprimary} />
+        <Cancel width={24} height={24} color={colors.textsecondary} />
       </button>
 
       {action == "sendoptions" ? (

@@ -19,7 +19,7 @@ export const SendEthFromToken = (): JSX.Element => {
 
   const onSpendOnBehalf = async () => {
     if (receiverAddress == "") {
-      showerrorsnack("Fill in all fields");
+      showerrorsnack("Enter a destination address");
     } else {
       setProcessing(true);
       showsuccesssnack("Please wait...");

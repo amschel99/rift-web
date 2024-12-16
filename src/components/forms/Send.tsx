@@ -25,7 +25,7 @@ export const Send = (): JSX.Element => {
 
   const onSendTx = async () => {
     if (ethAmnt == "" || receiverAddress == "" || errorInEthValue()) {
-      showerrorsnack("Fill in all fields");
+      showerrorsnack("Enter an amount & address");
     } else {
       setProcessing(true);
       showsuccesssnack("Please wait...");

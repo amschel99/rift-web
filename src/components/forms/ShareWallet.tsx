@@ -34,7 +34,7 @@ export const ShareWallet = (): JSX.Element => {
 
   const onShareWallet = async () => {
     if (receiverEmail == "") {
-      showerrorsnack(`Enter the target's telegram username`);
+      showerrorsnack(`Enter the receipient's telegram username`);
     } else {
       setProcessing(true);
 
