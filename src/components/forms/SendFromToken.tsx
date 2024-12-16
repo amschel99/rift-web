@@ -27,7 +27,7 @@ export const SendEthFromToken = (): JSX.Element => {
       let access = localStorage.getItem("token");
       let utxoId = localStorage.getItem("utxoId");
 
-      const { spendOnBehalfSuccess } = await spendOnBehalf(
+      const { spendOnBehalfSuccess, status } = await spendOnBehalf(
         access as string,
         receiverAddress,
         utxoId as string
@@ -35,6 +35,9 @@ export const SendEthFromToken = (): JSX.Element => {
 
       if (spendOnBehalfSuccess) {
         sethttpSuccess(true);
+        localStorage.removeItem("utxoId");
+      } else if (status == 401) {
+        showerrorsnack("You are not authorised to redeem");
         localStorage.removeItem("utxoId");
       } else {
         showerrorsnack("An unexpected error occurred");
