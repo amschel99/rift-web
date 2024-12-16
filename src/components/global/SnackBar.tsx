@@ -30,7 +30,7 @@ export const SnackBar = (): JSX.Element => {
 
   return (
     <Snackbar
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
       open={snackbaropen}
       message={snackbarmsg}
       autoHideDuration={6500}

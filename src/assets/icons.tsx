@@ -111,6 +111,30 @@ export const Check = ({ width, height, color }: iconprops): JSX.Element => {
   );
 };
 
+export const ChevronLeft = ({
+  width,
+  height,
+  color,
+}: iconprops): JSX.Element => {
+  return (
+    <svg
+      width={width ?? 8}
+      height={height ?? 14}
+      viewBox="0 0 8 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M7 1L1 7L7 13"
+        stroke={color ?? "black"}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
 export const Database = ({ width, height, color }: iconprops): JSX.Element => {
   return (
     <svg

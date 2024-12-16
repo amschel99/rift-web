@@ -93,7 +93,7 @@ export const ShareKey = ({
         ) : (
           <>
             Share
-            <Share width={14} height={16} color={colors.primary} />
+            <Share width={14} height={16} color={colors.textprimary} />
           </>
         )}
       </button>

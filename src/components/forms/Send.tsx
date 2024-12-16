@@ -135,7 +135,7 @@ export const Send = (): JSX.Element => {
           <Loading width="1.5rem" height="1.5rem" />
         ) : (
           <>
-            Send <SendIcon color={colors.primary} />
+            Send <SendIcon color={colors.textprimary} />
           </>
         )}
       </button>

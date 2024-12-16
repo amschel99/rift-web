@@ -30,7 +30,7 @@
   padding-left: 2rem;
   padding-right: 2rem;
   font-size: 1rem;
-  color: var(--textsecondary);
+  color: var(--textprimary);
 }
 
 #sharewalletaccess p {
@@ -65,7 +65,7 @@
   font-family: "Open Sans", sans-serif;
   font-size: medium;
   font-weight: 400;
-  color: var(--primary);
+  color: var(--textprimary);
   background-color: var(--danger);
   border-radius: 0.25rem;
   cursor: pointer;

@@ -174,7 +174,7 @@ export const SendEthFromToken = (): JSX.Element => {
           <Loading />
         ) : (
           <>
-            Send <SendFromToken color={colors.primary} />
+            Send <SendFromToken color={colors.textprimary} />
           </>
         )}
       </button>

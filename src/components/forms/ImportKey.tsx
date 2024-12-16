@@ -81,7 +81,7 @@ export const ImportKey = (): JSX.Element => {
           <Loading width="1.5rem" height="1.5rem" />
         ) : (
           <>
-            Import Key <Add width={20} height={20} color={colors.primary} />
+            Import Key <Add width={20} height={20} color={colors.textprimary} />
           </>
         )}
       </button>
