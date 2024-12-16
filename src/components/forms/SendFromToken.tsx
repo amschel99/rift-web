@@ -14,41 +14,29 @@ export const SendEthFromToken = (): JSX.Element => {
 
   // receiverAddress -> to
   const [receiverAddress, setReceiverAddress] = useState<string>("");
-  // accesstoken -> spendToken
-  const [accessToken, setAccessToken] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
   const [httpSuccess, sethttpSuccess] = useState<boolean>(false);
 
-  const errorInEthValue = (): boolean => {
-    if (Number.isInteger(Number(amount))) return false;
-    else if (amount.split(".")[1].length > 5) return true;
-    else return false;
-  };
-
   const onSpendOnBehalf = async () => {
-    if (
-      receiverAddress == "" ||
-      accessToken == "" ||
-      amount == "" ||
-      errorInEthValue()
-    ) {
+    if (receiverAddress == "") {
       showerrorsnack("Fill in all fields");
     } else {
       setProcessing(true);
       showsuccesssnack("Please wait...");
 
       let access = localStorage.getItem("token");
+      let utxoId = localStorage.getItem("utxoId");
 
       const { spendOnBehalfSuccess } = await spendOnBehalf(
         access as string,
-        accessToken,
         receiverAddress,
-        amount
+        utxoId as string
       );
 
-      if (spendOnBehalfSuccess) sethttpSuccess(true);
-      else {
+      if (spendOnBehalfSuccess) {
+        sethttpSuccess(true);
+        localStorage.removeItem("utxoId");
+      } else {
         showerrorsnack("An unexpected error occurred, please try again");
       }
     }
@@ -75,39 +63,7 @@ export const SendEthFromToken = (): JSX.Element => {
     <div id="sendethfromtoken">
       <img src={foreignspend} alt="Foreign spend" />
 
-      <p>
-        To send ETH using a shared wallet access token, paste the token, enter
-        the receipient's address and amount
-      </p>
-
-      <TextField
-        value={accessToken}
-        onChange={(ev) => setAccessToken(ev.target.value)}
-        label="Wallet Access Token"
-        placeholder="ey. . ."
-        fullWidth
-        variant="standard"
-        autoComplete="off"
-        type="text"
-        sx={{
-          marginTop: "1.25rem",
-          "& .MuiInputBase-input": {
-            color: colors.textprimary,
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-          },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: colors.divider,
-          },
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: colors.divider,
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: colors.accent,
-          },
-        }}
-      />
+      <p>Enter a destination address to redeem your crypto</p>
 
       <TextField
         value={receiverAddress}
@@ -118,37 +74,6 @@ export const SendEthFromToken = (): JSX.Element => {
         variant="standard"
         autoComplete="off"
         type="text"
-        sx={{
-          marginTop: "1.25rem",
-          "& .MuiInputBase-input": {
-            color: colors.textprimary,
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-          },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: colors.divider,
-          },
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: colors.divider,
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: colors.accent,
-          },
-        }}
-      />
-
-      <TextField
-        value={amount}
-        onChange={(ev) => setAmount(ev.target.value)}
-        onKeyUp={() => errorInEthValue()}
-        error={errorInEthValue()}
-        label="Amount"
-        placeholder="0.5"
-        fullWidth
-        variant="standard"
-        autoComplete="off"
-        type="number"
         sx={{
           marginTop: "1.25rem",
           "& .MuiInputBase-input": {
