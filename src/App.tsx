@@ -30,7 +30,7 @@ function App(): JSX.Element {
    if (startParam) {
   const [utxoId, utxoVal] = startParam.split("=");
 
-  if (utxoId && utxoVal) {
+  if (utxoId) {
     localStorage.setItem("utxoId", utxoId);
     localStorage.setItem("utxoVal", utxoVal);
     openAppDrawer("sendfromtoken");
@@ -41,7 +41,7 @@ function App(): JSX.Element {
 
 
     if (utxoId) {
-      
+      alert('here')
       openAppDrawer("sendfromtoken");
     }
   }, []);
