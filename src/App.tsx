@@ -21,30 +21,20 @@ function App(): JSX.Element {
   const checkAccessUser = useCallback(() => {
     let address: string | null = localStorage.getItem("address");
     let token: string | null = localStorage.getItem("token");
-    let utxoId = localStorage.getItem("utxoId");
 
     if (address == "" || address == null || token == "" || token == null) {
       navigate("/signup");
     }
 
-   if (startParam) {
-   
-  const [utxoId, utxoVal] = startParam.split("=");
-openAppDrawer("sendfromtoken");
-  if (utxoId && utxoVal) {
-    localStorage.setItem("utxoId", utxoId);
-    localStorage.setItem("utxoVal", utxoVal);
-    
-  } else {
-    console.error("Invalid startParam format. Expected 'key=value'.");
-  }
-}
+    if (startParam) {
+      const [utxoId, utxoVal] = startParam.split("=");
 
-
-    if (utxoId) {
-  
-    
       openAppDrawer("sendfromtoken");
+
+      if (utxoId && utxoVal) {
+        localStorage.setItem("utxoId", utxoId);
+        localStorage.setItem("utxoVal", utxoVal);
+      }
     }
   }, []);
 
