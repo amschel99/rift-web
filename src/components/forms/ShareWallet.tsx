@@ -54,7 +54,7 @@ export const ShareWallet = (): JSX.Element => {
         closeAppDrawer();
 
         openTelegramLink(
-          `https://t.me/share/url?url=${token}&text=Open this link to redeem some crypto I sent you...`
+          `https://t.me/share/url?url=${token}&text=Open this link to receive some crypto I sent you...StratoVault`
         );
       } else {
         showerrorsnack(
