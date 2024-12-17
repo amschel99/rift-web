@@ -2,6 +2,7 @@ import { JSX, useState } from "react";
 import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
 import { TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
+import { useAppDrawer } from "../../hooks/drawer";
 import { importKey } from "../../utils/api/keys";
 import { Add } from "../../assets/icons";
 import { Loading } from "../../assets/animations";
@@ -11,6 +12,7 @@ import "../../styles/components/forms.css";
 
 export const ImportKey = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
+  const { closeAppDrawer } = useAppDrawer();
 
   const [importedKey, setImportedKey] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
@@ -32,6 +34,7 @@ export const ImportKey = (): JSX.Element => {
 
       if (isOk) {
         showsuccesssnack("Key imported successfully");
+        closeAppDrawer();
       } else {
         showerrorsnack("An unexpected error occurred");
       }
@@ -75,7 +78,7 @@ export const ImportKey = (): JSX.Element => {
         }}
       />
 
-      <button onClick={onImportKey}>
+      <button disabled={processing} onClick={onImportKey}>
         {processing ? (
           <Loading width="1.5rem" height="1.5rem" />
         ) : (
