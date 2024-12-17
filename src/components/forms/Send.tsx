@@ -1,6 +1,7 @@
 import { JSX, useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
+import { useAppDrawer } from "../../hooks/drawer";
 import { sendEth } from "../../utils/api/wallet";
 import { SOCKET } from "../../utils/api/config";
 import { Loading } from "../../assets/animations";
@@ -11,6 +12,7 @@ import "../../styles/components/forms.css";
 
 export const Send = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
+  const { closeAppDrawer } = useAppDrawer();
 
   const [receiverAddress, setReceiverAddress] = useState<string>("");
   const [ethAmnt, setEthAmnt] = useState<string>("");
@@ -56,6 +58,7 @@ export const Send = (): JSX.Element => {
       SOCKET.on("TXConfirmed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
+        closeAppDrawer();
       });
       SOCKET.on("TXFailed", () => {
         setProcessing(false);
@@ -133,7 +136,7 @@ export const Send = (): JSX.Element => {
         }}
       />
 
-      <button onClick={onSendTx}>
+      <button disabled={processing} onClick={onSendTx}>
         {processing ? (
           <Loading width="1.5rem" height="1.5rem" />
         ) : (
