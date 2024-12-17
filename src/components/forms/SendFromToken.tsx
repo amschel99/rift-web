@@ -45,18 +45,22 @@ export const SendEthFromToken = (): JSX.Element => {
 // alert(spendOnBehalfSuccess )
 // alert(status)
       if (spendOnBehalfSuccess == true && status==200) {
+         localStorage.removeItem("utxoId");
         sethttpSuccess(true);
        
       } else if ( spendOnBehalfSuccess == true && status == 401) {
+         localStorage.removeItem("utxoId");
         showerrorsnack("You are not authorised to redeem");
        
       }
        else if ( spendOnBehalfSuccess == true &&  status == 403) {
+         localStorage.removeItem("utxoId");
         showerrorsnack("The redeem code expired!");
        
       }
       
       else {
+         localStorage.removeItem("utxoId");
         showerrorsnack("An unexpected error occurred");
       }
 
