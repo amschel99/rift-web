@@ -2,6 +2,7 @@ import { JSX, useState } from "react";
 import { TextField } from "@mui/material";
 import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../../hooks/snackbar";
+import { useAppDrawer } from "../../hooks/drawer";
 import { ShareKeyWithOtherUser } from "../../utils/api/keys";
 import { Loading } from "../../assets/animations";
 import { Share } from "../../assets/icons";
@@ -15,6 +16,7 @@ export const ShareKey = ({
   keyToShare: string;
 }): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
+  const { closeAppDrawer } = useAppDrawer();
 
   const [keytargetusr, setkeytargetusr] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
@@ -39,6 +41,7 @@ export const ShareKey = ({
 
       if (isOk) {
         showsuccesssnack("Key was shared successfully");
+        closeAppDrawer();
       } else {
         showerrorsnack("An unexpected error occurred");
       }
@@ -87,7 +90,11 @@ export const ShareKey = ({
         {keyToShare}
       </p>
 
-      <button className="submitlogin" onClick={onShareKey}>
+      <button
+        disabled={processing}
+        className="submitlogin"
+        onClick={onShareKey}
+      >
         {processing ? (
           <Loading width="1.5rem" height="1.5rem" />
         ) : (
