@@ -135,7 +135,7 @@ export const ShareWallet = (): JSX.Element => {
         }}
       />
 
-      <p className="timevalidlabel">Time ({time} minutes)</p>
+      <p className="timevalidlabel">Valid for ({time} minutes)</p>
       <Slider
         value={time}
         onChange={handleChange}
