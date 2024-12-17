@@ -11,7 +11,7 @@ import "../../styles/components/forms.css";
 
 export const SendEthFromToken = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
-  const [disabled, setDisabled]=useState(false)
+  const [, setDisabled]=useState(false)
 
   function base64ToString(base64: string) {
   return decodeURIComponent(escape(atob(base64)));
