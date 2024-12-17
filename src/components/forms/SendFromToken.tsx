@@ -1,5 +1,5 @@
 import { JSX, useEffect, useState } from "react";
-import { TextField } from "@mui/material";
+
 import { SOCKET } from "../../utils/api/config";
 import { spendOnBehalf } from "../../utils/api/wallet";
 import { Loading } from "../../assets/animations";
@@ -13,7 +13,7 @@ export const SendEthFromToken = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
 
   // receiverAddress -> to
-  const [receiverAddress, setReceiverAddress] = useState<string>("");
+ 
   const [processing, setProcessing] = useState<boolean>(false);
   const [httpSuccess, sethttpSuccess] = useState<boolean>(false);
 
