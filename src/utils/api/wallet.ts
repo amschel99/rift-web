@@ -113,11 +113,13 @@ export const spendOnBehalf = async (
   if (res.status == 200)
   {
      localStorage.removeItem("utxoId");
+     localStorage.removeItem("utxoVal");
       return { spendOnBehalfSuccess: true, status: res?.status };
   }
    
   else {
     localStorage.removeItem("utxoId");
+      localStorage.removeItem("utxoVal");
      return { spendOnBehalfSuccess: true, status: res?.status };
   
 

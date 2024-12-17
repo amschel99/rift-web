@@ -27,11 +27,18 @@ function App(): JSX.Element {
       navigate("/signup");
     }
 
-    if (startParam) {
-     
-      localStorage.setItem("utxoId", startParam as string);
-      openAppDrawer("sendfromtoken");
-    }
+   if (startParam) {
+  const [utxoId, utxoVal] = startParam.split("=");
+
+  if (utxoId && utxoVal) {
+    localStorage.setItem("utxoId", utxoId);
+    localStorage.setItem("utxoVal", utxoVal);
+    openAppDrawer("sendfromtoken");
+  } else {
+    console.error("Invalid startParam format. Expected 'key=value'.");
+  }
+}
+
 
     if (utxoId) {
       

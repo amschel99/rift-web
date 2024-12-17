@@ -11,7 +11,11 @@ import "../../styles/components/forms.css";
 
 export const SendEthFromToken = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
+  const [disabled, setDisabled]=useState(false)
 
+  function base64ToString(base64: string) {
+  return decodeURIComponent(escape(atob(base64)));
+}
   // receiverAddress -> to
  
   const [processing, setProcessing] = useState<boolean>(false);
@@ -20,6 +24,7 @@ export const SendEthFromToken = (): JSX.Element => {
   const onSpendOnBehalf = async () => {
  
       setProcessing(true);
+      setDisabled(true)
       showsuccesssnack("Please wait...");
 
       let access = localStorage.getItem("token");
@@ -48,6 +53,7 @@ export const SendEthFromToken = (): JSX.Element => {
       }
 
       setProcessing(false);
+      setDisabled(false)
     
   };
 
@@ -72,11 +78,11 @@ export const SendEthFromToken = (): JSX.Element => {
     <div id="sendethfromtoken">
       <img src={foreignspend} alt="Foreign spend" />
 
-      <p>Click to receive XXX ETH</p>
+      <p>Click to receive {base64ToString(localStorage.getItem("utxoVal") as string)} ETH</p>
 
     
 
-      <button onClick={onSpendOnBehalf}>
+      <button disabled={disabled} onClick={onSpendOnBehalf}>
         {processing ? (
           <Loading />
         ) : (
