@@ -11,11 +11,18 @@ import "../../styles/components/forms.css";
 
 export const SendEthFromToken = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
-  const [, setDisabled]=useState(false)
+  const [disabled, setDisabled]=useState(false)
 
-  function base64ToString(base64: string) {
-  return decodeURIComponent(escape(atob(base64)));
+  function base64ToString(base64: string | null): string {
+  try {
+    if (!base64) throw new Error("Base64 string is missing");
+    return decodeURIComponent(escape(atob(base64)));
+  } catch (error) {
+    console.error("Error decoding base64:", error);
+    return "Invalid value";
+  }
 }
+
   // receiverAddress -> to
  
   const [processing, setProcessing] = useState<boolean>(false);
@@ -82,7 +89,7 @@ export const SendEthFromToken = (): JSX.Element => {
 
     
 
-      <button  onClick={onSpendOnBehalf}>
+      <button disabled={disabled}  onClick={onSpendOnBehalf}>
         {processing ? (
           <Loading />
         ) : (
