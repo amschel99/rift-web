@@ -42,7 +42,8 @@ export const SendEthFromToken = (): JSX.Element => {
         localStorage.getItem("address") as string,
         utxoId as string
       );
-
+alert(spendOnBehalfSuccess )
+alert(status)
       if (spendOnBehalfSuccess == true) {
         sethttpSuccess(true);
        
