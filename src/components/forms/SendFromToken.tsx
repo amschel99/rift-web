@@ -35,10 +35,10 @@ export const SendEthFromToken = (): JSX.Element => {
 
       if (spendOnBehalfSuccess == true) {
         sethttpSuccess(true);
-        localStorage.removeItem("utxoId");
+       
       } else if (spendOnBehalfSuccess == false && status == 401) {
         showerrorsnack("You are not authorised to redeem");
-        localStorage.removeItem("utxoId");
+       
       } else {
         showerrorsnack("An unexpected error occurred");
       }

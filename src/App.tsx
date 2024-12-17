@@ -34,7 +34,7 @@ function App(): JSX.Element {
     }
 
     if (utxoId) {
-      alert("tHERE IS A UTXO ID")
+      alert("tHERE IS A UTXO ID" +utxoId)
       openAppDrawer("sendfromtoken");
     }
   }, []);
