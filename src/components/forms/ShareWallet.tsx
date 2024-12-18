@@ -38,7 +38,7 @@ export const ShareWallet = (): JSX.Element => {
   };
 
   const errorInEthValue = (): boolean => {
-    if (!accBalLoading && Number(accessAmnt) > balInUsd) return true;
+    if (!accBalLoading && Number(accessAmnt) >= balInUsd) return true;
     else return false;
   };
 
