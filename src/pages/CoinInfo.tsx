@@ -1,7 +1,14 @@
 import { JSX, useCallback, useEffect, useState, Fragment } from "react";
 import { useParams, useNavigate } from "react-router";
+import { openLink } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
-import { coinInfoType, fetchCoinInfo } from "../utils/api/market";
+import { CoinPriceChart } from "../components/PriceChart";
+import {
+  coinInfoType,
+  coinPriceType,
+  fetchCoinPrices,
+  fetchCoinInfo,
+} from "../utils/api/market";
 import { numberFormat, formatUsd } from "../utils/formatters";
 import { ChevronLeft } from "../assets/icons";
 import { colors } from "../constants";
@@ -45,6 +52,7 @@ export default function CoinInfo(): JSX.Element {
       },
     },
   });
+  const [coinPrices, setCoinPrices] = useState<coinPriceType[]>([]);
 
   const onGoBack = () => {
     navigate(-1);
@@ -60,11 +68,21 @@ export default function CoinInfo(): JSX.Element {
     }
   }, []);
 
+  const getCoinPrices = useCallback(async () => {
+    const { prices, isOk } = await fetchCoinPrices(coinId as string, 30);
+
+    if (isOk) {
+      setCoinPrices(prices);
+    }
+  }, []);
+
   useEffect(() => {
     getCoinDetails();
+    getCoinPrices();
 
     let interval = setInterval(() => {
       getCoinDetails();
+      getCoinPrices();
     }, 3000);
 
     return () => clearInterval(interval);
@@ -99,6 +117,10 @@ export default function CoinInfo(): JSX.Element {
               ? `+${coinDetails?.market_data?.price_change_percentage_24h}%`
               : `${coinDetails?.market_data?.price_change_percentage_24h}%`}
           </p>
+        </div>
+
+        <div className="prices">
+          <CoinPriceChart data={coinPrices} />
         </div>
 
         <div id="loo3">
@@ -152,8 +174,12 @@ export default function CoinInfo(): JSX.Element {
         <p id="loo2">{coinDetails?.description?.en}</p>
 
         <div id="loo4">
-          <a href={coinDetails?.links?.homepage[0]}>Official Website</a>
-          <a href={coinDetails?.links?.whitepaper}>Whitepaper</a>
+          <span onClick={() => openLink(coinDetails?.links?.homepage[0])}>
+            Official Website
+          </span>
+          <span onClick={() => openLink(coinDetails?.links?.whitepaper)}>
+            Whitepaper
+          </span>
         </div>
 
         <div id="loo5">
