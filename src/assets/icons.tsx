@@ -135,6 +135,37 @@ export const ChevronLeft = ({
   );
 };
 
+export const ComingSoon = ({
+  color,
+  width,
+  height,
+}: iconprops): JSX.Element => {
+  return (
+    <svg
+      width={width ?? 20}
+      height={height ?? 22}
+      viewBox="0 0 20 22"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M18.5 12.5C18.5 14.7543 17.6045 16.9163 16.0104 18.5104C14.4163 20.1045 12.2543 21 10 21C7.74566 21 5.58365 20.1045 3.98959 18.5104C2.39553 16.9163 1.5 14.7543 1.5 12.5C1.5 10.2457 2.39553 8.08365 3.98959 6.48959C5.58365 4.89553 7.74566 4 10 4C12.2543 4 14.4163 4.89553 16.0104 6.48959C17.6045 8.08365 18.5 10.2457 18.5 12.5Z"
+        stroke={color ?? "black"}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 18C8.54131 18 7.14236 17.4205 6.11091 16.3891C5.07946 15.3576 4.5 13.9587 4.5 12.5C4.5 11.0413 5.07946 9.64236 6.11091 8.61091C7.14236 7.57946 8.54131 7 10 7M10 12.5L13 8M11.5 2.5C11.5 2.10218 11.342 1.72064 11.0607 1.43934C10.7794 1.15804 10.3978 1 10 1C9.60218 1 9.22064 1.15804 8.93934 1.43934C8.65804 1.72064 8.5 2.10218 8.5 2.5C8.5 2.89782 8.65804 3.27936 8.93934 3.56066C9.22064 3.84196 9.60218 4 10 4C10.3978 4 10.7794 3.84196 11.0607 3.56066C11.342 3.27936 11.5 2.89782 11.5 2.5Z"
+        stroke={color ?? "black"}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
 export const Database = ({ width, height, color }: iconprops): JSX.Element => {
   return (
     <svg
