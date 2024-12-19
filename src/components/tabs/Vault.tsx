@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, JSX } from "react";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
+import { useLaunchParams, backButton } from "@telegram-apps/sdk-react";
 import ReactPullToRefresh from "react-simple-pull-to-refresh";
 import { useSnackbar } from "../../hooks/snackbar";
 import { fetchMyKeys, keyType } from "../../utils/api/keys";
@@ -54,6 +54,20 @@ export const VaultTab = (): JSX.Element => {
 
   useEffect(() => {
     getMyKeys();
+  }, []);
+
+  useEffect(() => {
+    if (backButton.isSupported()) {
+      backButton.mount();
+    }
+
+    if (backButton.isVisible()) {
+      backButton.hide();
+    }
+
+    return () => {
+      backButton.unmount();
+    };
   }, []);
 
   return (

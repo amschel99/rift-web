@@ -5,6 +5,7 @@ import {
   mountClosingBehavior,
   enableClosingConfirmation,
   unmountClosingBehavior,
+  isSwipeBehaviorSupported,
   mountSwipeBehavior,
   disableVerticalSwipes,
   unmountSwipeBehavior,
@@ -53,7 +54,10 @@ function App(): JSX.Element {
 
   useEffect(() => {
     mountClosingBehavior();
-    mountSwipeBehavior();
+
+    if (isSwipeBehaviorSupported()) {
+      mountSwipeBehavior();
+    }
 
     enableClosingConfirmation();
     disableVerticalSwipes();

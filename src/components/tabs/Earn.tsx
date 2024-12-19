@@ -1,4 +1,6 @@
-import { JSX } from "react";
+import { JSX, useEffect } from "react";
+import { backButton } from "@telegram-apps/sdk-react";
+import { useTabs } from "../../hooks/tabs";
 import { CheckAlt, Stake, Lock, Share, Receive } from "../../assets/icons";
 import { colors } from "../../constants";
 import friendsduel from "../../assets/images/labs/friendsduel.png";
@@ -6,6 +8,23 @@ import telemarket from "../../assets/images/labs/telemarket.png";
 import "../../styles/components/tabs/earntab.css";
 
 export const EarnTab = (): JSX.Element => {
+  const { switchtab } = useTabs();
+
+  backButton.onClick(() => {
+    switchtab("vault");
+  });
+
+  useEffect(() => {
+    if (backButton.isSupported()) {
+      backButton.mount();
+      backButton.show();
+    }
+
+    return () => {
+      backButton.unmount();
+    };
+  }, []);
+
   return (
     <section id="earntab">
       <p className="title">Earn</p>
