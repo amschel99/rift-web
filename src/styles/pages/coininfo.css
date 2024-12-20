@@ -31,6 +31,10 @@
   padding: 0 1rem;
 }
 
+#aboutcoin #loo1 {
+  margin-top: 0.75rem;
+}
+
 #aboutcoin #loo1 .name_symbol {
   font-size: 1rem;
   font-weight: 400;
@@ -121,6 +125,7 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 1rem;
+  margin-bottom: 3rem;
 }
 
 #aboutcoin #loo5 span {
@@ -130,4 +135,28 @@
   font-weight: 500;
   background-color: var(--divider);
   color: var(--textsecondary);
+}
+
+#aboutcoin .buy_sell {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 1rem;
+  background-color: var(--primary);
+}
+
+#aboutcoin .buy_sell button {
+  width: 48%;
+  height: 2rem;
+  border: 0;
+  border-radius: 1rem;
+  outline: none;
+  outline-color: transparent;
+  color: var(--textprimary);
+  background-color: var(--danger);
 }
