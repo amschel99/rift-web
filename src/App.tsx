@@ -50,9 +50,10 @@ function App(): JSX.Element {
       }
     }
   else{
+
     //display the UI for calling airwallex api
     let value=data[0]
-    let [id, nonce]= value.split("_")
+    let [id, nonce]= value.split("_");
     alert(`The id and nonce are ${id} + ${nonce} `)
   }
   }
