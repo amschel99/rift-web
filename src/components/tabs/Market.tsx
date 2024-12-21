@@ -22,9 +22,11 @@ export const MarketTab = (): JSX.Element => {
     unitDisplay: "short",
   });
 
-  backButton.onClick(() => {
-    switchtab("vault");
-  });
+  if (backButton.isMounted()) {
+    backButton.onClick(() => {
+      switchtab("vault");
+    });
+  }
 
   const getCoins = useCallback(async () => {
     const { coins, isOk } = await fetchCoins();
@@ -91,8 +93,8 @@ export const MarketTab = (): JSX.Element => {
                 }}
               >
                 {_coin.price_change_percentage_24h > 0
-                  ? `+${_coin.price_change_percentage_24h}%`
-                  : `${_coin.price_change_percentage_24h}%`}
+                  ? `+${_coin.price_change_percentage_24h.toFixed(2)}%`
+                  : `${_coin.price_change_percentage_24h.toFixed(2)}%`}
               </em>
             </span>
           </div>

@@ -15,9 +15,11 @@ import "../../styles/components/tabs/security.css";
 export const SecurityTab = (): JSX.Element => {
   const { switchtab } = useTabs();
 
-  backButton.onClick(() => {
-    switchtab("vault");
-  });
+  if (backButton.isMounted()) {
+    backButton.onClick(() => {
+      switchtab("vault");
+    });
+  }
 
   useEffect(() => {
     if (backButton.isSupported()) {

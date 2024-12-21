@@ -59,7 +59,9 @@ export default function CoinInfo(): JSX.Element {
     navigate(-1);
   };
 
-  backButton.onClick(() => onGoBack());
+  if (backButton.isMounted()) {
+    backButton.onClick(() => onGoBack());
+  }
 
   const getCoinDetails = useCallback(async () => {
     const { coinInfo, isOK } = await fetchCoinInfo(coinId as string);
@@ -124,8 +126,12 @@ export default function CoinInfo(): JSX.Element {
             }}
           >
             {coinDetails?.market_data?.price_change_percentage_24h > 0
-              ? `+${coinDetails?.market_data?.price_change_percentage_24h}%`
-              : `${coinDetails?.market_data?.price_change_percentage_24h}%`}
+              ? `+${coinDetails?.market_data?.price_change_percentage_24h.toFixed(
+                  2
+                )}%`
+              : `${coinDetails?.market_data?.price_change_percentage_24h.toFixed(
+                  2
+                )}%`}
           </p>
         </div>
 

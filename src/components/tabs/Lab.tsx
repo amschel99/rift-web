@@ -12,9 +12,11 @@ import "../../styles/components/tabs/labstab.css";
 export const LabsTab = (): JSX.Element => {
   const { switchtab } = useTabs();
 
-  backButton.onClick(() => {
-    switchtab("vault");
-  });
+  if (backButton.isMounted()) {
+    backButton.onClick(() => {
+      switchtab("vault");
+    });
+  }
 
   useEffect(() => {
     if (backButton.isSupported()) {

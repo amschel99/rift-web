@@ -11,9 +11,11 @@ import "../../styles/components/tabs/earntab.css";
 export const EarnTab = (): JSX.Element => {
   const { switchtab } = useTabs();
 
-  backButton.onClick(() => {
-    switchtab("vault");
-  });
+  if (backButton.isMounted()) {
+    backButton.onClick(() => {
+      switchtab("vault");
+    });
+  }
 
   useEffect(() => {
     if (backButton.isSupported()) {
