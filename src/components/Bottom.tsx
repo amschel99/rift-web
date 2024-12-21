@@ -11,6 +11,8 @@ export const BottomTabNavigation = (): JSX.Element => {
     <div id="bottomtab">
       <button onClick={() => switchtab("vault")}>
         <Vault
+          width={20}
+          height={18}
           color={currTab == "vault" ? colors.accent : colors.textprimary}
         />
         <span
@@ -24,6 +26,8 @@ export const BottomTabNavigation = (): JSX.Element => {
 
       <button onClick={() => switchtab("market")}>
         <Market
+          width={20}
+          height={20}
           color={currTab == "market" ? colors.accent : colors.textprimary}
         />
         <span
@@ -36,7 +40,11 @@ export const BottomTabNavigation = (): JSX.Element => {
       </button>
 
       <button onClick={() => switchtab("labs")}>
-        <Labs color={currTab == "labs" ? colors.accent : colors.textprimary} />
+        <Labs
+          width={20}
+          height={20}
+          color={currTab == "labs" ? colors.accent : colors.textprimary}
+        />
         <span
           style={{
             color: currTab == "labs" ? colors.accent : colors.textprimary,

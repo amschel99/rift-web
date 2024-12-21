@@ -25,6 +25,7 @@ export const ShareWallet = (): JSX.Element => {
   const [ethValinUSd, setEthValinUSd] = useState<number>(0.0);
 
   const [accessAmnt, setAccessAmnt] = useState<string>("");
+  const [ethQty, setEthQty] = useState<string>("");
   const [time, setTime] = useState<number>(30);
   const [processing, setProcessing] = useState<boolean>(false);
 
@@ -39,7 +40,7 @@ export const ShareWallet = (): JSX.Element => {
   };
 
   const errorInUSDVal = (): boolean => {
-    if (!accBalLoading && Number(accessAmnt) >= balInUsd) return true;
+    if (Number(accessAmnt) >= balInUsd) return true;
     else return false;
   };
 
@@ -107,16 +108,46 @@ export const ShareWallet = (): JSX.Element => {
         {accBalLoading ? "- - -" : `${accBalance.toFixed(8)} ETH`}
       </p>
 
-      <p className="quantity">
-        <span>Quantity (ETH)</span> <br />
-        {accBalLoading
-          ? "- - -"
-          : (Number(accessAmnt) / ethValinUSd).toFixed(5)}
-      </p>
+      <TextField
+        value={accessAmnt == "" ? "" : ethQty}
+        onChange={(ev) => {
+          setEthQty(ev.target.value);
+          setAccessAmnt((Number(ev.target.value) * ethValinUSd).toFixed(2));
+        }}
+        onKeyUp={() => errorInUSDVal()}
+        error={errorInUSDVal()}
+        label="Quantity (ETH)"
+        placeholder="0.05"
+        fullWidth
+        variant="standard"
+        autoComplete="off"
+        type="number"
+        disabled={accBalLoading}
+        sx={{
+          "& .MuiInputBase-input": {
+            color: colors.textprimary,
+          },
+          "& .MuiInputLabel-root": {
+            color: colors.textsecondary,
+          },
+          "& .MuiInput-underline:before": {
+            borderBottomColor: colors.textsecondary,
+          },
+          "& .MuiInput-underline:hover:before": {
+            borderBottomColor: colors.textsecondary,
+          },
+          "& .MuiInput-underline:after": {
+            borderBottomColor: colors.accent,
+          },
+        }}
+      />
 
       <TextField
-        value={accessAmnt}
-        onChange={(ev) => setAccessAmnt(ev.target.value)}
+        value={ethQty == "" ? "" : accessAmnt}
+        onChange={(ev) => {
+          setAccessAmnt(ev.target.value);
+          setEthQty((Number(ev.target.value) / ethValinUSd).toFixed(5));
+        }}
         onKeyUp={() => errorInUSDVal()}
         error={errorInUSDVal()}
         label="Amount (USD)"
@@ -125,8 +156,9 @@ export const ShareWallet = (): JSX.Element => {
         variant="standard"
         autoComplete="off"
         type="number"
+        disabled={accBalLoading}
         sx={{
-          marginTop: "1rem",
+          marginTop: "0.75rem",
           "& .MuiInputBase-input": {
             color: colors.textprimary,
           },

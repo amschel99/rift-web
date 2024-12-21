@@ -1,7 +1,9 @@
 import { JSX, useCallback, useEffect, useState, Fragment } from "react";
 import { useParams, useNavigate } from "react-router";
 import { openLink } from "@telegram-apps/sdk-react";
+import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
+import { SnackBar } from "../components/global/SnackBar";
 import { CoinPriceChart } from "../components/PriceChart";
 import {
   coinInfoType,
@@ -10,7 +12,6 @@ import {
   fetchCoinInfo,
 } from "../utils/api/market";
 import { numberFormat, formatUsd } from "../utils/formatters";
-import { ChevronLeft } from "../assets/icons";
 import { colors } from "../constants";
 import "../styles/pages/coininfo.css";
 
@@ -58,6 +59,8 @@ export default function CoinInfo(): JSX.Element {
     navigate(-1);
   };
 
+  backButton.onClick(() => onGoBack());
+
   const getCoinDetails = useCallback(async () => {
     const { coinInfo, isOK } = await fetchCoinInfo(coinId as string);
 
@@ -88,12 +91,19 @@ export default function CoinInfo(): JSX.Element {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (backButton.isSupported()) {
+      backButton.mount();
+      backButton.show();
+    }
+
+    return () => {
+      backButton.unmount();
+    };
+  }, []);
+
   return (
     <section id="aboutcoin">
-      <button className="goback" onClick={onGoBack}>
-        <ChevronLeft color={colors.textprimary} />
-      </button>
-
       <Fragment>
         <div id="loo1">
           <p className="name_symbol">
@@ -188,6 +198,17 @@ export default function CoinInfo(): JSX.Element {
           ))}
         </div>
       </Fragment>
+
+      <div className="buy_sell">
+        <button onClick={() => showerrorsnack("Feature coming soon...")}>
+          Buy
+        </button>
+        <button onClick={() => showerrorsnack("Feature coming soon...")}>
+          Sell
+        </button>
+      </div>
+
+      <SnackBar />
     </section>
   );
 }

@@ -4,6 +4,8 @@ import { useTabs } from "../../hooks/tabs";
 import { colors } from "../../constants";
 import { ComingSoon } from "../../assets/icons";
 import friendsduel from "../../assets/images/labs/friendsduel.png";
+import stratocover from "../../assets/images/labs/stratocover.jpg";
+import mantracover from "../../assets/images/labs/mantracover.jpeg";
 import telemarket from "../../assets/images/labs/telemarket.png";
 import "../../styles/components/tabs/labstab.css";
 
@@ -31,26 +33,40 @@ export const LabsTab = (): JSX.Element => {
 
       <div className="projects">
         <div className="project">
-          <img src={friendsduel} alt="friendsduel" />
+          <img src={stratocover} alt="stratosphere" className="project_cover" />
+
+          <div className="project_logo">
+            <img src={friendsduel} alt="friendsduel" />
+          </div>
 
           <div className="about">
             <p>
-              FriendsDuel
+              StratosphereX
               <ComingSoon width={16} height={18} color={colors.textsecondary} />
             </p>
-            <span>Create groups, send & share crypto...</span>
+
+            <span>A DEX for interoperability trading.</span>
+
+            <p className="project_category">DEX</p>
           </div>
         </div>
 
         <div className="project">
-          <img src={telemarket} alt="friendsduel" />
+          <img src={mantracover} alt="stratosphere" className="project_cover" />
+
+          <div className="project_logo">
+            <img src={telemarket} alt="friendsduel" />
+          </div>
 
           <div className="about">
             <p>
-              Telemarket
+              Mantra Staking
               <ComingSoon width={16} height={18} color={colors.textsecondary} />
             </p>
-            <span>Modern crypto trading</span>
+
+            <span>Crypto staking for the modern world.</span>
+
+            <p className="project_category">Crypto Staking</p>
           </div>
         </div>
       </div>
