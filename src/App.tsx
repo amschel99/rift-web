@@ -37,7 +37,8 @@ function App(): JSX.Element {
     }
 
     if (startParam) {
-    let data=  startParam.split(";")
+      alert(startParam)
+    let data=  startParam.split("-")
     if(data.length==1){
       const [utxoId, utxoVal] = startParam.split("=");
 
@@ -51,7 +52,7 @@ function App(): JSX.Element {
   else{
     //display the UI for calling airwallex api
     let value=data[0]
-    let [id, nonce]= value.split("=")
+    let [id, nonce]= value.split("_")
     alert(`The id and nonce are ${id} + ${nonce} `)
   }
   }
