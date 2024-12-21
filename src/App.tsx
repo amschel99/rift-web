@@ -24,7 +24,7 @@ import { EarnTab } from "./components/tabs/Earn";
 function App(): JSX.Element {
   const { currTab } = useTabs();
   const { openAppDrawer } = useAppDrawer();
-  const { startParam } = useLaunchParams();
+  const { startParam, } = useLaunchParams();
 
   const navigate = useNavigate();
 
@@ -37,6 +37,8 @@ function App(): JSX.Element {
     }
 
     if (startParam) {
+    let data=  startParam.split(";")
+    if(data.length==1){
       const [utxoId, utxoVal] = startParam.split("=");
 
       openAppDrawer("sendfromtoken");
@@ -46,6 +48,13 @@ function App(): JSX.Element {
         localStorage.setItem("utxoVal", utxoVal);
       }
     }
+  else{
+    //display the UI for calling airwallex api
+    let value=data[0]
+    let [id, nonce]= value.split("=")
+    alert(`The id and nonce are ${id} + ${nonce} `)
+  }
+  }
   }, []);
 
   useEffect(() => {

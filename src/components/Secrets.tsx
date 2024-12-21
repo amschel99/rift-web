@@ -67,7 +67,7 @@ export const SharedSecrets = ({
 
           <div className="metadata">
             <p className="hash">Token</p>
-            <p className="value">{secret?.token}</p>
+            <p className="value">{secret?.url}</p>
           </div>
         </div>
       ))}

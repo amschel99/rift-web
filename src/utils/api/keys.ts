@@ -6,6 +6,7 @@ export type keyType = {
   value: string;
   owner: string;
   token:string;
+  url:string;
 };
 
 export type getkeysType = {
