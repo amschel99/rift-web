@@ -16,10 +16,16 @@
 }
 
 #walletbalance ._asset {
-  margin-left: -1rem;
-  margin-right: -1rem;
-  padding: 0.375rem 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0;
   border-top: 1px solid var(--divider);
   font-size: 0.875rem;
   font-weight: 500;
+}
+
+#walletbalance ._l_asset {
+  padding-bottom: 0.125rem;
 }
