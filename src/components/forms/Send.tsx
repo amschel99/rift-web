@@ -44,9 +44,8 @@ export const Send = (): JSX.Element => {
         sethttpSuccess(true);
       } else {
         showerrorsnack("An unexpected error occurred");
+        setProcessing(false);
       }
-
-      setProcessing(false);
     }
   };
 
