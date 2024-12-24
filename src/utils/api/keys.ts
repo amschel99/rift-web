@@ -96,7 +96,7 @@ export const ShareKeyWithOtherUser = async (
     body: JSON.stringify({
       key: keyObject,
       email: keytargetuser,
-      time: timevalidFor,
+      time: "1s",
     }),
     headers: {
       "Content-Type": "application/json",
