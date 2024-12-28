@@ -78,7 +78,7 @@ export const WalletBalance = ({
 
       <p className="balinusd">
         {accBalLoading ? (
-          <Skeleton variant="text" width="100%" animation="wave" />
+          <Skeleton variant="text" width="50%" animation="wave" />
         ) : (
           `${usdFormatter.format(
             btcAccBalanceUsd + amountInUsd + usdtAccBalance
