@@ -1,1 +1,1 @@
-Zkgoblin mode -ZKgm!!!! --------------------------------- mode
+Zkgoblin mode -ZKgm!!!! --------------------------------- modeee
