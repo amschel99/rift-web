@@ -8,8 +8,6 @@
 }
 
 .chatinput {
-  flex-direction: row;
-  align-items: center;
   justify-content: space-between;
   width: 96%;
   padding: 0.25rem;
@@ -24,7 +22,8 @@
 }
 
 .chatinput .promptinput {
-  width: 90%;
+  width: 100%;
+  min-height: 3.5rem;
   border-radius: 0.625rem;
   border: 0;
   outline: none;
