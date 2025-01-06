@@ -147,6 +147,7 @@ export const UseOpenAiKey = async (
 
   let res: Response = await fetch(URL, {
     method: "POST",
+    body: JSON.stringify({ nonce: nonce }),
     headers: {
       "Content-Type": "application/json",
     },
