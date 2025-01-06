@@ -32,14 +32,8 @@ export const WalletBalance = ({
   const [usdtAccBalance, setusdtAccBalance] = useState<number>(0);
   const [amountInUsd, setAmountInUsd] = useState<number>(0);
 
-  let shouldRefetchbalances = localStorage.getItem("shouldRefetchbalances");
-
   const getWalletBalance = useCallback(async () => {
-    if (
-      refreshing ||
-      shouldRefetchbalances == null ||
-      shouldRefetchbalances == "true"
-    ) {
+    if (refreshing) {
       setAccBalLoading(true);
 
       let access: string | null = localStorage.getItem("token");
@@ -93,7 +87,7 @@ export const WalletBalance = ({
 
   useEffect(() => {
     getWalletBalance();
-  }, [refreshing, shouldRefetchbalances]);
+  }, [refreshing]);
 
   return (
     <div id="walletbalance">
