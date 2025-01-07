@@ -36,9 +36,9 @@ function App(): JSX.Element {
     if (address == "" || address == null || token == "" || token == null) {
       navigate("/signup");
     }
-
+alert(`The start param is ${startParam}`)
     if (startParam) {
-      alert(startParam)
+   
       if(startParam.startsWith("ref")){
         //know that this is a refferal and split by -
         const [_ ,id]=startParam.split("-");
