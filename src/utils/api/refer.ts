@@ -45,6 +45,7 @@ export const earnFromReferral = async (code: string): Promise<string | void> => 
       throw new Error("Unauthorized. Please log in again.");
     } else if (response.status === 400) {
       const errorMessage = await response.text();
+      
       throw new Error(errorMessage); 
     } else {
       throw new Error("Failed to process referral earnings.");
