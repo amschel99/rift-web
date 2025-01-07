@@ -7,7 +7,7 @@ export const createReferralLink = async (): Promise<string | void> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, 
+        Authorization: `Bearer ${localStorage.getItem("token")}`, 
       },
     });
 
@@ -33,7 +33,7 @@ export const earnFromReferral = async (code: string): Promise<string | void> => 
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, 
+        Authorization: `Bearer ${localStorage.getItem("token")}`, 
       },
     });
 
