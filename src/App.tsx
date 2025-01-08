@@ -45,7 +45,9 @@ function App(): JSX.Element {
       if (startParam.startsWith("ref")) {
         // opened with referal link
         const [_, id] = startParam.split("-");
+
         localStorage.setItem("referalId", id);
+
         return;
       }
 
@@ -61,6 +63,8 @@ function App(): JSX.Element {
 
         return;
       }
+
+      return startParam?.replace("id", "");
     }
   };
 
