@@ -63,30 +63,40 @@ export const SendEthFromToken = (): JSX.Element => {
     );
 
     if (spendOnBehalfSuccess == true && status == 200) {
+      localStorage.removeItem("utxoId");
+
       sethttpSuccess(true);
       showsuccesssnack("Please wait for the transaction...");
     } else if ((spendOnBehalfSuccess == true && status) == 403) {
+      localStorage.removeItem("utxoId");
+
       showerrorsnack("This link has expired");
       closeAppDrawer();
       navigate("/");
     } else if (spendOnBehalfSuccess == true && status == 404) {
+      localStorage.removeItem("utxoId");
+
       showerrorsnack("This link has been used");
       closeAppDrawer();
       navigate("/");
     } else {
+      localStorage.removeItem("utxoId");
+
       showerrorsnack("An unexpected error occurred");
       closeAppDrawer();
     }
-
-    localStorage.removeItem("utxoId");
   };
 
   useEffect(() => {
     if (httpSuccess) {
       SOCKET.on("TXSent", () => {
+        localStorage.removeItem("utxoId");
+
         showsuccesssnack("Please hold on...");
       });
       SOCKET.on("TXConfirmed", () => {
+        localStorage.removeItem("utxoId");
+
         setProcessing(false);
         showsuccesssnack(
           `Successfully collected ${base64ToString(
@@ -94,7 +104,6 @@ export const SendEthFromToken = (): JSX.Element => {
           )} ETH`
         );
 
-        localStorage.removeItem("utxoVal");
         closeAppDrawer();
         navigate("/");
       });
