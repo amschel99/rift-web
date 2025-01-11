@@ -86,9 +86,13 @@
 
 #sharewalletaccess .timevalidlabel,
 #sharewalletaccess .valid_minutes,
-#sharewalletaccess .noexpiry p {
+#sharewalletaccess .noexpiry p,
+#authorise .timevalidlabel,
+#authorise .valid_minutes,
+#authorise .noexpiry p {
   width: 100%;
   margin-top: 0.75rem;
+  padding-left: unset;
   text-align: left;
   font-size: 0.875rem;
   font-weight: bold;
@@ -96,17 +100,21 @@
 }
 
 #sharewalletaccess .timevalidlabel span,
-#sharewalletaccess .noexpiry span {
+#sharewalletaccess .noexpiry span,
+#authorise .timevalidlabel span,
+#authorise .noexpiry span {
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--textsecondary);
 }
 
-#sharewalletaccess .valid_minutes {
+#sharewalletaccess .valid_minutes,
+#authorise .valid_minutes {
   font-weight: 300;
 }
 
-#sharewalletaccess .noexpiry {
+#sharewalletaccess .noexpiry,
+#authorise .noexpiry {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -114,7 +122,8 @@
   width: 100%;
 }
 
-#sharewalletaccess .noexpiry p {
+#sharewalletaccess .noexpiry p,
+#authorise .noexpiry p {
   width: 100%;
   margin: unset;
   padding: unset;
