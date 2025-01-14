@@ -19,7 +19,7 @@ export const WalletBalance = (): JSX.Element => {
   const [usdtAccBalance, setusdtAccBalance] = useState<number>(0);
   const [amountInUsd, setAmountInUsd] = useState<number>(0);
 
-  const refetchThreshold = 30 * 60 * 1000;
+  const refetchThreshold = 10 * 60 * 1000;
 
   const getWalletBalance = useCallback(async () => {
     setAccBalLoading(true);
@@ -50,9 +50,15 @@ export const WalletBalance = (): JSX.Element => {
 
   useEffect(() => {
     const now = Date.now();
+
+    const localethbal = localStorage.getItem("ethbal");
     const lastFetched = Number(localStorage.getItem("lastFetched") || 0);
 
-    if (now - lastFetched > refetchThreshold) {
+    if (
+      localethbal == null ||
+      typeof localethbal == undefined ||
+      now - lastFetched > refetchThreshold
+    ) {
       getWalletBalance();
       localStorage.setItem("lastFetched", String(now));
     }
