@@ -1,5 +1,5 @@
 import { JSX, useState } from "react";
-import { Send } from "../../assets/icons";
+import { SendChat } from "../../assets/icons";
 import { colors } from "../../constants";
 import "../../styles/components/chat/chatinput.css";
 
@@ -20,7 +20,7 @@ export const ChatInput = ({
         name="message"
         id="message"
         className="promptinput"
-        placeholder="message..."
+        placeholder="Ask me anything..."
         value={propmtValue}
         onChange={(e) => setPropmtValue(e.target.value)}
       />
@@ -33,10 +33,10 @@ export const ChatInput = ({
           onSubmitPrompt(propmtValue);
         }}
       >
-        <Send
-          width={20}
-          height={20}
-          color={promptLoading ? colors.textsecondary : colors.textprimary}
+        <SendChat
+          color={
+            propmtValue == "" || promptLoading ? colors.divider : colors.accent
+          }
         />
       </button>
     </div>

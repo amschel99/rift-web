@@ -8,29 +8,30 @@
 }
 
 .chatinput {
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  width: 96%;
-  padding: 0.25rem;
-  border: 1px solid var(--divider);
-  border-radius: 0.625rem;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem;
+  border-top: 1px solid var(--divider);
   position: fixed;
-  bottom: 0.25rem;
-  left: 50%;
-  right: 50%;
-  transform: translateX(-50%);
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: var(--primary);
 }
 
 .chatinput .promptinput {
-  width: 100%;
-  min-height: 3.5rem;
-  border-radius: 0.625rem;
+  width: 90%;
+  height: 100%;
   border: 0;
   outline: none;
   outline-color: transparent;
   resize: none;
   font-family: "Open Sans", sans-serif;
   font-size: 0.875rem;
+  font-weight: 600;
   color: var(--textprimary);
   background-color: transparent;
 }
@@ -49,9 +50,5 @@
   outline: none;
   outline-color: transparent;
   border-radius: 0.5rem;
-  background-color: var(--accent);
-}
-
-.chatinput .submitprompt:disabled {
-  background-color: var(--textsecondary);
+  background-color: transparent;
 }
