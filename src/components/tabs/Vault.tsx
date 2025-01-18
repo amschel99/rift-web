@@ -119,6 +119,8 @@ export const VaultTab = (): JSX.Element => {
         {secretsTab == "all" && mysecrets.length > 0 && (
           <MySecrets secretsLs={mykeys} />
         )}
+        {secretsTab == "all" && sharedsecrets.length > 0 && <br />}
+
         {secretsTab == "all" && sharedsecrets.length > 0 && (
           <SharedSecrets secretsLs={sharedsecrets} />
         )}

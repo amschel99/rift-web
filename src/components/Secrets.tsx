@@ -106,16 +106,14 @@ export const SharedSecrets = ({
             </span>
           </div>
 
-          <div className="metadata">
-            <span className="hash">
-              {secret.purpose == "OPENAI" ? "AI ChatBot" : "AirWallex"}
-              {secret.purpose == "OPENAI" ? (
-                <ChatBot color={colors.textprimary} />
-              ) : (
-                <NFT color={colors.textprimary} />
-              )}
-            </span>
-          </div>
+          <span className="hash">
+            {secret.purpose == "OPENAI" ? "ChatBot(GPT-4o)" : "AirWallex"}
+            {secret.purpose == "OPENAI" ? (
+              <ChatBot width={16} height={16} color={colors.textprimary} />
+            ) : (
+              <NFT width={10} height={17} color={colors.textprimary} />
+            )}
+          </span>
         </div>
       ))}
     </div>
