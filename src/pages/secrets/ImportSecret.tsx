@@ -88,32 +88,35 @@ export default function ImportSecret(): JSX.Element {
         label="Your Secret/Key"
         placeholder="Secret/key"
         fullWidth
-        variant="standard"
+        variant="outlined"
         autoComplete="off"
-        multiline
-        maxRows={6}
+        type="text"
         sx={{
-          marginTop: "1.25rem",
-          "& .MuiInputBase-input": {
-            color: colors.textprimary,
+          marginTop: "1rem",
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: colors.divider,
+            },
+            "& input": {
+              color: colors.textprimary,
+            },
+            "&::placeholder": {
+              color: colors.textsecondary,
+              opacity: 1,
+            },
           },
           "& .MuiInputLabel-root": {
             color: colors.textsecondary,
+            fontSize: "0.875rem",
           },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: colors.accent,
+          "& .MuiInputLabel-root.Mui-focused": {
+            color: colors.accent,
           },
         }}
       />
 
       <div className="keyutil">
-        <p>What will this secret be used for ?</p>
+        <p className="_secret_utils">What will this secret be used for ?</p>
 
         <div
           className="util"

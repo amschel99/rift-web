@@ -89,7 +89,7 @@ export default function ShareSecret(): JSX.Element {
   }, []);
 
   return (
-    <div id="authorise">
+    <div id="authorize">
       <img src={sharekey} alt="share key" />
 
       <p className="title">
@@ -103,25 +103,29 @@ export default function ShareSecret(): JSX.Element {
         label="Telegram Username"
         placeholder="telegram-username"
         fullWidth
-        variant="standard"
+        variant="outlined"
         autoComplete="off"
-        type="email"
+        type="text"
         sx={{
-          marginTop: "1.25rem",
-          "& .MuiInputBase-input": {
-            color: colors.textprimary,
+          marginTop: "1rem",
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: colors.divider,
+            },
+            "& input": {
+              color: colors.textprimary,
+            },
+            "&::placeholder": {
+              color: colors.textsecondary,
+              opacity: 1,
+            },
           },
           "& .MuiInputLabel-root": {
             color: colors.textsecondary,
+            fontSize: "0.875rem",
           },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: colors.accent,
+          "& .MuiInputLabel-root.Mui-focused": {
+            color: colors.accent,
           },
         }}
       />

@@ -1,12 +1,11 @@
-import { JSX, useEffect, useState } from "react";
+import { CSSProperties, JSX, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
+import { Popover } from "@mui/material";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Map, { Marker } from "react-map-gl";
 import { useAppDrawer } from "../../hooks/drawer";
-import { AppDrawer } from "../../components/global/AppDrawer";
-import { SnackBar } from "../../components/global/SnackBar";
-import { Node, TEE } from "../../assets/icons";
+import { Node, TEE, Filter } from "../../assets/icons";
 import { colors } from "../../constants";
 import nodetees from "../../components/tabs/security/nodestees.json";
 import "../../styles/pages/nodesteeselector.css";
@@ -19,17 +18,24 @@ export type locationType = {
   isAvailable: boolean;
   countryFlag: string;
 };
+type filtersType = "mynodes" | "allnodes" | "mytee" | "alltee";
 
 const MAPBOXKEY =
-  "pk.eyJ1IjoidGhmYWxhbiIsImEiOiJjbTVzYjlnZTIwa2JzMmpvaGZxajVkcGxkIn0.de7xmTPseu14twqLV7m4Rw";
+  "pk.eyJ1Ijoic3RjLXBrbXQiLCJhIjoiY202MmN0eTZ0MG5wazJsc2V3bWwwN2c5ZSJ9.4vlL7NMqmcOxjT6dgQOwjw";
 
 export default function NodesTeeSelector(): JSX.Element {
   const navigate = useNavigate();
   const { type } = useParams();
   const { openAppDrawer, drawerOpen } = useAppDrawer();
 
+  const [selectedFilter, setSelectedFilter] = useState<filtersType>("allnodes");
+
   const selectorLocations = Locations.filter((_loc) =>
-    type == "nodes" ? _loc?.isNode : !_loc?.isNode
+    type == "nodes" || selectedFilter == "allnodes"
+      ? _loc?.isNode
+      : selectedFilter == "alltee"
+      ? !_loc?.isNode
+      : !_loc?.isNode
   );
 
   const [viewState, setViewState] = useState({
@@ -39,6 +45,18 @@ export default function NodesTeeSelector(): JSX.Element {
     bearing: 0,
     pitch: 30,
   });
+  const [filtersEl, setFiltersEl] = useState<HTMLButtonElement | null>(null);
+
+  const filtersOpen = Boolean(filtersEl);
+  const filtersPopoVrId = filtersOpen ? "agency-popover" : undefined;
+
+  const openFilters = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFiltersEl(event.currentTarget);
+  };
+
+  const closeFilters = () => {
+    setFiltersEl(null);
+  };
 
   const goBack = () => {
     navigate(-1);
@@ -81,9 +99,131 @@ export default function NodesTeeSelector(): JSX.Element {
         onMove={(evt) => setViewState(evt.viewState)}
         mapboxAccessToken={MAPBOXKEY}
         initialViewState={{ fitBoundsOptions: { maxZoom: 6, minZoom: 4 } }}
-        mapStyle="mapbox://styles/mapbox/dark-v10"
+        mapStyle="mapbox://styles/stc-pkmt/cm5xmsgdf00c701qt7xhfcxzr"
         style={{ width: "100%", height: "100%", overflow: "hidden" }}
       >
+        <div className="filters">
+          <button className="filterbtn" onClick={openFilters}>
+            {selectedFilter == "allnodes"
+              ? "all nodes"
+              : selectedFilter == "mynodes"
+              ? "my nodes"
+              : selectedFilter == "mytee"
+              ? "my tEE"
+              : "all tEEs"}
+            <span className="icon">
+              <Filter width={14} height={8} color={colors.textprimary} />
+            </span>
+          </button>
+          <Popover
+            id={filtersPopoVrId}
+            open={filtersOpen}
+            anchorEl={filtersEl}
+            onClose={closeFilters}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            elevation={0}
+            slotProps={{
+              paper: { style: popOverStyles },
+            }}
+          >
+            <p className="selectortitle">Nodes</p>
+
+            <button
+              className="filterctr"
+              onClick={() => {
+                setSelectedFilter("mynodes");
+                closeFilters();
+              }}
+            >
+              <span className="radioctr">
+                <span
+                  style={{
+                    backgroundColor:
+                      selectedFilter == "mynodes"
+                        ? colors.accent
+                        : colors.divider,
+                  }}
+                />
+              </span>
+              <p>
+                My Nodes
+                <span>Nodes your'e currently using</span>
+              </p>
+            </button>
+
+            <button
+              className="filterctr"
+              onClick={() => {
+                setSelectedFilter("allnodes");
+                closeFilters();
+              }}
+            >
+              <span className="radioctr">
+                <span
+                  style={{
+                    backgroundColor:
+                      selectedFilter == "allnodes"
+                        ? colors.accent
+                        : colors.divider,
+                  }}
+                />
+              </span>
+              <p>
+                All Nodes
+                <span>All Nodes</span>
+              </p>
+            </button>
+
+            <p className="selectortitle">TEEs</p>
+
+            <button
+              className="filterctr"
+              onClick={() => {
+                setSelectedFilter("mytee");
+                closeFilters();
+              }}
+            >
+              <span className="radioctr">
+                <span
+                  style={{
+                    backgroundColor:
+                      selectedFilter == "mytee"
+                        ? colors.accent
+                        : colors.divider,
+                  }}
+                />
+              </span>
+              <p>
+                My TEE
+                <span>TEE your'e currently using</span>
+              </p>
+            </button>
+
+            <button
+              className="filterctr"
+              onClick={() => {
+                setSelectedFilter("alltee");
+                closeFilters();
+              }}
+            >
+              <span className="radioctr">
+                <span
+                  style={{
+                    backgroundColor:
+                      selectedFilter == "alltee"
+                        ? colors.accent
+                        : colors.divider,
+                  }}
+                />
+              </span>
+              <p>
+                All TEEs
+                <span>All Trusted Execution Environments</span>
+              </p>
+            </button>
+          </Popover>
+        </div>
+
         {selectorLocations.map((loc, idx) => (
           <Marker
             key={loc?.id}
@@ -121,9 +261,6 @@ export default function NodesTeeSelector(): JSX.Element {
           </Marker>
         ))}
       </Map>
-
-      <AppDrawer />
-      <SnackBar />
     </section>
   );
 }
@@ -194,3 +331,80 @@ const Locations: locationType[] = [
     countryFlag: "🇯🇵",
   }, // tokyo 2
 ];
+
+// const otherLocations: locationType[] = [
+//   {
+//     id: 1,
+//     latitude: 22.396427,
+//     longitude: 114.109497,
+//     isNode: false,
+//     isAvailable: true,
+//     countryFlag: "🇭🇰",
+//   }, // hong kong
+//   {
+//     id: 12,
+//     latitude: 22.3419101,
+//     longitude: 114.1697932,
+//     isNode: true,
+//     isAvailable: true,
+//     countryFlag: "🇭🇰",
+//   }, // hong kong 2
+//   {
+//     id: 2,
+//     latitude: 1.352083,
+//     longitude: 103.819839,
+//     isNode: true,
+//     isAvailable: true,
+//     countryFlag: "🇸🇬",
+//   }, // singapore
+//   {
+//     id: 22,
+//     latitude: 1.3660403,
+//     longitude: 103.8503053,
+//     isNode: false,
+//     isAvailable: true,
+//     countryFlag: "🇸🇬",
+//   }, // singapore 2
+//   {
+//     id: 3,
+//     latitude: 23.697809,
+//     longitude: 120.960518,
+//     isNode: false,
+//     isAvailable: true,
+//     countryFlag: "🇹🇼",
+//   }, // taiwan
+//   {
+//     id: 32,
+//     latitude: 23.9921626,
+//     longitude: 120.2983413,
+//     isNode: false,
+//     isAvailable: true,
+//     countryFlag: "🇹🇼",
+//   }, // taiwan 2
+//   {
+//     id: 4,
+//     latitude: 35.689487,
+//     longitude: 139.691711,
+//     isNode: true,
+//     isAvailable: true,
+//     countryFlag: "🇯🇵",
+//   }, // tokyo
+//   {
+//     id: 42,
+//     latitude: 34.6777117,
+//     longitude: 135.4036361,
+//     isNode: true,
+//     isAvailable: true,
+//     countryFlag: "🇯🇵",
+//   }, // tokyo 2
+// ];
+
+const popOverStyles: CSSProperties = {
+  width: "13.375rem",
+  height: "13.375rem",
+  padding: "0.375rem",
+  marginTop: 6,
+  border: `1px solid ${colors.divider}`,
+  borderRadius: "0.5rem",
+  backgroundColor: colors.primary,
+};
