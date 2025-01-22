@@ -128,7 +128,7 @@ export default function SendEthLink(): JSX.Element {
         autoComplete="off"
         type="number"
         sx={{
-          marginTop: "1.25rem",
+          marginTop: "0.375rem",
           "& .MuiInputBase-input": {
             color: colors.textprimary,
           },
