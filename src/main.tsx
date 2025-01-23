@@ -32,6 +32,9 @@ import { AppDrawer } from "./components/global/AppDrawer.tsx";
 import { SnackBar } from "./components/global/SnackBar.tsx";
 import "./styles/constants.css";
 import "./styles/index.css";
+import Premiums from "./pages/Premiums.tsx";
+import TransferLinkPage from "./pages/PaymentRequest.tsx";
+import PaymentRequestPage from "./pages/PaymentRequest.tsx";
 
 eruda.init();
 init();
@@ -73,6 +76,8 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/refer" element={<Referral />} />
                 <Route path="/lend" element={<LendToSpend />} />
                 <Route path="/lend/new" element={<CreateLendToSpend />} />
+                <Route path="/premiums" element={<Premiums />} />
+                <Route path="/payment-request" element={<PaymentRequestPage />} />
               </Routes>
 
               <SnackBar />

@@ -19,7 +19,12 @@ export const Profile = (): JSX.Element => {
   const onRefer = () => {
     navigate("/refer");
   };
-
+const getPremiums=()=>{
+  navigate('/premiums')
+}
+const paymentRequest=()=>{
+  navigate('/payment-request')
+}
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();
@@ -74,6 +79,23 @@ export const Profile = (): JSX.Element => {
         <p>
           Account Recovery
           <span>Setup a recovery method for your account</span>
+        </p>
+      </div>
+      <div className="earn l_earn" onClick={paymentRequest}>
+        <img src={accRecovery} alt="paymentRequest" />
+
+        <p>
+        Transfer Page
+          <span>get payed by transfer</span>
+        </p>
+      </div>
+
+      <div className="earn l_earn" onClick={getPremiums}>
+        <img src={accRecovery} alt="premium" />
+
+        <p>
+        subscribe to Premiums 
+          <span>Subricribe to our Telegram premium features and do the transaction within our app. </span>
         </p>
       </div>
     </div>
