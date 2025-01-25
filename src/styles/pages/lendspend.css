@@ -51,8 +51,13 @@
 
 #lendtospend .newlendctr {
   position: fixed;
-  bottom: 1.5rem;
+  bottom: 1rem;
   right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 #lendtospend .newlend {
@@ -62,12 +67,12 @@
   justify-content: center;
   width: 2.875rem;
   height: 2.875rem;
-  margin-top: 0.75rem;
   border: 0;
   outline: none;
   outline-color: transparent;
   border-radius: 0.875rem;
   background-color: var(--danger);
+  z-index: 1000;
 }
 
 #lendtospend #assets {

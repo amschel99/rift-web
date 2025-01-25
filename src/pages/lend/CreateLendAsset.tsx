@@ -3,7 +3,7 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { TextField } from "@mui/material";
 import { PopOver } from "../../components/global/PopOver";
-import { formatUsd } from "../../utils/formatters";
+import { formatNumber, formatUsd } from "../../utils/formatters";
 import { ChevronLeft, Stake } from "../../assets/icons";
 import { colors } from "../../constants";
 import btclogo from "../../assets/images/btc.png";
@@ -171,7 +171,11 @@ export default function CreateLendAsset(): JSX.Element {
       <div className="balances">
         <p className="tle">Balance</p>
         <p className="cryptobal">
-          {assetType == "BTC" ? btcbal : assetType == "ETH" ? ethbal : usdcbal}
+          {assetType == "BTC"
+            ? formatNumber(Number(btcbal))
+            : assetType == "ETH"
+            ? formatNumber(Number(ethbal))
+            : formatNumber(Number(usdcbal))}
           &nbsp;
           {assetType}&nbsp;&gt;&nbsp;
           <span className="fiatbal">

@@ -32,7 +32,7 @@ export const ErrorOutput = (): JSX.Element => {
     <div className="outputs errroutput">
       <Error width="6rem" height="6rem" />
       <p>{dialogMessage}</p>
-      <button onClick={() => closeAppDialog()}>Close</button>
+      <button onClick={() => closeAppDialog()}>Ok, Close</button>
     </div>
   );
 };

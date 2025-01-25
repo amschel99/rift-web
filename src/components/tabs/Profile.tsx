@@ -53,7 +53,7 @@ export const Profile = (): JSX.Element => {
             Hi, {initData?.user?.username} 👋
           </p>
           <p className="uid">
-            ID:{ethAddr?.substring(2, 6)}
+            ID ~ {ethAddr?.substring(2, 6)}
             {btcAddr?.substring(2, 6)}
           </p>
         </div>

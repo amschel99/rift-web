@@ -44,4 +44,5 @@ const popOverStyles: CSSProperties = {
   border: `1px solid ${colors.divider}`,
   borderRadius: "0.5rem",
   backgroundColor: colors.primary,
+  zIndex: 10000,
 };

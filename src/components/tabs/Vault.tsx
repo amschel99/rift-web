@@ -122,7 +122,10 @@ export const VaultTab = (): JSX.Element => {
         {secretsTab == "all" && sharedsecrets.length > 0 && <br />}
 
         {secretsTab == "all" && sharedsecrets.length > 0 && (
-          <SharedSecrets secretsLs={sharedsecrets} />
+          <SharedSecrets
+            sx={{ marginTop: "-0.75rem" }}
+            secretsLs={sharedsecrets}
+          />
         )}
 
         {secretsTab == "me" &&

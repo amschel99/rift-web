@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { CSSProperties, JSX } from "react";
 import { useNavigate } from "react-router";
 import { useAppDrawer } from "../hooks/drawer";
 import { useAppDialog } from "../hooks/dialog";
@@ -49,8 +49,10 @@ export const MySecrets = ({
 
 export const SharedSecrets = ({
   secretsLs,
+  sx,
 }: {
   secretsLs: keyType[];
+  sx?: CSSProperties;
 }): JSX.Element => {
   const navigate = useNavigate();
   const { openAppDrawerWithUrl } = useAppDrawer();
@@ -78,13 +80,13 @@ export const SharedSecrets = ({
     } else {
       openAppDialog(
         "failure",
-        "Failed to prepare chat. The shared secret may have expired. Please try again..."
+        "The secret you are trying to use may have expired. Please try again."
       );
     }
   };
 
   return (
-    <div id="sharedsecrets">
+    <div style={sx} id="sharedsecrets">
       {secretsLs.map((secret, idx) => (
         <div
           className="_sharedsecret"

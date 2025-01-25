@@ -245,4 +245,5 @@
   border-radius: 0.25rem;
   color: var(--textprimary);
   background-color: var(--danger);
+  z-index: 1;
 }

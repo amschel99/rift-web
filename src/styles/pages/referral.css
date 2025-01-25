@@ -10,8 +10,8 @@
   gap: 0.25rem;
   width: 100%;
   padding: 1rem 0.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--divider);
+  border: 1px solid var(--divider);
+  border-radius: 1rem;
 }
 
 #referral .l1 img {
@@ -23,13 +23,15 @@
 
 #referral .l1 .title {
   text-align: center;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: bold;
 }
 
 #referral .l1 .desc {
   padding: 0 3.75rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  color: var(--textsecondary);
 }
 
 #referral .earns {

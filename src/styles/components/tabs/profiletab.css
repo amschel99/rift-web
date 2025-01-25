@@ -15,11 +15,8 @@
 
 .profiletab .pic_uname .uid {
   margin-top: 0.25rem;
-  padding: 0.125rem;
-  border-radius: 1rem;
   font-size: 0.75rem;
-  font-weight: 500;
-  background-color: var(--divider);
+  font-weight: bold;
 }
 
 .profiletab .earn {
@@ -45,11 +42,12 @@
   align-items: flex-start;
   justify-content: flex-start;
   gap: 0.125rem;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 
 .profiletab .earn span {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 300;
   color: var(--textsecondary);
 }
