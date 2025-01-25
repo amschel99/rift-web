@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { Skeleton } from "@mui/material";
 import { walletBalance, uSdTBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
-import { formatUsd } from "../utils/formatters";
+import { formatUsd, formatNumber } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
 import usdclogo from "../assets/images/labs/usdc.png";
@@ -19,7 +19,22 @@ export const WalletBalance = (): JSX.Element => {
   const [usdtAccBalance, setusdtAccBalance] = useState<number>(0);
   const [amountInUsd, setAmountInUsd] = useState<number>(0);
 
-  const refetchThreshold = 3 * 60 * 1000;
+  const initialfetch = localStorage.getItem("initialfetch");
+
+  const btcbal: number =
+    btcAccBalance == 0 ? Number(localStorage.getItem("btcbal")) : btcAccBalance;
+  const ethbal: number =
+    accBalance == 0 ? Number(localStorage.getItem("ethbal")) : accBalance;
+  const usdcbal: number =
+    usdtAccBalance == 0
+      ? Number(localStorage.getItem("usdtbal"))
+      : usdtAccBalance;
+  const btcbalUsd: number =
+    btcAccBalanceUsd == 0
+      ? Number(localStorage.getItem("btcbalUsd"))
+      : btcAccBalanceUsd;
+  const ethbalUsd: number =
+    amountInUsd == 0 ? Number(localStorage.getItem("ethbalUsd")) : amountInUsd;
 
   const getWalletBalance = useCallback(async () => {
     setAccBalLoading(true);
@@ -44,36 +59,13 @@ export const WalletBalance = (): JSX.Element => {
     localStorage.setItem("ethbalUsd", String(ethInUSD));
     localStorage.setItem("usdtbal", data?.balance);
     localStorage.setItem("ethvalue", String(ethValue));
+    localStorage.setItem("initialfetch", "false");
 
     setAccBalLoading(false);
   }, []);
 
   useEffect(() => {
-    const now = Date.now();
-
-    const localethbal = localStorage.getItem("ethbal");
-    const lastFetched = Number(localStorage.getItem("lastFetched") || 0);
-
-    if (
-      localethbal == null ||
-      typeof localethbal == undefined ||
-      now - lastFetched > refetchThreshold
-    ) {
-      getWalletBalance();
-      localStorage.setItem("lastFetched", String(now));
-    } else {
-      const btcbal = localStorage.getItem("btcbal");
-      const ethbal = localStorage.getItem("ethbal");
-      const usdcbal = localStorage.getItem("usdtbal");
-      const btcbalUsd = localStorage.getItem("btcbalUsd");
-      const ethbalUsd = localStorage.getItem("ethbalUsd");
-
-      setBtcAccAccBalance(Number(btcbal));
-      setBtcAccAccBalanceUsd(Number(btcbalUsd));
-      setAccBalance(Number(ethbal));
-      setAmountInUsd(Number(ethbalUsd));
-      setusdtAccBalance(Number(usdcbal));
-    }
+    getWalletBalance();
   }, []);
 
   return (
@@ -81,7 +73,7 @@ export const WalletBalance = (): JSX.Element => {
       <p className="bal">Wallet Balance</p>
 
       <p className="balinusd">
-        {accBalLoading ? (
+        {accBalLoading && initialfetch == null ? (
           <Skeleton
             variant="text"
             width="50%"
@@ -89,11 +81,11 @@ export const WalletBalance = (): JSX.Element => {
             animation="wave"
           />
         ) : (
-          `${formatUsd(btcAccBalanceUsd + amountInUsd + usdtAccBalance)}`
+          `${formatUsd(btcbalUsd + ethbalUsd + usdcbal)}`
         )}
       </p>
 
-      {accBalLoading ? (
+      {accBalLoading && initialfetch == null ? (
         <>
           <Skeleton
             variant="text"
@@ -127,11 +119,9 @@ export const WalletBalance = (): JSX.Element => {
             </div>
 
             <p className="balance">
-              <span>{btcAccBalance}</span>
+              <span>{formatNumber(btcbal)}</span>
 
-              <span className="fiat">
-                {formatUsd(Number(localStorage.getItem("btcbalUsd")))}
-              </span>
+              <span className="fiat">{formatUsd(btcbalUsd)}</span>
             </p>
           </div>
 
@@ -146,11 +136,9 @@ export const WalletBalance = (): JSX.Element => {
             </div>
 
             <p className="balance">
-              <span>{accBalance}</span>
+              <span>{formatNumber(ethbal)}</span>
 
-              <span className="fiat">
-                {formatUsd(Number(localStorage.getItem("ethbalUsd")))}
-              </span>
+              <span className="fiat">{formatUsd(ethbalUsd)}</span>
             </p>
           </div>
 
@@ -165,11 +153,9 @@ export const WalletBalance = (): JSX.Element => {
             </div>
 
             <p className="balance">
-              <span>{usdtAccBalance}</span>
+              <span>{formatNumber(usdcbal)}</span>
 
-              <span className="fiat">
-                {formatUsd(Number(localStorage.getItem("usdtbal")))}
-              </span>
+              <span className="fiat">{formatUsd(usdcbal)}</span>
             </p>
           </div>
         </>

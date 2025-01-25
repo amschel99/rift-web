@@ -85,6 +85,8 @@ export const SendEthFromToken = (): JSX.Element => {
       showerrorsnack("An unexpected error occurred");
       closeAppDrawer();
     }
+
+    localStorage.removeItem("utxoId");
   };
 
   useEffect(() => {
