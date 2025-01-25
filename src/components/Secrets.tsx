@@ -56,10 +56,10 @@ export const SharedSecrets = ({
   const { openAppDrawerWithUrl } = useAppDrawer();
   const { openAppDialog, closeAppDialog } = useAppDialog();
 
-  const decodeChatSecretUrl = async (secretUrl: string) => {
+  const decodeChatSecretUrl = async (linkUrl: string) => {
     openAppDialog("loading", "Preparing your chat...");
 
-    const parsedUrl = new URL(secretUrl as string);
+    const parsedUrl = new URL(linkUrl as string);
     const params = parsedUrl.searchParams;
     const scrtId = params.get("id");
     const scrtNonce = params.get("nonce");
