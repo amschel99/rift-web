@@ -101,6 +101,7 @@ function App(): JSX.Element {
           sliderIconColor="#eee"
           background_color="#242d39"
           autoWidth
+          textColor="#eee"
           circle
         />
       </div>
