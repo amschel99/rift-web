@@ -17,7 +17,9 @@ import { SecurityTab } from "./components/tabs/Security";
 import { LabsTab } from "./components/tabs/Lab";
 import { EarnTab } from "./components/tabs/Earn";
 import { Profile } from "./components/tabs/Profile";
+import toast, { Toaster } from "react-hot-toast";
 import "../src/index.css";
+import { SwipeableButton } from "react-swipeable-button";
 
 function App(): JSX.Element {
   const navigate = useNavigate();
@@ -62,6 +64,11 @@ function App(): JSX.Element {
     };
   });
 
+  function onSuccess() {
+    navigate("/b2b-suite");
+    toast.success("Switched to Sphere Business");
+  }
+
   return (
     <section>
       {currTab == "home" ? (
@@ -86,14 +93,19 @@ function App(): JSX.Element {
         </Fragment>
       )}
 
-      <Link
-        className="bg-slate-500 text-white rounded-xl p-2 absolute bottom-20"
-        to={"/b2b-suite"}
-      >
-        Business
-      </Link>
-
+      <div className="w-full px-4 items-center flex-col justify-center absolute bottom-20">
+        <SwipeableButton
+          onSuccess={onSuccess}
+          text="Switch to Sphere Business"
+          text_unlocked="Sphere For Businesses"
+          sliderIconColor="#eee"
+          background_color="#242d39"
+          autoWidth
+          circle
+        />
+      </div>
       <BottomTabNavigation />
+      <Toaster />
     </section>
   );
 }
