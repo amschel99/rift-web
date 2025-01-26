@@ -1,5 +1,5 @@
 import { JSX, Fragment, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   mountClosingBehavior,
   enableClosingConfirmation,
@@ -85,6 +85,13 @@ function App(): JSX.Element {
           <Profile />
         </Fragment>
       )}
+
+      <Link
+        className="bg-slate-500 text-white rounded-xl p-2 absolute bottom-20"
+        to={"/b2b-suite"}
+      >
+        Business
+      </Link>
 
       <BottomTabNavigation />
     </section>

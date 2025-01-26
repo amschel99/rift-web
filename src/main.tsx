@@ -34,6 +34,7 @@ import { SnackBar } from "./components/global/SnackBar.tsx";
 import "./styles/constants.css";
 import "./styles/index.css";
 import "./index.css";
+import BusinessSuite from "./pages/b2b/BusinessSuite.tsx";
 
 eruda.init();
 init();
@@ -76,6 +77,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/lend" element={<LendToUse />} />
                 <Route path="/lend/asset" element={<CreateLendAsset />} />
                 <Route path="/lend/secret" element={<CreateLendSecret />} />
+                <Route path="/b2b-suite" element={<BusinessSuite />} />
               </Routes>
 
               <SnackBar />
