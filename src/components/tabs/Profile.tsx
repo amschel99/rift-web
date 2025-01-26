@@ -22,8 +22,11 @@ export const Profile = (): JSX.Element => {
 const getPremiums=()=>{
   navigate('/premiums')
 }
+const DepositRequest=()=>{
+  navigate('/deposit/onlink')
+}
 const paymentRequest=()=>{
-  navigate('/payment-request')
+  navigate('/share-deposit')
 }
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -86,6 +89,14 @@ const paymentRequest=()=>{
 
         <p>
        Payment Request 
+          <span>get paid for your work</span>
+        </p>
+      </div>
+      <div className="earn l_earn" onClick={DepositRequest}>
+        <img src={accRecovery} alt="paymentRequest" />
+
+        <p>
+     Deposit Request
           <span>get paid for your work</span>
         </p>
       </div>

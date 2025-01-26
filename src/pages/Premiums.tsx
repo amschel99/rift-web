@@ -1,193 +1,222 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { 
-    Bell, Star, Zap, Rocket,  Shield, 
-    Globe, 
-    MessageCircle, ChartLine, Cloud 
-  } from 'lucide-react';
-  
-import '../styles/pages/premiums.css'
-
+  // CreditCard, 
+  ShieldCheck, 
+  // Globe, 
+  // DollarSign, 
+  Zap, 
+  Lock, 
+  ChevronsDown, 
+  Bitcoin 
+} from 'lucide-react';
+import '../styles/pages/premiums.css';
+import { backButton } from '@telegram-apps/sdk-react';
+import { useTabs } from '../hooks/tabs';
+import { useNavigate } from "react-router";
 const colors = {
-  primary: "#242d39",
-  textPrimary: "rgba(248, 250, 252, 1)",
-  textSecondary: "rgba(127, 127, 127, 1)",
-  accent: "#496BCC",
-  danger: "rgb(255, 82, 82)",
-  success: "#0FB14D",
-  divider: "rgba(248, 250, 252, 0.05)"
+  primary: '#0a1128',
+  secondary: '#001f3f',
+  accent:' rgb(73, 107, 204)',
+  textPrimary: '#e6f2ff',
+  textSecondary: '#8cb3d9',
+  
 };
 
-interface PremiumItem {
+interface PremiumFeature {
   id: number;
   title: string;
-  description: string;
+  description: string[];
   price: number;
   icon: React.ElementType;
-  type: 'telegram' | 'stratosphere';
+  benefits: string[];
 }
 
+const telegramPremiumFeatures: PremiumFeature[] = [
+  {
+    id: 1,
+    title: 'Crypto Telegram Premium',
+    description: [
+      'First-ever Telegram Premium subscription via crypto',
+      'Seamless integration with Stratosphere wallet'
+    ],
+    price: 2.41,
+    icon: Bitcoin,
+    benefits: [
+      'Pay with wallet assets',
+      '50% revenue share',
+      'Flexible crypto payment',
+      'No fiat required'
+    ]
+  }
+];
 
-  const premiumItems: PremiumItem[] = [
-    // Telegram Premium Options
-    { 
-      id: 1, 
-      title: 'Telegram Premium', 
-      description: 'Exclusive features & no ads', 
-      price: 5.99, 
-      icon: Bell,
-      type: 'telegram'
-    },
-    { 
-      id: 2, 
-      title: 'Advanced Messaging', 
-      description: '4x larger file uploads', 
-      price: 3.99, 
-      icon: Zap,
-      type: 'telegram'
-    },
-    { 
-      id: 3, 
-      title: 'Chat Privacy', 
-      description: 'Advanced encryption & hidden status', 
-      price: 4.49, 
-      icon: Shield,
-      type: 'telegram'
-    },
-    { 
-      id: 4, 
-      title: 'Voice Boost', 
-      description: 'Enhanced voice message features', 
-      price: 2.99, 
-      icon: MessageCircle,
-      type: 'telegram'
-    },
-    { 
-      id: 5, 
-      title: 'Global Translator', 
-      description: 'Real-time message translation', 
-      price: 6.49, 
-      icon: Globe,
-      type: 'telegram'
-    },
+const stratospherePremiumFeatures: PremiumFeature[] = [
+  {
+    id: 2,
+    title: 'Advanced Recovery',
+    description: [
+      'Secure account recovery mechanism',
+      'Multiple verification layers'
+    ],
+    price: 2.99,
+    icon: ShieldCheck,
+    benefits: [
+      'Multi-factor authentication',
+      'Encrypted recovery paths',
+      'Instant account restoration',
+      'Secure key management'
+    ]
+  },
+  {
+    id: 3,
+    title: 'Key Management Pro',
+    description: [
+      'Next-level private key security',
+      'Advanced wallet management'
+    ],
+    price: 1.99,
+    icon: Lock,
+    benefits: [
+      'Secure key storage',
+      'Encrypted backups',
+      'Multi-device sync',
+      'Instant key rotation'
+    ]
+  },
+  {
+    id: 4,
+    title: 'Airdrop Maximizer',
+    description: [
+      'Exclusive cryptocurrency airdrop access',
+      'Early token allocation opportunities'
+    ],
+    price: 2.99,
+    icon: Zap,
+    benefits: [
+      'Priority airdrop alerts',
+      'Automatic participation',
+      'Detailed token insights',
+      'Reduced gas fees'
+    ]
+  }
+];
+
+const PremiumFeaturesPage: React.FC = () => {
+  const [selectedTab, setSelectedTab] = useState<'telegram' | 'stratosphere'>('telegram');
+
+
+  const { switchtab } = useTabs();
+  const navigate = useNavigate();
+  const goBack = () => {
+      switchtab("profile");
+      navigate(-1);
+    };
+    useEffect(() => {
+      if (backButton.isSupported()) {
+        backButton.mount();
+        backButton.show();
+      }
   
-    // Stratosphere Premium Options
-    { 
-      id: 6, 
-      title: 'Stratosphere Pro', 
-      description: 'Enhanced wallet features', 
-      price: 9.99, 
-      icon: Star,
-      type: 'stratosphere'
-    },
-    { 
-      id: 7, 
-      title: 'Crypto Insights', 
-      description: 'Real-time market analysis', 
-      price: 14.99, 
-      icon: Rocket,
-      type: 'stratosphere'
-    },
-    { 
-      id: 8, 
-      title: 'Portfolio Guardian', 
-      description: 'Advanced risk management', 
-      price: 19.99, 
-      icon: Shield,
-      type: 'stratosphere'
-    },
-    { 
-      id: 9, 
-      title: 'Trading Signals', 
-      description: 'AI-powered trading recommendations', 
-      price: 24.99, 
-      icon: ChartLine,
-      type: 'stratosphere'
-    },
-    { 
-      id: 10, 
-      title: 'Cloud Backup', 
-      description: 'Secure wallet & asset backup', 
-      price: 7.99, 
-      icon: Cloud,
-      type: 'stratosphere'
-    }
-  ];
+      if (backButton.isMounted()) {
+        backButton.onClick(goBack);
+      }
+  
+      return () => {
+        backButton.offClick(goBack);
+        backButton.unmount();
+      };
+    }, []);
+  
 
-const Premiums: React.FC = () => {
-  const [activeType, setActiveType] = useState<'telegram' | 'stratosphere'>('telegram');
-
-  const filteredItems = premiumItems.filter(item => item.type === activeType);
+  const renderFeatureCard = (feature: PremiumFeature) => (
+    <div 
+      key={feature.id} 
+      className="premium-feature-card"
+      style={{
+        // backgroundColor: colors.cardBackground,
+        // borderColor: colors.accent
+      }}
+    >
+      <div className="feature-header">
+        <feature.icon size={48} color={colors.accent} strokeWidth={1.5} />
+        <h3>{feature.title}</h3>
+      </div>
+      
+      <div className="feature-description">
+        {feature.description.map((desc, index) => (
+          <p key={index}>{desc}</p>
+        ))}
+      </div>
+      
+      <div className="feature-price">
+        <span>${feature.price}/month</span>
+      </div>
+      
+      <div className="feature-benefits">
+        <h4>Benefits</h4>
+        <ul>
+          {feature.benefits.map((benefit, index) => (
+            <li key={index}>
+              <ChevronsDown size={16} color={colors.accent} />
+              {benefit}
+            </li>
+          ))}
+        </ul>
+      </div>
+      
+      <button 
+        className="subscribe-button"
+       
+      >
+        Subscribe Now
+      </button>
+    </div>
+  );
 
   return (
     <div 
-      className="premium-container" 
-      style={{ 
-        backgroundColor: colors.primary, 
-        color: colors.textPrimary 
+      className="premium-features-container"
+      style={{
+        // backgroundColor: colors.primary,
+        color: colors.textPrimary
       }}
     >
-      <div className="premium-toggle">
+      <div className="premium-header">
+        <h1>Stratosphere Wallet Premium</h1>
+        <p>Unlock powerful features with flexible crypto payments</p>
+      </div>
+
+      <div className="premium-tabs">
         <button 
-          onClick={() => setActiveType('telegram')}
-          className={activeType === 'telegram' ? 'active' : ''}
+          onClick={() => setSelectedTab('telegram')}
+          className={selectedTab === 'telegram' ? 'active' : ''}
           style={{
-            backgroundColor: activeType === 'telegram' ? colors.accent : 'transparent',
-            color: activeType === 'telegram' ? colors.textPrimary : colors.textSecondary
+            backgroundColor: selectedTab === 'telegram' ? colors.accent : 'transparent',
+            color: selectedTab === 'telegram' ? colors.primary : colors.textSecondary
           }}
         >
           Telegram Premium
         </button>
         <button 
-          onClick={() => setActiveType('stratosphere')}
-          className={activeType === 'stratosphere' ? 'active' : ''}
+          onClick={() => setSelectedTab('stratosphere')}
+          className={selectedTab === 'stratosphere' ? 'active' : ''}
           style={{
-            backgroundColor: activeType === 'stratosphere' ? colors.accent : 'transparent',
-            color: activeType === 'stratosphere' ? colors.textPrimary : colors.textSecondary
+            backgroundColor: selectedTab === 'stratosphere' ? colors.accent : 'transparent',
+            color: selectedTab === 'stratosphere' ? colors.primary : colors.textSecondary
           }}
         >
           Stratosphere Premium
         </button>
       </div>
 
-      <div className="premium-grid">
-        {filteredItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div 
-              key={item.id} 
-              className="premium-card"
-              style={{ 
-                borderColor: colors.divider,
-                backgroundColor: colors.primary
-              }}
-            >
-              <div className="card-header">
-                <Icon 
-                  size={32} 
-                  color={colors.accent} 
-                  strokeWidth={1.5} 
-                />
-                <h3>{item.title}</h3>
-              </div>
-              <p className="card-description">{item.description}</p>
-              <div className="card-footer">
-                <span className="price">${item.price}/month</span>
-                <button 
-                  className="buy-button"
-                  style={{
-                    backgroundColor: colors.accent,
-                    color: colors.textPrimary
-                  }}
-                >
-                  Purchase
-                </button>
-              </div>
-            </div>
-          );
-        })}
+      <div className="premium-features-grid">
+        {selectedTab === 'telegram' 
+          ? telegramPremiumFeatures.map(renderFeatureCard)
+          : stratospherePremiumFeatures.map(renderFeatureCard)
+        }
       </div>
     </div>
   );
 };
 
-export default Premiums;
+export default PremiumFeaturesPage;

@@ -33,7 +33,8 @@ import { SnackBar } from "./components/global/SnackBar.tsx";
 import "./styles/constants.css";
 import "./styles/index.css";
 import Premiums from "./pages/Premiums.tsx";
-import PaymentRequestPage from "./pages/PaymentRequest.tsx";
+import { DepositLinkGenerator } from "./pages/DepositLinkGenerator.tsx";
+import DepositPage from "./pages/Depositpage.tsx";
 
 eruda.init();
 init();
@@ -76,7 +77,8 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/lend" element={<LendToSpend />} />
                 <Route path="/lend/new" element={<CreateLendToSpend />} />
                 <Route path="/premiums" element={<Premiums />} />
-                <Route path="/payment-request" element={<PaymentRequestPage />} />
+                <Route path="/share-deposit" element={<DepositLinkGenerator />} />
+                <Route path="/deposit/onlink" element={<DepositPage walletAddress={"dldslkmdsckmdcm;dmc"} />} />
               </Routes>
 
               <SnackBar />
