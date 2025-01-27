@@ -4,9 +4,9 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
 import { uSdTBalance } from "../utils/api/wallet";
 import { formatUsd } from "../utils/formatters";
-import { Copy, Send, Receive } from "../assets/icons";
+import { Copy, Receive } from "../assets/icons";
 import { colors } from "../constants";
-import usdclogo from "../assets/images/labs/usdc.png";
+import usdclogo from "../assets/images/labs/mantralogo.jpeg";
 import "../styles/pages/assets.css";
 
 export default function UsdtAsset(): JSX.Element {
@@ -74,11 +74,11 @@ export default function UsdtAsset(): JSX.Element {
 
       <div className="balance">
         <p>{accBalLoading ? "- - -" : `${formatUsd(usdtAccBalance)}`}</p>
-        <span>{accBalLoading ? "- - -" : `${usdtAccBalance} USDC`}</span>
+        <span>{accBalLoading ? "- - -" : `${usdtAccBalance} OM`}</span>
       </div>
 
       <div className="actions">
-        <p>Send USDC directly to another address</p>
+        <p>Receive & buy OM Tokens</p>
 
         <span className="divider" />
 
@@ -88,8 +88,8 @@ export default function UsdtAsset(): JSX.Element {
             <Receive width={18} height={18} color={colors.textprimary} />
           </button>
 
-          <button className="send" onClick={() => navigate("/send-usdc")}>
-            Send USDC <Send width={18} height={18} color={colors.textprimary} />
+          <button className="send" onClick={() => navigate("/get-om")}>
+            Get OM
           </button>
         </div>
       </div>

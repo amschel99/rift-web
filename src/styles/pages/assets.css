@@ -17,6 +17,7 @@
   margin-top: 1rem;
   width: 4rem;
   height: 4rem;
+  border-radius: 50%;
 }
 
 #btc-asset .address,
@@ -128,6 +129,13 @@
   width: 62%;
   border-radius: 1rem;
   background-color: var(--danger);
+}
+
+#usdt-asset .actions .buttons .send {
+  background-color: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  background-image: linear-gradient(315deg, #e787c0, #ffb386);
 }
 
 #btc-asset .actions .buttons .receive,

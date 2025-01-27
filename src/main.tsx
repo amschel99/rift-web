@@ -28,6 +28,7 @@ import Splash from "./pages/Splash.tsx";
 import LendToUse from "./pages/lend/LendToUse.tsx";
 import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
+import BuyOm from "./pages/transactions/BuyOm.tsx";
 import { AppDialog } from "./components/global/AppDialog.tsx";
 import { AppDrawer } from "./components/global/AppDrawer.tsx";
 import { SnackBar } from "./components/global/SnackBar.tsx";
@@ -56,6 +57,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/send-eth" element={<SendEth />} />
                 <Route path="/usdt-asset" element={<UsdtAsset />} />
                 <Route path="/send-usdc" element={<SendUsdc />} />
+                <Route path="/get-om" element={<BuyOm />} />
                 <Route
                   path="/chat/:conversationId/:chatAccessToken/:initialMessage/:nonce"
                   element={<ChatBot />}

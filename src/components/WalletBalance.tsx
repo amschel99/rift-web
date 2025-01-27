@@ -6,7 +6,7 @@ import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { formatUsd, formatNumber } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
-import usdclogo from "../assets/images/labs/usdc.png";
+import usdclogo from "../assets/images/labs/mantralogo.jpeg";
 import "../styles/components/walletbalance.css";
 
 export const WalletBalance = (): JSX.Element => {
@@ -147,8 +147,8 @@ export const WalletBalance = (): JSX.Element => {
               <img src={usdclogo} alt="btc" />
 
               <p>
-                USD Coin
-                <span>USDC</span>
+                Mantra DAO
+                <span>OM</span>
               </p>
             </div>
 

@@ -17,6 +17,7 @@ import { SecurityTab } from "./components/tabs/Security";
 import { LabsTab } from "./components/tabs/Lab";
 import { EarnTab } from "./components/tabs/Earn";
 import { Profile } from "./components/tabs/Profile";
+import mantralogo from "./assets/images/labs/mantralogo.jpeg";
 
 function App(): JSX.Element {
   const navigate = useNavigate();
@@ -85,6 +86,9 @@ function App(): JSX.Element {
         </Fragment>
       )}
 
+      <div id="getom" onClick={() => navigate("/get-om")}>
+        <img src={mantralogo} alt="mantra" />
+      </div>
       <BottomTabNavigation />
     </section>
   );
