@@ -103,7 +103,7 @@ function BusinessSuite() {
         </div>
       </div>
       <div className="h-16"></div>
-      <div className="fixed z-50 bottom-0 left-0 right-0 w-full px-4 py-4 flex items-center justify-between bg-primary">
+      <div className="fixed shadow-lg z-50 bottom-0 left-0 right-0 w-full px-4 py-4 flex items-center justify-between bg-divider rounded-t-2xl backdrop-blur-lg">
         <IconHomeFilled size={26} />
         <IconChartInfographic size={26} />
         <IconUserCircle size={26} />
