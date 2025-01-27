@@ -6,7 +6,8 @@ import { useTabs } from "../../hooks/tabs";
 import { colors } from "../../constants";
 import refer from "../../assets/images/refer.png";
 import accRecovery from "../../assets/images/icons/acc-recovery.png";
-import "../../styles/components/tabs/profiletab.css";
+import rewards from "../../assets/images/icons/rewards.png";
+import "../../styles/components/tabs/profile.scss";
 
 export const Profile = (): JSX.Element => {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ export const Profile = (): JSX.Element => {
 
   const onRefer = () => {
     navigate("/refer");
+  };
+
+  const onRewards = () => {
+    navigate("/rewards/nil");
   };
 
   useEffect(() => {
@@ -68,8 +73,17 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
+      <div className="earn l_earn" onClick={onRewards}>
+        <img src={rewards} alt="rewards" />
+
+        <p>
+          Rewards & Airdrops
+          <span>Complete tasks & unlock rewards</span>
+        </p>
+      </div>
+
       <div className="earn l_earn">
-        <img src={accRecovery} alt="refer" />
+        <img src={accRecovery} alt="accoun recoverys" />
 
         <p>
           Account Recovery

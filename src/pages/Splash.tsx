@@ -51,6 +51,12 @@ export default function Splash(): JSX.Element {
     if (startParam) {
       let data = startParam.split("-");
 
+      if (startParam.startsWith("om")) {
+        // opened with airdrop link
+        navigate(`/rewards/${startParam}`);
+        return;
+      }
+
       if (startParam.startsWith("ref")) {
         // opened with referal link
         const [_, id] = startParam.split("-");

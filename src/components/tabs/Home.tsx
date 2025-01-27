@@ -5,18 +5,17 @@ import ReactPullToRefresh from "react-simple-pull-to-refresh";
 import { Avatar } from "@mui/material";
 import { useTabs } from "../../hooks/tabs";
 import { fetchMyKeys, keyType } from "../../utils/api/keys";
-import { MySecrets, SharedSecrets } from "../../components/Secrets";
+import { MySecrets, SharedSecrets } from "../Secrets";
 import { WalletBalance } from "../WalletBalance";
 import { Refresh, Add } from "../../assets/icons";
 import { colors } from "../../constants";
 import { Loading } from "../../assets/animations";
-import "../../styles/components/tabs/vault.css";
+import "../../styles/components/tabs/home.scss";
 
-// home
-export const VaultTab = (): JSX.Element => {
+export const HomeTab = (): JSX.Element => {
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
-  const { currTab, switchtab } = useTabs();
+  const { switchtab } = useTabs();
 
   const [_refreshing, setRefreshing] = useState<boolean>(false);
   const [mykeys, setMyKeys] = useState<keyType[]>([]);
@@ -77,7 +76,7 @@ export const VaultTab = (): JSX.Element => {
         </div>
       }
     >
-      <section id="vaulttab">
+      <section id="hometab">
         <WalletBalance />
 
         <div id="secrets_import">
@@ -148,15 +147,7 @@ export const VaultTab = (): JSX.Element => {
             </p>
           ))}
 
-        <div
-          style={{
-            border:
-              currTab == "profile"
-                ? `1px solid ${colors.textsecondary}`
-                : `1px solid ${colors.primary}`,
-          }}
-          className="avatrctr"
-        >
+        <div className="avatrctr">
           <Avatar
             src={initData?.user?.photoUrl}
             alt={initData?.user?.username}

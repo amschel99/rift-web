@@ -2,26 +2,28 @@ import { JSX, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
-import { uSdTBalance } from "../utils/api/wallet";
+import { mantraBalance } from "../utils/api/wallet";
 import { formatUsd } from "../utils/formatters";
 import { Copy, Receive } from "../assets/icons";
 import { colors } from "../constants";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
 import "../styles/pages/assets.css";
 
-export default function UsdtAsset(): JSX.Element {
+export default function OmAsset(): JSX.Element {
   const navigate = useNavigate();
   const { showsuccesssnack } = useSnackbar();
 
   const [accBalLoading, setAccBalLoading] = useState<boolean>(false);
-  const [usdtAccBalance, setusdtAccBalance] = useState<number>(0);
+  const [mantraBal, setMantrBal] = useState<number>(0);
+  const [mantraBalUsd, setMantrBalUsd] = useState<number>(0);
 
   const backbuttonclick = () => {
     navigate(-1);
   };
 
   let walletAddress = localStorage.getItem("address");
-  let usdtbal = localStorage.getItem("usdtbal");
+  let mantrabal = localStorage.getItem("mantrabal");
+  let mantrabalusd = localStorage.getItem("mantrabalusd");
 
   const onCopyAddr = () => {
     if (walletAddress !== null) {
@@ -31,16 +33,22 @@ export default function UsdtAsset(): JSX.Element {
   };
 
   const onGetBalance = useCallback(async () => {
-    if (usdtbal == null) {
+    if (mantrabal == null || mantrabalusd == null) {
       setAccBalLoading(true);
 
+      let mantrausdval = localStorage.getItem("mantrausdval");
       let access: string | null = localStorage.getItem("token");
-      const { data } = await uSdTBalance(access as string);
-      setusdtAccBalance(Number(data?.balance));
+
+      const { data } = await mantraBalance(access as string);
+      const mantrabalusd = Number(data?.balance) * Number(mantrausdval);
+
+      setMantrBal(Number(data?.balance));
+      setMantrBalUsd(mantrabalusd);
 
       setAccBalLoading(false);
     } else {
-      setusdtAccBalance(Number(usdtbal));
+      setMantrBal(Number(mantrabal));
+      setMantrBalUsd(Number(mantrabalusd));
     }
   }, []);
 
@@ -64,7 +72,7 @@ export default function UsdtAsset(): JSX.Element {
   }, []);
 
   return (
-    <section id="usdt-asset">
+    <section id="om-asset">
       <img src={usdclogo} alt="usdt" />
 
       <button className="address" onClick={onCopyAddr}>
@@ -73,8 +81,8 @@ export default function UsdtAsset(): JSX.Element {
       </button>
 
       <div className="balance">
-        <p>{accBalLoading ? "- - -" : `${formatUsd(usdtAccBalance)}`}</p>
-        <span>{accBalLoading ? "- - -" : `${usdtAccBalance} OM`}</span>
+        <p>{accBalLoading ? "- - -" : `${formatUsd(mantraBalUsd)}`}</p>
+        <span>{accBalLoading ? "- - -" : `${mantraBal} OM`}</span>
       </div>
 
       <div className="actions">

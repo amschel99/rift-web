@@ -22,6 +22,10 @@
   border-bottom: 1px solid var(--divider);
 }
 
+.quickactions .mantra img {
+  border-radius: 50%;
+}
+
 .quickactions .parent img {
   width: 2.25rem;
   height: 2.25rem;

@@ -1,13 +1,13 @@
 import { JSX, useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 import { Skeleton } from "@mui/material";
-import { useSnackbar } from "../../hooks/snackbar";
-import { formatUsd } from "../../utils/formatters";
-import { coinType, fetchCoins } from "../../utils/api/market";
-import { colors } from "../../constants";
-import "../../styles/components/tabs/markettab.css";
+import { useSnackbar } from "../../../hooks/snackbar";
+import { formatUsd } from "../../../utils/formatters";
+import { coinType, fetchCoins } from "../../../utils/api/market";
+import { colors } from "../../../constants";
+import "../../../styles/components/tabs/coins.scss";
 
-export const MarketTab = (): JSX.Element => {
+export const Coins = (): JSX.Element => {
   const { showerrorsnack } = useSnackbar();
   const navigate = useNavigate();
 

@@ -8,6 +8,7 @@ import { colors } from "../../constants";
 import consumekey from "../../assets/images/consumesecret.png";
 import "../../styles/components/forms.css";
 
+// use shared airwallex key
 export const ConsumeSharedKey = (): JSX.Element => {
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer, linkUrl } = useAppDrawer();

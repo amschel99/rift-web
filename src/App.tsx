@@ -12,12 +12,11 @@ import {
 import { useTabs } from "./hooks/tabs";
 import { useAppDrawer } from "./hooks/drawer";
 import { BottomTabNavigation } from "./components/Bottom";
-import { VaultTab } from "./components/tabs/Vault";
+import { HomeTab } from "./components/tabs/Home";
 import { SecurityTab } from "./components/tabs/Security";
 import { LabsTab } from "./components/tabs/Lab";
-import { EarnTab } from "./components/tabs/Earn";
+import { DefiTab } from "./components/tabs/Defi";
 import { Profile } from "./components/tabs/Profile";
-import mantralogo from "./assets/images/labs/mantralogo.jpeg";
 
 function App(): JSX.Element {
   const navigate = useNavigate();
@@ -66,7 +65,7 @@ function App(): JSX.Element {
     <section>
       {currTab == "home" ? (
         <Fragment>
-          <VaultTab />
+          <HomeTab />
         </Fragment>
       ) : currTab == "security" ? (
         <Fragment>
@@ -74,7 +73,7 @@ function App(): JSX.Element {
         </Fragment>
       ) : currTab == "earn" ? ( // earn -> defi (staking+coins)
         <Fragment>
-          <EarnTab />
+          <DefiTab />
         </Fragment>
       ) : currTab == "labs" ? (
         <Fragment>
@@ -86,9 +85,6 @@ function App(): JSX.Element {
         </Fragment>
       )}
 
-      <div id="getom" onClick={() => navigate("/get-om")}>
-        <img src={mantralogo} alt="mantra" />
-      </div>
       <BottomTabNavigation />
     </section>
   );

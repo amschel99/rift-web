@@ -20,7 +20,7 @@ function base64ToString(base64: string | null): string {
   }
 }
 
-// foreign spend
+// foreign spend - send eth to my address from shared link
 export const SendEthFromToken = (): JSX.Element => {
   const navigate = useNavigate();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();

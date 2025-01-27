@@ -21,6 +21,9 @@ export const ENDPOINTS = {
   createReferralLink: "/create-refferal",
   incentivize: "/earn-from-referral",
   rewardnewuser: "/reward-new-user",
+  claimairdrop: "/claim-airdrop",
+  unlocktokens: "/unlock-tokens",
+  getunlockedtokens: "/fetch-unlock-tokens",
 };
 
 export const SOCKET = io(BASEURL);

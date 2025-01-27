@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useAppDrawer } from "../../hooks/drawer";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
-import usdclogo from "../../assets/images/labs/usdc.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import referearn from "../../assets/images/refer.png";
 import lendearn from "../../assets/images/icons/lendto.png";
 import "../../styles/components/drawer/quickactions.css";
@@ -22,9 +22,9 @@ export const QuickActions = (): JSX.Element => {
     navigate("/eth-asset");
   };
 
-  const sendUsdc = () => {
+  const getMantra = () => {
     closeAppDrawer();
-    navigate("/send-usdc");
+    navigate("/get-om");
   };
 
   const onRefer = () => {
@@ -41,7 +41,16 @@ export const QuickActions = (): JSX.Element => {
     <div className="quickactions">
       <p className="title">Quick Actions</p>
 
-      <div className="parent f_parent" onClick={sendBtc}>
+      <div className="parent f_parent mantra" onClick={getMantra}>
+        <img src={mantralogo} alt="mantra" />
+
+        <div className="child">
+          <p>Get OM</p>
+          <span>Buy OM using Eth, USD or HKD</span>
+        </div>
+      </div>
+
+      <div className="parent " onClick={sendBtc}>
         <img src={btclogo} alt="btc" />
 
         <div className="child">
@@ -56,15 +65,6 @@ export const QuickActions = (): JSX.Element => {
         <div className="child">
           <p>Send ETH</p>
           <span>Send ETH directly to an address or via Telegram</span>
-        </div>
-      </div>
-
-      <div className="parent" onClick={sendUsdc}>
-        <img src={usdclogo} alt="usdc" />
-
-        <div className="child">
-          <p>Send USDC</p>
-          <span>Send USDC directly to another address</span>
         </div>
       </div>
 

@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 export type draweraction =
-  | "send"
   | "sendfromtoken"
   | "consumekey"
   | "refferred"
@@ -31,7 +30,8 @@ interface providerProps {
 }
 
 export const AppDrawerProvider = ({ children }: providerProps): JSX.Element => {
-  const [drawerAction, setDrawerAction] = useState<draweraction>("send");
+  const [drawerAction, setDrawerAction] =
+    useState<draweraction>("sendfromtoken");
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [keyToshare, setKeyToshare] = useState<string>("");
   const [linkUrl, setSecretUrl] = useState<string>("");

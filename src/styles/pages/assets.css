@@ -1,6 +1,6 @@
 #btc-asset,
 #eth-asset,
-#usdt-asset {
+#om-asset {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,7 +13,7 @@
 
 #btc-asset img,
 #eth-asset img,
-#usdt-asset img {
+#om-asset img {
   margin-top: 1rem;
   width: 4rem;
   height: 4rem;
@@ -22,7 +22,7 @@
 
 #btc-asset .address,
 #eth-asset .address,
-#usdt-asset .address {
+#om-asset .address {
   border: 0;
   outline: none;
   outline-color: transparent;
@@ -40,7 +40,7 @@
 
 #btc-asset .balance,
 #eth-asset .balance,
-#usdt-asset .balance {
+#om-asset .balance {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,7 +50,7 @@
 
 #btc-asset .balance p,
 #eth-asset .balance p,
-#usdt-asset .balance p {
+#om-asset .balance p {
   font-family: "Raleway", serif;
   font-size: 2.25rem;
   font-weight: 600;
@@ -58,7 +58,7 @@
 
 #btc-asset .balance span,
 #eth-asset .balance span,
-#usdt-asset .balance span {
+#om-asset .balance span {
   font-size: small;
   font-weight: 600;
   color: var(--textsecondary);
@@ -66,7 +66,7 @@
 
 #btc-asset .actions,
 #eth-asset .actions,
-#usdt-asset .actions {
+#om-asset .actions {
   position: absolute;
   bottom: 1rem;
   left: 0;
@@ -82,7 +82,7 @@
 
 #btc-asset .actions .divider,
 #eth-asset .actions .divider,
-#usdt-asset .actions .divider {
+#om-asset .actions .divider {
   width: 100%;
   height: 1px;
   background-color: var(--divider);
@@ -90,7 +90,7 @@
 
 #btc-asset .actions p,
 #eth-asset .actions p,
-#usdt-asset .actions p {
+#om-asset .actions p {
   width: 100%;
   font-size: 0.875rem;
   text-align: left;
@@ -99,7 +99,7 @@
 
 #btc-asset .actions .buttons button,
 #eth-asset .actions .buttons button,
-#usdt-asset .actions .buttons button {
+#om-asset .actions .buttons button {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -115,7 +115,7 @@
 
 #btc-asset .actions .buttons,
 #eth-asset .actions .buttons,
-#usdt-asset .actions .buttons {
+#om-asset .actions .buttons {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -125,13 +125,13 @@
 
 #btc-asset .actions .buttons .send,
 #eth-asset .actions .buttons .send,
-#usdt-asset .actions .buttons .send {
+#om-asset .actions .buttons .send {
   width: 62%;
   border-radius: 1rem;
   background-color: var(--danger);
 }
 
-#usdt-asset .actions .buttons .send {
+#om-asset .actions .buttons .send {
   background-color: transparent;
   color: var(--primary);
   font-weight: 600;
@@ -140,7 +140,7 @@
 
 #btc-asset .actions .buttons .receive,
 #eth-asset .actions .buttons .receive,
-#usdt-asset .actions .buttons .receive {
+#om-asset .actions .buttons .receive {
   width: 35%;
   background-color: var(--divider);
 }

@@ -7,13 +7,16 @@ import { SnackBarProvider } from "./hooks/snackbar";
 import { AppDrawerProvider } from "./hooks/drawer.tsx";
 import { TabsProvider } from "./hooks/tabs.tsx";
 import { AppDialogProvider } from "./hooks/dialog.tsx";
+import { AppDialog } from "./components/global/AppDialog.tsx";
+import { AppDrawer } from "./components/global/AppDrawer.tsx";
+import { SnackBar } from "./components/global/SnackBar.tsx";
 import App from "./App.tsx";
 import Authentication from "./pages/Auth.tsx";
 import Logout from "./pages/Logout.tsx";
 import CoinInfo from "./pages/CoinInfo.tsx";
 import BtcAsset from "./pages/BtcAsset.tsx";
 import EthAsset from "./pages/EthAsset.tsx";
-import UsdtAsset from "./pages/UsdtAset.tsx";
+import OmAsset from "./pages/OmAsset.tsx";
 import ChatBot from "./pages/ChatBot.tsx";
 import SendBtc from "./pages/transactions/SendBtc.tsx";
 import SendEth from "./pages/transactions/SendEth.tsx";
@@ -29,11 +32,8 @@ import LendToUse from "./pages/lend/LendToUse.tsx";
 import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import BuyOm from "./pages/transactions/BuyOm.tsx";
-import { AppDialog } from "./components/global/AppDialog.tsx";
-import { AppDrawer } from "./components/global/AppDrawer.tsx";
-import { SnackBar } from "./components/global/SnackBar.tsx";
-import "./styles/constants.css";
-import "./styles/index.css";
+import Rewards from "./pages/Rewards.tsx";
+import "./styles/index.scss";
 
 eruda.init();
 init();
@@ -55,7 +55,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/send-btc" element={<SendBtc />} />
                 <Route path="/eth-asset" element={<EthAsset />} />
                 <Route path="/send-eth" element={<SendEth />} />
-                <Route path="/usdt-asset" element={<UsdtAsset />} />
+                <Route path="/om-asset" element={<OmAsset />} />
                 <Route path="/send-usdc" element={<SendUsdc />} />
                 <Route path="/get-om" element={<BuyOm />} />
                 <Route
@@ -77,6 +77,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/lend" element={<LendToUse />} />
                 <Route path="/lend/asset" element={<CreateLendAsset />} />
                 <Route path="/lend/secret" element={<CreateLendSecret />} />
+                <Route path="/rewards/:id" element={<Rewards />} />
               </Routes>
 
               <SnackBar />

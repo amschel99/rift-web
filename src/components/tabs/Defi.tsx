@@ -4,14 +4,13 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useTabs } from "../../hooks/tabs";
 import { Stake, Lock } from "../../assets/icons";
 import { colors } from "../../constants";
-import { MarketTab } from "./Market";
+import { Coins } from "./defi/Coins";
 import friendsduel from "../../assets/images/labs/friendsduel.png";
 import telemarket from "../../assets/images/labs/telemarket.png";
 import lendtospend from "../../assets/images/icons/lendto.png";
-import "../../styles/components/tabs/earntab.css";
+import "../../styles/components/tabs/defitab.scss";
 
-// * - defi tab
-export const EarnTab = (): JSX.Element => {
+export const DefiTab = (): JSX.Element => {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
 
@@ -32,7 +31,7 @@ export const EarnTab = (): JSX.Element => {
   }, []);
 
   return (
-    <section id="earntab">
+    <section id="defitab">
       <p className="title">Earn</p>
 
       <p className="yt_title">Yield Tokens</p>
@@ -144,7 +143,7 @@ export const EarnTab = (): JSX.Element => {
         </div>
       </div>
 
-      <MarketTab />
+      <Coins />
 
       <div className="lendtospend" onClick={() => navigate("/lend")}>
         <img src={lendtospend} alt="lend to spend" />
