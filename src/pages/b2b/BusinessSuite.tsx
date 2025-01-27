@@ -9,6 +9,8 @@ import {
 } from "@tabler/icons-react";
 import { Airdropped } from "../../components/charts/Airdropped";
 import { backButton } from "@telegram-apps/sdk-react";
+import { UnlockedChart } from "../../components/charts/Unlocked";
+import { PointsChart } from "../../components/charts/Points";
 
 function BusinessSuite() {
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ function BusinessSuite() {
               </p>
             </div>
             <div className="flex flex-col items-center justify-center pr-2">
-              <IconPlus size={30} />
+              <IconPlus size={30} className="cursor-pointer" />
               {/* <p className="text-gray-600 text-xs font-semibold leading-relaxed">
                 Create
               </p> */}
@@ -59,8 +61,48 @@ function BusinessSuite() {
           </div>
           <Airdropped />
         </div>
+        <div className="flex flex-col items-center gap-2 mt-2">
+          <div className="bg-divider/10 w-full rounded-xl mx-1">
+            <div className="flex items-center justify-between">
+              <div className="px-4 py-4">
+                <h1 className="text-textprimary text-xl font-body font-bold">
+                  $4,175
+                </h1>
+                <p className=" text-gray-400 text-xs font-semibold leading-relaxed">
+                  USDT Unlocked
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center pr-2">
+                <IconPlus size={30} className="cursor-pointer" />
+                {/* <p className="text-gray-600 text-xs font-semibold leading-relaxed">
+                Create
+              </p> */}
+              </div>
+            </div>
+            <UnlockedChart />
+          </div>
+          <div className="bg-divider w-full rounded-xl mx-1">
+            <div className="flex items-center justify-between">
+              <div className="px-4 py-4">
+                <h1 className="text-textprimary text-xl font-body font-bold">
+                  10,000
+                </h1>
+                <p className=" text-gray-400 text-xs font-semibold leading-relaxed">
+                  Distrubuted Points
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center pr-2">
+                <IconPlus size={30} className="cursor-pointer" />
+                {/* <p className="text-gray-600 text-xs font-semibold leading-relaxed">
+                Create
+              </p> */}
+              </div>
+            </div>
+            <PointsChart />
+          </div>
+        </div>
       </div>
-      <div className="absolute bottom-4 w-full px-4 items-center justify-between flex bg-primary/50">
+      <div className=" w-full px-4 items-center justify-between flex bg-primary/50">
         <IconHomeFilled size={26} />
         <IconChartInfographic size={26} />
         <IconUserCircle size={26} />

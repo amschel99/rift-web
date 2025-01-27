@@ -15,7 +15,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "../ui/card";
 import { ChartConfig, ChartContainer } from "../ui/chart";
 const chartData = [
@@ -28,21 +27,22 @@ const chartConfig = {
   },
   safari: {
     label: "Safari",
-    color: "hsl(var(--chart-2))",
+    color: "#A5F4A5",
   },
 } satisfies ChartConfig;
 
 export function Airdropped() {
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col border-none">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Radial Chart - Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription className="font-body font-semibold text-gray-500">
+          January
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square h-[185px]"
         >
           <RadialBarChart
             data={chartData}
@@ -73,7 +73,11 @@ export function Airdropped() {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-4xl font-bold"
+                          className="fill-foreground text-4xl font-semibold font-body text-white"
+                          style={{
+                            color: "#fff",
+                            fill: "#A5F4A5",
+                          }}
                         >
                           {chartData[0].visitors.toLocaleString()}
                         </tspan>
@@ -81,8 +85,12 @@ export function Airdropped() {
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
+                          style={{
+                            color: "#fff",
+                            fill: "#fff", // Ensure the fill color is white
+                          }}
                         >
-                          Visitors
+                          Happy Clients😎
                         </tspan>
                       </text>
                     );
@@ -97,8 +105,8 @@ export function Airdropped() {
         <div className="flex items-center gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+        <div className="leading-none text-muted-foreground text-gray-500 text-xs">
+          Showing total receipts of airdrops this month
         </div>
       </CardFooter>
     </Card>
