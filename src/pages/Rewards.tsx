@@ -13,6 +13,7 @@ import {
   unlockTokens,
 } from "../utils/api/airdrop";
 import { formatUsd } from "../utils/formatters";
+import { getMantraUsdVal } from "../utils/api/mantra";
 import { Confetti } from "../assets/animations";
 import { CheckAlt, Lock, Stake } from "../assets/icons";
 import { colors } from "../constants";
@@ -47,6 +48,13 @@ export default function Rewards(): JSX.Element {
       `https://t.me/share/url?url=${appUrl}&text=Hey, Join me on StratoSphereId. A multiasset crypto wallet that also manages your secrets.`
     );
   };
+
+  const ongetMantraUsdVal = useCallback(async () => {
+    if (mantrausdval == null) {
+      const { mantraInUSD } = await getMantraUsdVal(1);
+      localStorage.setItem("mantrausdval", String(mantraInUSD));
+    }
+  }, []);
 
   const onStake = () => {
     showerrorsnack("Staking coming soon...");
@@ -113,6 +121,7 @@ export default function Rewards(): JSX.Element {
   }, [id]);
 
   useEffect(() => {
+    ongetMantraUsdVal();
     ongetUnlocked();
     unlockForShare();
     unlockForEvident();
@@ -211,7 +220,7 @@ export default function Rewards(): JSX.Element {
           <span>{formatUsd(unlockedAmnt * mantrausdval)}</span>
         </p>
         <p className="aboutunlocked">
-          All unlocked amount is moved to your wallet balance
+          All unlocked amount is moved to your wallet
         </p>
       </div>
     </section>

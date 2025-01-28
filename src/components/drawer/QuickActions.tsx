@@ -4,9 +4,8 @@ import { useAppDrawer } from "../../hooks/drawer";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
-import referearn from "../../assets/images/refer.png";
 import lendearn from "../../assets/images/icons/lendto.png";
-import "../../styles/components/drawer/quickactions.css";
+import "../../styles/components/drawer/quickactions.scss";
 
 export const QuickActions = (): JSX.Element => {
   const navigate = useNavigate();
@@ -25,11 +24,6 @@ export const QuickActions = (): JSX.Element => {
   const getMantra = () => {
     closeAppDrawer();
     navigate("/get-om");
-  };
-
-  const onRefer = () => {
-    closeAppDrawer();
-    navigate("/refer");
   };
 
   const onLendEarn = () => {
@@ -65,15 +59,6 @@ export const QuickActions = (): JSX.Element => {
         <div className="child">
           <p>Send ETH</p>
           <span>Send ETH directly to an address or via Telegram</span>
-        </div>
-      </div>
-
-      <div className="parent" onClick={onRefer}>
-        <img src={referearn} alt="refer" />
-
-        <div className="child">
-          <p>Refer & Earn</p>
-          <span>Invite friends and earn USDC</span>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { BorrowedAsset } from "../../components/lend/Assets";
 import { BorrowedSecret } from "../../components/lend/Secrets";
 import { Import, Stake } from "../../assets/icons";
 import { colors } from "../../constants";
-import "../../styles/pages/lendspend.css";
+import "../../styles/pages/lendspend.scss";
 
 export default function LendToUse(): JSX.Element {
   const navigate = useNavigate();

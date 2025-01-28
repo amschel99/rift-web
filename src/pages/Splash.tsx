@@ -4,7 +4,7 @@ import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
 import { earnFromReferral, rewardNewUser } from "../utils/api/refer";
 import { Loading } from "../assets/animations";
-import "../styles/pages/auth.css";
+import "../styles/pages/auth.scss";
 
 const base64ToString = (base64: string | null): string => {
   try {

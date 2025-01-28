@@ -10,9 +10,9 @@ import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import assets from "../../assets/images/icons/lendto.png";
-import "../../styles/pages/createlend.css";
+import "../../styles/pages/createlend.scss";
 
-export type assetType = "BTC" | "ETH" | "USDC";
+export type assetType = "BTC" | "ETH" | "USDC" | "USD" | "HKD";
 export type assetUtility = "staking" | "trading" | "governance" | "liquidity";
 
 export default function CreateLendAsset(): JSX.Element {
@@ -365,8 +365,7 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(20)}
             style={{
-              backgroundColor:
-                yieldDist == 20 ? colors.textsecondary : colors.divider,
+              backgroundColor: yieldDist == 20 ? colors.accent : colors.divider,
             }}
           >
             20%
@@ -374,8 +373,7 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(30)}
             style={{
-              backgroundColor:
-                yieldDist == 30 ? colors.textsecondary : colors.divider,
+              backgroundColor: yieldDist == 30 ? colors.accent : colors.divider,
             }}
           >
             30%
@@ -383,8 +381,7 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(40)}
             style={{
-              backgroundColor:
-                yieldDist == 40 ? colors.textsecondary : colors.divider,
+              backgroundColor: yieldDist == 40 ? colors.accent : colors.divider,
             }}
           >
             40%
@@ -392,8 +389,7 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(50)}
             style={{
-              backgroundColor:
-                yieldDist == 50 ? colors.textsecondary : colors.divider,
+              backgroundColor: yieldDist == 50 ? colors.accent : colors.divider,
             }}
           >
             50%
@@ -401,8 +397,7 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(60)}
             style={{
-              backgroundColor:
-                yieldDist == 60 ? colors.textsecondary : colors.divider,
+              backgroundColor: yieldDist == 60 ? colors.accent : colors.divider,
             }}
           >
             60%

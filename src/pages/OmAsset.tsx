@@ -3,11 +3,11 @@ import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
 import { mantraBalance } from "../utils/api/wallet";
-import { formatUsd } from "../utils/formatters";
+import { formatUsd, formatNumber } from "../utils/formatters";
 import { Copy, Receive } from "../assets/icons";
 import { colors } from "../constants";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
-import "../styles/pages/assets.css";
+import "../styles/pages/assets.scss";
 
 export default function OmAsset(): JSX.Element {
   const navigate = useNavigate();
@@ -82,7 +82,7 @@ export default function OmAsset(): JSX.Element {
 
       <div className="balance">
         <p>{accBalLoading ? "- - -" : `${formatUsd(mantraBalUsd)}`}</p>
-        <span>{accBalLoading ? "- - -" : `${mantraBal} OM`}</span>
+        <span>{accBalLoading ? "- - -" : `${formatNumber(mantraBal)} OM`}</span>
       </div>
 
       <div className="actions">

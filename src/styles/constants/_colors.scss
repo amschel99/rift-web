@@ -8,7 +8,7 @@ $divider: rgba(248, 250, 252, 0.05);
 $boxshadow: rgba(0, 0, 0, 0.125);
 $lightgradient: linear-gradient(
   to bottom,
-  var(--divider),
+  $divider,
   rgba(36, 45, 57, 0.85),
   rgba(36, 45, 57, 0.85)
 );

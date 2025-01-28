@@ -6,7 +6,7 @@ import { NFT, User } from "../../assets/icons";
 import { colors } from "../../constants";
 import { Return } from "../../assets/icons";
 import { assetType, assetUtility } from "../../pages/lend/CreateLendAsset";
-import "../../styles/components/lend/assets.css";
+import "../../styles/components/lend/assets.scss";
 
 interface props {
   owner: string;

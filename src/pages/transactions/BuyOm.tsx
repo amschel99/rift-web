@@ -1,24 +1,73 @@
-import { JSX, useEffect, useState } from "react";
-import { backButton } from "@telegram-apps/sdk-react";
+import { JSX, MouseEvent, useCallback, useEffect, useState } from "react";
+import { useLaunchParams, backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
-import { formatUsd } from "../../utils/formatters";
+import { TextField } from "@mui/material";
+import { useSnackbar } from "../../hooks/snackbar";
+import { PopOver } from "../../components/global/PopOver";
+import { awxbalType, fetchAirWllxBalances } from "../../utils/api/awllx";
+import { formatUsd, formatNumber } from "../../utils/formatters";
 import ethlogo from "../../assets/images/eth.png";
 import { colors } from "../../constants";
 import "../../styles/pages/buyom.scss";
 
-export default function BuyOm(): JSX.Element {
-  const navigate = useNavigate();
+type currencyType = "ETH" | "USD" | "HKD";
 
-  const [getQty, setGetQty] = useState<number>(0);
+export default function BuyOm(): JSX.Element {
+  const { initData } = useLaunchParams();
+  const navigate = useNavigate();
+  const { showerrorsnack } = useSnackbar();
+
+  const [getQty, setGetQty] = useState<string>("");
+  const [selectCurrency, setSelectCurrency] = useState<currencyType>("ETH");
+  const [awxBalances, setAwxBalances] = useState<awxbalType | null>({
+    message: "",
+    balances: { HKD: 0, USD: 0 },
+  });
+  const [currAnchorEl, setCurrAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const ethbalUsd = Number(localStorage.getItem("ethbalUsd"));
   const ethbal = Number(localStorage.getItem("ethbal"));
   const ethusd = Number(localStorage.getItem("ethvalue"));
   const mantraUsd = Number(localStorage.getItem("mantrausdval"));
 
+  const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
+    setCurrAnchorEl(event.currentTarget);
+  };
+
   const goBack = () => {
     navigate(-1);
   };
+
+  const onSelectCurrency = (currency: currencyType) => {
+    if (currency == "ETH") {
+      setSelectCurrency(currency);
+      setCurrAnchorEl(null);
+    } else if (awxBalances == null) {
+      showerrorsnack("Have you imported an Aiwallex API key ?");
+      setCurrAnchorEl(null);
+    } else {
+      setSelectCurrency(currency);
+      setCurrAnchorEl(null);
+    }
+  };
+
+  const onGetBalances = useCallback(async () => {
+    const keyOwner = initData?.user?.username;
+    let token: string | null = localStorage.getItem("token");
+
+    const { balances, status } = await fetchAirWllxBalances(
+      token as string,
+      keyOwner as string
+    );
+
+    if (status !== 404) {
+      setAwxBalances(balances);
+    }
+  }, []);
+
+  useEffect(() => {
+    onGetBalances();
+  }, []);
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -40,39 +89,138 @@ export default function BuyOm(): JSX.Element {
     <section id="buyom">
       <p className="title">
         Get OM <br />
-        <span>Buy OM using your ETH balance</span>
+        <span>Buy OM your ETH, USD or HKD</span>
       </p>
 
       <div className="balancectr">
-        <div className="currency">
-          <img src={ethlogo} alt="eth" />
+        <div className="currency" onClick={openAssetPopOver}>
+          {selectCurrency == "ETH" ? (
+            <img src={ethlogo} alt="eth" />
+          ) : selectCurrency == "USD" ? (
+            <span className="flag">🇺🇸</span>
+          ) : (
+            <span className="flag">🇭🇰</span>
+          )}
 
-          <p>ETH</p>
+          <p>{selectCurrency}</p>
         </div>
 
-        <input
+        <div className="inpuctr">
+          <TextField
+            variant="standard"
+            fullWidth
+            value={getQty}
+            onChange={(ev) => setGetQty(ev.target.value)}
+            placeholder={`Amount (${selectCurrency})`}
+            type="number"
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                style: {
+                  height: "3.75rem",
+                },
+              },
+            }}
+            sx={{
+              "& .MuiInputBase-input": {
+                color: colors.textprimary,
+              },
+              "& .MuiInputBase-input::placeholder": {
+                color: colors.textsecondary,
+              },
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 0,
+                border: "none",
+                boxShadow: "none",
+                "&:hover fieldset": {
+                  border: "none",
+                },
+                "&.Mui-focused fieldset": {
+                  border: "none",
+                },
+                "&::placeholder": {
+                  color: colors.textsecondary,
+                },
+              },
+            }}
+          />
+        </div>
+        {/* <input
           className="qtyinput"
           type="number"
           min="0"
           step="any"
-          placeholder="Amount (ETH)"
+          placeholder={`Amount (${selectCurrency})`}
           style={{ color: getQty >= ethbal ? colors.danger : "" }}
           value={getQty == 0 ? "" : getQty}
           onChange={(ev) => setGetQty(Number(ev.target.value))}
-        />
+        /> */}
       </div>
       <p className="fiatbal">
-        {ethbal.toFixed(5)} ETH ~ {formatUsd(ethbalUsd)}
+        {selectCurrency == "ETH"
+          ? formatNumber(ethbal) + " ETH"
+          : selectCurrency == "USD"
+          ? formatNumber(awxBalances?.balances?.USD as number) + " USD"
+          : formatNumber(awxBalances?.balances?.HKD as number) + " HKD"}
+        &nbsp;~&nbsp;
+        {selectCurrency == "ETH"
+          ? formatUsd(ethbalUsd)
+          : selectCurrency == "USD"
+          ? formatUsd(awxBalances?.balances?.USD as number)
+          : formatUsd(Number(awxBalances?.balances?.HKD) / 7.79)}
       </p>
+      <PopOver anchorEl={currAnchorEl} setAnchorEl={setCurrAnchorEl}>
+        {
+          <div className="select_assets">
+            <div className="img_desc" onClick={() => onSelectCurrency("ETH")}>
+              <img src={ethlogo} alt="asset" />
+
+              <p className="desc">
+                ETH <br /> <span>{formatNumber(ethbal)}</span>
+              </p>
+            </div>
+
+            <div className="img_desc" onClick={() => onSelectCurrency("USD")}>
+              <span className="flag">🇺🇸</span>
+
+              <p className="desc">
+                USD <br />
+                <span>
+                  {awxBalances == null
+                    ? "Failed to get your balance"
+                    : formatNumber(awxBalances?.balances?.USD as number)}
+                </span>
+              </p>
+            </div>
+
+            <div className="img_desc" onClick={() => onSelectCurrency("HKD")}>
+              <span className="flag">🇭🇰</span>
+
+              <p className="desc">
+                HKD <br />
+                <span>
+                  {awxBalances == null
+                    ? "Failed to get your balance"
+                    : formatNumber(awxBalances?.balances?.HKD as number)}
+                </span>
+              </p>
+            </div>
+
+            <p className="asset_tle">What would you like to buy OM with ?</p>
+          </div>
+        }
+      </PopOver>
 
       <p
         className="omamount"
-        style={{ color: getQty >= ethbal ? colors.danger : "" }}
+        style={{ color: Number(getQty) >= ethbal ? colors.danger : "" }}
       >
         You Get
         <br />
-        <span style={{ color: getQty >= ethbal ? colors.danger : "" }}>
-          {getQty == 0 ? "0" : ((getQty * ethusd) / mantraUsd).toFixed(2)}
+        <span style={{ color: Number(getQty) >= ethbal ? colors.danger : "" }}>
+          {Number(getQty) == 0
+            ? "0"
+            : formatNumber((Number(getQty) * ethusd) / mantraUsd)}
           &nbsp; <em>OM</em>
         </span>
       </p>

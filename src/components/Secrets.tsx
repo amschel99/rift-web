@@ -5,7 +5,7 @@ import { useAppDialog } from "../hooks/dialog";
 import { keyType, UseOpenAiKey } from "../utils/api/keys";
 import { Share, User, NFT, ChatBot } from "../assets/icons";
 import { colors } from "../constants";
-import "../styles/components/secrets.css";
+import "../styles/components/secrets.scss";
 
 export type secrettype = {
   secretVal: string;
@@ -108,7 +108,7 @@ export const SharedSecrets = ({
             </span>
           </div>
 
-          <span className="hash">
+          <span className="secretutility">
             {secret.purpose == "OPENAI" ? "ChatBot(GPT-4o)" : "AirWallex"}
             {secret.purpose == "OPENAI" ? (
               <ChatBot width={16} height={16} color={colors.textprimary} />

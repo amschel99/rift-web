@@ -6,7 +6,7 @@ import { colors } from "../../constants";
 import poelogo from "../../assets/images/icons/poe.png";
 import openailogo from "../../assets/images/openai-alt.png";
 import awxlogo from "../../assets/images/awx.png";
-import "../../styles/components/lend/secrets.css";
+import "../../styles/components/lend/secrets.scss";
 
 interface props {
   secret: string;

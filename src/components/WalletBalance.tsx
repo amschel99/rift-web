@@ -8,7 +8,7 @@ import { formatUsd, formatNumber } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
-import "../styles/components/walletbalance.css";
+import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = (): JSX.Element => {
   const navigate = useNavigate();

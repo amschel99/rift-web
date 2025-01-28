@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import { useAppDialog } from "../../hooks/dialog";
 import { Loading, Success, Error } from "../../assets/animations";
-import "../../styles/components/dialog.css";
+import "../../styles/components/dialog.scss";
 
 export const LoadingOutput = (): JSX.Element => {
   const { dialogMessage } = useAppDialog();

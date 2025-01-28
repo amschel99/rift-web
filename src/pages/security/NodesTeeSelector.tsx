@@ -8,7 +8,7 @@ import { useAppDrawer } from "../../hooks/drawer";
 import { Node, TEE, Filter } from "../../assets/icons";
 import { colors } from "../../constants";
 import nodetees from "../../components/tabs/security/nodestees.json";
-import "../../styles/pages/nodesteeselector.css";
+import "../../styles/pages/nodesteeselector.scss";
 
 export type locationType = {
   id: number;
@@ -394,8 +394,8 @@ const Locations: locationType[] = [
 ];
 
 const popOverStyles: CSSProperties = {
-  width: "13.375rem",
-  height: "13.375rem",
+  width: "13.5rem",
+  height: "14.5rem",
   padding: "0.375rem",
   marginTop: 6,
   border: `1px solid ${colors.divider}`,

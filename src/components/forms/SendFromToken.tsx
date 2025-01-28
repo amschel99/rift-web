@@ -9,7 +9,7 @@ import { useAppDrawer } from "../../hooks/drawer";
 import { SendFromToken } from "../../assets/icons";
 import { colors } from "../../constants";
 import foreignspend from "../../assets/images/obhehalfspend.png";
-import "../../styles/components/forms.css";
+import "../../styles/components/forms.scss";
 
 function base64ToString(base64: string | null): string {
   try {

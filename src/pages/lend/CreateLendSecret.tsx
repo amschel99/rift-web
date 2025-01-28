@@ -3,13 +3,13 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { TextField } from "@mui/material";
 import { PopOver } from "../../components/global/PopOver";
+import { formatUsd } from "../../utils/formatters";
 import { colors } from "../../constants";
 import { ChevronLeft, Import } from "../../assets/icons";
 import poelogo from "../../assets/images/icons/poe.png";
 import openailogo from "../../assets/images/openai-alt.png";
 import awxlogo from "../../assets/images/awx.png";
-import "../../styles/pages/createlendsecret.css";
-import { formatUsd } from "../../utils/formatters";
+import "../../styles/pages/createlendsecret.scss";
 
 export type secretType = "POE" | "OPENAI" | "AIRWALLEX";
 
@@ -184,8 +184,7 @@ export default function CreateLendSecret(): JSX.Element {
           <button
             onClick={() => setSecretFee("1")}
             style={{
-              backgroundColor:
-                Number(secretFee) == 1 ? colors.textsecondary : "",
+              backgroundColor: Number(secretFee) == 1 ? colors.accent : "",
             }}
           >
             {formatUsd(1)}
@@ -193,8 +192,7 @@ export default function CreateLendSecret(): JSX.Element {
           <button
             onClick={() => setSecretFee("12")}
             style={{
-              backgroundColor:
-                Number(secretFee) == 12 ? colors.textsecondary : "",
+              backgroundColor: Number(secretFee) == 12 ? colors.accent : "",
             }}
           >
             {formatUsd(12)}
@@ -202,8 +200,7 @@ export default function CreateLendSecret(): JSX.Element {
           <button
             onClick={() => setSecretFee("18")}
             style={{
-              backgroundColor:
-                Number(secretFee) == 18 ? colors.textsecondary : "",
+              backgroundColor: Number(secretFee) == 18 ? colors.accent : "",
             }}
           >
             {formatUsd(18)}

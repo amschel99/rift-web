@@ -29,7 +29,7 @@
       @include mixins.useButton();
       @include mixins.useBaseFont();
       padding: 0.25rem;
-      border-bottom: 1px solid var(--primary);
+      border-bottom: 1px solid colors.$primary;
       font-size: 0.875rem;
       color: colors.$textsecondary;
       transition: all ease-in-out 0.25s;

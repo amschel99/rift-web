@@ -24,6 +24,7 @@ export const ENDPOINTS = {
   claimairdrop: "/claim-airdrop",
   unlocktokens: "/unlock-tokens",
   getunlockedtokens: "/fetch-unlock-tokens",
+  awxbalances: "/get-airwallex-balances",
 };
 
 export const SOCKET = io(BASEURL);

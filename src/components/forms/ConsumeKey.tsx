@@ -6,7 +6,7 @@ import { Loading } from "../../assets/animations";
 import { Import } from "../../assets/icons";
 import { colors } from "../../constants";
 import consumekey from "../../assets/images/consumesecret.png";
-import "../../styles/components/forms.css";
+import "../../styles/components/forms.scss";
 
 // use shared airwallex key
 export const ConsumeSharedKey = (): JSX.Element => {

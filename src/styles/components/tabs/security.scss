@@ -39,7 +39,7 @@
       @include mixins.useFlex(row, no-wrap, center, flex-start, 0.75rem);
       margin: 0.625rem -1rem;
       padding: 0.625rem 1rem;
-      background-color: colors.$divider;
+      background-color: rgba($color: colors.$divider, $alpha: 0.015);
 
       img {
         width: 2.5rem;
