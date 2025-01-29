@@ -19,8 +19,6 @@ import { EarnTab } from "./components/tabs/Earn";
 import { Profile } from "./components/tabs/Profile";
 import { Toaster } from "react-hot-toast";
 import "../src/index.css";
-import { SwipeableButton } from "react-swipeable-button";
-import Swiper from "./components/global/Swiper";
 
 function App(): JSX.Element {
   const navigate = useNavigate();
@@ -89,11 +87,6 @@ function App(): JSX.Element {
         </Fragment>
       )}
 
-      <Swiper
-        swiperTitle="Switch to Sphere Business"
-        swiperDescription="Sphere For Business"
-        swiperRoute="/b2b-suite"
-      />
       <BottomTabNavigation />
       <Toaster />
     </section>

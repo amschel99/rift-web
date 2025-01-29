@@ -16,8 +16,8 @@ function Swiper({
   }
   return (
     <div
-      className={`w-full px-4 items-center flex-col justify-center ${
-        swiperRoute === "/b2b-suite" ? "absolute bottom-20" : ""
+      className={`w-full px-4 py-4 items-center flex-col justify-center mb-4 ${
+        swiperRoute === "/b2b-suite" ? "mb-[50px]" : ""
       }`}
     >
       <SwipeableButton

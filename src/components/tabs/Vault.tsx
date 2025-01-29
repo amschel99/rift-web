@@ -11,6 +11,7 @@ import { Refresh, Add } from "../../assets/icons";
 import { colors } from "../../constants";
 import { Loading } from "../../assets/animations";
 import "../../styles/components/tabs/vault.css";
+import Swiper from "../global/Swiper";
 
 // home
 export const VaultTab = (): JSX.Element => {
@@ -172,6 +173,12 @@ export const VaultTab = (): JSX.Element => {
           />
         </div>
       </section>
+      <Swiper
+        swiperTitle="Switch to Sphere Business"
+        swiperDescription="Sphere For Business"
+        swiperRoute="/b2b-suite"
+      />
+      <div className="h-16"></div>
     </ReactPullToRefresh>
   );
 };

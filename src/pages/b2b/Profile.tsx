@@ -58,7 +58,7 @@ function ProfilePage() {
   return (
     <div className="relative">
       <Profile />
-      <h1 className="mt-4 mx-2 font-semibold font-body">My Business Profile</h1>
+      <h1 className="mt-4 mx-2 font-semibold font-body">My Business</h1>
       <div className="flex flex-col gap-4 mt-2 mb-4">
         {profileItems.map((item) => (
           <ProfileItem profileItem={item} />
@@ -76,7 +76,7 @@ function ProfilePage() {
         swiperDescription="Personal Sphere"
         swiperRoute="/"
       />
-      <div className="h-16"></div>
+      <div className="h-6"></div>
     </div>
   );
 }
