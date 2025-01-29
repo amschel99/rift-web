@@ -65,7 +65,7 @@ function ProfilePage() {
         ))}
       </div>
       <h1 className="mt-4 mx-2 font-semibold font-body mb-1">My Trophies</h1>
-      <div className="grid grid-cols-2 mb-4 gap-1 mx-2">
+      <div className="grid grid-cols-2 mb-4 gap-2 mx-2">
         {trophies.map((trophy) => (
           <Trophy key={trophy.id} trophy={trophy} />
         ))}
