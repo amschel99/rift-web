@@ -11,7 +11,6 @@ import { Refresh, Add } from "../../assets/icons";
 import { colors } from "../../constants";
 import { Loading } from "../../assets/animations";
 import "../../styles/components/tabs/home.scss";
-import "../../styles/components/tabs/vault.css";
 import Swiper from "../global/Swiper";
 
 export const HomeTab = (): JSX.Element => {
