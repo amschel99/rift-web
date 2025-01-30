@@ -20,7 +20,11 @@ function Gift() {
           borderRadius: "10px",
           marginTop: "10px",
         }}
-      ></div>
+      >
+        <h1 className="text-white text-xl font-bold text-center mt-1">
+          Telegram Premium
+        </h1>
+      </div>
     </div>
   );
 }
