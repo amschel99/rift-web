@@ -1,0 +1,233 @@
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition-ease {
+  transition: all 0.3s ease;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.deposit-link {
+  &-container {
+    min-height: 100vh;
+    @include flex-center;
+    background-color: var(--primary);
+    padding: 1rem;
+    font-family: "Inter", sans-serif;
+  }
+
+  &-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    @include transition-ease;
+    animation: fadeIn 0.5s ease-out;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+
+  &-info {
+    text-align: center;
+    color: var(--textsecondary);
+    font-size: 0.875rem;
+  }
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+
+  h1 {
+    color: var(--textprimary);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--textsecondary);
+    font-size: 0.875rem;
+  }
+}
+
+.icon {
+  &-circle {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    @include flex-center;
+    margin: 0 auto 1.5rem;
+  }
+
+  &-header {
+    width: 32px;
+    height: 32px;
+    color: var(--danger);
+  }
+}
+
+.earnings-section {
+  text-align: center;
+  margin-bottom: 2.5rem;
+
+  .label {
+    color: var(--textsecondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--textprimary);
+    @include flex-center;
+    gap: 0.5rem;
+  }
+
+  .currency {
+    color: var(--danger);
+  }
+}
+
+.link {
+  &-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    span {
+      color: var(--textsecondary);
+      font-size: 0.875rem;
+    }
+  }
+
+  &-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--textsecondary);
+  }
+
+  &-input {
+    &-container {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 0.75rem;
+    }
+
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--textprimary);
+    font-size: 0.875rem;
+    padding-right: 40px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.copy-button {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--textsecondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  @include flex-center;
+  @include transition-ease;
+
+  &:hover {
+    color: var(--textprimary);
+  }
+}
+
+.share {
+  &-button {
+    width: 100%;
+    background-color: var(--danger);
+    color: var(--textprimary);
+    border: none;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    font-size: 0.775rem;
+    font-weight: 600;
+    cursor: pointer;
+    @include flex-center;
+    gap: 0.5rem;
+    @include transition-ease;
+    margin-bottom: 1.5rem;
+
+    &:hover {
+      transform: translateY(-2px);
+      background-color: rgba(255, 82, 82, 0.8);
+    }
+  }
+
+  &-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.success {
+  color: var(--success);
+  animation: pulse 0.3s ease-in-out;
+}
+
+// Media Queries
+@media (max-width: 480px) {
+  .deposit-link-card {
+    padding: 1.5rem;
+  }
+
+  .amount {
+    font-size: 2rem;
+  }
+}

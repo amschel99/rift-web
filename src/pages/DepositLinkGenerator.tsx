@@ -65,8 +65,8 @@ generateDepositLink();
   }
 
   return (
-    <div className="referral-container">
-      <div className="referral-card">
+    <div className="deposit-link-container">
+      <div className="deposit-link-card">
         <div className="card-header">
           <div className="icon-circle">
             <LinkIcon className="header-icon" />
@@ -101,7 +101,7 @@ generateDepositLink();
           Share On Telegram
         </button>
 
-        <div className="referral-info">
+        <div className="deposit-link-info">
           <p>Generate a link to receive crypto payments directly to your wallet 🚀</p>
         </div>
       </div>
