@@ -31,10 +31,13 @@ import Splash from "./pages/Splash.tsx";
 import LendToUse from "./pages/lend/LendToUse.tsx";
 import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
-import BuyOm from "./pages/transactions/BuyOm.tsx";
+import "./styles/constants.css";
+import "./styles/index.css";
+import "./index.css";
+import BusinessSuite from "./pages/b2b/BusinessSuite.tsx";
 import Rewards from "./pages/Rewards.tsx";
 import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
-import "./styles/index.scss";
+import BuyOm from "./pages/transactions/BuyOm.tsx";
 
 // eruda.init();
 init();
@@ -80,6 +83,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/lend/asset" element={<CreateLendAsset />} />
                 <Route path="/lend/secret" element={<CreateLendSecret />} />
                 <Route path="/rewards/:id" element={<Rewards />} />
+                <Route path="/b2b-suite" element={<BusinessSuite />} />
               </Routes>
 
               <SnackBar />

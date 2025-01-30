@@ -11,6 +11,8 @@ import { Refresh, Add } from "../../assets/icons";
 import { colors } from "../../constants";
 import { Loading } from "../../assets/animations";
 import "../../styles/components/tabs/home.scss";
+import "../../styles/components/tabs/vault.css";
+import Swiper from "../global/Swiper";
 
 export const HomeTab = (): JSX.Element => {
   const { initData } = useLaunchParams();
@@ -131,10 +133,12 @@ export const HomeTab = (): JSX.Element => {
           (mysecrets.length > 0 ? (
             <MySecrets secretsLs={mykeys} />
           ) : (
-            <p className="nokeys">
-              Import Your Keys & Secrets to see them listed here <br />
-              You can also share your keys
-            </p>
+            <div className="">
+              <p className="nokeys">
+                Import Your Keys & Secrets to see them listed here <br />
+                You can also share your keys.
+              </p>
+            </div>
           ))}
 
         {secretsTab == "shared" &&
@@ -161,6 +165,12 @@ export const HomeTab = (): JSX.Element => {
           />
         </div>
       </section>
+      <Swiper
+        swiperTitle="Switch to Sphere Business"
+        swiperDescription="Sphere For Business"
+        swiperRoute="/b2b-suite"
+      />
+      <div className="h-16"></div>
     </ReactPullToRefresh>
   );
 };

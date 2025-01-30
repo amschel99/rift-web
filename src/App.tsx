@@ -1,5 +1,5 @@
 import { JSX, Fragment, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   mountClosingBehavior,
   enableClosingConfirmation,
@@ -17,6 +17,8 @@ import { SecurityTab } from "./components/tabs/Security";
 import { LabsTab } from "./components/tabs/Lab";
 import { DefiTab } from "./components/tabs/Defi";
 import { Profile } from "./components/tabs/Profile";
+import { Toaster } from "react-hot-toast";
+import "../src/index.css";
 
 function App(): JSX.Element {
   const navigate = useNavigate();
@@ -86,6 +88,7 @@ function App(): JSX.Element {
       )}
 
       <BottomTabNavigation />
+      <Toaster />
     </section>
   );
 }
