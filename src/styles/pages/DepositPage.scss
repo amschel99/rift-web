@@ -1,0 +1,289 @@
+// Variables
+:root {
+  --primary: #242d39;
+  --textprimary: rgba(248, 250, 252, 1);
+  --textsecondary: rgba(127, 127, 127, 1);
+  --danger: rgb(255, 82, 82);
+  --success: #0fb14d;
+  --divider: rgba(248, 250, 252, 0.05);
+  --accent: rgba(73, 107, 204, 1);
+  --background-secondary: rgba(44, 62, 80, 0.7);
+  --input-background: #1a2736;
+}
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition-ease {
+  transition: all 0.3s ease;
+}
+
+// Keyframes
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.deposit-page {
+  &-container {
+    width: 100%;
+    min-height: 100vh;
+    @include flex-center;
+    flex-direction: column;
+    padding: 1rem;
+    background: var(--primary);
+    background-image: 
+      radial-gradient(circle at 75% 30%, rgba(73, 107, 204, 0.1) 0%, transparent 30%),
+      linear-gradient(to bottom right, var(--primary) 0%, #191f28 100%);
+  }
+
+  &-card {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(36, 45, 57, 0.9);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    backdrop-filter: blur(12px);
+  }
+
+  &-header {
+    margin-bottom: 2rem;
+    animation: slideDown 0.6s ease-out;
+    @include flex-center;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+
+    .icon-container {
+      @include flex-center;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--textprimary);
+      margin-bottom: 0.5rem;
+    }
+
+    .description {
+      font-size: 0.875rem;
+      margin-bottom: 15px;
+    }
+  }
+}
+
+.wallet-address {
+  background: var(--input-background);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  color: var(--textsecondary);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.asset {
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: var(--input-background);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateX(8px);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &.selected {
+      background: linear-gradient(90deg, rgba(73, 107, 204, 0.1) 0%, rgba(73, 107, 204, 0.05) 100%);
+      border-color: var(--accent);
+    }
+  }
+
+  &-icon {
+    &-container {
+      position: relative;
+      margin-right: 1rem;
+    }
+
+    &-backdrop {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      @include flex-center;
+      @include transition-ease;
+
+      .icon-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
+  &-info {
+    flex-grow: 1;
+  }
+
+  &-name {
+    &-container {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    &-name {
+      font-weight: 500;
+      color: var(--textprimary);
+    }
+  }
+
+  &-symbol {
+    font-size: 0.8rem;
+    color: var(--textsecondary);
+  }
+
+  &-minimum {
+    font-size: 0.8rem;
+    color: var(--textsecondary);
+  }
+}
+
+.floating-input {
+  position: relative;
+  margin: 1.5rem 0;
+
+  input {
+    width: 100%;
+    padding: 1rem;
+    background: var(--input-background);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    color: var(--textprimary);
+    font-size: 1rem;
+    @include transition-ease;
+
+    &:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+  }
+
+  label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--textsecondary);
+    pointer-events: none;
+    @include transition-ease;
+    background: var(--input-background);
+    padding: 0 0.25rem;
+  }
+
+  input:focus ~ label,
+  input:not(:placeholder-shown) ~ label {
+    top: 0;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+}
+
+.action-button {
+  width: 100%;
+  padding: 1rem;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  @include transition-ease;
+
+  &.disabled {
+    background: var(--textsecondary);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(73, 107, 204, 0.3);
+
+    .button-glow {
+      opacity: 1;
+    }
+  }
+}
+
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  @include transition-ease;
+}
+
+.footer-depo {
+  width: 100%;
+  margin-top: 10px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  @include flex-center;
+}
+
+.glowing-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-text {
+  color: var(--textsecondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .glowing-card {
+    max-width: 600px;
+  }
+
+  .footer-text {
+    font-size: 0.875rem;
+  }
+}

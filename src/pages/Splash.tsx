@@ -48,6 +48,7 @@ export default function Splash(): JSX.Element {
   };
 
   const checkStartParams = () => {
+    console.log({startParam});
     if (startParam) {
       let data = startParam.split("-");
 
@@ -73,6 +74,8 @@ export default function Splash(): JSX.Element {
 
         navigate("/auth");
         return;
+      }else if (startParam.startsWith('address')){
+        console.log({startParam});
       }
     } else {
       let address: string | null = localStorage.getItem("address");
