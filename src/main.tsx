@@ -32,7 +32,6 @@ import LendToUse from "./pages/lend/LendToUse.tsx";
 import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import "./styles/index.scss";
-import "./index.css";
 import BusinessSuite from "./pages/b2b/BusinessSuite.tsx";
 import Rewards from "./pages/Rewards.tsx";
 import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
