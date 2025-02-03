@@ -27,4 +27,4 @@ dist-ssr
 
 todo*
 
-package-lock*
+package-lock.json
