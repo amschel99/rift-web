@@ -39,8 +39,10 @@ import BuyOm from "./pages/transactions/BuyOm.tsx";
 import DepositLinkGenerator from "./pages/DepositLinkGenerator.tsx";
 import PremiumFeaturesPage from "./pages/Premiums.tsx";
 import DepositPage from "./pages/Depositpage.tsx";
+import AIHelper from "./pages/AIHelper.tsx";
 import "./styles/index.scss";
 import "./index.css";
+import AIHelper from "./pages/AIHelper.tsx";
 
 eruda.init();
 init();
@@ -102,6 +104,7 @@ createRoot(document.getElementById("root")!).render(
                     path="/deposit/shared-link"
                     element={<DepositPage />}
                   />
+                  <Route path="/ai-helper" element={<AIHelper />} />
                 </Routes>
 
                 <SnackBar />
