@@ -15,12 +15,14 @@ import {
 } from "../utils/api/airdrop";
 import { formatUsd } from "../utils/formatters";
 import { getMantraUsdVal } from "../utils/api/mantra";
+import { dateDistance, formatDateToStr } from "../utils/dates";
 import { Confetti } from "../assets/animations";
-import { Lock, Stake, Send } from "../assets/icons";
+import { Lock } from "../assets/icons";
 import { colors } from "../constants";
 import rewards from "../assets/images/icons/rewards.png";
 import shareapp from "../assets/images/refer.png";
 import staketokens from "../assets/images/icons/lendto.png";
+import transaction from "../assets/images/obhehalfspend.png";
 import "../styles/pages/rewards.scss";
 
 export default function Rewards(): JSX.Element {
@@ -30,7 +32,7 @@ export default function Rewards(): JSX.Element {
   const { switchtab } = useTabs();
   const { drawerOpen, openAppDrawer } = useAppDrawer();
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
-  const { closeAppDialog } = useAppDialog();
+  const { openAppDialog, closeAppDialog } = useAppDialog();
 
   const [animationplayed, setAnimationPlayed] = useState<boolean>(false);
 
@@ -89,6 +91,7 @@ export default function Rewards(): JSX.Element {
 
   useEffect(() => {
     if (id !== "nil") {
+      openAppDialog("loading", "Claiming your Airdrop tokens, please wait");
       mutateClaimAirdrop();
     }
   }, [id]);
@@ -127,13 +130,14 @@ export default function Rewards(): JSX.Element {
         <p className="fiat">
           <span className="crypto">{unlockedTokens?.amount} OM</span> ~&nbsp;
           {formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
-          <Lock width={10} height={14} color={colors.textsecondary} />
+          <Lock width={10} height={14} color={colors.danger} />
         </p>
 
         <span className="info">
           Your rewards will be unlocked as you complete tasks
         </span>
       </div>
+
       <div className="tasks">
         <p className="title">Tasks</p>
 
@@ -141,10 +145,8 @@ export default function Rewards(): JSX.Element {
           <img src={shareapp} alt="rewards" />
 
           <p>
-            Share&nbsp;
-            <Stake color={colors.success} />
-            <br />
-            <span>Share the app & unlock 1 OM every time</span>
+            Share
+            <span>Share the app & unlock 1 OM</span>
           </p>
         </div>
 
@@ -152,10 +154,8 @@ export default function Rewards(): JSX.Element {
           <img src={staketokens} alt="rewards" />
 
           <p>
-            Stake&nbsp;
-            <Stake color={colors.success} />
-            <br />
-            <span>Stake crypto assets & unlock 4 OM</span>
+            Stake
+            <span>Stake crypto asset(s) & unlock 4 OM</span>
           </p>
         </div>
 
@@ -165,11 +165,11 @@ export default function Rewards(): JSX.Element {
             openAppDrawer("unlocktransactions");
           }}
         >
+          <img src={transaction} alt="transaction" />
+
           <p>
-            Make a transaction&nbsp;
-            <Send color={colors.success} />
-            <br />
-            <span>Make a transaction of any amount to unlock 1 OM</span>
+            Make a transaction
+            <span>Perform a transaction & unlock 1 OM</span>
           </p>
         </div>
       </div>
@@ -195,20 +195,25 @@ export default function Rewards(): JSX.Element {
         )}
 
         {unlockHistory &&
-          unlockHistory[0]?.message?.map((message, index) => (
-            <p
-              style={{
-                borderBottom:
-                  index == unlockHistory[0]?.message?.length - 1
-                    ? `1px solid ${colors.divider}`
-                    : "",
-              }}
-              className="message"
-              key={index}
-            >
-              {message}
-            </p>
-          ))}
+          unlockHistory[0]?.message?.map((message, index) => {
+            const datestr = message.split(" ").pop() as string;
+
+            return (
+              <p
+                style={{
+                  borderBottom:
+                    index == unlockHistory[0]?.message?.length - 1
+                      ? `1px solid ${colors.divider}`
+                      : "",
+                }}
+                className="message"
+                key={index}
+              >
+                {message.split(" ").slice(0, -1).join(" ")}&nbsp;
+                {formatDateToStr(datestr)}&nbsp;({dateDistance(datestr)})
+              </p>
+            );
+          })}
       </div>
     </section>
   );
