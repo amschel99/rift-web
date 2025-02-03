@@ -63,12 +63,14 @@
     .setup {
       @include mixins.useFlex(row, no-wrap, center, center, 0.5rem);
       @include mixins.useButton();
+      @include mixins.useBaseFont();
       gap: 0.5rem;
       width: 100%;
       margin-top: 1rem;
       padding: 0.5rem;
       border-radius: 0.25rem;
       background-color: colors.$danger;
+      font-size: 0.875rem;
       color: colors.$textprimary;
     }
 

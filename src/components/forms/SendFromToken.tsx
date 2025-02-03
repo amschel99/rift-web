@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { SOCKET } from "../../utils/api/config";
 import { spendOnBehalf } from "../../utils/api/wallet";
 import { getEthUsdVal } from "../../utils/ethusd";
+import { base64ToString } from "../../utils/base64";
 import { Loading } from "../../assets/animations";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
@@ -11,15 +12,6 @@ import { SendFromToken } from "../../assets/icons";
 import { colors } from "../../constants";
 import foreignspend from "../../assets/images/obhehalfspend.png";
 import "../../styles/components/forms.scss";
-
-function base64ToString(base64: string | null): string {
-  try {
-    if (!base64) throw new Error("Base64 string is missing");
-    return decodeURIComponent(escape(atob(base64)));
-  } catch (error) {
-    return "Invalid value";
-  }
-}
 
 // foreign spend - send eth to my address from shared link
 export const SendEthFromToken = (): JSX.Element => {

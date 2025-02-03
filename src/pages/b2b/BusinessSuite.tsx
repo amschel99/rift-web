@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import {
   IconGiftFilled,
@@ -17,7 +16,6 @@ function BusinessSuite() {
   const backbuttonclick = () => {
     navigate(-1);
   };
-  toast.success("Switched to Sphere Business");
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();

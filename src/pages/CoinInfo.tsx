@@ -65,10 +65,13 @@ export default function CoinInfo(): JSX.Element {
       <Fragment>
         <div id="loo1">
           <p className="name_symbol">
-            {coinDetails?.name} <span>{coinDetails?.symbol}</span>
+            {coinDetails && coinDetails?.name}{" "}
+            <span>{coinDetails && coinDetails?.symbol}</span>
           </p>
           <p className="price">
-            {formatUsd(coinDetails?.market_data?.current_price?.usd)}
+            {formatUsd(
+              coinDetails && coinDetails?.market_data?.current_price?.usd
+            )}
           </p>
           <p
             className="price_change24"
@@ -76,23 +79,31 @@ export default function CoinInfo(): JSX.Element {
               fontStyle: "normal",
               fontWeight: "600",
               color:
+                coinDetails &&
                 coinDetails?.market_data?.price_change_percentage_24h < 0
                   ? colors.danger
                   : colors.success,
             }}
           >
-            {coinDetails?.market_data?.price_change_percentage_24h > 0
-              ? `+${coinDetails?.market_data?.price_change_percentage_24h.toFixed(
-                  2
-                )}%`
-              : `${coinDetails?.market_data?.price_change_percentage_24h.toFixed(
-                  2
-                )}%`}
+            {coinDetails &&
+            coinDetails?.market_data?.price_change_percentage_24h > 0
+              ? `+${
+                  coinDetails &&
+                  coinDetails?.market_data?.price_change_percentage_24h.toFixed(
+                    2
+                  )
+                }%`
+              : `${
+                  coinDetails &&
+                  coinDetails?.market_data?.price_change_percentage_24h.toFixed(
+                    2
+                  )
+                }%`}
           </p>
         </div>
 
         <div className="prices">
-          <CoinPriceChart data={coinPrices} />
+          <CoinPriceChart data={coinPrices && coinPrices} />
 
           <div className="dayscount">
             <button
@@ -185,21 +196,30 @@ export default function CoinInfo(): JSX.Element {
           </p>
         </div>
 
-        <p id="loo2">{coinDetails?.description?.en}</p>
+        <p id="loo2">{coinDetails && coinDetails?.description?.en}</p>
 
         <div id="loo4">
-          <span onClick={() => openLink(coinDetails?.links?.homepage[0])}>
+          <span
+            onClick={() =>
+              openLink(coinDetails && coinDetails?.links?.homepage[0])
+            }
+          >
             Official Website
           </span>
-          <span onClick={() => openLink(coinDetails?.links?.whitepaper)}>
+          <span
+            onClick={() =>
+              openLink(coinDetails && coinDetails?.links?.whitepaper)
+            }
+          >
             Whitepaper
           </span>
         </div>
 
         <div id="loo5">
-          {coinDetails?.categories?.map((_cat, idx) => (
-            <span key={_cat + idx}>{_cat}</span>
-          ))}
+          {coinDetails &&
+            coinDetails?.categories?.map((_cat, idx) => (
+              <span key={_cat + idx}>{_cat}</span>
+            ))}
         </div>
       </Fragment>
 

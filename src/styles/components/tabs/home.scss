@@ -17,6 +17,9 @@
     .importsecret {
       @include mixins.useFlex(row, no-wrap, center, center, 0);
       @include mixins.useButton();
+      padding: 0.5rem;
+      border-radius: 0.625rem;
+      background-color: colors.$danger;
     }
   }
 
@@ -51,7 +54,6 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    border-radius: 50%;
   }
 }
 
@@ -61,8 +63,9 @@
 
   .action {
     @include mixins.useFlex(column, nowrap, flex-start, center, 0);
-    padding: 0 0.375rem;
+    padding: 0 0.5rem;
     height: 50%;
+    background-color: colors.$divider;
 
     p {
       @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);

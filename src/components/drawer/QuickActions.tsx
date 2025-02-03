@@ -39,7 +39,7 @@ export const QuickActions = (): JSX.Element => {
 
   return (
     <div className="quickactions">
-      <p className="title">Quick Actions</p>
+      {/* <p className="title">Quick Actions</p> */}
 
       <div className="parent f_parent mantra" onClick={getMantra}>
         <img src={mantralogo} alt="mantra" />
@@ -77,10 +77,10 @@ export const QuickActions = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="parent" onClick={openAIHelper}>
+      <div className="parent last_parent" onClick={openAIHelper}>
         <img src={aihelpericon} alt="AI Helper" />
         <div className="child">
-          <p>AI Helper</p>
+          <p>AI Assistant</p>
           <span>Get instant guidance on app features</span>
         </div>
       </div>

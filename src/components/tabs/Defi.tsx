@@ -149,7 +149,7 @@ export const DefiTab = (): JSX.Element => {
         <img src={lendtospend} alt="lend to spend" />
 
         <p>
-          Lend & Earn <Stake color={colors.success} /> <br />
+          Lend & Earn <br />
           <span>Allow others to use your crypto assets and secrets</span>
         </p>
       </div>

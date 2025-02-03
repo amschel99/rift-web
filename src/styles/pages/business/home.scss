@@ -1,0 +1,53 @@
+@use "../../constants/colors" as colors;
+@use "../../constants/mixins" as mixins;
+
+#businesshome {
+  padding: 1rem;
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .desc {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid colors.$divider;
+    font-size: 0.875rem;
+    color: colors.$textsecondary;
+  }
+
+  .avatrctr {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+.profile_actions {
+  width: 100%;
+  height: 100%;
+
+  .action {
+    @include mixins.useFlex(column, nowrap, flex-start, center, 0);
+    padding: 0 0.5rem;
+    height: 50%;
+    background-color: colors.$divider;
+
+    p {
+      @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: colors.$textprimary;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: colors.$textsecondary;
+    }
+  }
+
+  .first {
+    border-bottom: 1px solid colors.$divider;
+  }
+}

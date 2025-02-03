@@ -74,7 +74,6 @@ const drawerstyles: CSSProperties = {
   justifyContent: "flex-start",
   width: "100vw",
   height: "49vh",
-  padding: "0.25rem",
   borderTopLeftRadius: "0.5rem",
   borderTopRightRadius: "0.5rem",
   zIndex: 4000,

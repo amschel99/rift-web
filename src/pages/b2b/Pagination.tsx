@@ -1,4 +1,3 @@
-import toast from "react-hot-toast";
 import {
   Pagination,
   PaginationContent,
@@ -20,12 +19,7 @@ export function PaginationContainer() {
           <PaginationLink href="">1</PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink
-            href=""
-            isActive
-            onClick={() => toast.success("Page 2 loaded")}
-            className="font-body"
-          >
+          <PaginationLink href="" isActive className="font-body">
             2
           </PaginationLink>
         </PaginationItem>

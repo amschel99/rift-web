@@ -3,7 +3,6 @@ import ProfileItem, { ProfileItemProps } from "./ProfileItem";
 import airdrop from "../../public/airdrop.webp";
 import unlock from "../../public/unlock.webp";
 import points from "../../public/points.png";
-import Swiper from "../../components/global/Swiper";
 import trophy1 from "../../public/trophy1.png";
 import trophy2 from "../../public/trophy2.png";
 import trophy3 from "../../public/trophy3.png";
@@ -70,13 +69,6 @@ function ProfilePage() {
           <Trophy key={trophy.id} trophy={trophy} />
         ))}
       </div>
-
-      <Swiper
-        swiperTitle="Switch to Personal Profile"
-        swiperDescription="Personal Sphere"
-        swiperRoute="/"
-      />
-      <div className="h-6"></div>
     </div>
   );
 }

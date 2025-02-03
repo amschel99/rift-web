@@ -37,9 +37,38 @@ export const PopOver = ({
   );
 };
 
+export const PopOverAlt = ({
+  children,
+  anchorEl,
+  setAnchorEl,
+}: props): JSX.Element => {
+  const popOverOPen = Boolean(anchorEl);
+  const popOverId = popOverOPen ? "generic-popover" : undefined;
+
+  const onClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <Popover
+      id={popOverId}
+      open={popOverOPen}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      elevation={0}
+      slotProps={{
+        paper: { style: { ...popOverStyles, width: "12rem", height: "8rem" } },
+      }}
+    >
+      {children}
+    </Popover>
+  );
+};
+
 const popOverStyles: CSSProperties = {
   width: "100%",
-  height: "13.375rem",
+  height: "13.5rem",
   marginTop: 6,
   border: `1px solid ${colors.divider}`,
   borderRadius: "0.5rem",

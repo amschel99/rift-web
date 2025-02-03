@@ -3,24 +3,25 @@
 
 #unlocktransactions {
   width: 100%;
-  padding: 0 1rem;
 
   .title {
     margin-top: 1rem;
-    font-size: 0.875rem;
-    font-weight: 400;
+    padding: 0 1rem;
+    font-size: 1rem;
+    font-weight: bold;
     color: colors.$textprimary;
   }
 
   .desc {
     margin-bottom: 1rem;
+    padding: 0 1rem;
     font-size: 0.75rem;
     color: colors.$textsecondary;
   }
 
   .parent {
     @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);
-    padding: 1rem 0;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid colors.$divider;
 
     .child {

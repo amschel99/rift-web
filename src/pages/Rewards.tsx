@@ -210,7 +210,8 @@ export default function Rewards(): JSX.Element {
                 key={index}
               >
                 {message.split(" ").slice(0, -1).join(" ")}&nbsp;
-                {formatDateToStr(datestr)}&nbsp;({dateDistance(datestr)})
+                {formatDateToStr(datestr)}&nbsp;
+                <span>({dateDistance(datestr)})</span>
               </p>
             );
           })}

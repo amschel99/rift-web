@@ -5,9 +5,10 @@ import { Avatar } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useTabs } from "../../hooks/tabs";
 import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
-import { MySecrets, SharedSecrets } from "../Secrets";
 import { WalletBalance } from "../WalletBalance";
-import { Add } from "../../assets/icons";
+import { MySecrets, SharedSecrets } from "../Secrets";
+import { PopOverAlt } from "../global/PopOver";
+import { Add, QuickActions, Stake } from "../../assets/icons";
 import { colors } from "../../constants";
 import "../../styles/components/tabs/home.scss";
 
@@ -17,6 +18,9 @@ export const HomeTab = (): JSX.Element => {
   const { switchtab } = useTabs();
 
   const [secretsTab, setSecretsTab] = useState<"all" | "me" | "shared">("all");
+  const [profileAnchorEl, setProfileAnchorEl] = useState<HTMLDivElement | null>(
+    null
+  );
 
   const { data } = useQuery({
     queryKey: ["secrets"],
@@ -29,6 +33,16 @@ export const HomeTab = (): JSX.Element => {
 
   const onImportKey = () => {
     navigate("/importsecret");
+  };
+
+  const ongoToProfile = () => {
+    setProfileAnchorEl(null);
+    switchtab("profile");
+  };
+
+  const onSwitchToBusiness = () => {
+    setProfileAnchorEl(null);
+    navigate("/business");
   };
 
   let mysecrets = mykeys?.filter((_scret) => _scret.type == "own");
@@ -58,7 +72,7 @@ export const HomeTab = (): JSX.Element => {
         <p>Secrets</p>
 
         <button className="importsecret" onClick={onImportKey}>
-          <Add color={colors.textprimary} />
+          <Add width={18} height={18} color={colors.textprimary} />
         </button>
       </div>
 
@@ -128,10 +142,33 @@ export const HomeTab = (): JSX.Element => {
             width: 32,
             height: 32,
           }}
-          onClick={() => {
-            switchtab("profile");
+          onClick={(e) => {
+            setProfileAnchorEl(e.currentTarget);
           }}
         />
+        <PopOverAlt anchorEl={profileAnchorEl} setAnchorEl={setProfileAnchorEl}>
+          {
+            <div className="profile_actions">
+              <div className="action first" onClick={ongoToProfile}>
+                <p>
+                  My Profile <Stake color={colors.textprimary} />
+                </p>
+                <span>Visit my profile</span>
+              </div>
+              <div className="action" onClick={onSwitchToBusiness}>
+                <p>
+                  Business
+                  <QuickActions
+                    width={10}
+                    height={10}
+                    color={colors.textprimary}
+                  />
+                </p>
+                <span>Stratosphere for Businesses</span>
+              </div>
+            </div>
+          }
+        </PopOverAlt>
       </div>
     </section>
   );
