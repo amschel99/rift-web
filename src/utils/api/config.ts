@@ -13,7 +13,7 @@ export const ENDPOINTS = {
   getkeys: "/fetch-keys",
   sharekey: "/share-key",
   usekey: "/use-key",
-  usdtbalance: "/usdt-balance",
+  ombalance: "/usdt-balance",
   sendusdt: "/spend-usdt",
   sendbtc: "/spend-btc",
   promptgpt: "/conversational-ai", // prompt gpt
@@ -23,6 +23,7 @@ export const ENDPOINTS = {
   rewardnewuser: "/reward-new-user",
   claimairdrop: "/claim-airdrop",
   unlocktokens: "/unlock-tokens",
+  unlockhistory: "/unlock-history",
   getunlockedtokens: "/fetch-unlock-tokens",
   importawxkey: "/import-airwallex",
   awxbalances: "/get-airwallex-balances",

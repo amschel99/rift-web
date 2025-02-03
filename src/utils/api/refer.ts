@@ -12,7 +12,7 @@ export const createReferralLink = async (
   });
 
   const referralLink = await response.json();
-  return `${referralLink}&type=${type}`;
+  return `${referralLink}%26type=${type}`;
 };
 
 export const earnFromReferral = async (code: string, referaltype: string) => {

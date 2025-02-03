@@ -1,5 +1,5 @@
 import { JSX, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ import "../../styles/pages/transaction.scss";
 
 export default function SendEth(): JSX.Element {
   const navigate = useNavigate();
+  const { intent } = useParams();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
@@ -24,15 +25,14 @@ export default function SendEth(): JSX.Element {
   const [httpSuccess, setHttpSuccess] = useState<boolean>(false);
 
   const { mutate: mutateSenEth } = useMutation({
-    mutationFn: () => sendEth(receiverAddress, ethAmnt),
+    mutationFn: () => sendEth(receiverAddress, ethAmnt, intent as string),
     onSuccess: () => {
       setHttpSuccess(true);
       showsuccesssnack("Please hold on...");
     },
-    onError: (error) => {
-      alert(error)
+    onError: () => {
       setProcessing(false);
-      showerrorsnack("Unexpected error occurred ");
+      showerrorsnack("An unexpected error occurred");
     },
   });
 
@@ -61,14 +61,12 @@ export default function SendEth(): JSX.Element {
 
   useEffect(() => {
     if (httpSuccess) {
-      SOCKET.on("TXSent", () => {
-        showsuccesssnack("Please hold on...");
-      });
       SOCKET.on("TXConfirmed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
         closeAppDrawer();
       });
+
       SOCKET.on("TXFailed", () => {
         setProcessing(false);
         showerrorsnack("The transaction failed");
@@ -76,7 +74,6 @@ export default function SendEth(): JSX.Element {
     }
 
     return () => {
-      SOCKET.off("TXSent");
       SOCKET.off("TXConfirmed");
       SOCKET.off("TXFailed");
     };

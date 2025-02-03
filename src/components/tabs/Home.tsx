@@ -35,7 +35,6 @@ export const HomeTab = (): JSX.Element => {
   let sharedsecrets = mykeys?.filter(
     (_scret) => _scret.type == "foreign" && !_scret?.expired
   );
-  console.log(mysecrets?.length + sharedsecrets?.length);
 
   useEffect(() => {
     if (backButton.isSupported()) {

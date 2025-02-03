@@ -3,11 +3,14 @@ import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useTabs } from "../hooks/tabs";
+import { useAppDrawer } from "../hooks/drawer";
 import { useSnackbar } from "../hooks/snackbar";
 import { useAppDialog } from "../hooks/dialog";
 import {
   claimAirdrop,
   getUnlockedTokens,
+  unlockhistorytype,
+  unlockTokensHistory,
   unlockTokensType,
 } from "../utils/api/airdrop";
 import { formatUsd } from "../utils/formatters";
@@ -18,7 +21,6 @@ import { colors } from "../constants";
 import rewards from "../assets/images/icons/rewards.png";
 import shareapp from "../assets/images/refer.png";
 import staketokens from "../assets/images/icons/lendto.png";
-
 import "../styles/pages/rewards.scss";
 
 export default function Rewards(): JSX.Element {
@@ -26,8 +28,8 @@ export default function Rewards(): JSX.Element {
   const { invalidateQueries } = useQueryClient();
   const navigate = useNavigate();
   const { switchtab } = useTabs();
-  const { showerrorsnack } = useSnackbar();
-  const { showsuccesssnack } = useSnackbar();
+  const { drawerOpen, openAppDrawer } = useAppDrawer();
+  const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { closeAppDialog } = useAppDialog();
 
   const [animationplayed, setAnimationPlayed] = useState<boolean>(false);
@@ -44,11 +46,17 @@ export default function Rewards(): JSX.Element {
     queryFn: getUnlockedTokens,
   });
 
+  const { data } = useQuery({
+    queryKey: ["unlockhitory"],
+    queryFn: unlockTokensHistory,
+  });
+  const unlockHistory = data as unlockhistorytype[];
+
   // claim airdrop
   const { mutate: mutateClaimAirdrop } = useMutation({
     mutationFn: () => claimAirdrop(airdropId as string),
     onSuccess: () => {
-      invalidateQueries({ queryKey: ["getunlocked"] });
+      invalidateQueries({ queryKey: ["getunlocked", "unlockhitory"] });
       showsuccesssnack("You Successfully claimed Airdrop Tokens");
       closeAppDialog();
     },
@@ -61,7 +69,6 @@ export default function Rewards(): JSX.Element {
   const unlockedTokens = unlocked as unlockTokensType;
 
   const onShareApp = () => {
-    //should just generate a refferal link or redirect to refferal maybe attach something to show it's for unlocking
     navigate("/refer/unlock");
   };
 
@@ -100,7 +107,7 @@ export default function Rewards(): JSX.Element {
       backButton.offClick(goBack);
       backButton.unmount();
     };
-  }, []);
+  }, [drawerOpen]);
 
   return (
     <section id="rewards">
@@ -155,15 +162,14 @@ export default function Rewards(): JSX.Element {
         <div
           className="task"
           onClick={() => {
-            //should open a modal that asks you what transaction you wanna make and redirect to the respective page
-            //add extra param in transaction api that awards you points if you made a transaction to unlock
+            openAppDrawer("unlocktransactions");
           }}
         >
           <p>
             Make a transaction&nbsp;
             <Send color={colors.success} />
             <br />
-            <span>Make a transaction of any amount to unlock some tokens</span>
+            <span>Make a transaction of any amount to unlock 1 OM</span>
           </p>
         </div>
       </div>
@@ -181,6 +187,28 @@ export default function Rewards(): JSX.Element {
         <p className="aboutunlocked">
           Any unlocked amount is sent to your wallet
         </p>
+      </div>
+
+      <div className="history">
+        {unlockHistory && unlockHistory[0]?.message?.length !== 0 && (
+          <p className="title">History</p>
+        )}
+
+        {unlockHistory &&
+          unlockHistory[0]?.message?.map((message, index) => (
+            <p
+              style={{
+                borderBottom:
+                  index == unlockHistory[0]?.message?.length - 1
+                    ? `1px solid ${colors.divider}`
+                    : "",
+              }}
+              className="message"
+              key={index}
+            >
+              {message}
+            </p>
+          ))}
       </div>
     </section>
   );

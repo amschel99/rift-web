@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { init } from "@telegram-apps/sdk-react";
-// import eruda from "eruda";
+import eruda from "eruda";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SnackBarProvider } from "./hooks/snackbar";
@@ -42,7 +42,7 @@ import DepositPage from "./pages/Depositpage.tsx";
 import "./styles/index.scss";
 import "./index.css";
 
-// eruda.init();
+eruda.init();
 init();
 
 const queryclient = new QueryClient();
@@ -62,11 +62,15 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="/logout" element={<Logout />} />
                   <Route path="/coin/:coinId" element={<CoinInfo />} />
                   <Route path="/btc-asset" element={<BtcAsset />} />
-                  <Route path="/send-btc" element={<SendBtc />} />
-                  <Route path="/eth-asset" element={<EthAsset />} />
-                  <Route path="/send-eth" element={<SendEth />} />
+                  <Route path="/send-btc/:intent" element={<SendBtc />} />
+                  <Route path="/eth-asset/:intent" element={<EthAsset />} />
+                  <Route path="/send-eth/:intent" element={<SendEth />} />
+                  <Route
+                    path="/sendcollectlink/:intent"
+                    element={<SendEthLink />}
+                  />
                   <Route path="/om-asset" element={<OmAsset />} />
-                  <Route path="/send-usdc" element={<SendUsdc />} />
+                  <Route path="/send-usdc/:intent" element={<SendUsdc />} />
                   <Route path="/get-om" element={<BuyOm />} />
                   <Route
                     path="/chat/:conversationId/:chatAccessToken/:initialMessage/:nonce"
@@ -77,7 +81,6 @@ createRoot(document.getElementById("root")!).render(
                     path="/security/selector/:type"
                     element={<NodesTeeSelector />}
                   />
-                  <Route path="/sendcollectlink" element={<SendEthLink />} />
                   <Route path="/importsecret" element={<ImportSecret />} />
                   <Route path="/importawx" element={<ImportAirwllxKey />} />
                   <Route

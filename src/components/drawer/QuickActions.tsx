@@ -13,12 +13,12 @@ export const QuickActions = (): JSX.Element => {
 
   const sendBtc = () => {
     closeAppDrawer();
-    navigate("/send-btc");
+    navigate("/send-btc/send");
   };
 
   const sendEth = () => {
     closeAppDrawer();
-    navigate("/eth-asset");
+    navigate("/eth-asset/send");
   };
 
   const getMantra = () => {

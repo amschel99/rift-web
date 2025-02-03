@@ -148,7 +148,7 @@ export const WalletBalance = (): JSX.Element => {
             </p>
           </div>
 
-          <div className="_asset" onClick={() => navigate("/eth-asset")}>
+          <div className="_asset" onClick={() => navigate("/eth-asset/send")}>
             <div>
               <img src={ethlogo} alt="btc" />
 

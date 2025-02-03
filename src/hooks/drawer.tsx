@@ -5,7 +5,8 @@ export type draweraction =
   | "consumekey"
   | "refferred"
   | "quickactions"
-  | "nodeteeselector";
+  | "nodeteeselector"
+  | "unlocktransactions";
 
 interface draerctxtype {
   action: draweraction;

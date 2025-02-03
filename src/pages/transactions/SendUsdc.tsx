@@ -1,12 +1,12 @@
 import { JSX, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
 import { SOCKET } from "../../utils/api/config";
-import { sendUSDT } from "../../utils/api/wallet";
+import { sendUSDC } from "../../utils/api/wallet";
 import { colors } from "../../constants";
 import { Info, Send } from "../../assets/icons";
 import { Loading } from "../../assets/animations";
@@ -15,6 +15,7 @@ import "../../styles/pages/transaction.scss";
 
 export default function SendUsdc(): JSX.Element {
   const navigate = useNavigate();
+  const { intent } = useParams();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
@@ -26,7 +27,7 @@ export default function SendUsdc(): JSX.Element {
   let availableBalance = localStorage.getItem("usdtbal");
 
   const { mutate: mutateSendUsdc, isSuccess } = useMutation({
-    mutationFn: () => sendUSDT(receiverAddress, usdcAmnt),
+    mutationFn: () => sendUSDC(receiverAddress, usdcAmnt, intent as string),
   });
 
   const errorInUsdcValue = (): boolean => {

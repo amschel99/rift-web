@@ -55,9 +55,7 @@ export default function Authentication(): JSX.Element {
         }
       });
 
-      SOCKET.on("AccountCreationFailed", () => {
-        console.log("accounts event...!!!");
-      });
+      SOCKET.on("AccountCreationFailed", () => {});
 
       return () => {
         SOCKET.off("AccountCreationSuccess");

@@ -109,7 +109,7 @@ export const SharedSecrets = ({
           </div>
 
           <span className="secretutility">
-            {secret.purpose == "OPENAI" ? "ChatBot(GPT-4o)" : "AirWallex"}
+            {secret.purpose == "OPENAI" ? "GPT-4o" : "AirWallex"}
             {secret.purpose == "OPENAI" ? (
               <ChatBot width={16} height={16} color={colors.textprimary} />
             ) : (

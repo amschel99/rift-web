@@ -1,5 +1,5 @@
 import { JSX, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
 import { formatUsd, formatNumber } from "../utils/formatters";
@@ -10,6 +10,7 @@ import "../styles/pages/assets.scss";
 
 export default function EthAsset(): JSX.Element {
   const navigate = useNavigate();
+  const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
 
   const backbuttonclick = () => {
@@ -53,8 +54,8 @@ export default function EthAsset(): JSX.Element {
       </button>
 
       <div className="balance">
-        <p>{formatUsd(Number(ethbal))}</p>
-        <span>{formatNumber(Number(ethbalUsd))} ETH</span>
+        <p>{formatUsd(Number(ethbalUsd))}</p>
+        <span>{formatNumber(Number(ethbal))} ETH</span>
       </div>
 
       <div className="actions">
@@ -68,13 +69,16 @@ export default function EthAsset(): JSX.Element {
         <div className="buttons">
           <button
             className="receive"
-            onClick={() => navigate("/sendcollectlink")}
+            onClick={() => navigate(`/sendcollectlink/${intent}`)}
           >
             Create Link
             <Telegram width={18} height={18} color={colors.textprimary} />
           </button>
 
-          <button className="send" onClick={() => navigate("/send-eth")}>
+          <button
+            className="send"
+            onClick={() => navigate(`/send-eth/${intent}`)}
+          >
             Send ETH <Send width={18} height={18} color={colors.textprimary} />
           </button>
         </div>

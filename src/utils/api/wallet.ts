@@ -50,7 +50,7 @@ export const walletBalance = async (): Promise<walletBalTtype> => {
 export const mantraBalance = async (): Promise<usdtBalTYpe> => {
   let token: string | null = localStorage.getItem("token");
 
-  let URL = BASEURL + ENDPOINTS.usdtbalance;
+  let URL = BASEURL + ENDPOINTS.ombalance;
 
   let res: Response = await fetch(URL, {
     method: "POST",
@@ -65,14 +65,18 @@ export const mantraBalance = async (): Promise<usdtBalTYpe> => {
 
 // HTTP - Spend / Send eth from wallet to another address
 // io events - TXSent, TXConfirmed
-export const sendEth = async (toAddr: string, ethValStr: string) => {
+export const sendEth = async (
+  toAddr: string,
+  ethValStr: string,
+  intent: string
+) => {
   let token: string | null = localStorage.getItem("token");
 
   let URL = BASEURL + ENDPOINTS.spend;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to: toAddr, value: ethValStr }),
+    body: JSON.stringify({ to: toAddr, value: ethValStr, intent }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -80,14 +84,18 @@ export const sendEth = async (toAddr: string, ethValStr: string) => {
   });
 };
 
-export const sendUSDT = async (toAddr: string, usdtValStr: string) => {
+export const sendUSDC = async (
+  toAddr: string,
+  usdtCalStr: string,
+  intent: string
+) => {
   let token: string | null = localStorage.getItem("token");
 
   let URL = BASEURL + ENDPOINTS.sendusdt;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to: toAddr, value: usdtValStr }),
+    body: JSON.stringify({ to: toAddr, value: usdtCalStr, intent }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -95,14 +103,18 @@ export const sendUSDT = async (toAddr: string, usdtValStr: string) => {
   });
 };
 
-export const sendBTC = async (toAddr: string, btcValStr: string) => {
+export const sendBTC = async (
+  toAddr: string,
+  btcValStr: string,
+  intent: string
+) => {
   let token: string | null = localStorage.getItem("token");
 
   let URL = BASEURL + ENDPOINTS.sendbtc;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to: toAddr, value: btcValStr }),
+    body: JSON.stringify({ to: toAddr, value: btcValStr, intent }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -138,9 +150,10 @@ export const shareWalletAccess = async (
 export const spendOnBehalf = async (
   accessToken: string,
   to: string,
-  id: string
+  id: string,
+  intent: string
 ): Promise<{ status: number }> => {
-  let URL = BASEURL + ENDPOINTS.spendwithtoken + `?id=${id}`;
+  let URL = BASEURL + ENDPOINTS.spendwithtoken + `?id=${id}&intent=${intent}`;
 
   let res: Response = await fetch(URL, {
     method: "POST",

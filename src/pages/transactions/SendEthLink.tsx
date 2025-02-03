@@ -4,7 +4,7 @@ import {
   openTelegramLink,
   useLaunchParams,
 } from "@telegram-apps/sdk-react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Checkbox, Slider, TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { shareWalletAccess } from "../../utils/api/wallet";
@@ -18,6 +18,7 @@ import "../../styles/pages/sendcollectlink.scss";
 export default function SendEthLink(): JSX.Element {
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
+  const { intent } = useParams();
   const { showerrorsnack } = useSnackbar();
 
   let localethBal = localStorage.getItem("ethbal");
@@ -66,8 +67,9 @@ export default function SendEthLink(): JSX.Element {
       );
 
       if (token) {
+        const shareUrl = token + `%26intent=${intent}`;
         openTelegramLink(
-          `https://t.me/share/url?url=${token}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
+          `https://t.me/share/url?url=${shareUrl}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
         );
       } else {
         showerrorsnack(

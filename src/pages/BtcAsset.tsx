@@ -67,7 +67,7 @@ export default function BtcAsset(): JSX.Element {
             <Receive width={18} height={18} color={colors.textprimary} />
           </button>
 
-          <button className="send" onClick={() => navigate("/send-btc")}>
+          <button className="send" onClick={() => navigate("/send-btc/send")}>
             Send BTC <Send width={18} height={18} color={colors.textprimary} />
           </button>
         </div>

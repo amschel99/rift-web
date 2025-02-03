@@ -61,7 +61,6 @@ export default function Splash(): JSX.Element {
   const checkStartParams = () => {
     if (startParam) {
       let data = startParam.split("-");
-
       if (startParam.startsWith("om")) {
         // opened with airdrop link
         navigate(`/rewards/${startParam}`);
@@ -75,17 +74,19 @@ export default function Splash(): JSX.Element {
         rewardReferrer(id);
       } else if (data.length == 1) {
         // opened with collectible link
-        const [utxoId, utxoVal] = startParam.split("=");
+        const utxoId = startParam.split("_")[0];
+        const utxoVal = startParam.split("_")[1];
+        const utxoIntent = startParam.split("_")[2];
 
         if (utxoId && utxoVal) {
           localStorage.setItem("utxoId", utxoId);
           localStorage.setItem("utxoVal", utxoVal);
+          localStorage.setItem("utxoIntent", utxoIntent);
         }
 
         navigate("/auth");
         return;
       } else if (startParam.startsWith("address")) {
-        console.log({ startParam });
       }
     } else {
       if (address && token) {

@@ -38,7 +38,6 @@ export default function CoinInfo(): JSX.Element {
   });
   const coinDetails = coininfoDetails as coinInfoType;
   const coinPrices = coininfoPrices as CandlestickData[];
-  console.log(dayCountPrices);
 
   const onGoBack = () => {
     switchtab("earn");

@@ -1,5 +1,11 @@
 import { BASEURL, ENDPOINTS } from "./config";
 
+export type unlockhistorytype = {
+  _id: string;
+  username: string;
+  message: string[];
+};
+
 export const claimAirdrop = async (airDropid: string) => {
   const URL = BASEURL + ENDPOINTS.claimairdrop + `?id=${airDropid}`;
   const accessToken = localStorage.getItem("token");
@@ -45,4 +51,18 @@ export const unlockTokens = async (amount: number) => {
     },
     body: JSON.stringify({ amount }),
   });
+};
+
+export const unlockTokensHistory = async (): Promise<unlockhistorytype[]> => {
+  const accessToken = localStorage.getItem("token");
+  const URL = BASEURL + ENDPOINTS.unlockhistory;
+
+  const res: Response = await fetch(URL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res.json();
 };

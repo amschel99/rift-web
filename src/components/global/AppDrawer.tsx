@@ -5,6 +5,7 @@ import { useAppDrawer } from "../../hooks/drawer";
 import { SendEthFromToken } from "../forms/SendFromToken";
 import { ConsumeSharedKey } from "../forms/ConsumeKey";
 import { QuickActions } from "../drawer/QuickActions";
+import { UnlockTransactions } from "../drawer/UnlockTransactions";
 import { NodeTeeSelector } from "../tabs/security/NodeTeeSelector";
 import { colors } from "../../constants";
 
@@ -58,6 +59,8 @@ export const AppDrawer = (): JSX.Element => {
         <ConsumeSharedKey />
       ) : action == "quickactions" ? (
         <QuickActions />
+      ) : action == "unlocktransactions" ? (
+        <UnlockTransactions />
       ) : (
         <NodeTeeSelector />
       )}
