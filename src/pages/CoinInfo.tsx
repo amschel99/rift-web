@@ -41,7 +41,7 @@ export default function CoinInfo(): JSX.Element {
 
   const onGoBack = () => {
     switchtab("earn");
-    navigate(-1);
+    navigate("/app");
   };
 
   useEffect(() => {

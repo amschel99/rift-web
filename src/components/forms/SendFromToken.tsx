@@ -1,6 +1,5 @@
 import { JSX, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { SOCKET } from "../../utils/api/config";
 import { spendOnBehalf } from "../../utils/api/wallet";
 import { getEthUsdVal } from "../../utils/ethusd";
@@ -15,7 +14,7 @@ import "../../styles/components/forms.scss";
 
 // foreign spend - send eth to my address from shared link
 export const SendEthFromToken = (): JSX.Element => {
-  const navigate = useNavigate();
+  const queryclient = useQueryClient();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
@@ -28,7 +27,6 @@ export const SendEthFromToken = (): JSX.Element => {
 
   const [disableReceive, setdisableReceive] = useState<boolean>(false);
   const [processing, setProcessing] = useState<boolean>(false);
-  const [httpSuccess, sethttpSuccess] = useState<boolean>(false);
 
   const collectValue = (
     Number(base64ToString(utxoVal)) * Number(ethusdval)
@@ -39,7 +37,7 @@ export const SendEthFromToken = (): JSX.Element => {
   let utxoIntent = localStorage.getItem("utxoIntent");
   let address = localStorage.getItem("address");
 
-  const { mutate: mutateCollectEth } = useMutation({
+  const { mutate: mutateCollectEth, isSuccess } = useMutation({
     mutationFn: () =>
       spendOnBehalf(
         access as string,
@@ -52,7 +50,7 @@ export const SendEthFromToken = (): JSX.Element => {
 
       if (res.status == 200) {
         localStorage.removeItem("utxoId");
-        sethttpSuccess(true);
+
         showsuccesssnack("Please wait for the transaction...");
       } else if (res.status == 403) {
         localStorage.removeItem("utxoId");
@@ -76,11 +74,15 @@ export const SendEthFromToken = (): JSX.Element => {
   });
 
   useEffect(() => {
-    if (httpSuccess) {
+    if (isSuccess) {
+      console.log("waiting to collect...");
+
       localStorage.removeItem("utxoId");
 
       SOCKET.on("TXConfirmed", () => {
         localStorage.removeItem("utxoId");
+
+        queryclient.invalidateQueries({ queryKey: ["ethbal"] });
 
         setProcessing(false);
         showsuccesssnack(
@@ -90,16 +92,21 @@ export const SendEthFromToken = (): JSX.Element => {
         );
 
         closeAppDrawer();
-        navigate("/app");
       });
-      SOCKET.on("TXFailed", () => {});
+      SOCKET.on("TXFailed", () => {
+        localStorage.removeItem("utxoId");
+
+        setProcessing(false);
+        showerrorsnack("The transaction could not be completed");
+        closeAppDrawer();
+      });
 
       return () => {
         SOCKET.off("TXConfirmed");
         SOCKET.off("TXFailed");
       };
     }
-  }, [httpSuccess]);
+  }, [isSuccess]);
 
   return (
     <div id="sendethfromtoken">

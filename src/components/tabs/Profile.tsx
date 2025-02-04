@@ -83,7 +83,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn l_earn" onClick={onRewards}>
+      <div className="earn" onClick={onRewards}>
         <img src={rewards} alt="rewards" />
 
         <p>
@@ -92,7 +92,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn l_earn">
+      <div className="earn">
         <img src={accRecovery} alt="accoun recoverys" />
 
         <p>
@@ -101,7 +101,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn l_earn" onClick={sharebleDepositLink}>
+      <div className="earn" onClick={sharebleDepositLink}>
         <img src={depositIcon} alt="sharebleDepositLink" />
 
         <p>
@@ -110,7 +110,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn l_earn" onClick={getPremiums}>
+      <div className="earn" onClick={getPremiums}>
         <img src={premiumsIcon} alt="premium" />
 
         <p>
