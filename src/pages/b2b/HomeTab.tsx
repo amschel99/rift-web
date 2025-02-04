@@ -3,6 +3,7 @@ import { useLaunchParams, backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { Avatar } from "@mui/material";
 import { useTabs } from "../../hooks/tabs";
+import { useAppDialog } from "../../hooks/dialog";
 import { PopOverAlt } from "../../components/global/PopOver";
 import { Airdropped } from "../../components/charts/Airdropped";
 import { UnlockedChart } from "../../components/charts/Unlocked";
@@ -18,18 +19,24 @@ export default function HomeTab(): JSX.Element {
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
   const { switchtab } = useTabs();
+  const { openAppDialog, closeAppDialog } = useAppDialog();
 
   const [profileAnchorEl, setProfileAnchorEl] = useState<HTMLDivElement | null>(
     null
   );
 
-  const ongoToProfile = () => {
+  const switchToPersonalProfile = () => {
     setProfileAnchorEl(null);
-    switchtab("home");
-    navigate("/app");
+    openAppDialog("loading", "Switching to personal Account");
+
+    setTimeout(() => {
+      closeAppDialog();
+      switchtab("home");
+      navigate("/app");
+    }, 2500);
   };
 
-  const onSwitchToBusiness = () => {
+  const goToBusinessProfile = () => {
     setProfileAnchorEl(null);
   };
 
@@ -64,13 +71,13 @@ export default function HomeTab(): JSX.Element {
         <PopOverAlt anchorEl={profileAnchorEl} setAnchorEl={setProfileAnchorEl}>
           {
             <div className="profile_actions">
-              <div className="action first" onClick={ongoToProfile}>
+              <div className="action first" onClick={switchToPersonalProfile}>
                 <p>
                   Personal Account <Stake color={colors.textprimary} />
                 </p>
                 <span>Stratosphere personal account</span>
               </div>
-              <div className="action" onClick={onSwitchToBusiness}>
+              <div className="action" onClick={goToBusinessProfile}>
                 <p>
                   Business
                   <QuickActions

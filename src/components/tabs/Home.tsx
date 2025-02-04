@@ -4,6 +4,7 @@ import { backButton, useLaunchParams } from "@telegram-apps/sdk-react";
 import { Avatar } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useTabs } from "../../hooks/tabs";
+import { useAppDialog } from "../../hooks/dialog";
 import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
 import { WalletBalance } from "../WalletBalance";
 import { MySecrets, SharedSecrets } from "../Secrets";
@@ -16,6 +17,7 @@ export const HomeTab = (): JSX.Element => {
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
   const { switchtab } = useTabs();
+  const { openAppDialog, closeAppDialog } = useAppDialog();
 
   const [secretsTab, setSecretsTab] = useState<"all" | "me" | "shared">("all");
   const [profileAnchorEl, setProfileAnchorEl] = useState<HTMLDivElement | null>(
@@ -42,7 +44,13 @@ export const HomeTab = (): JSX.Element => {
 
   const onSwitchToBusiness = () => {
     setProfileAnchorEl(null);
-    navigate("/business");
+
+    openAppDialog("loading", "Switching to Stratosphere Business");
+
+    setTimeout(() => {
+      closeAppDialog();
+      navigate("/business");
+    }, 2500);
   };
 
   let mysecrets = mykeys?.filter((_scret) => _scret.type == "own");
