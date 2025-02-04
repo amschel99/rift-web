@@ -34,7 +34,6 @@ export default function StartCampaign(): JSX.Element {
         Number(qtyPerUser)
       ),
     onSuccess: (data: string) => {
-      console.log(data);
       setCampaignName("");
       setMaxSupply("");
       setQtyPerUser("");

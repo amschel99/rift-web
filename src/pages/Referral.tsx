@@ -18,7 +18,7 @@ export default function Referral(): JSX.Element {
 
   const goBack = () => {
     switchtab("profile");
-    navigate(-1);
+    navigate("/app");
   };
 
   const {

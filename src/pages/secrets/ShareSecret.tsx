@@ -29,7 +29,8 @@ export default function ShareSecret(): JSX.Element {
   ];
 
   const goBack = () => {
-    navigate(-1);
+    switchtab("home");
+    navigate("/app");
   };
 
   const goToSecurity = () => {

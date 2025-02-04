@@ -2,6 +2,7 @@ import { JSX, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
+import { useTabs } from "../hooks/tabs";
 import { formatUsd, formatNumber } from "../utils/formatters";
 import { Copy, Send, Telegram } from "../assets/icons";
 import { colors } from "../constants";
@@ -12,9 +13,11 @@ export default function EthAsset(): JSX.Element {
   const navigate = useNavigate();
   const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
+  const { switchtab } = useTabs();
 
-  const backbuttonclick = () => {
-    navigate(-1);
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
   };
 
   let walletAddress = localStorage.getItem("address");
@@ -35,11 +38,11 @@ export default function EthAsset(): JSX.Element {
     }
 
     if (backButton.isMounted()) {
-      backButton.onClick(backbuttonclick);
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(backbuttonclick);
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

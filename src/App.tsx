@@ -23,7 +23,6 @@ import { SecurityTab } from "./components/tabs/Security";
 import { LabsTab } from "./components/tabs/Lab";
 import { DefiTab } from "./components/tabs/Defi";
 import { Profile } from "./components/tabs/Profile";
-import "../src/index.css";
 
 function App(): JSX.Element {
   const { initData } = useLaunchParams();
@@ -124,7 +123,7 @@ function App(): JSX.Element {
       unmountClosingBehavior();
       unmountSwipeBehavior();
     };
-  });
+  }, []);
 
   return (
     <section>

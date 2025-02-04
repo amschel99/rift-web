@@ -1,5 +1,5 @@
-import { JSX, useState } from "react";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
+import { JSX, useEffect, useState } from "react";
+import { backButton, useLaunchParams } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { Avatar } from "@mui/material";
 import { useTabs } from "../../hooks/tabs";
@@ -38,6 +38,20 @@ export default function Business(): JSX.Element {
   const onstartCampaign = () => {
     navigate("/start-campaign");
   };
+
+  useEffect(() => {
+    if (backButton.isSupported()) {
+      backButton.mount();
+    }
+
+    if (backButton.isVisible()) {
+      backButton.hide();
+    }
+
+    return () => {
+      backButton.unmount();
+    };
+  }, []);
 
   return (
     <section id="businesshome">

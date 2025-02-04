@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { init } from "@telegram-apps/sdk-react";
-import eruda from "eruda";
+// import eruda from "eruda";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SnackBarProvider } from "./hooks/snackbar";
@@ -43,7 +43,7 @@ import Business from "./pages/business/Index.tsx";
 import StartCampaign from "./pages/business/StartCampaign.tsx";
 import "./styles/index.scss";
 
-eruda.init();
+// eruda.init();
 init();
 
 const queryclient = new QueryClient();

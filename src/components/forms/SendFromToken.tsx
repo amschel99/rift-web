@@ -75,8 +75,6 @@ export const SendEthFromToken = (): JSX.Element => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log("waiting to collect...");
-
       localStorage.removeItem("utxoId");
 
       SOCKET.on("TXConfirmed", () => {

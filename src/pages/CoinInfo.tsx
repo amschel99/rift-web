@@ -39,7 +39,7 @@ export default function CoinInfo(): JSX.Element {
   const coinDetails = coininfoDetails as coinInfoType;
   const coinPrices = coininfoPrices as CandlestickData[];
 
-  const onGoBack = () => {
+  const goBack = () => {
     switchtab("earn");
     navigate("/app");
   };
@@ -51,11 +51,11 @@ export default function CoinInfo(): JSX.Element {
     }
 
     if (backButton.isMounted()) {
-      backButton.onClick(() => onGoBack());
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(onGoBack);
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

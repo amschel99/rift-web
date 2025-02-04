@@ -39,7 +39,7 @@ export default function BuyOm(): JSX.Element {
     selectCurrency == "ETH" ? ethusd : selectCurrency == "USD" ? 1 : 7.79;
 
   const goBack = () => {
-    navigate(-1);
+    navigate("/om-asset");
   };
 
   const onSelectCurrency = (currency: currencyType) => {

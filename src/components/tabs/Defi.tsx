@@ -14,6 +14,11 @@ export const DefiTab = (): JSX.Element => {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
 
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
+
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();
@@ -21,11 +26,11 @@ export const DefiTab = (): JSX.Element => {
     }
 
     if (backButton.isVisible()) {
-      backButton.onClick(() => switchtab("home"));
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(() => switchtab("home"));
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

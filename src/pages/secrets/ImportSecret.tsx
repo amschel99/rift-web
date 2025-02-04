@@ -23,7 +23,8 @@ export default function ImportSecret(): JSX.Element {
   const [processing, setProcessing] = useState<boolean>(false);
 
   const goBack = () => {
-    navigate(-1);
+    switchtab("home");
+    navigate("/app");
   };
 
   const goToSecurity = () => {

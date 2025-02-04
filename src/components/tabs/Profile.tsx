@@ -35,6 +35,11 @@ export const Profile = (): JSX.Element => {
     navigate("/rewards/nil");
   };
 
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
+
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();
@@ -42,11 +47,11 @@ export const Profile = (): JSX.Element => {
     }
 
     if (backButton.isVisible()) {
-      backButton.onClick(() => switchtab("home"));
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(() => switchtab("home"));
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

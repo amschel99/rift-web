@@ -39,7 +39,7 @@ export default function SendEth(): JSX.Element {
   let availableBalance = localStorage.getItem("ethbal");
 
   const backbuttonclick = () => {
-    navigate(-1);
+    navigate("/eth-asset/:send");
   };
 
   const errorInEthValue = (): boolean => {

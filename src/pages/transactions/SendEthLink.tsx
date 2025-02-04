@@ -38,7 +38,7 @@ export default function SendEthLink(): JSX.Element {
   ];
 
   const goBack = () => {
-    navigate(-1);
+    navigate(`/eth-asset/${intent}`);
   };
 
   const handleChange = (_event: Event, newValue: number | number[]) => {

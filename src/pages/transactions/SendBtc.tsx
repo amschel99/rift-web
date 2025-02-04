@@ -20,7 +20,7 @@ export default function SendBtc(): JSX.Element {
   const { closeAppDrawer } = useAppDrawer();
 
   const backbuttonclick = () => {
-    navigate(-1);
+    navigate("/btc-asset");
   };
 
   let availableBalance = localStorage.getItem("btcbal");

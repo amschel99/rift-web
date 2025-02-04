@@ -7,13 +7,16 @@ import { Copy, Receive, Send } from "../assets/icons";
 import { colors } from "../constants";
 import btclogo from "../assets/images/btc.png";
 import "../styles/pages/assets.scss";
+import { useTabs } from "../hooks/tabs";
 
 export default function BtcAsset(): JSX.Element {
   const navigate = useNavigate();
+  const { switchtab } = useTabs();
   const { showsuccesssnack } = useSnackbar();
 
   const backbuttonclick = () => {
-    navigate(-1);
+    switchtab("home");
+    navigate("/app");
   };
 
   let walletAddress = localStorage.getItem("btcaddress");

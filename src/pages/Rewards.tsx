@@ -5,6 +5,7 @@ import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useAppDrawer } from "../hooks/drawer";
 import { useSnackbar } from "../hooks/snackbar";
 import { useAppDialog } from "../hooks/dialog";
+import { useTabs } from "../hooks/tabs";
 import {
   claimAirdrop,
   getUnlockedTokens,
@@ -31,6 +32,7 @@ export default function Rewards(): JSX.Element {
   const { drawerOpen, openAppDrawer } = useAppDrawer();
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
+  const { switchtab } = useTabs();
 
   const [animationplayed, setAnimationPlayed] = useState<boolean>(false);
 
@@ -81,6 +83,7 @@ export default function Rewards(): JSX.Element {
   };
 
   const goBack = () => {
+    switchtab("profile");
     navigate("/app");
   };
 

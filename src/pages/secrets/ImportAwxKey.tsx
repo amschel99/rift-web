@@ -21,8 +21,8 @@ export default function ImportAirwllxKey(): JSX.Element {
   const [processing, setProcessing] = useState<boolean>(false);
 
   const goBack = () => {
-    switchtab("profile");
-    navigate(-1);
+    switchtab("home");
+    navigate("/app");
   };
 
   const onImportKey = async () => {

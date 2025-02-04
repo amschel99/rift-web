@@ -18,6 +18,11 @@ export const SecurityTab = (): JSX.Element => {
     navigate("/security/setup");
   };
 
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
+
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();
@@ -25,11 +30,11 @@ export const SecurityTab = (): JSX.Element => {
     }
 
     if (backButton.isMounted()) {
-      backButton.onClick(() => switchtab("home"));
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(() => switchtab("home"));
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

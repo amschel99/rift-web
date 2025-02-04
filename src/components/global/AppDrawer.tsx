@@ -1,5 +1,4 @@
-import { JSX, useEffect, CSSProperties } from "react";
-import { backButton } from "@telegram-apps/sdk-react";
+import { JSX, CSSProperties } from "react";
 import { Drawer } from "@mui/material";
 import { useAppDrawer } from "../../hooks/drawer";
 import { SendEthFromToken } from "../forms/SendFromToken";
@@ -13,46 +12,15 @@ import { colors } from "../../constants";
 export const AppDrawer = (): JSX.Element => {
   const { action, drawerOpen, closeAppDrawer } = useAppDrawer();
 
-  const onCloseDrawer = () => {
-    if (backButton.isMounted()) {
-      backButton.hide();
-      backButton.unmount();
-    }
-
-    closeAppDrawer();
-  };
-
-  const dismissDrawer = () => {
-    onCloseDrawer();
-  };
-
-  useEffect(() => {
-    if (drawerOpen && backButton.isSupported()) {
-      backButton.mount();
-      backButton.show();
-    }
-
-    if (backButton.isVisible()) {
-      backButton.onClick(dismissDrawer);
-    }
-
-    return () => {
-      backButton.offClick(dismissDrawer);
-      backButton.unmount();
-    };
-  }, [drawerOpen]);
-
   return (
     <Drawer
       anchor={"bottom"}
       elevation={0}
       PaperProps={{ sx: drawerstyles }}
       open={drawerOpen}
-      onClose={() => onCloseDrawer()}
+      onClose={() => closeAppDrawer()}
     >
-      {action !== "nodeteeselector" && action !== "quickactions" && (
-        <div style={barstyles} />
-      )}
+      <div style={barstyles} />
 
       {action == "collectfromwallet" ? (
         <SendEthFromToken />
