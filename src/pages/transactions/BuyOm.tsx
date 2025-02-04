@@ -1,10 +1,10 @@
-import { JSX, MouseEvent, useCallback, useEffect, useState } from "react";
+import { JSX, useCallback, useEffect, useState } from "react";
 import { useLaunchParams, backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDialog } from "../../hooks/dialog";
-import { PopOver } from "../../components/global/PopOver";
+// import { PopOver } from "../../components/global/PopOver";
 import { awxbalType, fetchAirWllxBalances } from "../../utils/api/awllx";
 import { formatUsd, formatNumber } from "../../utils/formatters";
 import ethlogo from "../../assets/images/eth.png";
@@ -25,7 +25,7 @@ export default function BuyOm(): JSX.Element {
     message: "",
     balances: { HKD: 0, USD: 0 },
   });
-  const [currAnchorEl, setCurrAnchorEl] = useState<HTMLDivElement | null>(null);
+  // const [currAnchorEl, setCurrAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const ethbalUsd = Number(localStorage.getItem("ethbalUsd"));
   const ethbal = Number(localStorage.getItem("ethbal"));
@@ -40,9 +40,9 @@ export default function BuyOm(): JSX.Element {
   const selectedcurrencyUsdValue =
     selectCurrency == "ETH" ? ethusd : selectCurrency == "USD" ? 1 : 7.79;
 
-  const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
-    setCurrAnchorEl(event.currentTarget);
-  };
+  // const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
+  //   setCurrAnchorEl(event.currentTarget);
+  // };
 
   const goBack = () => {
     navigate(-1);
@@ -51,13 +51,13 @@ export default function BuyOm(): JSX.Element {
   const onSelectCurrency = (currency: currencyType) => {
     if (currency == "ETH") {
       setSelectCurrency(currency);
-      setCurrAnchorEl(null);
+      // setCurrAnchorEl(null);
     } else if (awxBalances == null) {
       showerrorsnack("Have you imported an Aiwallex API key ?");
-      setCurrAnchorEl(null);
+      // setCurrAnchorEl(null);
     } else {
       setSelectCurrency(currency);
-      setCurrAnchorEl(null);
+      // setCurrAnchorEl(null);
     }
   };
 
@@ -105,8 +105,89 @@ export default function BuyOm(): JSX.Element {
         <span>Buy OM using ETH, USD or HKD</span>
       </p>
 
+      <div className="select_currency_ctr">
+        <div className="select_currency">
+          <div className="img_desc" onClick={() => onSelectCurrency("ETH")}>
+            <div className="flag_balance">
+              <img src={ethlogo} alt="asset" />
+
+              <p className="desc">
+                ETH <br /> <span>{formatNumber(ethbal)}</span>
+              </p>
+            </div>
+
+            <div className="radioctr">
+              <div
+                style={{
+                  backgroundColor:
+                    selectCurrency == "ETH"
+                      ? colors.textprimary
+                      : colors.primary,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="img_desc" onClick={() => onSelectCurrency("USD")}>
+            <div className="flag_balance">
+              <span className="flag">🇺🇸</span>
+
+              <p className="desc">
+                USD <br />
+                <span>
+                  {awxBalances == null
+                    ? "Failed to get your balance"
+                    : formatNumber(awxBalances?.balances?.USD as number)}
+                </span>
+              </p>
+            </div>
+
+            <div className="radioctr">
+              <div
+                style={{
+                  backgroundColor:
+                    selectCurrency == "USD"
+                      ? colors.textprimary
+                      : colors.primary,
+                }}
+              />
+            </div>
+          </div>
+
+          <div
+            className="img_desc l_currency"
+            onClick={() => onSelectCurrency("HKD")}
+          >
+            <div className="flag_balance">
+              <span className="flag">🇭🇰</span>
+
+              <p className="desc">
+                HKD <br />
+                <span>
+                  {awxBalances == null
+                    ? "Failed to get your balance"
+                    : formatNumber(awxBalances?.balances?.HKD as number)}
+                </span>
+              </p>
+            </div>
+
+            <div className="radioctr">
+              <div
+                style={{
+                  backgroundColor:
+                    selectCurrency == "HKD"
+                      ? colors.textprimary
+                      : colors.primary,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <p className="asset_tle">Choose an asset to buy OM with</p>
+
       <div className="balancectr">
-        <div className="currency" onClick={openAssetPopOver}>
+        <div className="currency">
           {selectCurrency == "ETH" ? (
             <img src={ethlogo} alt="eth" />
           ) : selectCurrency == "USD" ? (
@@ -175,47 +256,6 @@ export default function BuyOm(): JSX.Element {
           ? formatUsd(awxBalances?.balances?.USD as number)
           : formatUsd(Number(awxBalances?.balances?.HKD) / 7.79)}
       </p>
-      <PopOver anchorEl={currAnchorEl} setAnchorEl={setCurrAnchorEl}>
-        {
-          <div className="select_currency">
-            <div className="img_desc" onClick={() => onSelectCurrency("ETH")}>
-              <img src={ethlogo} alt="asset" />
-
-              <p className="desc">
-                ETH <br /> <span>{formatNumber(ethbal)}</span>
-              </p>
-            </div>
-
-            <div className="img_desc" onClick={() => onSelectCurrency("USD")}>
-              <span className="flag">🇺🇸</span>
-
-              <p className="desc">
-                USD <br />
-                <span>
-                  {awxBalances == null
-                    ? "Failed to get your balance"
-                    : formatNumber(awxBalances?.balances?.USD as number)}
-                </span>
-              </p>
-            </div>
-
-            <div className="img_desc" onClick={() => onSelectCurrency("HKD")}>
-              <span className="flag">🇭🇰</span>
-
-              <p className="desc">
-                HKD <br />
-                <span>
-                  {awxBalances == null
-                    ? "Failed to get your balance"
-                    : formatNumber(awxBalances?.balances?.HKD as number)}
-                </span>
-              </p>
-            </div>
-
-            <p className="asset_tle">Choose an asset to buy OM with</p>
-          </div>
-        }
-      </PopOver>
 
       <p
         className="omamount"
