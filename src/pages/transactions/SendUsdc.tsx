@@ -5,15 +5,16 @@ import { TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
-import { SOCKET } from "../../utils/api/config";
 import { sendUSDC } from "../../utils/api/wallet";
 import { colors } from "../../constants";
 import { Info, Send } from "../../assets/icons";
 import { Loading } from "../../assets/animations";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import "../../styles/pages/transaction.scss";
+import { useSocket } from "../../utils/SocketProvider";
 
 export default function SendUsdc(): JSX.Element {
+   const { socket } = useSocket();
   const navigate = useNavigate();
   const { intent } = useParams();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
@@ -59,23 +60,26 @@ export default function SendUsdc(): JSX.Element {
 
   useEffect(() => {
     if (httpSuccess) {
-      SOCKET.on("TXSent", () => {
+               if (!socket) return;
+
+      socket.on("TXSent", () => {
         showsuccesssnack("Please hold on...");
       });
-      SOCKET.on("TXConfirmed", () => {
+      socket.on("TXConfirmed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
         closeAppDrawer();
       });
-      SOCKET.on("TXFailed", () => {
+      socket.on("TXFailed", () => {
         setProcessing(false);
       });
     }
 
     return () => {
-      SOCKET.off("TXSent");
-      SOCKET.off("TXConfirmed");
-      SOCKET.off("TXFailed");
+               if (!socket) return;
+      socket.off("TXSent");
+      socket.off("TXConfirmed");
+      socket.off("TXFailed");
     };
   }, [httpSuccess]);
 

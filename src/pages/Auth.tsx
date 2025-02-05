@@ -2,13 +2,14 @@ import { JSX, useEffect, useCallback } from "react";
 import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
-import { SOCKET } from "../utils/api/config";
 import { signupUser } from "../utils/api/signup";
 import { createEVMWallet } from "../utils/api/wallet";
 import { Loading } from "../assets/animations";
 import "../styles/pages/auth.scss";
+import { useSocket } from "../utils/SocketProvider";
 
 export default function Authentication(): JSX.Element {
+    const { socket } = useSocket();
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
 
@@ -36,7 +37,9 @@ export default function Authentication(): JSX.Element {
 
   useEffect(() => {
     if (signupsuccess && createwalletsuccess) {
-      SOCKET.on("AccountCreationSuccess", (data) => {
+         if (!socket) return;
+      
+      socket.on("AccountCreationSuccess", (data) => {
         localStorage.setItem("address", data?.address);
         localStorage.setItem("btcaddress", data?.btcAdress);
         localStorage.setItem("token", data?.accessToken);
@@ -44,8 +47,8 @@ export default function Authentication(): JSX.Element {
         const retries = 8;
 
         if (data?.user == tgUsername) {
-          SOCKET.off("AccountCreationSuccess");
-          SOCKET.off("AccountCreationFailed");
+          socket.off("AccountCreationSuccess");
+          socket.off("AccountCreationFailed");
 
           navigate("/app");
         } else {
@@ -55,11 +58,11 @@ export default function Authentication(): JSX.Element {
         }
       });
 
-      SOCKET.on("AccountCreationFailed", () => {});
+      socket.on("AccountCreationFailed", () => {});
 
       return () => {
-        SOCKET.off("AccountCreationSuccess");
-        SOCKET.off("AccountCreationFailed");
+        socket.off("AccountCreationSuccess");
+        socket.off("AccountCreationFailed");
       };
     }
   }, [signupsuccess, createwalletsuccess]);

@@ -42,6 +42,7 @@ import AIHelper from "./pages/AIHelper.tsx";
 import Business from "./pages/business/Index.tsx";
 import StartCampaign from "./pages/business/StartCampaign.tsx";
 import "./styles/index.scss";
+import { SocketProvider } from "./utils/SocketProvider.tsx";
 
 // eruda.init();
 init();
@@ -50,6 +51,7 @@ const queryclient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <SocketProvider>
     <QueryClientProvider client={queryclient}>
       <SnackBarProvider>
         <AppDrawerProvider>
@@ -116,5 +118,6 @@ createRoot(document.getElementById("root")!).render(
         </AppDrawerProvider>
       </SnackBarProvider>
     </QueryClientProvider>
+    </SocketProvider>
   </StrictMode>
 );

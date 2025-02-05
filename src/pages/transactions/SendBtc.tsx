@@ -5,15 +5,16 @@ import { TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
-import { SOCKET } from "../../utils/api/config";
 import { sendBTC } from "../../utils/api/wallet";
 import { colors } from "../../constants";
 import { Send, Info } from "../../assets/icons";
 import { Loading } from "../../assets/animations";
 import btclogo from "../../assets/images/btc.png";
 import "../../styles/pages/transaction.scss";
+import { useSocket } from "../../utils/SocketProvider";
 
 export default function SendBtc(): JSX.Element {
+    const { socket } = useSocket();
   const navigate = useNavigate();
   const { intent } = useParams();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
@@ -59,20 +60,22 @@ export default function SendBtc(): JSX.Element {
 
   useEffect(() => {
     if (httpSuccess) {
-      SOCKET.on("TXConfirmed", () => {
+           if (!socket) return;
+      socket.on("TXConfirmed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
         closeAppDrawer();
       });
-      SOCKET.on("TXFailed", () => {
+      socket.on("TXFailed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
       });
     }
 
     return () => {
-      SOCKET.off("TXConfirmed");
-      SOCKET.off("TXFailed");
+           if (!socket) return;
+      socket.off("TXConfirmed");
+      socket.off("TXFailed");
     };
   }, [httpSuccess]);
 
