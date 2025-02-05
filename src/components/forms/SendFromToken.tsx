@@ -80,7 +80,7 @@ export const SendEthFromToken = (): JSX.Element => {
       SOCKET.on("TXConfirmed", () => {
         localStorage.removeItem("utxoId");
 
-        queryclient.invalidateQueries({ queryKey: ["ethbal"] });
+        queryclient.invalidateQueries({ queryKey: ["btceth"] });
 
         setProcessing(false);
         showsuccesssnack(

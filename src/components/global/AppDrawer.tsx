@@ -44,7 +44,7 @@ const drawerstyles: CSSProperties = {
   alignItems: "center",
   justifyContent: "flex-start",
   width: "100vw",
-  height: "49vh",
+  height: "39vh",
   borderTopLeftRadius: "0.5rem",
   borderTopRightRadius: "0.5rem",
   zIndex: 4000,

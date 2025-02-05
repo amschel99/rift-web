@@ -1,13 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { init } from "@telegram-apps/sdk-react";
-// import eruda from "eruda";
+import eruda from "eruda";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SnackBarProvider } from "./hooks/snackbar";
 import { AppDrawerProvider } from "./hooks/drawer.tsx";
 import { TabsProvider } from "./hooks/tabs.tsx";
 import { AppDialogProvider } from "./hooks/dialog.tsx";
+import { SocketProvider } from "./utils/SocketProvider.tsx";
 import { AppDialog } from "./components/global/AppDialog.tsx";
 import { AppDrawer } from "./components/global/AppDrawer.tsx";
 import { SnackBar } from "./components/global/SnackBar.tsx";
@@ -42,82 +43,81 @@ import AIHelper from "./pages/AIHelper.tsx";
 import Business from "./pages/business/Index.tsx";
 import StartCampaign from "./pages/business/StartCampaign.tsx";
 import "./styles/index.scss";
-import { SocketProvider } from "./utils/SocketProvider.tsx";
 
-// eruda.init();
+eruda.init();
 init();
 
 const queryclient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <SocketProvider>
     <QueryClientProvider client={queryclient}>
-      <SnackBarProvider>
-        <AppDrawerProvider>
-          <TabsProvider>
-            <AppDialogProvider>
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" index element={<Splash />} />
-                  <Route path="/auth" element={<Authentication />} />
-                  <Route path="/app" element={<App />} />
-                  <Route path="/logout" element={<Logout />} />
-                  <Route path="/coin/:coinId" element={<CoinInfo />} />
-                  <Route path="/btc-asset" element={<BtcAsset />} />
-                  <Route path="/send-btc/:intent" element={<SendBtc />} />
-                  <Route path="/eth-asset/:intent" element={<EthAsset />} />
-                  <Route path="/send-eth/:intent" element={<SendEth />} />
-                  <Route
-                    path="/sendcollectlink/:intent"
-                    element={<SendEthLink />}
-                  />
-                  <Route path="/om-asset" element={<OmAsset />} />
-                  <Route path="/send-usdc/:intent" element={<SendUsdc />} />
-                  <Route path="/get-om" element={<BuyOm />} />
-                  <Route
-                    path="/chat/:conversationId/:chatAccessToken/:initialMessage/:nonce"
-                    element={<ChatBot />}
-                  />
-                  <Route path="/security/setup" element={<SecuritySetup />} />
-                  <Route
-                    path="/security/selector/:type"
-                    element={<NodesTeeSelector />}
-                  />
-                  <Route path="/importsecret" element={<ImportSecret />} />
-                  <Route path="/importawx" element={<ImportAirwllxKey />} />
-                  <Route
-                    path="/sharesecret/:key/:purpose"
-                    element={<ShareSecret />}
-                  />
-                  <Route path="/refer/:intent" element={<Referral />} />
-                  <Route path="/lend" element={<LendToUse />} />
-                  <Route path="/lend/asset" element={<CreateLendAsset />} />
-                  <Route path="/lend/secret" element={<CreateLendSecret />} />
-                  <Route path="/rewards/:id" element={<Rewards />} />
-                  <Route
-                    path="/shareble-deposit-link"
-                    element={<DepositLinkGenerator />}
-                  />
-                  <Route path="/premiums" element={<PremiumFeaturesPage />} />
-                  <Route
-                    path="/deposit/shared-link"
-                    element={<DepositPage />}
-                  />
-                  <Route path="/ai-helper" element={<AIHelper />} />
-                  <Route path="/business" element={<Business />} />
-                  <Route path="/start-campaign" element={<StartCampaign />} />
-                </Routes>
+      <SocketProvider>
+        <SnackBarProvider>
+          <AppDrawerProvider>
+            <TabsProvider>
+              <AppDialogProvider>
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" index element={<Splash />} />
+                    <Route path="/auth" element={<Authentication />} />
+                    <Route path="/app" element={<App />} />
+                    <Route path="/logout" element={<Logout />} />
+                    <Route path="/coin/:coinId" element={<CoinInfo />} />
+                    <Route path="/btc-asset" element={<BtcAsset />} />
+                    <Route path="/send-btc/:intent" element={<SendBtc />} />
+                    <Route path="/eth-asset/:intent" element={<EthAsset />} />
+                    <Route path="/send-eth/:intent" element={<SendEth />} />
+                    <Route
+                      path="/sendcollectlink/:intent"
+                      element={<SendEthLink />}
+                    />
+                    <Route path="/om-asset" element={<OmAsset />} />
+                    <Route path="/send-usdc/:intent" element={<SendUsdc />} />
+                    <Route path="/get-om" element={<BuyOm />} />
+                    <Route
+                      path="/chat/:conversationId/:chatAccessToken/:initialMessage/:nonce"
+                      element={<ChatBot />}
+                    />
+                    <Route path="/security/setup" element={<SecuritySetup />} />
+                    <Route
+                      path="/security/selector/:type"
+                      element={<NodesTeeSelector />}
+                    />
+                    <Route path="/importsecret" element={<ImportSecret />} />
+                    <Route path="/importawx" element={<ImportAirwllxKey />} />
+                    <Route
+                      path="/sharesecret/:key/:purpose"
+                      element={<ShareSecret />}
+                    />
+                    <Route path="/refer/:intent" element={<Referral />} />
+                    <Route path="/lend" element={<LendToUse />} />
+                    <Route path="/lend/asset" element={<CreateLendAsset />} />
+                    <Route path="/lend/secret" element={<CreateLendSecret />} />
+                    <Route path="/rewards/:id" element={<Rewards />} />
+                    <Route
+                      path="/shareble-deposit-link"
+                      element={<DepositLinkGenerator />}
+                    />
+                    <Route path="/premiums" element={<PremiumFeaturesPage />} />
+                    <Route
+                      path="/deposit/shared-link"
+                      element={<DepositPage />}
+                    />
+                    <Route path="/ai-helper" element={<AIHelper />} />
+                    <Route path="/business" element={<Business />} />
+                    <Route path="/start-campaign" element={<StartCampaign />} />
+                  </Routes>
 
-                <SnackBar />
-                <AppDialog />
-                <AppDrawer />
-              </BrowserRouter>
-            </AppDialogProvider>
-          </TabsProvider>
-        </AppDrawerProvider>
-      </SnackBarProvider>
+                  <SnackBar />
+                  <AppDialog />
+                  <AppDrawer />
+                </BrowserRouter>
+              </AppDialogProvider>
+            </TabsProvider>
+          </AppDrawerProvider>
+        </SnackBarProvider>
+      </SocketProvider>
     </QueryClientProvider>
-    </SocketProvider>
   </StrictMode>
 );
