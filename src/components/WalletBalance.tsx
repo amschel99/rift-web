@@ -6,6 +6,8 @@ import { walletBalance, mantraBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { getMantraUsdVal } from "../utils/api/mantra";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
+import { Stake } from "../assets/icons/actions";
+import { colors } from "../constants";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
@@ -170,6 +172,15 @@ export const WalletBalance = (): JSX.Element => {
           </div>
         </>
       )}
+
+      <div className="allassets">
+        <button className="seeall">
+          All Balances
+          <span>
+            <Stake width={6} height={11} color={colors.textsecondary} />
+          </span>
+        </button>
+      </div>
     </div>
   );
 };
