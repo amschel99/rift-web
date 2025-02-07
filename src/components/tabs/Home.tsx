@@ -40,7 +40,6 @@ export const HomeTab = (): JSX.Element => {
   let mykeys: keyType[] = allKeys?.keys?.map((_key: string) =>
     JSON.parse(_key)
   );
-  let userhasawxkey = localStorage.getItem("userhasawxkey");
 
   const onImportKey = () => {
     navigate("/importsecret");
@@ -63,7 +62,7 @@ export const HomeTab = (): JSX.Element => {
   };
 
   const onimportAwx = () => {
-    navigate("/importawx");
+    openAppDialog("awxkeyimport", "Import AirWallex API Key");
   };
 
   let mysecrets = mykeys?.filter((_scret) => _scret.type == "own");
@@ -204,7 +203,7 @@ export const HomeTab = (): JSX.Element => {
         }
       </PopOverAlt>
 
-      {airwallexData?.status == 404 && userhasawxkey == null && (
+      {airwallexData?.status == 404 && (
         <div className="airwallex" onClick={onimportAwx}>
           <img src={airwallex} alt="airwallex" />
         </div>

@@ -1,13 +1,13 @@
 import { JSX, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
-import { useSnackbar } from "../hooks/snackbar";
-import { useTabs } from "../hooks/tabs";
-import { formatUsd, formatNumber } from "../utils/formatters";
-import { Copy, Receive } from "../assets/icons/actions";
-import { colors } from "../constants";
-import usdclogo from "../assets/images/labs/mantralogo.jpeg";
-import "../styles/pages/assets.scss";
+import { useSnackbar } from "../../hooks/snackbar";
+import { useTabs } from "../../hooks/tabs";
+import { formatUsd, formatNumber } from "../../utils/formatters";
+import { Copy, Receive } from "../../assets/icons/actions";
+import { colors } from "../../constants";
+import usdclogo from "../../assets/images/labs/mantralogo.jpeg";
+import "../../styles/pages/assets/assets.scss";
 
 export default function OmAsset(): JSX.Element {
   const navigate = useNavigate();

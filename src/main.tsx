@@ -16,9 +16,10 @@ import App from "./App.tsx";
 import Splash from "./pages/Splash.tsx";
 import Authentication from "./pages/Auth.tsx";
 import Logout from "./pages/Logout.tsx";
-import BtcAsset from "./pages/BtcAsset.tsx";
-import EthAsset from "./pages/EthAsset.tsx";
-import OmAsset from "./pages/OmAsset.tsx";
+import BtcAsset from "./pages/assets/BtcAsset.tsx";
+import EthAsset from "./pages/assets/EthAsset.tsx";
+import OmAsset from "./pages/assets/OmAsset.tsx";
+import AllAssets from "./pages/assets/AllAssets.tsx";
 import ChatBot from "./pages/ChatBot.tsx";
 import SendBtc from "./pages/transactions/SendBtc.tsx";
 import SendEth from "./pages/transactions/SendEth.tsx";
@@ -67,6 +68,7 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/app" element={<App />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/coin/:coinId" element={<CoinInfo />} />
+                    <Route path="/all-assets" element={<AllAssets />} />
                     <Route path="/btc-asset" element={<BtcAsset />} />
                     <Route path="/send-btc/:intent" element={<SendBtc />} />
                     <Route path="/eth-asset/:intent" element={<EthAsset />} />

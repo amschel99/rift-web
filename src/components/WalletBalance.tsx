@@ -76,7 +76,7 @@ export const WalletBalance = (): JSX.Element => {
             height="2.5rem"
             animation="wave"
           />
-        ) : String(walletusdbalance)?.length > 6 ? (
+        ) : String(walletusdbalance).split(".")[0]?.length - 1 >= 7 ? (
           "$" + numberFormat(walletusdbalance)
         ) : (
           formatUsd(walletusdbalance)
@@ -174,7 +174,7 @@ export const WalletBalance = (): JSX.Element => {
       )}
 
       <div className="allassets">
-        <button className="seeall">
+        <button className="seeall" onClick={() => navigate("/all-assets")}>
           All Balances
           <span>
             <Stake width={6} height={11} color={colors.textsecondary} />
