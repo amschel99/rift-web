@@ -59,19 +59,19 @@ export default function Rewards(): JSX.Element {
       localStorage.removeItem("airdropId");
       showsuccesssnack("You Successfully claimed Airdrop Tokens");
 
- queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
-queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
-
-      closeAppDialog();
+      queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
+      queryClient.invalidateQueries({ queryKey: ["getunlocked"] }).then(() => {
+        closeAppDialog();
+      });
     },
     onError: () => {
       localStorage.removeItem("airdropId");
       showerrorsnack("Sorry, the Airdrop did not work");
 
-    queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
-queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
-
-      closeAppDialog();
+      queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
+      queryClient.invalidateQueries({ queryKey: ["getunlocked"] }).then(() => {
+        closeAppDialog();
+      });
     },
   });
 
