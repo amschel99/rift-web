@@ -28,10 +28,10 @@ import { Notifications } from "./components/tabs/Notifications";
 function App(): JSX.Element {
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
-  const { currTab } = useTabs();
   const { openAppDrawer } = useAppDrawer();
-  const { showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
+  const { showsuccesssnack } = useSnackbar();
+  const { currTab } = useTabs();
 
   const tgUsername = initData?.user?.username as string;
 

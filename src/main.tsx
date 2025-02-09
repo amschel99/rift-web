@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { init } from "@telegram-apps/sdk-react";
 // import eruda from "eruda";
+import { init } from "@telegram-apps/sdk-react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SnackBarProvider } from "./hooks/snackbar";
@@ -21,7 +21,6 @@ import EthAsset from "./pages/assets/EthAsset.tsx";
 import OmAsset from "./pages/assets/OmAsset.tsx";
 import UsdAsset from "./pages/assets/UsdAsset.tsx";
 import HkdAsset from "./pages/assets/HkdAsset.tsx";
-import AllAssets from "./pages/assets/AllAssets.tsx";
 import ChatBot from "./pages/ChatBot.tsx";
 import SendBtc from "./pages/transactions/SendBtc.tsx";
 import SendEth from "./pages/transactions/SendEth.tsx";
@@ -44,8 +43,7 @@ import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import Referral from "./pages/Referral.tsx";
 import Rewards from "./pages/Rewards.tsx";
-import DepositLinkGenerator from "./pages/paymentlinks/DepositLinkGenerator.tsx";
-import DepositPage from "./pages/paymentlinks/Depositpage.tsx";
+import LinkGenerator from "./pages/paymentlinks/LinkGenerator.tsx";
 import Premium from "./pages/Premium.tsx";
 import Business from "./pages/business/Index.tsx";
 import StartCampaign from "./pages/business/StartCampaign.tsx";
@@ -71,7 +69,6 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/app" element={<App />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/coin/:coinId" element={<CoinInfo />} />
-                    <Route path="/all-assets" element={<AllAssets />} />
                     <Route path="/btc-asset" element={<BtcAsset />} />
                     <Route path="/send-btc/:intent" element={<SendBtc />} />
                     <Route path="/eth-asset/:intent" element={<EthAsset />} />
@@ -115,13 +112,9 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/rewards/:id" element={<Rewards />} />
                     <Route
                       path="/shareble-deposit-link"
-                      element={<DepositLinkGenerator />}
+                      element={<LinkGenerator />}
                     />
                     <Route path="/premiums" element={<Premium />} />
-                    <Route
-                      path="/deposit/shared-link"
-                      element={<DepositPage />}
-                    />
                     <Route path="/business" element={<Business />} />
                     <Route path="/start-campaign" element={<StartCampaign />} />
                   </Routes>

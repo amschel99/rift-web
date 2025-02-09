@@ -35,6 +35,10 @@ export const Profile = (): JSX.Element => {
     navigate("/rewards/nil");
   };
 
+  const gotoRecovery = () => {
+    navigate("/security/recover");
+  };
+
   const goBack = () => {
     switchtab("home");
     navigate("/app");
@@ -97,7 +101,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn">
+      <div className="earn" onClick={gotoRecovery}>
         <img src={accRecovery} alt="accoun recoverys" />
 
         <p>

@@ -47,42 +47,6 @@ export const Coins = (): JSX.Element => {
             height="4.5rem"
             style={{ borderRadius: "0.25rem" }}
           />
-          <Skeleton
-            animation="wave"
-            width="100%"
-            height="4.5rem"
-            style={{ borderRadius: "0.25rem" }}
-          />
-          <Skeleton
-            animation="wave"
-            width="100%"
-            height="4.5rem"
-            style={{ borderRadius: "0.25rem" }}
-          />
-          <Skeleton
-            animation="wave"
-            width="100%"
-            height="4.5rem"
-            style={{ borderRadius: "0.25rem" }}
-          />
-          <Skeleton
-            animation="wave"
-            width="100%"
-            height="4.5rem"
-            style={{ borderRadius: "0.25rem" }}
-          />
-          <Skeleton
-            animation="wave"
-            width="100%"
-            height="4.5rem"
-            style={{ borderRadius: "0.25rem" }}
-          />
-          <Skeleton
-            animation="wave"
-            width="100%"
-            height="4.5rem"
-            style={{ borderRadius: "0.25rem" }}
-          />
         </div>
       )}
 

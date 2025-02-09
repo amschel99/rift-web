@@ -11,6 +11,7 @@ import { TransactionLimit } from "../drawer/TransactionLimit";
 import { AddPin } from "../drawer/AddPin";
 import { DeleteRecovery } from "../drawer/DeleteRecovery";
 import { colors } from "../../constants";
+import { PaymentLink } from "../drawer/PaymentLink";
 
 export const AppDrawer = (): JSX.Element => {
   const { action, drawerOpen, closeAppDrawer } = useAppDrawer();
@@ -46,6 +47,8 @@ export const AppDrawer = (): JSX.Element => {
         <AddPin />
       ) : action == "deleteemail" || action == "deletephone" ? (
         <DeleteRecovery />
+      ) : action == "paymentlink" ? (
+        <PaymentLink />
       ) : (
         <NodeTeeSelector />
       )}

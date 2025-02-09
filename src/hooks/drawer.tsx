@@ -10,6 +10,7 @@ export type draweraction =
   | "addpin"
   | "deleteemail"
   | "deletephone"
+  | "paymentlink"
   | "unlocktransactions";
 
 interface draerctxtype {
