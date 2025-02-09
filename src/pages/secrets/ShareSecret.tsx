@@ -8,7 +8,7 @@ import { ShareKeyWithOtherUser } from "../../utils/api/keys";
 import sharekey from "../../assets/images/secrets.png";
 import { colors } from "../../constants";
 import { Loading } from "../../assets/animations";
-import { Share } from "../../assets/icons";
+import { Share } from "../../assets/icons/actions";
 import "../../styles/pages/sharesecret.scss";
 
 export default function ShareSecret(): JSX.Element {
@@ -29,11 +29,7 @@ export default function ShareSecret(): JSX.Element {
   ];
 
   const goBack = () => {
-    navigate(-1);
-  };
-
-  const goToSecurity = () => {
-    switchtab("security");
+    switchtab("home");
     navigate("/app");
   };
 
@@ -216,10 +212,6 @@ export default function ShareSecret(): JSX.Element {
           </>
         )}
       </button>
-
-      <p onClick={goToSecurity} className="learnmore">
-        Learn how we secure your secrets
-      </p>
     </div>
   );
 }

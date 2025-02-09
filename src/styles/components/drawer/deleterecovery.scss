@@ -1,0 +1,42 @@
+@use "../../constants/colors" as colors;
+@use "../../constants/mixins" as mixins;
+
+.deleterecovery {
+  @include mixins.useFlex(column, nowrap, center, center, 1rem);
+  padding: 1rem;
+
+  img {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  p {
+    width: 100%;
+    color: colors.$textprimary;
+    font-size: 0.875rem;
+    font-weight: 200;
+    text-align: center;
+
+    span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-decoration: underline;
+    }
+  }
+
+  button {
+    @include mixins.useButton();
+    @include mixins.useBaseFont();
+    width: 100%;
+    border-radius: 0.25rem;
+    padding: 0.625rem;
+    background-color: colors.$danger;
+    font-weight: 500;
+    color: colors.$textprimary;
+  }
+
+  .undone {
+    margin-top: -0.875rem;
+    color: colors.$textsecondary;
+  }
+}

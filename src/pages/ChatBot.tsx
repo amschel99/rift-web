@@ -1,6 +1,7 @@
 import { JSX, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
+import { useTabs } from "../hooks/tabs";
 import {
   GetPromptHistory,
   messagesType,
@@ -16,11 +17,17 @@ export default function ChatBot(): JSX.Element {
   const navigate = useNavigate();
   const { conversationId, chatAccessToken, initialMessage, nonce } =
     useParams();
+  const { switchtab } = useTabs();
 
   const [botLoading, setBotLoading] = useState<boolean>(false);
   const [chatMessages, setChatMessages] = useState<messagesType[]>([
     { role: "assistant", content: initialMessage as string },
   ]);
+
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
 
   const submitPropmt = (userPrompt: string) => {
     setBotLoading(true);
@@ -81,10 +88,11 @@ export default function ChatBot(): JSX.Element {
     }
 
     if (backButton.isMounted()) {
-      backButton.onClick(() => navigate("/app"));
+      backButton.onClick(goBack);
     }
 
     return () => {
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

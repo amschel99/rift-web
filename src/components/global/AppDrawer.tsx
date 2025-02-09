@@ -1,63 +1,54 @@
-import { JSX, useEffect, CSSProperties } from "react";
-import { backButton } from "@telegram-apps/sdk-react";
+import { JSX, CSSProperties } from "react";
 import { Drawer } from "@mui/material";
 import { useAppDrawer } from "../../hooks/drawer";
 import { SendEthFromToken } from "../forms/SendFromToken";
 import { ConsumeSharedKey } from "../forms/ConsumeKey";
 import { QuickActions } from "../drawer/QuickActions";
+import { UnlockTransactions } from "../drawer/UnlockTransactions";
 import { NodeTeeSelector } from "../tabs/security/NodeTeeSelector";
+import { SendAirdropLink } from "../drawer/SendAirdropLink";
+import { TransactionLimit } from "../drawer/TransactionLimit";
+import { AddPin } from "../drawer/AddPin";
+import { DeleteRecovery } from "../drawer/DeleteRecovery";
 import { colors } from "../../constants";
+import { PaymentLink } from "../drawer/PaymentLink";
 
 export const AppDrawer = (): JSX.Element => {
   const { action, drawerOpen, closeAppDrawer } = useAppDrawer();
-
-  const onCloseDrawer = () => {
-    if (backButton.isMounted()) {
-      backButton.hide();
-      backButton.unmount();
-    }
-
-    closeAppDrawer();
-  };
-
-  const dismissDrawer = () => {
-    onCloseDrawer();
-  };
-
-  useEffect(() => {
-    if (drawerOpen && backButton.isSupported()) {
-      backButton.mount();
-      backButton.show();
-    }
-
-    if (backButton.isVisible()) {
-      backButton.onClick(dismissDrawer);
-    }
-
-    return () => {
-      backButton.offClick(dismissDrawer);
-      backButton.unmount();
-    };
-  }, [drawerOpen]);
 
   return (
     <Drawer
       anchor={"bottom"}
       elevation={0}
-      PaperProps={{ sx: drawerstyles }}
+      PaperProps={{
+        sx: {
+          ...drawerstyles,
+          height: action == "transactionlimit" ? "45vh" : "39vh",
+        },
+      }}
       open={drawerOpen}
-      onClose={() => onCloseDrawer()}
+      onClose={() => closeAppDrawer()}
     >
-      {action !== "nodeteeselector" && action !== "quickactions" && (
-        <div style={barstyles} />
-      )}
+      <div style={barstyles} />
 
-      {action == "sendfromtoken" ? (
+      {action == "collectfromwallet" ? (
         <SendEthFromToken />
       ) : action == "consumekey" ? (
         <ConsumeSharedKey />
       ) : action == "quickactions" ? (
         <QuickActions />
+      ) : action == "unlocktransactions" ? (
+        <UnlockTransactions />
+      ) : action == "sendairdroplink" ? (
+        <SendAirdropLink />
+      ) : action == "transactionlimit" ? (
+        <TransactionLimit />
+      ) : action == "addpin" ? (
+        <AddPin />
+      ) : action == "deleteemail" || action == "deletephone" ? (
+        <DeleteRecovery />
+      ) : action == "paymentlink" ? (
+        <PaymentLink />
       ) : (
         <NodeTeeSelector />
       )}
@@ -70,8 +61,6 @@ const drawerstyles: CSSProperties = {
   alignItems: "center",
   justifyContent: "flex-start",
   width: "100vw",
-  height: "49vh",
-  padding: "0.25rem",
   borderTopLeftRadius: "0.5rem",
   borderTopRightRadius: "0.5rem",
   zIndex: 4000,

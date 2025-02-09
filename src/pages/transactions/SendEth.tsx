@@ -1,83 +1,84 @@
 import { JSX, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { TextField } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
 import { sendEth } from "../../utils/api/wallet";
-import { SOCKET } from "../../utils/api/config";
+import { useSocket } from "../../utils/SocketProvider";
 import { Loading } from "../../assets/animations";
-import { Info, Send as SendIcon } from "../../assets/icons";
+import { Info, Send as SendIcon } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import ethereumlogo from "../../assets/images/eth.png";
 import "../../styles/pages/transaction.scss";
 
 export default function SendEth(): JSX.Element {
   const navigate = useNavigate();
+  const { intent } = useParams();
+  const { socket } = useSocket();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
   const [receiverAddress, setReceiverAddress] = useState<string>("");
   const [ethAmnt, setEthAmnt] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
-  const [httpSuccess, sethttpSuccess] = useState<boolean>(false);
+  const [httpSuccess, setHttpSuccess] = useState<boolean>(false);
+
+  const { mutate: mutateSenEth } = useMutation({
+    mutationFn: () => sendEth(receiverAddress, ethAmnt, intent as string),
+    onSuccess: () => {
+      setHttpSuccess(true);
+      showsuccesssnack("Please hold on...");
+    },
+    onError: () => {
+      setProcessing(false);
+      showerrorsnack("An unexpected error occurred");
+    },
+  });
 
   let availableBalance = localStorage.getItem("ethbal");
 
   const backbuttonclick = () => {
-    navigate(-1);
+    navigate("/eth-asset/:send");
   };
 
   const errorInEthValue = (): boolean => {
-    if (ethAmnt == "") return false;
+    if (ethAmnt === "") return false;
     else if (Number(ethAmnt) >= Number(availableBalance)) return true;
     else return false;
   };
 
   const onSendTx = async () => {
-    if (ethAmnt == "" || receiverAddress == "" || errorInEthValue()) {
+    if (ethAmnt === "" || receiverAddress === "" || errorInEthValue()) {
       showerrorsnack("Enter an amount & address");
     } else {
       setProcessing(true);
       showsuccesssnack("Please wait...");
 
-      let access = localStorage.getItem("token");
-
-      const { spendSuccess } = await sendEth(
-        access as string,
-        receiverAddress,
-        ethAmnt
-      );
-
-      if (spendSuccess) {
-        sethttpSuccess(true);
-      } else {
-        showerrorsnack("An unexpected error occurred");
-        setProcessing(false);
-      }
+      mutateSenEth();
     }
   };
 
   useEffect(() => {
     if (httpSuccess) {
-      SOCKET.on("TXSent", () => {
-        showsuccesssnack("Please hold on...");
-      });
-      SOCKET.on("TXConfirmed", () => {
+      if (!socket) return;
+      socket.on("TXConfirmed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
         closeAppDrawer();
       });
-      SOCKET.on("TXFailed", () => {
+
+      socket.on("TXFailed", () => {
         setProcessing(false);
-        showsuccesssnack("The transaction was completed successfully");
+        showerrorsnack("The transaction failed");
       });
     }
 
     return () => {
-      SOCKET.off("TXSent");
-      SOCKET.off("TXConfirmed");
-      SOCKET.off("TXFailed");
+      if (!socket) return;
+      socket.off("TXConfirmed");
+      socket.off("TXFailed");
     };
   }, [httpSuccess]);
 
@@ -100,17 +101,14 @@ export default function SendEth(): JSX.Element {
   return (
     <div id="sendasset">
       <img src={ethereumlogo} alt="send eth" />
-
       <p className="info">
         <Info width={14} height={14} color={colors.danger} />
         Send ETH to another address
       </p>
-
       <p>
         To send ETH to another address, simply provide an address and amount.
         Amount will be deducted from your balance.
       </p>
-
       <TextField
         value={receiverAddress}
         onChange={(ev) => setReceiverAddress(ev.target.value)}
@@ -143,7 +141,6 @@ export default function SendEth(): JSX.Element {
           },
         }}
       />
-
       <TextField
         value={ethAmnt}
         onChange={(ev) => setEthAmnt(ev.target.value)}
@@ -178,14 +175,12 @@ export default function SendEth(): JSX.Element {
           },
         }}
       />
-
       <p className="availablebalance">{availableBalance} ETH</p>
-
       <button
         disabled={
           processing ||
-          receiverAddress == "" ||
-          ethAmnt == "" ||
+          receiverAddress === "" ||
+          ethAmnt === "" ||
           Number(ethAmnt) >= Number(availableBalance)
         }
         onClick={onSendTx}
@@ -200,8 +195,8 @@ export default function SendEth(): JSX.Element {
               height={18}
               color={
                 processing ||
-                receiverAddress == "" ||
-                ethAmnt == "" ||
+                receiverAddress === "" ||
+                ethAmnt === "" ||
                 Number(ethAmnt) >= Number(availableBalance)
                   ? colors.textsecondary
                   : colors.textprimary

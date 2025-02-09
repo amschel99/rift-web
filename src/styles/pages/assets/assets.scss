@@ -1,5 +1,5 @@
-@use "../constants/colors" as colors;
-@use "../constants/mixins" as mixins;
+@use "../../constants/colors" as colors;
+@use "../../constants/mixins" as mixins;
 
 #btc-asset,
 #eth-asset,
@@ -71,15 +71,17 @@
       button {
         @include mixins.useFlex(row, nowrap, center, center, 0.5rem);
         @include mixins.useButton();
+        @include mixins.useBaseFont();
         width: 85%;
         padding: 0.5rem;
-        border-radius: 1rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 500;
         color: colors.$textprimary;
       }
 
       .send {
         width: 62%;
-        border-radius: 1rem;
         background-color: colors.$danger;
       }
 

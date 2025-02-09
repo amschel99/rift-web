@@ -2,7 +2,7 @@ import { JSX, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useTabs } from "../../hooks/tabs";
-import { Stake, Lock } from "../../assets/icons";
+import { Stake, Lock } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import { Coins } from "./defi/Coins";
 import friendsduel from "../../assets/images/labs/friendsduel.png";
@@ -14,6 +14,11 @@ export const DefiTab = (): JSX.Element => {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
 
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
+
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();
@@ -21,11 +26,11 @@ export const DefiTab = (): JSX.Element => {
     }
 
     if (backButton.isVisible()) {
-      backButton.onClick(() => switchtab("home"));
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(() => switchtab("home"));
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);
@@ -149,7 +154,7 @@ export const DefiTab = (): JSX.Element => {
         <img src={lendtospend} alt="lend to spend" />
 
         <p>
-          Lend & Earn <Stake color={colors.success} /> <br />
+          Lend & Earn <br />
           <span>Allow others to use your crypto assets and secrets</span>
         </p>
       </div>

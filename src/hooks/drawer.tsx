@@ -1,11 +1,17 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 export type draweraction =
-  | "sendfromtoken"
+  | "collectfromwallet"
   | "consumekey"
-  | "refferred"
+  | "sendairdroplink"
   | "quickactions"
-  | "nodeteeselector";
+  | "nodeteeselector"
+  | "transactionlimit"
+  | "addpin"
+  | "deleteemail"
+  | "deletephone"
+  | "paymentlink"
+  | "unlocktransactions";
 
 interface draerctxtype {
   action: draweraction;
@@ -31,7 +37,7 @@ interface providerProps {
 
 export const AppDrawerProvider = ({ children }: providerProps): JSX.Element => {
   const [drawerAction, setDrawerAction] =
-    useState<draweraction>("sendfromtoken");
+    useState<draweraction>("collectfromwallet");
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [keyToshare, setKeyToshare] = useState<string>("");
   const [linkUrl, setSecretUrl] = useState<string>("");

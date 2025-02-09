@@ -1,102 +1,108 @@
-import { JSX, useCallback, useEffect, useState } from "react";
+import { JSX } from "react";
 import { useNavigate } from "react-router";
+import { useLaunchParams } from "@telegram-apps/sdk-react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mui/material";
+import { useAppDialog } from "../hooks/dialog";
 import { walletBalance, mantraBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { getMantraUsdVal } from "../utils/api/mantra";
-import { formatUsd, formatNumber } from "../utils/formatters";
+import { fetchAirWllxBalances } from "../utils/api/awllx";
+import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
+import airwallex from "../assets/images/awx.png";
 import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = (): JSX.Element => {
+  const { initData } = useLaunchParams();
   const navigate = useNavigate();
+  const { openAppDialog } = useAppDialog();
 
-  const [accBalLoading, setAccBalLoading] = useState<boolean>(false);
-  const [ethAccBalance, setEthAccBalance] = useState<number>(0);
-  const [btcAccBalance, setBtcAccAccBalance] = useState<number>(0);
-  const [btcAccBalanceUsd, setBtcAccAccBalanceUsd] = useState<number>(0);
-  const [ethAmountInUsd, setEthAmountInUsd] = useState<number>(0);
-  const [mantraBal, setMantraBal] = useState<number>(0);
-  const [mantraBalUsd, setMantraBalUsd] = useState<number>(0);
+  const { data: btcethbalance, isLoading: btcethLoading } = useQuery({
+    queryKey: ["btceth"],
+    queryFn: walletBalance,
+  });
+  const { data: mantrabalance, isLoading: mantraLoading } = useQuery({
+    queryKey: ["mantra"],
+    queryFn: mantraBalance,
+  });
+  const { data: mantrausdval, isLoading: mantrausdloading } = useQuery({
+    queryKey: ["mantrausd"],
+    queryFn: getMantraUsdVal,
+  });
+  const { data: btcusdval, isLoading: btcusdloading } = useQuery({
+    queryKey: ["btcusd"],
+    queryFn: getBtcUsdVal,
+  });
+  const { data: ethusdval, isLoading: ethusdloading } = useQuery({
+    queryKey: ["ethusd"],
+    queryFn: getEthUsdVal,
+  });
+  const { data: airwallexData, isLoading: awxLoading } = useQuery({
+    queryKey: ["airwallexbalances"],
+    queryFn: () => fetchAirWllxBalances(initData?.user?.username as string),
+  });
 
-  const initialfetch = localStorage.getItem("initialfetch");
+  const walletusdbalance: number =
+    Number(btcethbalance?.btcBalance) * Number(btcusdval) +
+    Number(btcethbalance?.balance) * Number(ethusdval) +
+    Number(mantrabalance?.data?.balance) * Number(mantrausdval) +
+    Number(airwallexData?.balances?.balances?.HKD) / 7.79 +
+    Number(airwallexData?.balances?.balances?.USD);
 
-  const btcbal: number =
-    btcAccBalance == 0 ? Number(localStorage.getItem("btcbal")) : btcAccBalance;
-  const ethbal: number =
-    ethAccBalance == 0 ? Number(localStorage.getItem("ethbal")) : ethAccBalance;
-  const btcbalUsd: number =
-    btcAccBalanceUsd == 0
-      ? Number(localStorage.getItem("btcbalUsd"))
-      : btcAccBalanceUsd;
-  const ethbalUsd: number =
-    ethAmountInUsd == 0
-      ? Number(localStorage.getItem("ethbalUsd"))
-      : ethAmountInUsd;
-  const mantrabal =
-    mantraBal == 0 ? Number(localStorage.getItem("mantrabal")) : mantraBal;
-  const mantrabalusd =
-    mantraBalUsd == 0
-      ? Number(localStorage.getItem("mantrabalusd"))
-      : mantraBalUsd;
+  localStorage.setItem("btcbal", String(btcethbalance?.btcBalance));
+  localStorage.setItem(
+    "btcbalUsd",
+    String(Number(btcethbalance?.btcBalance) * Number(btcusdval))
+  );
+  localStorage.setItem("ethbal", String(btcethbalance?.balance));
+  localStorage.setItem(
+    "ethbalUsd",
+    String(Number(btcethbalance?.balance) * Number(ethusdval))
+  );
+  localStorage.setItem("mantrabal", String(mantrabalance?.data?.balance));
+  localStorage.setItem(
+    "mantrabalusd",
+    String(Number(mantrabalance?.data?.balance) * Number(mantrausdval))
+  );
+  localStorage.setItem("mantrausdval", String(mantrausdval));
+  localStorage.setItem("ethvalue", String(ethusdval));
 
-  const getWalletBalance = useCallback(async () => {
-    setAccBalLoading(true);
-
-    let access: string | null = localStorage.getItem("token");
-
-    const { btcBalance, balance } = await walletBalance(access as string);
-    const { ethInUSD, ethValue } = await getEthUsdVal(Number(balance));
-    const { btcQtyInUSD } = await getBtcUsdVal(Number(btcBalance));
-    const { data } = await mantraBalance(access as string);
-    const { mantraQtyUsd, mantraInUSD } = await getMantraUsdVal(
-      Number(data?.balance)
-    );
-
-    setEthAccBalance(Number(balance));
-    setBtcAccAccBalance(btcBalance);
-    setMantraBal(Number(data?.balance));
-    setBtcAccAccBalanceUsd(btcQtyInUSD);
-    setEthAmountInUsd(ethInUSD);
-    setMantraBalUsd(mantraQtyUsd);
-
-    localStorage.setItem("btcbal", String(btcBalance));
-    localStorage.setItem("btcbalUsd", String(btcQtyInUSD));
-    localStorage.setItem("ethbal", balance);
-    localStorage.setItem("ethbalUsd", String(ethInUSD));
-    localStorage.setItem("mantrabal", data?.balance);
-    localStorage.setItem("mantrabalusd", String(mantraQtyUsd));
-    localStorage.setItem("mantrausdval", String(mantraInUSD));
-    localStorage.setItem("ethvalue", String(ethValue));
-    localStorage.setItem("initialfetch", "false");
-
-    setAccBalLoading(false);
-  }, []);
-
-  useEffect(() => {
-    getWalletBalance();
-  }, []);
+  const onimportAwx = () => {
+    openAppDialog("awxkeyimport", "Import AirWallex API Key");
+  };
 
   return (
     <div id="walletbalance">
       <p className="bal">Wallet Balance</p>
 
       <p className="balinusd">
-        {accBalLoading && initialfetch == null ? (
+        {btcethLoading ||
+        mantraLoading ||
+        mantrausdloading ||
+        btcusdloading ||
+        ethusdloading ? (
           <Skeleton
             variant="text"
             width="50%"
             height="2.5rem"
             animation="wave"
           />
+        ) : String(walletusdbalance).split(".")[0]?.length - 1 >= 7 ? (
+          "$" + numberFormat(walletusdbalance)
         ) : (
-          `${formatUsd(btcbalUsd + ethbalUsd + mantrabalusd)}`
+          formatUsd(walletusdbalance)
         )}
       </p>
 
-      {accBalLoading && initialfetch == null ? (
+      {btcethLoading ||
+      mantraLoading ||
+      mantrausdloading ||
+      btcusdloading ||
+      ethusdloading ||
+      awxLoading ? (
         <>
           <Skeleton
             variant="text"
@@ -124,15 +130,19 @@ export const WalletBalance = (): JSX.Element => {
               <img src={usdclogo} alt="btc" />
 
               <p>
-                Mantra DAO
+                Mantra
                 <span>OM</span>
               </p>
             </div>
 
             <p className="balance">
-              <span>{formatNumber(mantrabal)}</span>
+              <span>{formatNumber(Number(mantrabalance?.data?.balance))}</span>
 
-              <span className="fiat">{formatUsd(mantrabalusd)}</span>
+              <span className="fiat">
+                {formatUsd(
+                  Number(mantrabalance?.data?.balance) * Number(mantrausdval)
+                )}
+              </span>
             </p>
           </div>
 
@@ -147,13 +157,17 @@ export const WalletBalance = (): JSX.Element => {
             </div>
 
             <p className="balance">
-              <span>{formatNumber(btcbal)}</span>
+              <span>{formatNumber(Number(btcethbalance?.btcBalance))}</span>
 
-              <span className="fiat">{formatUsd(btcbalUsd)}</span>
+              <span className="fiat">
+                {formatUsd(
+                  Number(btcethbalance?.btcBalance) * Number(btcusdval)
+                )}
+              </span>
             </p>
           </div>
 
-          <div className="_asset" onClick={() => navigate("/eth-asset")}>
+          <div className="_asset" onClick={() => navigate("/eth-asset/send")}>
             <div>
               <img src={ethlogo} alt="btc" />
 
@@ -164,11 +178,75 @@ export const WalletBalance = (): JSX.Element => {
             </div>
 
             <p className="balance">
-              <span>{formatNumber(ethbal)}</span>
+              <span>{formatNumber(Number(btcethbalance?.balance))}</span>
 
-              <span className="fiat">{formatUsd(ethbalUsd)}</span>
+              <span className="fiat">
+                {formatUsd(Number(btcethbalance?.balance) * Number(ethusdval))}
+              </span>
             </p>
           </div>
+
+          {airwallexData?.status == 404 ? (
+            <>
+              <p className="message">
+                An Airwallex key allows you to view your USD & HKD balances and
+                buy OM (using USD/HKD)
+              </p>
+
+              <div className="airwallex" onClick={onimportAwx}>
+                <span>Import AirWallex Key</span>
+                <img src={airwallex} alt="airwallex" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="currencybalance"
+                // onClick={() =>
+                //   airwallexData?.status == 404
+                //     ? openAppDialog("awxkeyimport", "Import Airwallex Key")
+                //     : navigate(
+                //         `/hkd-asset/${airwallexData?.balances?.balances?.HKD}`
+                //       )
+                // }
+              >
+                <div className="flag_symbol">
+                  <span className="flag">🇭🇰</span>
+                  <p className="symbol">HKD</p>
+                </div>
+
+                <div className="avail_total">
+                  <p className="avail">
+                    {airwallexData?.balances?.balances?.HKD.toFixed(2) || 0}
+                  </p>
+                  <span>HKD</span>
+                </div>
+              </div>
+
+              <div
+                className="currencybalance"
+                // onClick={() =>
+                //   airwallexData?.status == 404
+                //     ? openAppDialog("awxkeyimport", "Import Airwallex Key")
+                //     : navigate(
+                //         `/usd-asset/${airwallexData?.balances?.balances?.USD}`
+                //       )
+                // }
+              >
+                <div className="flag_symbol">
+                  <span className="flag">🇺🇸</span>
+                  <p className="symbol">USD</p>
+                </div>
+
+                <div className="avail_total">
+                  <p className="avail">
+                    {airwallexData?.balances?.balances?.USD.toFixed(2) || 0}
+                  </p>
+                  <span>USD</span>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

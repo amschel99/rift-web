@@ -3,11 +3,10 @@
 
 .quickactions {
   width: 100%;
-  padding: 0 1rem;
 
   .title {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 0.875rem;
+    margin-bottom: 0.875rem;
     font-size: 1rem;
     font-weight: 400;
     text-align: center;
@@ -16,7 +15,7 @@
 
   .parent {
     @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);
-    padding: 1rem 0;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid colors.$divider;
 
     .child {
@@ -35,6 +34,8 @@
     img {
       width: 2.25rem;
       height: 2.25rem;
+      object-fit: cover;
+      object-position: center;
     }
   }
 
@@ -42,9 +43,5 @@
     img {
       border-radius: 50%;
     }
-  }
-
-  .f_parent {
-    border-top: 1px solid colors.$divider;
   }
 }

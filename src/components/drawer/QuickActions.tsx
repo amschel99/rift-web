@@ -13,12 +13,12 @@ export const QuickActions = (): JSX.Element => {
 
   const sendBtc = () => {
     closeAppDrawer();
-    navigate("/send-btc");
+    navigate("/send-btc/send");
   };
 
   const sendEth = () => {
     closeAppDrawer();
-    navigate("/eth-asset");
+    navigate("/eth-asset/send");
   };
 
   const getMantra = () => {
@@ -33,7 +33,7 @@ export const QuickActions = (): JSX.Element => {
 
   return (
     <div className="quickactions">
-      <p className="title">Quick Actions</p>
+      {/* <p className="title">Quick Actions</p> */}
 
       <div className="parent f_parent mantra" onClick={getMantra}>
         <img src={mantralogo} alt="mantra" />
@@ -62,7 +62,7 @@ export const QuickActions = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="parent" onClick={onLendEarn}>
+      <div className="parent last_parent" onClick={onLendEarn}>
         <img src={lendearn} alt="lend to spend/earn" />
 
         <div className="child">

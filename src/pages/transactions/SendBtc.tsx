@@ -1,24 +1,27 @@
 import { JSX, useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { TextField } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
+import { useSocket } from "../../utils/SocketProvider";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
-import { SOCKET } from "../../utils/api/config";
 import { sendBTC } from "../../utils/api/wallet";
 import { colors } from "../../constants";
-import { Send, Info } from "../../assets/icons";
+import { Send, Info } from "../../assets/icons/actions";
 import { Loading } from "../../assets/animations";
 import btclogo from "../../assets/images/btc.png";
 import "../../styles/pages/transaction.scss";
 
 export default function SendBtc(): JSX.Element {
+  const { intent } = useParams();
   const navigate = useNavigate();
+  const { socket } = useSocket();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
   const backbuttonclick = () => {
-    navigate(-1);
+    navigate("/btc-asset");
   };
 
   let availableBalance = localStorage.getItem("btcbal");
@@ -28,6 +31,10 @@ export default function SendBtc(): JSX.Element {
   const [processing, setProcessing] = useState<boolean>(false);
   const [httpSuccess, sethttpSuccess] = useState<boolean>(false);
 
+  const { mutate: mutateSendBtc, isSuccess } = useMutation({
+    mutationFn: () => sendBTC(receiverAddress, btcAmnt, intent as string),
+  });
+
   const errorInBtcValue = (): boolean => {
     if (btcAmnt == "") return false;
     else if (Number(btcAmnt) >= Number(availableBalance)) return true;
@@ -36,19 +43,14 @@ export default function SendBtc(): JSX.Element {
 
   const onSendBtc = async () => {
     if (receiverAddress == "" || btcAmnt == "") {
-      showerrorsnack("Eanter a valid address & amount");
+      showerrorsnack("Enter a valid BTC address & amount");
     } else {
       setProcessing(true);
+      showsuccesssnack("Please wait...");
 
-      let access = localStorage.getItem("token");
+      mutateSendBtc();
 
-      const { spendSuccess } = await sendBTC(
-        access as string,
-        receiverAddress,
-        btcAmnt
-      );
-
-      if (spendSuccess) sethttpSuccess(true);
+      if (isSuccess) sethttpSuccess(true);
       else {
         showerrorsnack("An unexpected error occurred");
         setProcessing(false);
@@ -58,24 +60,22 @@ export default function SendBtc(): JSX.Element {
 
   useEffect(() => {
     if (httpSuccess) {
-      SOCKET.on("TXSent", () => {
-        showsuccesssnack("Please hold on...");
-      });
-      SOCKET.on("TXConfirmed", () => {
+      if (!socket) return;
+      socket.on("TXConfirmed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
         closeAppDrawer();
       });
-      SOCKET.on("TXFailed", () => {
+      socket.on("TXFailed", () => {
         setProcessing(false);
         showsuccesssnack("The transaction was completed successfully");
       });
     }
 
     return () => {
-      SOCKET.off("TXSent");
-      SOCKET.off("TXConfirmed");
-      SOCKET.off("TXFailed");
+      if (!socket) return;
+      socket.off("TXConfirmed");
+      socket.off("TXFailed");
     };
   }, [httpSuccess]);
 

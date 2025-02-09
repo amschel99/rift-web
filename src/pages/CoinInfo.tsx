@@ -1,13 +1,14 @@
-import { JSX, useCallback, useEffect, useState, Fragment } from "react";
-import { useParams, useNavigate } from "react-router";
+import { JSX, useEffect, Fragment, useState } from "react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { openLink } from "@telegram-apps/sdk-react";
+import { CandlestickData } from "lightweight-charts";
+import { useParams, useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
 import { useTabs } from "../hooks/tabs";
 import { CoinPriceChart } from "../components/PriceChart";
 import {
   coinInfoType,
-  coinPriceType,
   fetchCoinPrices,
   fetchCoinInfo,
 } from "../utils/api/market";
@@ -19,85 +20,29 @@ export default function CoinInfo(): JSX.Element {
   const { coinId } = useParams();
   const navigate = useNavigate();
   const { switchtab } = useTabs();
+  const queryclient = useQueryClient();
   const { showerrorsnack } = useSnackbar();
 
-  const [coinDetails, setCoinDetails] = useState<coinInfoType>({
-    id: "",
-    symbol: "",
-    name: "",
-    categories: [],
-    description: {
-      en: "",
-    },
-    links: {
-      homepage: [],
-      whitepaper: "",
-      official_forum_url: [],
-    },
-    image: {
-      thumb: "",
-      small: "",
-      large: "",
-    },
-    genesis_date: "",
-    market_cap_rank: 0,
-    market_data: {
-      current_price: {
-        usd: 0,
-      },
-      price_change_percentage_24h: 0,
-      total_supply: 0,
-      max_supply: 0,
-      circulating_supply: 0,
-      market_cap: {
-        usd: 0,
-      },
-    },
-  });
-  const [coinPrices, setCoinPrices] = useState<coinPriceType[]>([]);
   const [dayCountPrices, setDaycountPrices] = useState<number>(30);
 
-  const onGoBack = () => {
+  const { data: coininfoDetails } = useQuery({
+    queryKey: ["coindetails"],
+    queryFn: () => fetchCoinInfo(coinId as string),
+    refetchInterval: 3000,
+  });
+
+  const { data: coininfoPrices } = useQuery({
+    queryKey: ["coinprices"],
+    queryFn: () => fetchCoinPrices(coinId as string, dayCountPrices),
+    refetchInterval: 3000,
+  });
+  const coinDetails = coininfoDetails as coinInfoType;
+  const coinPrices = coininfoPrices as CandlestickData[];
+
+  const goBack = () => {
     switchtab("earn");
-    navigate(-1);
+    navigate("/app");
   };
-
-  if (backButton.isMounted()) {
-    backButton.onClick(() => onGoBack());
-  }
-
-  const getCoinDetails = useCallback(async () => {
-    const { coinInfo, isOK } = await fetchCoinInfo(coinId as string);
-
-    if (isOK && coinInfo?.id) {
-      setCoinDetails(coinInfo);
-    } else {
-      showerrorsnack("Failed to get coin details!");
-    }
-  }, []);
-
-  const getCoinPrices = useCallback(async () => {
-    const { prices, isOk } = await fetchCoinPrices(
-      coinId as string,
-      dayCountPrices ?? 30
-    );
-
-    if (isOk) {
-      setCoinPrices(prices);
-    }
-  }, [dayCountPrices]);
-
-  useEffect(() => {
-    getCoinDetails();
-    getCoinPrices();
-
-    let interval = setInterval(() => {
-      getCoinDetails();
-      getCoinPrices();
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [dayCountPrices]);
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -105,7 +50,12 @@ export default function CoinInfo(): JSX.Element {
       backButton.show();
     }
 
+    if (backButton.isMounted()) {
+      backButton.onClick(goBack);
+    }
+
     return () => {
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);
@@ -115,10 +65,13 @@ export default function CoinInfo(): JSX.Element {
       <Fragment>
         <div id="loo1">
           <p className="name_symbol">
-            {coinDetails.name} <span>{coinDetails.symbol}</span>
+            {coinDetails && coinDetails?.name}{" "}
+            <span>{coinDetails && coinDetails?.symbol}</span>
           </p>
           <p className="price">
-            {formatUsd(coinDetails?.market_data?.current_price?.usd)}
+            {formatUsd(
+              coinDetails && coinDetails?.market_data?.current_price?.usd
+            )}
           </p>
           <p
             className="price_change24"
@@ -126,46 +79,66 @@ export default function CoinInfo(): JSX.Element {
               fontStyle: "normal",
               fontWeight: "600",
               color:
+                coinDetails &&
                 coinDetails?.market_data?.price_change_percentage_24h < 0
                   ? colors.danger
                   : colors.success,
             }}
           >
-            {coinDetails?.market_data?.price_change_percentage_24h > 0
-              ? `+${coinDetails?.market_data?.price_change_percentage_24h.toFixed(
-                  2
-                )}%`
-              : `${coinDetails?.market_data?.price_change_percentage_24h.toFixed(
-                  2
-                )}%`}
+            {coinDetails &&
+            coinDetails?.market_data?.price_change_percentage_24h > 0
+              ? `+${
+                  coinDetails &&
+                  coinDetails?.market_data?.price_change_percentage_24h.toFixed(
+                    2
+                  )
+                }%`
+              : `${
+                  coinDetails &&
+                  coinDetails?.market_data?.price_change_percentage_24h.toFixed(
+                    2
+                  )
+                }%`}
           </p>
         </div>
 
         <div className="prices">
-          <CoinPriceChart data={coinPrices} />
+          <CoinPriceChart data={coinPrices || []} />
 
           <div className="dayscount">
             <button
               className={dayCountPrices == 1 ? "selecteddays" : ""}
-              onClick={() => setDaycountPrices(1)}
+              onClick={() => {
+                setDaycountPrices(1);
+                queryclient.invalidateQueries({ queryKey: ["coinprices"] });
+              }}
             >
               1D
             </button>
             <button
               className={dayCountPrices == 7 ? "selecteddays" : ""}
-              onClick={() => setDaycountPrices(7)}
+              onClick={() => {
+                setDaycountPrices(7);
+                queryclient.invalidateQueries({ queryKey: ["coinprices"] });
+              }}
             >
               1W
             </button>
             <button
               className={dayCountPrices == 30 ? "selecteddays" : ""}
-              onClick={() => setDaycountPrices(30)}
+              onClick={() => {
+                setDaycountPrices(30);
+                queryclient.invalidateQueries({ queryKey: ["coinprices"] });
+              }}
             >
               1M
             </button>
             <button
               className={dayCountPrices == 365 ? "selecteddays" : ""}
-              onClick={() => setDaycountPrices(365)}
+              onClick={() => {
+                setDaycountPrices(365);
+                queryclient.invalidateQueries({ queryKey: ["coinprices"] });
+              }}
             >
               1Y
             </button>
@@ -179,19 +152,21 @@ export default function CoinInfo(): JSX.Element {
           <p>
             Market Cap
             <span>
-              ${numberFormat(coinDetails?.market_data?.market_cap?.usd)}
+              ${numberFormat(Number(coinDetails?.market_data?.market_cap?.usd))}
             </span>
           </p>
           <p>
             Circulation Supply
             <span>
-              {numberFormat(coinDetails?.market_data?.circulating_supply)}
+              {numberFormat(
+                Number(coinDetails?.market_data?.circulating_supply)
+              )}
               &nbsp;
               <em
                 className="sym"
                 style={{ textTransform: "uppercase", fontStyle: "normal" }}
               >
-                {coinDetails.symbol}
+                {coinDetails?.symbol}
               </em>
             </span>
           </p>
@@ -199,19 +174,20 @@ export default function CoinInfo(): JSX.Element {
             Max Supply
             <span>
               {typeof coinDetails?.market_data?.max_supply == "number"
-                ? numberFormat(coinDetails?.market_data?.max_supply)
+                ? numberFormat(Number(coinDetails?.market_data?.max_supply))
                 : "---"}
             </span>
           </p>
           <p>
             Total Supply
             <span>
-              {numberFormat(coinDetails?.market_data?.total_supply)}&nbsp;
+              {numberFormat(Number(coinDetails?.market_data?.total_supply))}
+              &nbsp;
               <em
                 className="sym"
                 style={{ textTransform: "uppercase", fontStyle: "normal" }}
               >
-                {coinDetails.symbol}
+                {coinDetails?.symbol}
               </em>
             </span>
           </p>
@@ -220,21 +196,30 @@ export default function CoinInfo(): JSX.Element {
           </p>
         </div>
 
-        <p id="loo2">{coinDetails?.description?.en}</p>
+        <p id="loo2">{coinDetails && coinDetails?.description?.en}</p>
 
         <div id="loo4">
-          <span onClick={() => openLink(coinDetails?.links?.homepage[0])}>
+          <span
+            onClick={() =>
+              openLink(coinDetails && coinDetails?.links?.homepage[0])
+            }
+          >
             Official Website
           </span>
-          <span onClick={() => openLink(coinDetails?.links?.whitepaper)}>
+          <span
+            onClick={() =>
+              openLink(coinDetails && coinDetails?.links?.whitepaper)
+            }
+          >
             Whitepaper
           </span>
         </div>
 
         <div id="loo5">
-          {coinDetails?.categories?.map((_cat, idx) => (
-            <span key={_cat + idx}>{_cat}</span>
-          ))}
+          {coinDetails &&
+            coinDetails?.categories?.map((_cat, idx) => (
+              <span key={_cat + idx}>{_cat}</span>
+            ))}
         </div>
       </Fragment>
 

@@ -1,103 +1,86 @@
-import { JSX, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { JSX, useEffect, useState } from "react";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { SOCKET } from "../../utils/api/config";
 import { spendOnBehalf } from "../../utils/api/wallet";
 import { getEthUsdVal } from "../../utils/ethusd";
+import { base64ToString } from "../../utils/base64";
 import { Loading } from "../../assets/animations";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
-import { SendFromToken } from "../../assets/icons";
+import { SendFromToken } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import foreignspend from "../../assets/images/obhehalfspend.png";
 import "../../styles/components/forms.scss";
 
-function base64ToString(base64: string | null): string {
-  try {
-    if (!base64) throw new Error("Base64 string is missing");
-    return decodeURIComponent(escape(atob(base64)));
-  } catch (error) {
-    return "Invalid value";
-  }
-}
-
 // foreign spend - send eth to my address from shared link
 export const SendEthFromToken = (): JSX.Element => {
-  const navigate = useNavigate();
+  const queryclient = useQueryClient();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
-  let localethValue = localStorage.getItem("ethvalue");
+  let utxoVal = localStorage.getItem("utxoVal");
 
-  const [eThvalLoading, setEThvalLoading] = useState<boolean>(false);
-  const [ethValinUSd, setEthValinUSd] = useState<number>(0.0);
+  const { data: ethusdval, isPending } = useQuery({
+    queryKey: ["ethusd"],
+    queryFn: getEthUsdVal,
+  });
 
   const [disableReceive, setdisableReceive] = useState<boolean>(false);
   const [processing, setProcessing] = useState<boolean>(false);
-  const [httpSuccess, sethttpSuccess] = useState<boolean>(false);
 
-  const getUSDToEthValue = useCallback(async () => {
-    if (localethValue == null) {
-      setEThvalLoading(true);
+  const collectValue = (
+    Number(base64ToString(utxoVal)) * Number(ethusdval)
+  ).toFixed(2);
 
-      const { ethValue } = await getEthUsdVal(1);
+  let access = localStorage.getItem("token");
+  let utxoId = localStorage.getItem("utxoId");
+  let utxoIntent = localStorage.getItem("utxoIntent");
+  let address = localStorage.getItem("address");
 
-      setEthValinUSd(ethValue);
-      setEThvalLoading(false);
-    } else {
-      setEthValinUSd(Number(localethValue));
-    }
-  }, []);
-
-  const onSpendOnBehalf = async () => {
-    setProcessing(true);
-    setdisableReceive(true);
-    showsuccesssnack("Please wait...");
-
-    let access = localStorage.getItem("token");
-    let utxoId = localStorage.getItem("utxoId");
-
-    const { spendOnBehalfSuccess, status } = await spendOnBehalf(
-      access as string,
-      localStorage.getItem("address") as string,
-      utxoId as string
-    );
-
-    if (spendOnBehalfSuccess == true && status == 200) {
+  const { mutate: mutateCollectEth, isSuccess } = useMutation({
+    mutationFn: () =>
+      spendOnBehalf(
+        access as string,
+        address as string,
+        utxoId as string,
+        utxoIntent as string
+      ),
+    onSuccess: (res) => {
       localStorage.removeItem("utxoId");
 
-      sethttpSuccess(true);
-      showsuccesssnack("Please wait for the transaction...");
-    } else if ((spendOnBehalfSuccess == true && status) == 403) {
-      localStorage.removeItem("utxoId");
+      if (res.status == 200) {
+        localStorage.removeItem("utxoId");
 
-      showerrorsnack("This link has expired");
-      closeAppDrawer();
-      navigate("/app");
-    } else if (spendOnBehalfSuccess == true && status == 404) {
+        showsuccesssnack("Please wait for the transaction...");
+      } else if (res.status == 403) {
+        localStorage.removeItem("utxoId");
+        showerrorsnack("This link has expired");
+        closeAppDrawer();
+      } else if (res.status == 404) {
+        localStorage.removeItem("utxoId");
+        showerrorsnack("This link has been used");
+        closeAppDrawer();
+      } else {
+        localStorage.removeItem("utxoId");
+        showerrorsnack("An unexpected error occurred");
+        closeAppDrawer();
+      }
+    },
+    onError: () => {
       localStorage.removeItem("utxoId");
-
-      showerrorsnack("This link has been used");
-      closeAppDrawer();
-      navigate("/app");
-    } else {
-      localStorage.removeItem("utxoId");
-
       showerrorsnack("An unexpected error occurred");
       closeAppDrawer();
-    }
-
-    localStorage.removeItem("utxoId");
-  };
+    },
+  });
 
   useEffect(() => {
-    if (httpSuccess) {
-      SOCKET.on("TXSent", () => {
-        localStorage.removeItem("utxoId");
+    if (isSuccess) {
+      localStorage.removeItem("utxoId");
 
-        showsuccesssnack("Please hold on...");
-      });
       SOCKET.on("TXConfirmed", () => {
         localStorage.removeItem("utxoId");
+
+        queryclient.invalidateQueries({ queryKey: ["btceth"] });
 
         setProcessing(false);
         showsuccesssnack(
@@ -107,19 +90,21 @@ export const SendEthFromToken = (): JSX.Element => {
         );
 
         closeAppDrawer();
-        navigate("/app");
+      });
+      SOCKET.on("TXFailed", () => {
+        localStorage.removeItem("utxoId");
+
+        setProcessing(false);
+        showerrorsnack("The transaction could not be completed");
+        closeAppDrawer();
       });
 
       return () => {
-        SOCKET.off("TXSent");
         SOCKET.off("TXConfirmed");
+        SOCKET.off("TXFailed");
       };
     }
-  }, [httpSuccess]);
-
-  useEffect(() => {
-    getUSDToEthValue();
-  }, []);
+  }, [isSuccess]);
 
   return (
     <div id="sendethfromtoken">
@@ -127,17 +112,17 @@ export const SendEthFromToken = (): JSX.Element => {
 
       <p>
         Click 'Receive' to collect&nbsp;
-        {eThvalLoading
-          ? "- - -"
-          : `${(
-              Number(
-                base64ToString(localStorage.getItem("utxoVal") as string)
-              ) * ethValinUSd
-            ).toFixed(2)} USD`}
+        {isPending ? "- - -" : `${collectValue} USD`}
       </p>
 
-      <button disabled={disableReceive} onClick={onSpendOnBehalf}>
-        {processing ? (
+      <button
+        disabled={disableReceive}
+        onClick={() => {
+          setdisableReceive(true);
+          mutateCollectEth();
+        }}
+      >
+        {processing || disableReceive ? (
           <Loading width="1.5rem" height="1.5rem" />
         ) : (
           <>

@@ -1,25 +1,23 @@
-import { JSX, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { JSX, useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
-import { useSnackbar } from "../hooks/snackbar";
-import { getEthUsdVal } from "../utils/ethusd";
-import { walletBalance } from "../utils/api/wallet";
-import { formatUsd, formatNumber } from "../utils/formatters";
-import { Copy, Send, Telegram } from "../assets/icons";
-import { colors } from "../constants";
-import ethlogo from "../assets/images/eth.png";
-import "../styles/pages/assets.scss";
+import { useSnackbar } from "../../hooks/snackbar";
+import { useTabs } from "../../hooks/tabs";
+import { formatUsd, formatNumber } from "../../utils/formatters";
+import { Copy, Send, Telegram } from "../../assets/icons/actions";
+import { colors } from "../../constants";
+import ethlogo from "../../assets/images/eth.png";
+import "../../styles/pages/assets/assets.scss";
 
 export default function EthAsset(): JSX.Element {
   const navigate = useNavigate();
+  const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
+  const { switchtab } = useTabs();
 
-  const [accBalLoading, setAccBalLoading] = useState<boolean>(false);
-  const [accBalance, setAccBalance] = useState<number>(0);
-  const [amountInUsd, setAmountInUsd] = useState<number>(0);
-
-  const backbuttonclick = () => {
-    navigate(-1);
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
   };
 
   let walletAddress = localStorage.getItem("address");
@@ -33,25 +31,6 @@ export default function EthAsset(): JSX.Element {
     }
   };
 
-  const onGetBalance = useCallback(async () => {
-    if (ethbal == null || ethbalUsd == null) {
-      setAccBalLoading(true);
-
-      let access: string | null = localStorage.getItem("token");
-
-      const { balance } = await walletBalance(access as string);
-      const { ethInUSD } = await getEthUsdVal(Number(balance));
-
-      setAccBalance(Number(balance));
-      setAmountInUsd(ethInUSD);
-
-      setAccBalLoading(false);
-    } else {
-      setAccBalance(Number(ethbal));
-      setAmountInUsd(Number(ethbalUsd));
-    }
-  }, []);
-
   useEffect(() => {
     if (backButton.isSupported()) {
       backButton.mount();
@@ -59,16 +38,13 @@ export default function EthAsset(): JSX.Element {
     }
 
     if (backButton.isMounted()) {
-      backButton.onClick(backbuttonclick);
+      backButton.onClick(goBack);
     }
 
     return () => {
+      backButton.offClick(goBack);
       backButton.unmount();
     };
-  }, []);
-
-  useEffect(() => {
-    onGetBalance();
   }, []);
 
   return (
@@ -81,10 +57,8 @@ export default function EthAsset(): JSX.Element {
       </button>
 
       <div className="balance">
-        <p>{accBalLoading ? "- - -" : `${formatUsd(amountInUsd)}`}</p>
-        <span>
-          {accBalLoading ? "- - -" : `${formatNumber(accBalance)} ETH`}
-        </span>
+        <p>{formatUsd(Number(ethbalUsd))}</p>
+        <span>{formatNumber(Number(ethbal))} ETH</span>
       </div>
 
       <div className="actions">
@@ -98,13 +72,16 @@ export default function EthAsset(): JSX.Element {
         <div className="buttons">
           <button
             className="receive"
-            onClick={() => navigate("/sendcollectlink")}
+            onClick={() => navigate(`/sendcollectlink/${intent}`)}
           >
             Create Link
             <Telegram width={18} height={18} color={colors.textprimary} />
           </button>
 
-          <button className="send" onClick={() => navigate("/send-eth")}>
+          <button
+            className="send"
+            onClick={() => navigate(`/send-eth/${intent}`)}
+          >
             Send ETH <Send width={18} height={18} color={colors.textprimary} />
           </button>
         </div>

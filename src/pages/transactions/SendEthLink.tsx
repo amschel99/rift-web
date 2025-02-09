@@ -4,7 +4,7 @@ import {
   openTelegramLink,
   useLaunchParams,
 } from "@telegram-apps/sdk-react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Checkbox, Slider, TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { shareWalletAccess } from "../../utils/api/wallet";
@@ -12,12 +12,13 @@ import { colors } from "../../constants";
 import sharewallet from "../../assets/images/sharewallet.png";
 import { formatUsd } from "../../utils/formatters";
 import { Loading } from "../../assets/animations";
-import { Telegram } from "../../assets/icons";
+import { Telegram } from "../../assets/icons/actions";
 import "../../styles/pages/sendcollectlink.scss";
 
 export default function SendEthLink(): JSX.Element {
   const { initData } = useLaunchParams();
   const navigate = useNavigate();
+  const { intent } = useParams();
   const { showerrorsnack } = useSnackbar();
 
   let localethBal = localStorage.getItem("ethbal");
@@ -37,7 +38,7 @@ export default function SendEthLink(): JSX.Element {
   ];
 
   const goBack = () => {
-    navigate(-1);
+    navigate(`/eth-asset/${intent}`);
   };
 
   const handleChange = (_event: Event, newValue: number | number[]) => {
@@ -56,20 +57,19 @@ export default function SendEthLink(): JSX.Element {
     } else {
       setProcessing(true);
 
-      let access = localStorage.getItem("token");
       let usdAmountInETH = (Number(accessAmnt) / Number(localethValue)).toFixed(
         5
       );
 
       const { token } = await shareWalletAccess(
-        access as string,
         noExpiry ? "1000d" : `${time}m`,
         usdAmountInETH
       );
 
       if (token) {
+        const shareUrl = token + `%26intent=${intent}`;
         openTelegramLink(
-          `https://t.me/share/url?url=${token}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
+          `https://t.me/share/url?url=${shareUrl}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
         );
       } else {
         showerrorsnack(

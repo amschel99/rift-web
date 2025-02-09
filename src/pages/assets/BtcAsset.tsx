@@ -1,25 +1,22 @@
-import { JSX, useCallback, useEffect, useState } from "react";
+import { JSX, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
-import { useSnackbar } from "../hooks/snackbar";
-import { getBtcUsdVal } from "../utils/ethusd";
-import { formatUsd, formatNumber } from "../utils/formatters";
-import { walletBalance } from "../utils/api/wallet";
-import { Copy, Receive, Send } from "../assets/icons";
-import { colors } from "../constants";
-import btclogo from "../assets/images/btc.png";
-import "../styles/pages/assets.scss";
+import { useSnackbar } from "../../hooks/snackbar";
+import { useTabs } from "../../hooks/tabs";
+import { formatUsd, formatNumber } from "../../utils/formatters";
+import { Copy, Receive, Send } from "../../assets/icons/actions";
+import { colors } from "../../constants";
+import btclogo from "../../assets/images/btc.png";
+import "../../styles/pages/assets/assets.scss";
 
 export default function BtcAsset(): JSX.Element {
   const navigate = useNavigate();
+  const { switchtab } = useTabs();
   const { showsuccesssnack } = useSnackbar();
 
-  const [accBalLoading, setAccBalLoading] = useState<boolean>(false);
-  const [btcAccBalance, setBtcAccAccBalance] = useState<number>(0);
-  const [btcAccBalanceUsd, setBtcAccAccBalanceUsd] = useState<number>(0);
-
   const backbuttonclick = () => {
-    navigate(-1);
+    switchtab("home");
+    navigate("/app");
   };
 
   let walletAddress = localStorage.getItem("btcaddress");
@@ -32,25 +29,6 @@ export default function BtcAsset(): JSX.Element {
       showsuccesssnack("Address copied to clipboard");
     }
   };
-
-  const onGetBalance = useCallback(async () => {
-    if (btcbal == null || btcbalUsd == null) {
-      setAccBalLoading(true);
-
-      let access: string | null = localStorage.getItem("token");
-
-      const { btcBalance } = await walletBalance(access as string);
-      const { btcQtyInUSD } = await getBtcUsdVal(Number(btcBalance));
-
-      setBtcAccAccBalance(btcBalance);
-      setBtcAccAccBalanceUsd(btcQtyInUSD);
-
-      setAccBalLoading(false);
-    } else {
-      setBtcAccAccBalance(Number(btcbal));
-      setBtcAccAccBalanceUsd(Number(btcbalUsd));
-    }
-  }, []);
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -67,10 +45,6 @@ export default function BtcAsset(): JSX.Element {
     };
   }, []);
 
-  useEffect(() => {
-    onGetBalance();
-  }, []);
-
   return (
     <section id="btc-asset">
       <img src={btclogo} alt="btc" />
@@ -81,10 +55,8 @@ export default function BtcAsset(): JSX.Element {
       </button>
 
       <div className="balance">
-        <p>{accBalLoading ? "- - -" : `${formatUsd(btcAccBalanceUsd)}`}</p>
-        <span>
-          {accBalLoading ? "- - -" : `${formatNumber(btcAccBalance)} BTC`}
-        </span>
+        <p>{formatUsd(Number(btcbalUsd))}</p>
+        <span>{formatNumber(Number(btcbal))} BTC</span>
       </div>
 
       <div className="actions">
@@ -98,7 +70,7 @@ export default function BtcAsset(): JSX.Element {
             <Receive width={18} height={18} color={colors.textprimary} />
           </button>
 
-          <button className="send" onClick={() => navigate("/send-btc")}>
+          <button className="send" onClick={() => navigate("/send-btc/send")}>
             Send BTC <Send width={18} height={18} color={colors.textprimary} />
           </button>
         </div>

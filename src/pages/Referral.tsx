@@ -1,51 +1,45 @@
-import { JSX, useEffect, useCallback, useState } from "react";
-import { useNavigate } from "react-router";
+import { JSX, useEffect } from "react";
 import { openTelegramLink, backButton } from "@telegram-apps/sdk-react";
+import { useNavigate, useParams } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../hooks/snackbar";
 import { useTabs } from "../hooks/tabs";
 import { createReferralLink } from "../utils/api/refer";
-import { Copy, Telegram } from "../assets/icons";
+import { Copy, Telegram } from "../assets/icons/actions";
 import { colors } from "../constants";
-import refer from "../assets/images/refer.png";
+import refer from "../assets/images/icons/refer.png";
 import "../styles/pages/referral.scss";
 
 export default function Referral(): JSX.Element {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
+  const { intent } = useParams();
+  const { showsuccesssnack } = useSnackbar();
 
   const goBack = () => {
     switchtab("profile");
-    navigate(-1);
+    navigate("/app");
   };
 
-  const { showsuccesssnack } = useSnackbar();
-
-  const [processing, setProcessing] = useState<boolean>(false);
-  const [referLink, setReferLink] = useState<string>("");
+  const {
+    data: referLink,
+    mutate,
+    isPending,
+  } = useMutation({
+    mutationFn: () => createReferralLink(intent),
+  });
 
   const onCopyLink = () => {
-    navigator.clipboard.writeText(referLink);
+    navigator.clipboard.writeText(referLink as string);
     showsuccesssnack("Link copied to clipboard...");
   };
 
   const onShareTg = () => {
-    openTelegramLink(
-      `https://t.me/share/url?url=${referLink}&text=Get started with StratoSphere ID`
-    );
+    openTelegramLink(`https://t.me/share/url?url=${referLink}`);
   };
 
-  const generateReferLink = useCallback(async () => {
-    setProcessing(true);
-    const link = await createReferralLink();
-    if (link) {
-      setReferLink(link);
-      setProcessing(false);
-    } else {
-    }
-  }, []);
-
   useEffect(() => {
-    generateReferLink();
+    mutate();
   }, []);
 
   useEffect(() => {
@@ -76,32 +70,32 @@ export default function Referral(): JSX.Element {
 
       <p className="earns">
         You have earned
-        <span>0 USDC </span>
+        <span>0 OM</span>
       </p>
 
       <div className="actions">
         <p className="genlink">
-          {processing
+          {isPending
             ? "Generating your unique link, please wait..."
             : "Your link is ready to share 🔗"}
         </p>
 
         <button
           className="copylink"
-          disabled={processing || referLink == ""}
+          disabled={isPending || referLink == ""}
           onClick={onCopyLink}
         >
-          {processing
+          {isPending
             ? "Generating link, please wait..."
-            : referLink.substring(0, 31) + "..."}
+            : referLink?.substring(0, 31) + "..."}
           <span>
             Copy
-            <Copy width={12} height={14} color={colors.textprimary} />
+            <Copy width={12} height={14} color={colors.textsecondary} />
           </span>
         </button>
         <button
           className="send_tg"
-          disabled={processing || referLink == ""}
+          disabled={isPending || referLink == ""}
           onClick={onShareTg}
         >
           Share On Telegram

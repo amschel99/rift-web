@@ -1,5 +1,6 @@
 import { JSX, useEffect } from "react";
 import { backButton } from "@telegram-apps/sdk-react";
+import { useNavigate } from "react-router";
 import { useTabs } from "../../hooks/tabs";
 import { projectType, Project } from "./lab/Project";
 import startoxlogo from "../../assets/images/labs/stratox.png";
@@ -11,13 +12,13 @@ import evidentlogo from "../../assets/images/labs/evident.png";
 import "../../styles/components/tabs/labstab.scss";
 
 export const LabsTab = (): JSX.Element => {
+  const navigate = useNavigate();
   const { switchtab } = useTabs();
 
-  if (backButton.isMounted()) {
-    backButton.onClick(() => {
-      switchtab("home");
-    });
-  }
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -25,7 +26,12 @@ export const LabsTab = (): JSX.Element => {
       backButton.show();
     }
 
+    if (backButton.isMounted()) {
+      backButton.onClick(goBack);
+    }
+
     return () => {
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);

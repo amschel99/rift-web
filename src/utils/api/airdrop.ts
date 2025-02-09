@@ -1,23 +1,50 @@
 import { BASEURL, ENDPOINTS } from "./config";
 
-export const claimAirdrop = async (
-  airDropid: string
-): Promise<{ isOK: boolean; status: number }> => {
+export type unlockhistorytype = {
+  _id: string;
+  username: string;
+  message: string[];
+};
+
+export const createAirdropCampaign = async (
+  campaignname: string,
+  maxsupply: number,
+  qtyperuser: number
+): Promise<string> => {
+  // return airdrop url
+  const URL = BASEURL + ENDPOINTS.createairdrop;
+  const accessToken = localStorage.getItem("token");
+
+  const res: Response = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      campaign_name: campaignname,
+      max_tokens: maxsupply,
+      amount_per_user: qtyperuser,
+    }),
+  });
+
+  return res.json();
+};
+
+export const claimAirdrop = async (airDropid: string) => {
   const URL = BASEURL + ENDPOINTS.claimairdrop + `?id=${airDropid}`;
   const accessToken = localStorage.getItem("token");
 
-  let res: Response = await fetch(URL, {
+  await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
   });
-
-  return { isOK: res?.ok, status: res?.status };
 };
 
-type unlockTokensType = {
+export type unlockTokensType = {
   amount: number;
   unlocked: number;
 };
@@ -34,18 +61,14 @@ export const getUnlockedTokens = async (): Promise<unlockTokensType> => {
     },
   });
 
-  const data: unlockTokensType = await res.json();
-
-  return { amount: data?.amount, unlocked: data?.unlocked };
+  return await res.json();
 };
 
-export const unlockTokens = async (
-  amount: number
-): Promise<{ isOk: boolean; status: number }> => {
+export const unlockTokens = async (amount: number) => {
   const URL = BASEURL + ENDPOINTS.unlocktokens;
   const accessToken = localStorage.getItem("token");
 
-  const res: Response = await fetch(URL, {
+  await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -53,6 +76,18 @@ export const unlockTokens = async (
     },
     body: JSON.stringify({ amount }),
   });
+};
 
-  return { isOk: res?.ok, status: res?.status };
+export const unlockTokensHistory = async (): Promise<unlockhistorytype[]> => {
+  const accessToken = localStorage.getItem("token");
+  const URL = BASEURL + ENDPOINTS.unlockhistory;
+
+  const res: Response = await fetch(URL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res.json();
 };

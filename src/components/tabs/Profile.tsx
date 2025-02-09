@@ -4,31 +4,44 @@ import { backButton, useLaunchParams } from "@telegram-apps/sdk-react";
 import { Avatar } from "@mui/material";
 import { useTabs } from "../../hooks/tabs";
 import { colors } from "../../constants";
-import refer from "../../assets/images/refer.png";
+import refer from "../../assets/images/icons/refer.png";
 import accRecovery from "../../assets/images/icons/acc-recovery.png";
 import rewards from "../../assets/images/icons/rewards.png";
-import airwallex from "../../assets/images/awx.png";
+import premiumsIcon from "../../assets/images/icons/premium.png";
+import depositIcon from "../../assets/images/icons/paylinks.png";
 import "../../styles/components/tabs/profile.scss";
 
 export const Profile = (): JSX.Element => {
-  const navigate = useNavigate();
   const { initData } = useLaunchParams();
+  const navigate = useNavigate();
   const { switchtab } = useTabs();
 
   let ethAddr = localStorage.getItem("address");
   let btcAddr = localStorage.getItem("btcaddress");
-  let userhasawxkey = localStorage.getItem("userhasawxkey");
 
   const onRefer = () => {
-    navigate("/refer");
+    navigate("/refer/refer");
+  };
+
+  const getPremiums = () => {
+    navigate("/premiums");
+  };
+
+  const sharebleDepositLink = () => {
+    navigate("/shareble-deposit-link");
   };
 
   const onRewards = () => {
     navigate("/rewards/nil");
   };
 
-  const onimportAwx = () => {
-    navigate("/importawx");
+  const gotoRecovery = () => {
+    navigate("/security/recover");
+  };
+
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
   };
 
   useEffect(() => {
@@ -38,11 +51,11 @@ export const Profile = (): JSX.Element => {
     }
 
     if (backButton.isVisible()) {
-      backButton.onClick(() => switchtab("home"));
+      backButton.onClick(goBack);
     }
 
     return () => {
-      backButton.offClick(() => switchtab("home"));
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);
@@ -79,7 +92,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn l_earn" onClick={onRewards}>
+      <div className="earn" onClick={onRewards}>
         <img src={rewards} alt="rewards" />
 
         <p>
@@ -88,7 +101,7 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      <div className="earn l_earn">
+      <div className="earn" onClick={gotoRecovery}>
         <img src={accRecovery} alt="accoun recoverys" />
 
         <p>
@@ -97,11 +110,25 @@ export const Profile = (): JSX.Element => {
         </p>
       </div>
 
-      {userhasawxkey == null && (
-        <div className="airwallex" onClick={onimportAwx}>
-          <img src={airwallex} alt="airwallex" />
-        </div>
-      )}
+      <div className="earn" onClick={sharebleDepositLink}>
+        <img src={depositIcon} alt="sharebleDepositLink" />
+
+        <p>
+          Payment Links
+          <span>Securely receive crypto through links</span>
+        </p>
+      </div>
+
+      <div className="earn" onClick={getPremiums}>
+        <img src={premiumsIcon} alt="premium" />
+
+        <p>
+          Premium
+          <span>Explore Stratosphere premium</span>
+        </p>
+      </div>
+
+      <div className="useai">{/*  */}</div>
     </div>
   );
 };

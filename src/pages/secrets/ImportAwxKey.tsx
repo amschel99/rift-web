@@ -6,7 +6,7 @@ import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { importAwxKey } from "../../utils/api/awllx";
 import { colors } from "../../constants";
-import { Import } from "../../assets/icons";
+import { Import } from "../../assets/icons/actions";
 import { Loading } from "../../assets/animations";
 import airwlx from "../../assets/images/secrets.png";
 import "../../styles/components/secrets/airwallex.scss";
@@ -21,8 +21,8 @@ export default function ImportAirwllxKey(): JSX.Element {
   const [processing, setProcessing] = useState<boolean>(false);
 
   const goBack = () => {
-    switchtab("profile");
-    navigate(-1);
+    switchtab("home");
+    navigate("/app");
   };
 
   const onImportKey = async () => {
@@ -30,7 +30,6 @@ export default function ImportAirwllxKey(): JSX.Element {
       showerrorsnack("Enter a valid AirWallex API key");
     } else {
       setProcessing(true);
-
       let token: string | null = localStorage.getItem("token");
       let keyOwner = initData?.user?.username;
 
