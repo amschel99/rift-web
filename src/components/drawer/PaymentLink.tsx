@@ -17,9 +17,7 @@ export const PaymentLink = (): JSX.Element => {
 
   const onShareTg = () => {
     closeAppDrawer();
-    openTelegramLink(
-      `https://t.me/share/url?url=${linkUrl}&text=Claim airdrop tokens from my campaign on StratoSphereId`
-    );
+    openTelegramLink(`https://t.me/share/url?url=${linkUrl}`);
   };
 
   return (
