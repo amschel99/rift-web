@@ -6,14 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useTabs } from "../../hooks/tabs";
 import { useAppDialog } from "../../hooks/dialog";
 import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
-import { fetchAirWllxBalances } from "../../utils/api/awllx";
 import { WalletBalance } from "../WalletBalance";
 import { MySecrets, SharedSecrets } from "../Secrets";
 import { PopOverAlt } from "../global/PopOver";
 import { Add, QuickActions, Stake } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import { Notification } from "../../assets/icons/tabs";
-import airwallex from "../../assets/images/awx.png";
 import "../../styles/components/tabs/home.scss";
 
 export const HomeTab = (): JSX.Element => {
@@ -30,10 +28,6 @@ export const HomeTab = (): JSX.Element => {
   const { data } = useQuery({
     queryKey: ["secrets"],
     queryFn: fetchMyKeys,
-  });
-  const { data: airwallexData } = useQuery({
-    queryKey: ["airwallexbalances"],
-    queryFn: () => fetchAirWllxBalances(initData?.user?.username as string),
   });
 
   let allKeys = data as getkeysType;
@@ -59,10 +53,6 @@ export const HomeTab = (): JSX.Element => {
       closeAppDialog();
       navigate("/business");
     }, 1500);
-  };
-
-  const onimportAwx = () => {
-    openAppDialog("awxkeyimport", "Import AirWallex API Key");
   };
 
   let mysecrets = mykeys?.filter((_scret) => _scret.type == "own");
@@ -202,12 +192,6 @@ export const HomeTab = (): JSX.Element => {
           </div>
         }
       </PopOverAlt>
-
-      {airwallexData?.status == 404 && (
-        <div className="airwallex" onClick={onimportAwx}>
-          <img src={airwallex} alt="airwallex" />
-        </div>
-      )}
     </section>
   );
 };
