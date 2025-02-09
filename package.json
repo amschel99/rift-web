@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@types/crypto-js": "^4.2.2",
     "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",

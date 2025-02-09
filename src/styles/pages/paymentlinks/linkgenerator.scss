@@ -184,6 +184,7 @@
   padding: 0.5rem;
   @include flex-center;
   @include transition-ease;
+  cursor: pointer;
 
   &:hover {
     color: var(--textprimary);
@@ -200,7 +201,6 @@
     padding: 1rem;
     font-size: 0.775rem;
     font-weight: 600;
-    cursor: pointer;
     @include flex-center;
     gap: 0.5rem;
     @include transition-ease;

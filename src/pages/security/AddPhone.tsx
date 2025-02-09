@@ -1,7 +1,6 @@
 import { JSX, useEffect, useState } from "react";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
-import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { PhoneInput } from "../../components/security/PhoneInput";
 import { DigitsInput } from "../../components/security/DigitsInput";
@@ -12,7 +11,6 @@ import "../../styles/pages/security/addphone.scss";
 
 export default function AddPhone(): JSX.Element {
   const navigate = useNavigate();
-  const { switchtab } = useTabs();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
 
   const [phoneEntered, setPhoneEntered] = useState<boolean>(false);
@@ -21,8 +19,7 @@ export default function AddPhone(): JSX.Element {
   const [otpVals, setOtpVals] = useState<string>("");
 
   const goBack = () => {
-    switchtab("security");
-    navigate("/app");
+    navigate("/security/recover");
   };
 
   const onSubmitPhone = () => {

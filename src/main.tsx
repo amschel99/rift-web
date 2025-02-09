@@ -34,6 +34,7 @@ import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
 import ShareSecret from "./pages/secrets/ShareSecret.tsx";
 import AboutSecurity from "./pages/security/AboutSecurity.tsx";
 import SecuritySetup from "./pages/security/SecuritySetup.tsx";
+import RecoverySetup from "./pages/security/Recovery.tsx";
 import AddPin from "./pages/security/AddPin.tsx";
 import AddEmail from "./pages/security/AddEmail.tsx";
 import AddPhone from "./pages/security/AddPhone.tsx";
@@ -93,6 +94,10 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/security/email" element={<AddEmail />} />
                     <Route path="/security/phone" element={<AddPhone />} />
                     <Route path="/security/setup" element={<SecuritySetup />} />
+                    <Route
+                      path="/security/recover"
+                      element={<RecoverySetup />}
+                    />
                     <Route
                       path="/security/selector/:type"
                       element={<NodesTeeSelector />}

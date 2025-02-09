@@ -37,6 +37,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 0.25rem;
+  cursor: pointer;
 }
 
 .premium-tabs button.active {
@@ -85,9 +86,6 @@
   color: var(--textsecondary);
   margin-bottom: 1rem;
   font-size: 0.875rem;
- 
-
-  
 }
 
 .feature-price {
@@ -135,6 +133,7 @@
   transition: background-color 0.3s ease;
   border-radius: 0.25rem;
   width: 100%;
+  cursor: pointer;
 }
 
 .subscribe-button:hover {

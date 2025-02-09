@@ -17,7 +17,6 @@
     border: none;
     border-radius: 10px;
     padding: 10px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
     width: calc(50% - 15px);
     max-width: 250px;
@@ -33,7 +32,7 @@
 
     .feature-details {
       text-align: left;
-      
+
       .feature-label {
         font-weight: bold;
         display: block;

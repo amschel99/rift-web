@@ -56,6 +56,7 @@ function App(): JSX.Element {
     let address: string | null = localStorage.getItem("address");
     let token: string | null = localStorage.getItem("token");
     let airdropId = localStorage.getItem("airdropId");
+    const userhaspin = localStorage.getItem("userhaspin");
 
     if (address == null || token == null) {
       navigate("/auth");
@@ -102,6 +103,11 @@ function App(): JSX.Element {
         );
       }
 
+      return;
+    }
+
+    if (userhaspin == null) {
+      openAppDrawer("addpin");
       return;
     }
   }, []);

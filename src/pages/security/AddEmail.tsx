@@ -2,7 +2,6 @@ import { JSX, useEffect, useState } from "react";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { TextField } from "@mui/material";
-import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { colors } from "../../constants";
 import { Email } from "../../assets/icons/security";
@@ -12,7 +11,6 @@ import { DigitsInput } from "../../components/security/DigitsInput";
 
 export default function AddEmail(): JSX.Element {
   const navigate = useNavigate();
-  const { switchtab } = useTabs();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
 
   const [emailEntered, setEmailEntered] = useState<boolean>(false);
@@ -21,8 +19,7 @@ export default function AddEmail(): JSX.Element {
   const [otpVals, setOtpVals] = useState<string>("");
 
   const goBack = () => {
-    switchtab("security");
-    navigate("/app");
+    navigate("/security/recover");
   };
 
   const onSubmitEmailAddr = () => {

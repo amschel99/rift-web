@@ -7,6 +7,9 @@ export type draweraction =
   | "quickactions"
   | "nodeteeselector"
   | "transactionlimit"
+  | "addpin"
+  | "deleteemail"
+  | "deletephone"
   | "unlocktransactions";
 
 interface draerctxtype {

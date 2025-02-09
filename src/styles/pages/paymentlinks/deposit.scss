@@ -42,8 +42,11 @@
     flex-direction: column;
     padding: 1rem;
     background: var(--primary);
-    background-image: 
-      radial-gradient(circle at 75% 30%, rgba(73, 107, 204, 0.1) 0%, transparent 30%),
+    background-image: radial-gradient(
+        circle at 75% 30%,
+        rgba(73, 107, 204, 0.1) 0%,
+        transparent 30%
+      ),
       linear-gradient(to bottom right, var(--primary) 0%, #191f28 100%);
   }
 
@@ -108,7 +111,6 @@
     border-radius: 1rem;
     background: var(--input-background);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -119,7 +121,11 @@
     }
 
     &.selected {
-      background: linear-gradient(90deg, rgba(73, 107, 204, 0.1) 0%, rgba(73, 107, 204, 0.05) 100%);
+      background: linear-gradient(
+        90deg,
+        rgba(73, 107, 204, 0.1) 0%,
+        rgba(73, 107, 204, 0.05) 100%
+      );
       border-color: var(--accent);
     }
   }
@@ -226,6 +232,7 @@
   position: relative;
   overflow: hidden;
   @include transition-ease;
+  cursor: pointer;
 
   &.disabled {
     background: var(--textsecondary);
@@ -249,7 +256,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
   opacity: 0;
   @include transition-ease;
 }

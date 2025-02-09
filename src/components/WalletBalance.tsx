@@ -12,7 +12,7 @@ import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
-import airwallex from "../../assets/images/awx.png";
+import airwallex from "../assets/images/awx.png";
 import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = (): JSX.Element => {

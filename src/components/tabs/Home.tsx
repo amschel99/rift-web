@@ -12,9 +12,9 @@ import { MySecrets, SharedSecrets } from "../Secrets";
 import { PopOverAlt } from "../global/PopOver";
 import { Add, QuickActions, Stake } from "../../assets/icons/actions";
 import { colors } from "../../constants";
+import { Notification } from "../../assets/icons/tabs";
 import airwallex from "../../assets/images/awx.png";
 import "../../styles/components/tabs/home.scss";
-import { Notification } from "../../assets/icons/tabs";
 
 export const HomeTab = (): JSX.Element => {
   const { initData } = useLaunchParams();

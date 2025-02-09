@@ -5,7 +5,7 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useTabs } from "../../hooks/tabs";
 import { useAppDrawer } from "../../hooks/drawer";
 import { Lock, Stake, Telegram } from "../../assets/icons/actions";
-import { Email, Phone, Wallet } from "../../assets/icons/security";
+import { Wallet } from "../../assets/icons/security";
 import { colors } from "../../constants";
 import "../../styles/components/tabs/security.scss";
 
@@ -28,20 +28,12 @@ export const SecurityTab = (): JSX.Element => {
     navigate("/security/pin");
   };
 
-  const goToEmail = () => {
-    navigate("/security/email");
-  };
-
-  const goToPhone = () => {
-    navigate("/security/phone");
+  const goToRecovery = () => {
+    navigate("/security/recover");
   };
 
   const userhaspin = localStorage.getItem("userhaspin");
   const txlimit = localStorage.getItem("txlimit");
-  const useremail = localStorage.getItem("useremail");
-  const displayemailuname = useremail?.split("@")[0];
-  const displayemaildomain = useremail?.split("@")[1];
-  const userphone = localStorage.getItem("userphone");
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -88,33 +80,11 @@ export const SecurityTab = (): JSX.Element => {
           Account Recovery
           <span>Add an Email Address and Phone Number</span>
         </p>
-        <div className="recover_action" onClick={goToEmail}>
-          <p>
-            {useremail == null
-              ? "Add an Email Address"
-              : `${displayemailuname?.substring(
-                  0,
-                  4
-                )}***@${displayemaildomain}`}
-          </p>
+        <div className="recover_action" onClick={goToRecovery}>
+          <p>Setup Account Recovery</p>
 
-          <span>
-            <Email width={16} height={16} color={colors.textsecondary} />
-          </span>
-        </div>
-
-        <div className="recover_action" onClick={goToPhone}>
-          <p>
-            {userphone == null
-              ? "Add a Phone Number"
-              : `${userphone?.substring(0, 5)}***${userphone?.substring(
-                  userphone?.length / 2,
-                  userphone?.length / 2 + 3
-                )}`}
-          </p>
-
-          <span>
-            <Phone width={16} height={16} color={colors.textsecondary} />
+          <span className="account_recovery">
+            <Stake color={colors.textsecondary} />
           </span>
         </div>
       </div>
