@@ -1,99 +1,29 @@
 import { JSX, useEffect, useState } from "react";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
-import { ShieldCheck, Zap, Lock, ChevronsDown, Bitcoin } from "lucide-react";
+import { useSnackbar } from "../hooks/snackbar";
 import { useTabs } from "../hooks/tabs";
+import { colors } from "../constants";
+import { Premium as PremiumAnimation } from "../assets/animations";
+import { CheckAlt, QuickActions, Telegram } from "../assets/icons/actions";
 import "../styles/pages/premiums.scss";
 
-interface PremiumFeature {
-  id: number;
-  title: string;
-  description: string[];
-  price: number;
-  icon: React.ElementType;
-  benefits: string[];
-}
-
-const telegramPremiumFeatures: PremiumFeature[] = [
-  {
-    id: 1,
-    title: "Crypto Telegram Premium",
-    description: [
-      "First-ever Telegram Premium subscription via crypto",
-      "Seamless integration with Stratosphere wallet",
-    ],
-    price: 2.41,
-    icon: Bitcoin,
-    benefits: [
-      "Pay with wallet assets",
-      "50% revenue share",
-      "Flexible crypto payment",
-      "No fiat required",
-    ],
-  },
-];
-
-const stratospherePremiumFeatures: PremiumFeature[] = [
-  {
-    id: 2,
-    title: "Advanced Recovery",
-    description: [
-      "Secure account recovery mechanism",
-      "Multiple verification layers",
-    ],
-    price: 2.99,
-    icon: ShieldCheck,
-    benefits: [
-      "Multi-factor authentication",
-      "Encrypted recovery paths",
-      "Instant account restoration",
-      "Secure key management",
-    ],
-  },
-  {
-    id: 3,
-    title: "Key Management Pro",
-    description: [
-      "Next-level private key security",
-      "Advanced wallet management",
-    ],
-    price: 1.99,
-    icon: Lock,
-    benefits: [
-      "Secure key storage",
-      "Encrypted backups",
-      "Multi-device sync",
-      "Instant key rotation",
-    ],
-  },
-  {
-    id: 4,
-    title: "Airdrop Maximizer",
-    description: [
-      "Exclusive cryptocurrency airdrop access",
-      "Early token allocation opportunities",
-    ],
-    price: 2.99,
-    icon: Zap,
-    benefits: [
-      "Priority airdrop alerts",
-      "Automatic participation",
-      "Detailed token insights",
-      "Reduced gas fees",
-    ],
-  },
-];
+type premiumoptions = "telegram" | "strato";
 
 export default function Premium(): JSX.Element {
-  const [selectedTab, setSelectedTab] = useState<"telegram" | "stratosphere">(
-    "telegram"
-  );
-  const { switchtab } = useTabs();
   const navigate = useNavigate();
+  const { showerrorsnack } = useSnackbar();
+  const { switchtab } = useTabs();
+
+  const [selectPreium, setSelectPremium] = useState<premiumoptions>("strato");
 
   const goBack = () => {
     switchtab("profile");
-    navigate(-1);
+    navigate("/app");
+  };
+
+  const onSubscribe = () => {
+    showerrorsnack("Feature coming soon...");
   };
 
   useEffect(() => {
@@ -110,65 +40,120 @@ export default function Premium(): JSX.Element {
       backButton.offClick(goBack);
       backButton.unmount();
     };
-  }, [goBack]); // Added goBack to dependencies
-
-  const renderFeatureCard = (feature: PremiumFeature) => (
-    <div key={feature.id} className="premium-feature-card">
-      <div className="feature-icon">
-        <feature.icon size={48} strokeWidth={1.5} />
-      </div>
-      <h3 className="feature-title">{feature.title}</h3>
-      <div className="feature-description">
-        {feature.description.map((desc, index) => (
-          <p key={index}>{desc}</p>
-        ))}
-      </div>
-      <div className="feature-price">
-        ${feature.price.toFixed(2)}
-        <span>/month</span>
-      </div>
-      <div className="feature-benefits">
-        <h4>Benefits</h4>
-        <ul>
-          {feature.benefits.map((benefit, index) => (
-            <li key={index}>
-              <ChevronsDown size={16} />
-              {benefit}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <button className="subscribe-button">Subscribe Now</button>
-    </div>
-  );
+  }, []);
 
   return (
-    <div className="premium-features-container">
-      <div className="premium-header">
-        <h1>Stratosphere Wallet Premium</h1>
-        <p>Unlock powerful features with flexible crypto payments.</p>
+    <section id="premium">
+      <div className="img">
+        <PremiumAnimation width="12rem" height="12rem" />
       </div>
 
-      <div className="premium-tabs">
+      <p className="_title">StratoSphere Premium</p>
+      <p className="_desc">
+        Get StratoSphere Premium / Grant a friend Telegram Premium with your
+        crypto
+      </p>
+
+      <div className="actions">
         <button
-          onClick={() => setSelectedTab("telegram")}
-          className={selectedTab === "telegram" ? "active" : ""}
+          className={selectPreium == "telegram" ? "disabled" : ""}
+          onClick={() => setSelectPremium("strato")}
         >
-          Telegram Premium
+          StratoSphere
+          <QuickActions
+            width={12}
+            height={12}
+            color={
+              selectPreium == "strato"
+                ? colors.textprimary
+                : colors.textsecondary
+            }
+          />
         </button>
+
         <button
-          onClick={() => setSelectedTab("stratosphere")}
-          className={selectedTab === "stratosphere" ? "active" : ""}
+          className={selectPreium == "strato" ? "disabled" : ""}
+          onClick={() => setSelectPremium("telegram")}
         >
-          Stratosphere Premium
+          Telegram
+          <Telegram
+            width={12}
+            height={12}
+            color={
+              selectPreium == "telegram"
+                ? colors.textprimary
+                : colors.textsecondary
+            }
+          />
         </button>
       </div>
 
-      <div className="premium-features-grid">
-        {selectedTab === "telegram"
-          ? telegramPremiumFeatures.map(renderFeatureCard)
-          : stratospherePremiumFeatures.map(renderFeatureCard)}
-      </div>
-    </div>
+      {selectPreium == "strato" && (
+        <div className="benefits">
+          <div>
+            <CheckAlt color={colors.success} />
+            <p>
+              Multiple Addresses
+              <span>Get multiple adresses per chain for improved security</span>
+            </p>
+          </div>
+          <div>
+            <CheckAlt color={colors.success} />
+            <p>
+              Advanced Recovery
+              <span>Access additional account recovery methods</span>
+            </p>
+          </div>
+          <div>
+            <CheckAlt color={colors.success} />
+            <p>
+              StratoSphere Permit
+              <span>Give others access to your StratoSphere Id</span>
+            </p>
+          </div>
+          <div>
+            <CheckAlt color={colors.success} />
+            <p>
+              Node Selection
+              <span>Chose the nodes where your keys will be stored</span>
+            </p>
+          </div>
+          <div>
+            <CheckAlt color={colors.success} />
+            <p>
+              Enhanced Key Splitting
+              <span>
+                Increase the threshold of your key shards (upto 7 shards)
+              </span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {selectPreium == "telegram" && (
+        <div className="tgbenefits">
+          <p>
+            Grant other Stratosphere users Telegram premium using your crypto
+            balance
+          </p>
+          <span>
+            <Telegram color={colors.accent} />
+            Premium
+          </span>
+        </div>
+      )}
+
+      <button className="onsubscribe" onClick={onSubscribe}>
+        {selectPreium == "strato"
+          ? "Get StratoSphere Premium"
+          : "Grant Telegram Premium"}
+
+        {selectPreium == "strato" ? (
+          <QuickActions width={12} height={12} color={colors.textprimary} />
+        ) : (
+          <Telegram width={16} height={16} color={colors.textprimary} />
+        )}
+      </button>
+    </section>
   );
 }
