@@ -4,6 +4,7 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useTabs } from "../../hooks/tabs";
 import { formatUsd, formatNumber } from "../../utils/formatters";
 import { Send } from "../../assets/icons/actions";
+import { Convert } from "../../assets/icons/tabs";
 import { colors } from "../../constants";
 import "../../styles/pages/assets/assets.scss";
 
@@ -48,6 +49,14 @@ export default function HkdAsset(): JSX.Element {
         <span className="divider" />
 
         <div className="buttons">
+          <button
+            className="receive"
+            onClick={() => navigate(`/convert/HKD/${balance}`)}
+          >
+            Convert
+            <Convert width={12} height={16} color={colors.textprimary} />
+          </button>
+
           <button
             className="send"
             onClick={() => navigate(`/send-hkd/send/${balance}`)}

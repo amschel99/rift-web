@@ -29,6 +29,7 @@ import SendUsdc from "./pages/transactions/SendUsdc.tsx";
 import BuyOm from "./pages/transactions/BuyOm.tsx";
 import SendHkd from "./pages/transactions/SendHkd.tsx";
 import SendUsd from "./pages/transactions/SendUsd.tsx";
+import Convert from "./pages/assets/Convert.tsx";
 import CoinInfo from "./pages/CoinInfo.tsx";
 import ImportSecret from "./pages/secrets/ImportSecret.tsx";
 import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
@@ -91,6 +92,10 @@ createRoot(document.getElementById("root")!).render(
                     <Route
                       path="/send-usd/:intent/:balance"
                       element={<SendUsd />}
+                    />
+                    <Route
+                      path="/convert/:currency/:availableamount"
+                      element={<Convert />}
                     />
                     <Route
                       path="/chat/:conversationId/:chatAccessToken/:initialMessage/:nonce"
