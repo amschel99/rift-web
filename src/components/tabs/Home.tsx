@@ -7,6 +7,7 @@ import { useTabs } from "../../hooks/tabs";
 import { useAppDialog } from "../../hooks/dialog";
 import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
 import { WalletBalance } from "../WalletBalance";
+import { FiatBalances } from "../home/FiatBalances";
 import { MySecrets, SharedSecrets } from "../Secrets";
 import { PopOverAlt } from "../global/PopOver";
 import { Add, QuickActions, Stake } from "../../assets/icons/actions";
@@ -59,6 +60,9 @@ export const HomeTab = (): JSX.Element => {
   let sharedsecrets = mykeys?.filter(
     (_scret) => _scret.type == "foreign" && !_scret?.expired
   );
+
+  let ethAddr = localStorage.getItem("address");
+  let btcAddr = localStorage.getItem("btcaddress");
   let claimedstartairdrop = localStorage.getItem("claimedstartairdrop");
 
   useEffect(() => {
@@ -77,10 +81,65 @@ export const HomeTab = (): JSX.Element => {
 
   return (
     <section id="hometab">
+      <div className="id_actions">
+        <p className="sphereid">
+          ID ~ {ethAddr?.substring(2, 6)}
+          {btcAddr?.substring(2, 6)}
+        </p>
+
+        <div className="avatrctr">
+          <button
+            className="notification"
+            onClick={() => switchtab("notifications")}
+          >
+            <Notification
+              width={18}
+              height={18}
+              color={claimedstartairdrop ? colors.textsecondary : colors.danger}
+            />
+          </button>
+
+          <Avatar
+            src={initData?.user?.photoUrl}
+            alt={initData?.user?.username}
+            sx={{
+              width: 36,
+              height: 36,
+            }}
+            onClick={(e) => {
+              setProfileAnchorEl(e.currentTarget);
+            }}
+          />
+        </div>
+      </div>
+      <PopOverAlt anchorEl={profileAnchorEl} setAnchorEl={setProfileAnchorEl}>
+        {
+          <div className="profile_actions">
+            <div className="action first" onClick={ongoToProfile}>
+              <p>
+                My Profile <Stake color={colors.textprimary} />
+              </p>
+              <span>Visit my profile</span>
+            </div>
+            <div className="action" onClick={onSwitchToBusiness}>
+              <p>
+                Business
+                <QuickActions
+                  width={10}
+                  height={10}
+                  color={colors.textprimary}
+                />
+              </p>
+              <span>Stratosphere for Businesses</span>
+            </div>
+          </div>
+        }
+      </PopOverAlt>
+
       <WalletBalance />
 
       <div id="secrets_import">
-        <p>Secrets</p>
+        <p>Web2 Assets</p>
 
         <button className="importsecret" onClick={onImportKey}>
           <Add width={18} height={18} color={colors.textprimary} />
@@ -145,53 +204,7 @@ export const HomeTab = (): JSX.Element => {
           </p>
         ))}
 
-      <div className="avatrctr">
-        <Avatar
-          src={initData?.user?.photoUrl}
-          alt={initData?.user?.username}
-          sx={{
-            width: 36,
-            height: 36,
-          }}
-          onClick={(e) => {
-            setProfileAnchorEl(e.currentTarget);
-          }}
-        />
-
-        <button
-          className="notification"
-          onClick={() => switchtab("notifications")}
-        >
-          <Notification
-            width={18}
-            height={18}
-            color={claimedstartairdrop ? colors.textsecondary : colors.danger}
-          />
-        </button>
-      </div>
-      <PopOverAlt anchorEl={profileAnchorEl} setAnchorEl={setProfileAnchorEl}>
-        {
-          <div className="profile_actions">
-            <div className="action first" onClick={ongoToProfile}>
-              <p>
-                My Profile <Stake color={colors.textprimary} />
-              </p>
-              <span>Visit my profile</span>
-            </div>
-            <div className="action" onClick={onSwitchToBusiness}>
-              <p>
-                Business
-                <QuickActions
-                  width={10}
-                  height={10}
-                  color={colors.textprimary}
-                />
-              </p>
-              <span>Stratosphere for Businesses</span>
-            </div>
-          </div>
-        }
-      </PopOverAlt>
+      <FiatBalances />
     </section>
   );
 };

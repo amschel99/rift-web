@@ -5,6 +5,33 @@
   margin-bottom: 4.25rem;
   padding: 0 1rem;
 
+  .id_actions {
+    @include mixins.useFlex(row, nowrap, center, space-between, 0);
+    margin-top: 1rem;
+
+    .sphereid {
+      width: fit-content;
+      padding: 0.125rem 0.5rem;
+      border-radius: 1rem;
+      font-size: 0.65rem;
+      font-weight: bold;
+      background-color: colors.$divider;
+    }
+
+    .avatrctr {
+      @include mixins.useFlex(row, nowrap, center, center, 0.75rem);
+
+      .notification {
+        @include mixins.useFlex(row, nowrap, center, center, 0);
+        @include mixins.useButton();
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: colors.$divider;
+      }
+    }
+  }
+
   #secrets_import {
     @include mixins.useFlex(row, nowrap, center, space-between, 0);
     margin-top: 1.25rem;
@@ -49,22 +76,6 @@
     font-size: 0.75rem;
     text-align: center;
     color: colors.$textsecondary;
-  }
-
-  .avatrctr {
-    @include mixins.useFlex(row, nowrap, center, center, 0.75rem);
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-
-    .notification {
-      @include mixins.useFlex(row, nowrap, center, center, 0);
-      @include mixins.useButton();
-      width: 2rem;
-      height: 2rem;
-      border-radius: 50%;
-      background-color: colors.$divider;
-    }
   }
 }
 

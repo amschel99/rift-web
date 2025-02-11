@@ -1,24 +1,18 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mui/material";
-import { useAppDialog } from "../hooks/dialog";
 import { walletBalance, mantraBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { getMantraUsdVal } from "../utils/api/mantra";
-import { fetchAirWllxBalances } from "../utils/api/awllx";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
 import usdclogo from "../assets/images/labs/mantralogo.jpeg";
-import airwallex from "../assets/images/awx.png";
 import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = (): JSX.Element => {
-  const { initData } = useLaunchParams();
   const navigate = useNavigate();
-  const { openAppDialog } = useAppDialog();
 
   const { data: btcethbalance, isLoading: btcethLoading } = useQuery({
     queryKey: ["btceth"],
@@ -40,17 +34,11 @@ export const WalletBalance = (): JSX.Element => {
     queryKey: ["ethusd"],
     queryFn: getEthUsdVal,
   });
-  const { data: airwallexData, isLoading: awxLoading } = useQuery({
-    queryKey: ["airwallexbalances"],
-    queryFn: () => fetchAirWllxBalances(initData?.user?.username as string),
-  });
 
   const walletusdbalance: number =
     Number(btcethbalance?.btcBalance) * Number(btcusdval) +
     Number(btcethbalance?.balance) * Number(ethusdval) +
-    Number(mantrabalance?.data?.balance) * Number(mantrausdval) +
-    Number(airwallexData?.balances?.balances?.HKD) / 7.79 +
-    Number(airwallexData?.balances?.balances?.USD);
+    Number(mantrabalance?.data?.balance) * Number(mantrausdval);
 
   localStorage.setItem("btcbal", String(btcethbalance?.btcBalance));
   localStorage.setItem(
@@ -69,10 +57,6 @@ export const WalletBalance = (): JSX.Element => {
   );
   localStorage.setItem("mantrausdval", String(mantrausdval));
   localStorage.setItem("ethvalue", String(ethusdval));
-
-  const onimportAwx = () => {
-    openAppDialog("awxkeyimport", "Import AirWallex API Key");
-  };
 
   return (
     <div id="walletbalance">
@@ -101,8 +85,7 @@ export const WalletBalance = (): JSX.Element => {
       mantraLoading ||
       mantrausdloading ||
       btcusdloading ||
-      ethusdloading ||
-      awxLoading ? (
+      ethusdloading ? (
         <>
           <Skeleton
             variant="text"
@@ -185,68 +168,6 @@ export const WalletBalance = (): JSX.Element => {
               </span>
             </p>
           </div>
-
-          {airwallexData?.status == 404 ? (
-            <>
-              <p className="message">
-                An Airwallex key allows you to view your USD & HKD balances and
-                buy OM (using USD/HKD)
-              </p>
-
-              <div className="airwallex" onClick={onimportAwx}>
-                <span>Import AirWallex Key</span>
-                <img src={airwallex} alt="airwallex" />
-              </div>
-            </>
-          ) : (
-            <>
-              <div
-                className="currencybalance"
-                onClick={() =>
-                  airwallexData?.status == 404
-                    ? openAppDialog("awxkeyimport", "Import Airwallex Key")
-                    : navigate(
-                        `/hkd-asset/${airwallexData?.balances?.balances?.HKD}`
-                      )
-                }
-              >
-                <div className="flag_symbol">
-                  <span className="flag">🇭🇰</span>
-                  <p className="symbol">HKD</p>
-                </div>
-
-                <div className="avail_total">
-                  <p className="avail">
-                    {airwallexData?.balances?.balances?.HKD.toFixed(2) || 0}
-                  </p>
-                  <span>HKD</span>
-                </div>
-              </div>
-
-              <div
-                className="currencybalance"
-                onClick={() =>
-                  airwallexData?.status == 404
-                    ? openAppDialog("awxkeyimport", "Import Airwallex Key")
-                    : navigate(
-                        `/usd-asset/${airwallexData?.balances?.balances?.USD}`
-                      )
-                }
-              >
-                <div className="flag_symbol">
-                  <span className="flag">🇺🇸</span>
-                  <p className="symbol">USD</p>
-                </div>
-
-                <div className="avail_total">
-                  <p className="avail">
-                    {airwallexData?.balances?.balances?.USD.toFixed(2) || 0}
-                  </p>
-                  <span>USD</span>
-                </div>
-              </div>
-            </>
-          )}
         </>
       )}
     </div>

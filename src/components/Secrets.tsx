@@ -36,7 +36,7 @@ export const MySecrets = ({
           <button
             className="_secret"
             onClick={() => onShareSecret(secret?.value, secret?.purpose)}
-            key={secret.name + idx}
+            key={secret?.name + idx}
           >
             <span>{secret?.name.substring(0, 4)}</span>
             <Share color={colors.success} />
