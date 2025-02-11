@@ -3,8 +3,10 @@ import { useNavigate } from "react-router";
 import { useAppDrawer } from "../hooks/drawer";
 import { useAppDialog } from "../hooks/dialog";
 import { keyType, UseOpenAiKey } from "../utils/api/keys";
-import { Share, User, NFT, ChatBot } from "../assets/icons/actions";
+import { User, NFT, ChatBot } from "../assets/icons/actions";
 import { colors } from "../constants";
+import poelogo from "../assets/images/icons/poe.png";
+import awxlogo from "../assets/images/awx.png";
 import "../styles/components/secrets.scss";
 
 export type secrettype = {
@@ -21,26 +23,32 @@ export const MySecrets = ({
 }: {
   secretsLs: keyType[];
 }): JSX.Element => {
-  const navigate = useNavigate();
+  const { openAppDrawerWithKey } = useAppDrawer();
 
   let mysecrets = secretsLs.filter((_scret) => _scret.type == "own");
-
-  const onShareSecret = (secret: string, purpose: string) => {
-    navigate(`/sharesecret/${secret}/${purpose}`);
-  };
 
   return (
     <>
       <div id="mysecrets">
         {mysecrets.map((secret, idx) => (
-          <button
+          <div
             className="_secret"
-            onClick={() => onShareSecret(secret?.value, secret?.purpose)}
             key={secret?.name + idx}
+            onClick={() =>
+              openAppDrawerWithKey(
+                "secretactions",
+                secret?.value,
+                secret?.purpose
+              )
+            }
           >
             <span>{secret?.name.substring(0, 4)}</span>
-            <Share color={colors.success} />
-          </button>
+
+            <img
+              src={secret?.purpose == "OPENAI" ? poelogo : awxlogo}
+              alt="secret-purpose"
+            />
+          </div>
         ))}
       </div>
     </>
@@ -109,7 +117,7 @@ export const SharedSecrets = ({
           </div>
 
           <span className="secretutility">
-            {secret.purpose == "OPENAI" ? "GPT-4o" : "AirWallex"}
+            {secret.purpose == "OPENAI" ? "POE" : "AirWallex"}
             {secret.purpose == "OPENAI" ? (
               <ChatBot width={16} height={16} color={colors.textprimary} />
             ) : (

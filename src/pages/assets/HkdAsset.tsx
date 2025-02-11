@@ -44,7 +44,9 @@ export default function HkdAsset(): JSX.Element {
       </div>
 
       <div className="actions">
-        <p>Send HKD from your Airwallex balance</p>
+        <p>
+          Send HKD from your Airwallex balance or convert to stablecoins (USDC)
+        </p>
 
         <span className="divider" />
 

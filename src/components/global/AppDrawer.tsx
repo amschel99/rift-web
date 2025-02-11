@@ -10,8 +10,9 @@ import { SendAirdropLink } from "../drawer/SendAirdropLink";
 import { TransactionLimit } from "../drawer/TransactionLimit";
 import { AddPin } from "../drawer/AddPin";
 import { DeleteRecovery } from "../drawer/DeleteRecovery";
-import { colors } from "../../constants";
 import { PaymentLink } from "../drawer/PaymentLink";
+import { SecretActions } from "../drawer/SecretActions";
+import { colors } from "../../constants";
 
 export const AppDrawer = (): JSX.Element => {
   const { action, drawerOpen, closeAppDrawer } = useAppDrawer();
@@ -49,6 +50,8 @@ export const AppDrawer = (): JSX.Element => {
         <DeleteRecovery />
       ) : action == "paymentlink" ? (
         <PaymentLink />
+      ) : action == "secretactions" ? (
+        <SecretActions />
       ) : (
         <NodeTeeSelector />
       )}

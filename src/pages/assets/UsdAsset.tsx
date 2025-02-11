@@ -44,7 +44,9 @@ export default function UsdAsset(): JSX.Element {
       </div>
 
       <div className="actions">
-        <p>Send USD from your Airwallex balance</p>
+        <p>
+          Send USD from your Airwallex balance or convert to stablecoins (USDC)
+        </p>
 
         <span className="divider" />
 
