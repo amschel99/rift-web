@@ -118,7 +118,7 @@ export default function Rewards(): JSX.Element {
         <div>
           <Unlock width={12} height={17} color={colors.textprimary} />
           <p>
-            Available
+            OM Tokens Earned
             <span>
               {unlocked?.unlocked || 0} OM ~&nbsp;
               {formatUsd(
