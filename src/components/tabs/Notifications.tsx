@@ -18,7 +18,7 @@ export const Notifications = (): JSX.Element => {
   };
 
   const claimAirdrop = () => {
-    openTelegramLink("https://t.me/strato_vault_bot");
+    openTelegramLink("https://t.me/strato_vault_bot?start=start");
     // if (claimedstartairdrop == null) {
     //https://strato-vault.com/airdrop?id=C2OjYx6Bu0aE
     // localStorage.setItem("claimedstartairdrop", "true");
