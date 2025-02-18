@@ -41,7 +41,7 @@ export const BottomTabNavigation = (): JSX.Element => {
 
       <button onClick={() => navigate("/rewards/nil")}>
         <Labs width={20} height={20} color={colors.textprimary} />
-        <span style={{ color: colors.textprimary }}>Missions</span>
+        <span style={{ color: colors.textprimary }}>Rewards</span>
       </button>
 
       <button onClick={() => switchtab("earn")}>

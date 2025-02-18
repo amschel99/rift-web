@@ -17,8 +17,8 @@ export default function Web2Tab(): JSX.Element {
   );
   return (
     <>
-      <ImportSecret />
       <Web2Assets mykeys={mykeys} />
+      <ImportSecret />
     </>
   );
 }

@@ -54,6 +54,13 @@ export default function Web2Assets({ mykeys }: any) {
 
   return (
     <div id="secrets_container">
+      {claimedgpt == null && (
+        <div onClick={onClaimGptAccess} className="claim-gpt">
+          <span>Claim your free GPT4 Access</span>
+          <img src={claimgpt} alt="gpt" />
+        </div>
+      )}
+
       <div id="secrets_import">
         <p>Web2 Assets</p>
       </div>
@@ -118,13 +125,6 @@ export default function Web2Assets({ mykeys }: any) {
             Expired secrets will not be shown
           </p>
         ))}
-
-      {claimedgpt == null && (
-        <div onClick={onClaimGptAccess} className="claim-gpt">
-          <span>Claim your free GPT4 Access</span>
-          <img src={claimgpt} alt="gpt" />
-        </div>
-      )}
     </div>
   );
 }

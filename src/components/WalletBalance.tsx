@@ -21,7 +21,8 @@ import { getMantraUsdVal } from "../utils/api/mantra";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
-import usdclogo from "../assets/images/labs/mantralogo.jpeg";
+import mantralogo from "../assets/images/labs/mantralogo.jpeg";
+import usdclogo from "../assets/images/labs/usdc.png";
 import { Stake } from "../assets/icons/actions";
 import { colors } from "../constants";
 import "../styles/components/walletbalance.scss";
@@ -161,12 +162,18 @@ export const WalletBalance = (): JSX.Element => {
             height="3.75rem"
             animation="wave"
           />
+          <Skeleton
+            variant="text"
+            width="100%"
+            height="3.75rem"
+            animation="wave"
+          />
         </>
       ) : (
         <>
           <div className="_asset" onClick={() => navigate("/om-asset")}>
             <div>
-              <img src={usdclogo} alt="btc" />
+              <img src={mantralogo} alt="btc" />
 
               <p>
                 Mantra
@@ -224,6 +231,26 @@ export const WalletBalance = (): JSX.Element => {
               <span className="fiat">
                 <em className="price_change positive">+0.009%</em>&nbsp;
                 {formatUsd(Number(btcethbalance?.balance) * Number(ethusdval))}
+              </span>
+            </p>
+          </div>
+
+          <div className="_asset">
+            <div>
+              <img src={usdclogo} alt="usdc" />
+
+              <p>
+                USD Coin
+                <span>USDC</span>
+              </p>
+            </div>
+
+            <p className="balance">
+              <span>0</span>
+
+              <span className="fiat">
+                <em className="price_change positive">+0.001%</em>&nbsp;
+                {formatUsd(0)}
               </span>
             </p>
           </div>

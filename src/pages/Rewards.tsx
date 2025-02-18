@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -31,8 +31,6 @@ export default function Rewards(): JSX.Element {
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const { switchtab } = useTabs();
-
-  const [selectTab, setSelectTab] = useState<"tasks" | "history">("tasks");
 
   const airdropId = id == "nil" ? "nil" : id?.split("-")[1];
 
@@ -110,17 +108,14 @@ export default function Rewards(): JSX.Element {
 
   return (
     <section id="rewards">
-      <div className="imgctr">
-        <img src={rewards} alt="rewards" />
-      </div>
-
       <div className="balances">
         <div>
           <Unlock width={12} height={17} color={colors.textprimary} />
           <p>
-            OM Tokens Earned
+            Earned
             <span>
-              {unlocked?.unlocked || 0} OM ~&nbsp;
+              {unlocked?.unlocked || 0} <img src={rewards} alt="mantra" />
+              ~&nbsp;
               {formatUsd(
                 Number(unlocked?.unlocked || 0) * Number(mantrausdval)
               )}
@@ -133,96 +128,81 @@ export default function Rewards(): JSX.Element {
           <p>
             Locked
             <span>
-              {unlocked?.amount || 0} OM ~&nbsp;
+              {unlocked?.amount || 0} <img src={rewards} alt="mantra" /> ~&nbsp;
               {formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
             </span>
           </p>
         </div>
       </div>
 
-      <div className="tabs">
-        <button
-          className={selectTab == "tasks" ? "activetab" : ""}
-          onClick={() => setSelectTab("tasks")}
+      <div className="tasks">
+        <ReferEarn />
+
+        <p className="tasks_title">Unlock more OM</p>
+
+        <div className="task" onClick={onStake}>
+          <img src={staketokens} alt="rewards" />
+
+          <p>
+            Stake
+            <span>Stake crypto asset(s) & unlock 4 OM</span>
+          </p>
+        </div>
+
+        <div
+          className="task"
+          onClick={() => {
+            openAppDrawer("unlocktransactions");
+          }}
         >
-          Tasks
-        </button>
-        <button
-          className={selectTab == "history" ? "activetab" : ""}
-          onClick={() => setSelectTab("history")}
-        >
-          Earn History
-        </button>
+          <img src={transaction} alt="transaction" />
+
+          <p>
+            Make a transaction
+            <span>Perform a transaction & unlock 1 OM</span>
+          </p>
+        </div>
+
+        <div className="task">
+          <img src={dailycheckin} alt="transaction" />
+
+          <p>
+            Daily Check-in
+            <span>Claim a daily check-in reward (1 OM)</span>
+          </p>
+        </div>
       </div>
 
-      {selectTab == "tasks" ? (
-        <div className="tasks">
-          <ReferEarn />
+      <div className="history">
+        <p className="history_title">Earn History</p>
 
-          <p className="tasks_title">Unlock more OM</p>
+        {data ? (
+          data[0]?.message?.map((message, index) => {
+            const datestr = message.split(" ").pop() as string;
 
-          <div className="task" onClick={onStake}>
-            <img src={staketokens} alt="rewards" />
-
-            <p>
-              Stake
-              <span>Stake crypto asset(s) & unlock 4 OM</span>
-            </p>
-          </div>
-
-          <div
-            className="task"
-            onClick={() => {
-              openAppDrawer("unlocktransactions");
-            }}
-          >
-            <img src={transaction} alt="transaction" />
-
-            <p>
-              Make a transaction
-              <span>Perform a transaction & unlock 1 OM</span>
-            </p>
-          </div>
-
-          <div className="task">
-            <img src={dailycheckin} alt="transaction" />
-
-            <p>
-              Daily Check-in
-              <span>Claim a daily check-in reward (1 OM)</span>
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="history">
-          {data ? (
-            data[0]?.message?.map((message, index) => {
-              const datestr = message.split(" ").pop() as string;
-
-              return (
-                <p
-                  style={{
-                    borderBottom:
-                      index == data[0]?.message?.length - 1
-                        ? `1px solid ${colors.divider}`
-                        : "",
-                  }}
-                  className="message"
-                  key={index}
-                >
-                  {message.split(" ").slice(0, -1).join(" ")}&nbsp;
-                  {formatDateToStr(datestr)}&nbsp;
-                  <span>({dateDistance(datestr)})</span>
-                </p>
-              );
-            })
-          ) : (
-            <p className="nohistory">
-              Your history will appear here as you complete tasks
-            </p>
-          )}
-        </div>
-      )}
+            return (
+              <p
+                style={{
+                  borderBottom:
+                    index == data[0]?.message?.length - 1
+                      ? `1px solid ${colors.divider}`
+                      : "",
+                }}
+                className="message"
+                key={index}
+              >
+                {message.split(" ").slice(0, -1).join(" ")}&nbsp;
+                {formatDateToStr(datestr)}&nbsp;
+                <span>({dateDistance(datestr)})</span>
+              </p>
+            );
+          })
+        ) : (
+          <p className="nohistory">
+            Your history will appear here as you complete tasks
+          </p>
+        )}
+      </div>
     </section>
   );
 }

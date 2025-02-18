@@ -127,12 +127,14 @@ export default function LendToUse(): JSX.Element {
       </div>
 
       <div className="newlendctr">
-        <button className="newlend" onClick={lendSecret}>
-          <Import width={16} height={16} color={colors.textprimary} />
-        </button>
-
         <button className="newlend" onClick={lendAsset}>
+          Lend Crypto
           <Stake width={10} height={10} color={colors.textprimary} />
+        </button>
+        <div className="divider"></div>
+        <button className="newlend" onClick={lendSecret}>
+          Lend Secrets
+          <Import width={16} height={16} color={colors.textprimary} />
         </button>
       </div>
     </section>

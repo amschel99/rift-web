@@ -7,7 +7,6 @@ import { colors } from "../../constants";
 import { Coins } from "./defi/Coins";
 import friendsduel from "../../assets/images/labs/friendsduel.png";
 import telemarket from "../../assets/images/labs/telemarket.png";
-import lendtospend from "../../assets/images/icons/lendto.png";
 import "../../styles/components/tabs/defitab.scss";
 
 export const DefiTab = (): JSX.Element => {
@@ -148,15 +147,6 @@ export const DefiTab = (): JSX.Element => {
             Stake Now <Stake color={colors.textprimary} />
           </button>
         </div>
-      </div>
-
-      <div className="lendtospend" onClick={() => navigate("/lend")}>
-        <img src={lendtospend} alt="lend to spend" />
-
-        <p>
-          Lend & Earn <br />
-          <span>Allow others to use your crypto assets and secrets</span>
-        </p>
       </div>
     </section>
   );

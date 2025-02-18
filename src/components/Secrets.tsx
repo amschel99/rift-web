@@ -62,9 +62,7 @@ export const MySecrets = ({
               <div className="secret-details">
                 <span className="secret-name">{secret?.name}</span>
                 <span className="secret-subheading">
-                  {secret?.purpose == "OPENAI"
-                    ? "AI Service API Key"
-                    : "Payment Gateway API Key"}
+                  {secret?.purpose == "OPENAI" ? "AI" : "Banking"}
                 </span>
               </div>
             </div>

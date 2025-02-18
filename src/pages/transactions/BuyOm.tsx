@@ -97,7 +97,10 @@ export default function BuyOm(): JSX.Element {
 
       <div className="select_currency_ctr">
         <div className="select_currency">
-          <div className="img_desc" onClick={() => onSelectCurrency("ETH")}>
+          <div
+            className="currency_img_desc"
+            onClick={() => onSelectCurrency("ETH")}
+          >
             <div className="flag_balance">
               <img src={ethlogo} alt="asset" />
 
@@ -114,11 +117,14 @@ export default function BuyOm(): JSX.Element {
                       ? colors.textprimary
                       : colors.primary,
                 }}
-              />
+              ></div>
             </div>
           </div>
 
-          <div className="img_desc" onClick={() => onSelectCurrency("USD")}>
+          <div
+            className="currency_img_desc"
+            onClick={() => onSelectCurrency("USD")}
+          >
             <div className="flag_balance">
               <span className="flag">🇺🇸</span>
 
@@ -140,12 +146,12 @@ export default function BuyOm(): JSX.Element {
                       ? colors.textprimary
                       : colors.primary,
                 }}
-              />
+              ></div>
             </div>
           </div>
 
           <div
-            className="img_desc l_currency"
+            className="currency_img_desc l_currency"
             onClick={() => onSelectCurrency("HKD")}
           >
             <div className="flag_balance">
@@ -169,7 +175,7 @@ export default function BuyOm(): JSX.Element {
                       ? colors.textprimary
                       : colors.primary,
                 }}
-              />
+              ></div>
             </div>
           </div>
         </div>

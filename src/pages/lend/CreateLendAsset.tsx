@@ -365,7 +365,8 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(20)}
             style={{
-              backgroundColor: yieldDist == 20 ? colors.accent : colors.divider,
+              backgroundColor:
+                yieldDist == 20 ? colors.success : colors.divider,
             }}
           >
             20%
@@ -373,7 +374,8 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(30)}
             style={{
-              backgroundColor: yieldDist == 30 ? colors.accent : colors.divider,
+              backgroundColor:
+                yieldDist == 30 ? colors.success : colors.divider,
             }}
           >
             30%
@@ -381,7 +383,8 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(40)}
             style={{
-              backgroundColor: yieldDist == 40 ? colors.accent : colors.divider,
+              backgroundColor:
+                yieldDist == 40 ? colors.success : colors.divider,
             }}
           >
             40%
@@ -389,7 +392,8 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(50)}
             style={{
-              backgroundColor: yieldDist == 50 ? colors.accent : colors.divider,
+              backgroundColor:
+                yieldDist == 50 ? colors.success : colors.divider,
             }}
           >
             50%
@@ -397,7 +401,8 @@ export default function CreateLendAsset(): JSX.Element {
           <button
             onClick={() => setYieldDist(60)}
             style={{
-              backgroundColor: yieldDist == 60 ? colors.accent : colors.divider,
+              backgroundColor:
+                yieldDist == 60 ? colors.success : colors.divider,
             }}
           >
             60%

@@ -102,7 +102,7 @@ export default function CreateLendSecret(): JSX.Element {
               <img src={poelogo} alt="secret" />
 
               <p className="desc">
-                POE <br /> <span>{sphereId.substring(0, 4)}</span>
+                POE <br /> <span>L9P0...</span>
               </p>
             </div>
 
@@ -116,7 +116,7 @@ export default function CreateLendSecret(): JSX.Element {
               <img src={stratosphere} alt="secret" />
 
               <p className="desc">
-                Sphere ID <br /> <span>0K87...</span>
+                Sphere ID <br /> <span>{sphereId.substring(0, 4)}...</span>
               </p>
             </div>
 
