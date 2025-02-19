@@ -64,7 +64,7 @@ export default function Referral(): JSX.Element {
         <img src={refer} alt="refer" />
         <p className="title">Refer and earn</p>
         <p className="desc">
-          Earn USDC by inviting your friends to StratoSphereID
+          Earn OM by inviting your friends to StratoSphereID
         </p>
       </div>
 
