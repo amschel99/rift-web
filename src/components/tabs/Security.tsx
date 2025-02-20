@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useTabs } from "../../hooks/tabs";
 import { useAppDrawer } from "../../hooks/drawer";
-import { Lock, Stake, Telegram } from "../../assets/icons/actions";
+import { Lock, Stake, Telegram, Refresh } from "../../assets/icons/actions";
 import { Wallet } from "../../assets/icons/security";
 import { colors } from "../../constants";
 import "../../styles/components/tabs/security.scss";
@@ -83,8 +83,8 @@ export const SecurityTab = (): JSX.Element => {
         <div className="recover_action" onClick={goToRecovery}>
           <p>Setup Account Recovery</p>
 
-          <span className="account_recovery">
-            <Stake color={colors.textsecondary} />
+          <span>
+            <Refresh width={16} height={16} color={colors.textsecondary} />
           </span>
         </div>
       </div>

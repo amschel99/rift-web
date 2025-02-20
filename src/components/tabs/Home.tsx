@@ -7,7 +7,6 @@ import { useTabs } from "../../hooks/tabs";
 import { useAppDialog } from "../../hooks/dialog";
 import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
 import { WalletBalance } from "../WalletBalance";
-import { FiatBalances } from "../home/FiatBalances";
 import { MySecrets, SharedSecrets } from "../Secrets";
 import { PopOverAlt } from "../global/PopOver";
 import { Add, QuickActions, Stake } from "../../assets/icons/actions";
@@ -143,7 +142,7 @@ export const HomeTab = (): JSX.Element => {
       <WalletBalance />
 
       <div id="secrets_import">
-        <p>Web2 Assets</p>
+        <p>Secrets</p>
 
         <button className="importsecret" onClick={onImportKey}>
           <Add width={18} height={18} color={colors.textprimary} />
@@ -207,8 +206,6 @@ export const HomeTab = (): JSX.Element => {
             not be shown
           </p>
         ))}
-
-      <FiatBalances />
     </section>
   );
 };

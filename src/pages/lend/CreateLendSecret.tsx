@@ -116,7 +116,7 @@ export default function CreateLendSecret(): JSX.Element {
               <img src={stratosphere} alt="secret" />
 
               <p className="desc">
-                Sphere ID <br /> <span>0K87...</span>
+                Sphere ID <br /> <span>{sphereId.substring(0, 4)}...</span>
               </p>
             </div>
 

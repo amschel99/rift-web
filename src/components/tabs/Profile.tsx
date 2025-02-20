@@ -8,6 +8,7 @@ import refer from "../../assets/images/icons/refer.png";
 import accRecovery from "../../assets/images/icons/acc-recovery.png";
 import premiumsIcon from "../../assets/images/icons/premium.png";
 import depositIcon from "../../assets/images/icons/paylinks.png";
+import rewardsicon from "../../assets/images/icons/rewards.png";
 import "../../styles/components/tabs/profile.scss";
 
 export const Profile = (): JSX.Element => {
@@ -37,6 +38,10 @@ export const Profile = (): JSX.Element => {
   const goBack = () => {
     switchtab("home");
     navigate("/app");
+  };
+
+  const onRewards = () => {
+    navigate("/rewards/nil");
   };
 
   useEffect(() => {
@@ -76,6 +81,15 @@ export const Profile = (): JSX.Element => {
             {btcAddr?.substring(2, 6)}
           </p>
         </div>
+      </div>
+
+      <div className="earn" onClick={onRewards}>
+        <img src={rewardsicon} alt="rewards" />
+
+        <p>
+          Rewards & Airdrops
+          <span>Complete tasks & unlock rewards</span>
+        </p>
       </div>
 
       <div className="earn" onClick={onRefer}>
