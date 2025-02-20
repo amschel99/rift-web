@@ -14,9 +14,9 @@ import {
 import { formatUsd } from "../utils/formatters";
 import { getMantraUsdVal } from "../utils/api/mantra";
 import { dateDistance, formatDateToStr } from "../utils/dates";
-import { ReferEarn } from "../components/rewards/ReferEarn";
 import { Lock } from "../assets/icons/actions";
 import { colors } from "../constants";
+import referearn from "../assets/images/icons/refer.png";
 import rewards from "../assets/images/labs/mantralogo.jpeg";
 import staketokens from "../assets/images/icons/lendto.png";
 import transaction from "../assets/images/obhehalfspend.png";
@@ -72,6 +72,10 @@ export default function Rewards(): JSX.Element {
       });
     },
   });
+
+  const onRefer = () => {
+    navigate("/refer/unlock");
+  };
 
   const onStake = () => {
     navigate("/staking");
@@ -137,9 +141,16 @@ export default function Rewards(): JSX.Element {
       </div>
 
       <div className="tasks">
-        <ReferEarn />
-
         <p className="tasks_title">Unlock more OM</p>
+
+        <div className="task" onClick={onRefer}>
+          <img src={referearn} alt="refer" />
+
+          <p>
+            Refer & Earn
+            <span>Refer & earn 1 OM</span>
+          </p>
+        </div>
 
         <div className="task" onClick={onStake}>
           <img src={staketokens} alt="rewards" />

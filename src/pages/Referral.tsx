@@ -3,7 +3,6 @@ import { openTelegramLink, backButton } from "@telegram-apps/sdk-react";
 import { useNavigate, useParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../hooks/snackbar";
-import { useTabs } from "../hooks/tabs";
 import { createReferralLink } from "../utils/api/refer";
 import { Copy, Telegram } from "../assets/icons/actions";
 import { colors } from "../constants";
@@ -12,13 +11,11 @@ import "../styles/pages/referral.scss";
 
 export default function Referral(): JSX.Element {
   const navigate = useNavigate();
-  const { switchtab } = useTabs();
   const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
 
   const goBack = () => {
-    switchtab("profile");
-    navigate("/app");
+    navigate("/rewards/nil");
   };
 
   const {
@@ -63,9 +60,7 @@ export default function Referral(): JSX.Element {
       <div className="l1">
         <img src={refer} alt="refer" />
         <p className="title">Refer and earn</p>
-        <p className="desc">
-          Earn OM by inviting your friends to StratoSphereID
-        </p>
+        <p className="desc">Earn OM by inviting your friends to Sphere</p>
       </div>
 
       <p className="earns">
