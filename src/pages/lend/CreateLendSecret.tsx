@@ -5,10 +5,14 @@ import { TextField } from "@mui/material";
 import { PopOver } from "../../components/global/PopOver";
 import { formatUsd } from "../../utils/formatters";
 import { colors } from "../../constants";
+import { assetType } from "./CreateLendAsset";
 import { ChevronLeft, Import } from "../../assets/icons/actions";
 import poelogo from "../../assets/images/icons/poe.png";
 import stratosphere from "../../assets/images/sphere.jpg";
 import awxlogo from "../../assets/images/awx.png";
+import btclogo from "../../assets/images/btc.png";
+import ethlogo from "../../assets/images/eth.png";
+import usdclogo from "../../assets/images/labs/usdc.png";
 import "../../styles/pages/createlendsecret.scss";
 
 export type secretType = "POE" | "SPHERE" | "AIRWALLEX";
@@ -24,6 +28,9 @@ export default function CreateLendSecret(): JSX.Element {
   const [secretFee, setSecretFee] = useState<string>("1");
   const [customFee, setCustomFee] = useState<string>("");
   const [anchorEl, setanchorEl] = useState<HTMLDivElement | null>(null);
+  const [repayAsset, setRepayAsset] = useState<assetType>("HKD");
+  const [repaymentAnchorEl, setRepaymentAnchorEl] =
+    useState<HTMLDivElement | null>(null);
 
   let ethAddr = localStorage.getItem("address");
   let btcAddr = localStorage.getItem("btcaddress");
@@ -31,6 +38,10 @@ export default function CreateLendSecret(): JSX.Element {
 
   const openPopOver = (event: MouseEvent<HTMLDivElement>) => {
     setanchorEl(event.currentTarget);
+  };
+
+  const openRepaymentPopOver = (event: MouseEvent<HTMLDivElement>) => {
+    setRepaymentAnchorEl(event.currentTarget);
   };
 
   const goBack = () => {
@@ -189,6 +200,14 @@ export default function CreateLendSecret(): JSX.Element {
 
         <div className="qfees">
           <button
+            onClick={() => setSecretFee("0")}
+            style={{
+              backgroundColor: Number(secretFee) == 0 ? colors.accent : "",
+            }}
+          >
+            {formatUsd(0)} (Free)
+          </button>
+          <button
             onClick={() => setSecretFee("1")}
             style={{
               backgroundColor: Number(secretFee) == 1 ? colors.accent : "",
@@ -262,6 +281,109 @@ export default function CreateLendSecret(): JSX.Element {
           to use the secret
         </p>
       </div>
+
+      <p className="repayment_tle">
+        Payment Options
+        <span>How do you wish to be paid for this secret ?</span>
+      </p>
+      <div
+        className="repayment_curreny secretselector"
+        onClick={secretFee == "0" ? () => {} : openRepaymentPopOver}
+      >
+        <div className="img_desc">
+          <img
+            src={
+              repayAsset == "BTC"
+                ? btclogo
+                : repayAsset == "ETH"
+                ? ethlogo
+                : usdclogo
+            }
+            alt="secret"
+          />
+
+          <p className="desc">{repayAsset}</p>
+        </div>
+
+        <span className="inv_icon">
+          <ChevronLeft width={6} height={11} color={colors.textsecondary} />
+        </span>
+      </div>
+      <PopOver anchorEl={repaymentAnchorEl} setAnchorEl={setRepaymentAnchorEl}>
+        {
+          <div className="select_secrets">
+            <div
+              className="img_desc"
+              onClick={() => {
+                setRepayAsset("HKD");
+                setRepaymentAnchorEl(null);
+              }}
+            >
+              <span className="_icons">🇭🇰</span>
+
+              <p className="desc">
+                HKD <br /> <span>Fiat</span>
+              </p>
+            </div>
+
+            <div
+              className="img_desc"
+              onClick={() => {
+                setRepayAsset("USD");
+                setRepaymentAnchorEl(null);
+              }}
+            >
+              <span className="_icons">🇺🇸</span>
+
+              <p className="desc">
+                USD <br /> <span>Fiat</span>
+              </p>
+            </div>
+
+            <div
+              className="img_desc"
+              onClick={() => {
+                setRepayAsset("USDC");
+                setRepaymentAnchorEl(null);
+              }}
+            >
+              <img src={usdclogo} alt="secret" />
+
+              <p className="desc">
+                USDC <br /> <span>Crypto (Stablecoin)</span>
+              </p>
+            </div>
+
+            <div
+              className="img_desc"
+              onClick={() => {
+                setRepayAsset("ETH");
+                setRepaymentAnchorEl(null);
+              }}
+            >
+              <img src={ethlogo} alt="secret" />
+
+              <p className="desc">
+                ETH <br /> <span>Crypto</span>
+              </p>
+            </div>
+
+            <div
+              className="img_desc"
+              onClick={() => {
+                setRepayAsset("BTC");
+                setRepaymentAnchorEl(null);
+              }}
+            >
+              <img src={btclogo} alt="secret" />
+
+              <p className="desc">
+                BTC <br /> <span>Crypto</span>
+              </p>
+            </div>
+          </div>
+        }
+      </PopOver>
 
       <button className="submit" onClick={goBack}>
         Lend Secret <Import width={16} height={16} color={colors.textprimary} />
