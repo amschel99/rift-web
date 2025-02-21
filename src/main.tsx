@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// import eruda from "eruda";
+import eruda from "eruda";
 import { init } from "@telegram-apps/sdk-react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -57,7 +57,7 @@ import DepositFromAwx from "./pages/deposit/DepositFromAwx.tsx";
 import Staking from "./pages/Staking.tsx";
 import "./styles/index.scss";
 
-// eruda.init();
+eruda.init();
 init();
 
 const queryclient = new QueryClient();

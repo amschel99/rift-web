@@ -9,7 +9,7 @@ import { SendAirdropLink } from "../drawer/SendAirdropLink";
 import { TransactionLimit } from "../drawer/TransactionLimit";
 import { AddPin } from "../drawer/AddPin";
 import { DeleteRecovery } from "../drawer/DeleteRecovery";
-import { PaymentLink } from "../drawer/PaymentLink";
+import { RevokeSecretAccess } from "../drawer/RevokeSecretAccess";
 import { SecretActions } from "../drawer/SecretActions";
 import { colors } from "../../constants";
 
@@ -45,10 +45,10 @@ export const AppDrawer = (): JSX.Element => {
         <AddPin />
       ) : action == "deleteemail" || action == "deletephone" ? (
         <DeleteRecovery />
-      ) : action == "paymentlink" ? (
-        <PaymentLink />
       ) : action == "secretactions" ? (
         <SecretActions />
+      ) : action == "revokesecretaccess" ? (
+        <RevokeSecretAccess />
       ) : (
         <NodeTeeSelector />
       )}

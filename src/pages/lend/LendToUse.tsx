@@ -3,7 +3,7 @@ import { backButton } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { useTabs } from "../../hooks/tabs";
 import { BorrowedAsset } from "../../components/lend/Assets";
-import { BorrowedSecret } from "../../components/lend/Secrets";
+import { BorrowedSecret, LentSecret } from "../../components/lend/Secrets";
 import { Import, Stake } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import "../../styles/pages/lendspend.scss";
@@ -13,6 +13,8 @@ export default function LendToUse(): JSX.Element {
   const { switchtab } = useTabs();
 
   const [selector, setSelector] = useState<"lent" | "borrowed">("borrowed");
+
+  const secretRevoked = localStorage.getItem("revokedsecret");
 
   const goBack = () => {
     switchtab("home");
@@ -122,7 +124,18 @@ export default function LendToUse(): JSX.Element {
             />
           </>
         ) : (
-          <p className="noassets">You have not lent any assets...</p>
+          <>
+            {secretRevoked == null ? (
+              <LentSecret
+                borrower="amscelll"
+                secret="L9P0..."
+                secretType="POE"
+                secretFee={0}
+              />
+            ) : (
+              <p className="noassets">You have not lent any assets...</p>
+            )}
+          </>
         )}
       </div>
 

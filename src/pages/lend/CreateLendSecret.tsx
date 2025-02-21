@@ -291,16 +291,22 @@ export default function CreateLendSecret(): JSX.Element {
         onClick={secretFee == "0" ? () => {} : openRepaymentPopOver}
       >
         <div className="img_desc">
-          <img
-            src={
-              repayAsset == "BTC"
-                ? btclogo
-                : repayAsset == "ETH"
-                ? ethlogo
-                : usdclogo
-            }
-            alt="secret"
-          />
+          {repayAsset == "HKD" || repayAsset == "USD" ? (
+            <span className="country_flag">
+              {repayAsset == "HKD" ? "🇭🇰" : "🇺🇸"}
+            </span>
+          ) : (
+            <img
+              src={
+                repayAsset == "BTC"
+                  ? btclogo
+                  : repayAsset == "ETH"
+                  ? ethlogo
+                  : usdclogo
+              }
+              alt="secret"
+            />
+          )}
 
           <p className="desc">{repayAsset}</p>
         </div>

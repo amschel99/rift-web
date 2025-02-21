@@ -142,7 +142,7 @@ export default function DepositToAddress(): JSX.Element {
             </div>
 
             <p className="asset_tle">
-              Select an asset you would like to be paid
+              Select an asset you would like to deposit
             </p>
           </div>
         }
