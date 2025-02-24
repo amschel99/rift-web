@@ -1,27 +1,24 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mui/material";
+import { coinType } from "../../../types/earn";
 import { formatUsd } from "../../../utils/formatters";
-import { coinType, fetchCoins } from "../../../utils/api/market";
 import { colors } from "../../../constants";
 import "../../../styles/components/tabs/coins.scss";
 
-export const Coins = (): JSX.Element => {
-  const navigate = useNavigate();
+interface props {
+  coinsdata: coinType[];
+  coinsLoading: boolean;
+}
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["coins"],
-    queryFn: fetchCoins,
-    refetchInterval: 3000,
-  });
-  const coinsData = data as coinType[];
+export const Coins = ({ coinsdata, coinsLoading }: props): JSX.Element => {
+  const navigate = useNavigate();
 
   return (
     <section id="markettab">
       <p className="title">Coins</p>
 
-      {isLoading && (
+      {coinsLoading && (
         <div className="skeletons">
           <Skeleton
             animation="wave"
@@ -51,7 +48,7 @@ export const Coins = (): JSX.Element => {
       )}
 
       <div id="coins">
-        {coinsData?.map((_coin) => (
+        {coinsdata?.map((_coin) => (
           <div
             className="coin"
             key={_coin.id}
@@ -70,9 +67,6 @@ export const Coins = (): JSX.Element => {
               {formatUsd(_coin.current_price)} <br />
               <em
                 style={{
-                  fontStyle: "normal",
-                  fontWeight: "600",
-                  fontSize: "0.875rem",
                   color:
                     _coin?.price_change_percentage_24h < 0
                       ? colors.danger

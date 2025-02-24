@@ -2,6 +2,7 @@ import { JSX, useEffect } from "react";
 import { openTelegramLink, backButton } from "@telegram-apps/sdk-react";
 import { useNavigate, useParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
+import { useTabs } from "../hooks/tabs";
 import { useSnackbar } from "../hooks/snackbar";
 import { createReferralLink } from "../utils/api/refer";
 import { Copy, Telegram } from "../assets/icons/actions";
@@ -13,9 +14,11 @@ export default function Referral(): JSX.Element {
   const navigate = useNavigate();
   const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
+  const { switchtab } = useTabs();
 
   const goBack = () => {
-    navigate("/rewards/nil");
+    switchtab("rewards");
+    navigate("/app");
   };
 
   const {

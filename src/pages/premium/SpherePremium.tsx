@@ -8,6 +8,7 @@ import { CurrencyPopOver } from "../../components/global/PopOver";
 import spherelogo from "../../assets/images/sphere.jpg";
 import premiuum from "../../assets/images/icons/premium.png";
 import "../../styles/pages/premiums/spherepremium.scss";
+import { colors } from "../../constants";
 
 export default function SpherePremium(): JSX.Element {
   const navigate = useNavigate();
@@ -50,9 +51,7 @@ export default function SpherePremium(): JSX.Element {
 
   return (
     <section id="spherepremium">
-      <p className="title">
-        Premium <span>/ Sphere</span>
-      </p>
+      <p className="title">Sphere Premium</p>
 
       <div className="icon_ctr">
         <span className="icon">
@@ -68,7 +67,7 @@ export default function SpherePremium(): JSX.Element {
 
       <div className="duration">
         <p className="cost">
-          {premiumDuration == "monthly" ? formatUsd(3) : formatUsd(38)}
+          {premiumDuration == "monthly" ? formatUsd(6.05) : formatUsd(57.99)}
           &nbsp;
           <span>/ {premiumDuration == "monthly" ? "month" : "year"}</span>
         </p>
@@ -110,12 +109,33 @@ export default function SpherePremium(): JSX.Element {
           />
         </div>
 
-        <div className="total">
+        <div className"total">
           <p>Total</p>
           <span>
-            {premiumDuration == "monthly" ? formatUsd(3) : formatUsd(38)}
+            <em
+              style={{
+                textDecoration: selectCurrency == "HKDA" ? "line-through" : "",
+                color: selectCurrency == "HKDA" ? colors.danger : "",
+              }}
+            >
+              {premiumDuration == "monthly"
+                ? formatUsd(6.05)
+                : formatUsd(57.99)}
+            </em>
+
+            {selectCurrency == "HKDA" && (
+              <em className="discounted_price">
+                {premiumDuration == "monthly"
+                  ? formatUsd(6.05 - 6.05 * 0.1)
+                  : formatUsd(57.99 - 57.99 * 0.1)}
+              </em>
+            )}
           </span>
         </div>
+
+        <p className="discount">
+          Get <span>10%</span> off when you pay with HKDA
+        </p>
 
         <button className="getpremium" onClick={onGetPremium}>
           Get Sphere Premium

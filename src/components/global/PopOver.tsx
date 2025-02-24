@@ -104,20 +104,6 @@ export const CurrencyPopOver = ({
         <div
           className="img_desc"
           onClick={() => {
-            setCurrency("HKD");
-            setAnchorEl(null);
-          }}
-        >
-          <span className="_icons">🇭🇰</span>
-
-          <p className="desc">
-            HKD <br /> <span>Fiat</span>
-          </p>
-        </div>
-
-        <div
-          className="img_desc"
-          onClick={() => {
             setCurrency("HKDA");
             setAnchorEl(null);
           }}
@@ -126,6 +112,20 @@ export const CurrencyPopOver = ({
 
           <p className="desc">
             HKDA <br /> <span>Crypto (Stablecoin)</span>
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("HKD");
+            setAnchorEl(null);
+          }}
+        >
+          <span className="_icons">🇭🇰</span>
+
+          <p className="desc">
+            HKD <br /> <span>Fiat</span>
           </p>
         </div>
 

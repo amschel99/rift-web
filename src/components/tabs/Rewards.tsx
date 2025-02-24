@@ -1,30 +1,29 @@
 import { JSX, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { useAppDrawer } from "../hooks/drawer";
-import { useSnackbar } from "../hooks/snackbar";
-import { useAppDialog } from "../hooks/dialog";
-import { useTabs } from "../hooks/tabs";
+import { useAppDrawer } from "../../hooks/drawer";
+import { useSnackbar } from "../../hooks/snackbar";
+import { useAppDialog } from "../../hooks/dialog";
+import { useTabs } from "../../hooks/tabs";
 import {
   claimAirdrop,
   getUnlockedTokens,
   unlockTokensHistory,
-} from "../utils/api/airdrop";
-import { formatUsd } from "../utils/formatters";
-import { getMantraUsdVal } from "../utils/api/mantra";
-import { dateDistance, formatDateToStr } from "../utils/dates";
-import { Lock } from "../assets/icons/actions";
-import { colors } from "../constants";
-import referearn from "../assets/images/icons/refer.png";
-import rewards from "../assets/images/labs/mantralogo.jpeg";
-import staketokens from "../assets/images/icons/lendto.png";
-import transaction from "../assets/images/obhehalfspend.png";
-import dailycheckin from "../assets/images/icons/acc-recovery.png";
-import "../styles/pages/rewards.scss";
+} from "../../utils/api/airdrop";
+import { formatUsd } from "../../utils/formatters";
+import { getMantraUsdVal } from "../../utils/api/mantra";
+import { dateDistance, formatDateToStr } from "../../utils/dates";
+import { Lock } from "../../assets/icons/actions";
+import { colors } from "../../constants";
+import referearn from "../../assets/images/icons/refer.png";
+import rewards from "../../assets/images/labs/mantralogo.jpeg";
+import staketokens from "../../assets/images/icons/lendto.png";
+import transaction from "../../assets/images/obhehalfspend.png";
+import dailycheckin from "../../assets/images/icons/acc-recovery.png";
+import "../../styles/components/tabs/rewards.scss";
 
-export default function Rewards(): JSX.Element {
-  const { id } = useParams();
+export const Rewards = (): JSX.Element => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { openAppDrawer } = useAppDrawer();
@@ -32,7 +31,7 @@ export default function Rewards(): JSX.Element {
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const { switchtab } = useTabs();
 
-  const airdropId = id == "nil" ? "nil" : id?.split("-")[1];
+  const airdropId = localStorage.getItem("airdropId");
 
   const { data: mantrausdval } = useQuery({
     queryKey: ["mantrausd"],
@@ -87,12 +86,12 @@ export default function Rewards(): JSX.Element {
   };
 
   useEffect(() => {
-    if (id !== "nil") {
-      openAppDialog("loading", "Claiming your Airdrop tokens, please wait");
+    if (airdropId !== null) {
+      openAppDialog("loading", "Claiming your Airdrop tokens, please wait...");
 
       mutateClaimAirdrop();
     }
-  }, [id, airdropId]);
+  }, [airdropId]);
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -137,7 +136,12 @@ export default function Rewards(): JSX.Element {
 
           <p>
             Refer & Earn
-            <span>Refer & earn 1 OM</span>
+            <span>
+              Refer & earn&nbsp;
+              <em>
+                1 OM <img src={rewards} alt="mantra" />
+              </em>
+            </span>
           </p>
         </div>
 
@@ -146,7 +150,12 @@ export default function Rewards(): JSX.Element {
 
           <p>
             Stake
-            <span>Stake crypto asset(s) & unlock 4 OM</span>
+            <span>
+              Stake crypto asset(s) & unlock&nbsp;
+              <em>
+                4 OM <img src={rewards} alt="mantra" />
+              </em>
+            </span>
           </p>
         </div>
 
@@ -160,7 +169,12 @@ export default function Rewards(): JSX.Element {
 
           <p>
             Make a transaction
-            <span>Perform a transaction & unlock 1 OM</span>
+            <span>
+              Perform a transaction & unlock&nbsp;
+              <em>
+                1 OM <img src={rewards} alt="mantra" />
+              </em>
+            </span>
           </p>
         </div>
 
@@ -169,7 +183,12 @@ export default function Rewards(): JSX.Element {
 
           <p>
             Daily Check-in
-            <span>Claim a daily check-in reward (1 OM)</span>
+            <span>
+              Claim a daily check-in reward of&nbsp;
+              <em>
+                1 OM <img src={rewards} alt="mantra" />
+              </em>
+            </span>
           </p>
         </div>
       </div>
@@ -206,7 +225,7 @@ export default function Rewards(): JSX.Element {
                 key={index}
               >
                 {message.split(" ").slice(0, -1).join(" ")}&nbsp;
-                {formatDateToStr(datestr)}&nbsp;
+                {formatDateToStr(datestr)} <br />
                 <span>({dateDistance(datestr)})</span>
               </p>
             );
@@ -219,4 +238,4 @@ export default function Rewards(): JSX.Element {
       </div>
     </section>
   );
-}
+};

@@ -2,10 +2,10 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 export type tabsType =
   | "home"
-  | "profile"
   | "labs"
   | "security"
   | "earn"
+  | "rewards"
   | "notifications";
 
 interface tabsctxtype {

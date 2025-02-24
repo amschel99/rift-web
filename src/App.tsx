@@ -22,8 +22,8 @@ import { HomeTab } from "./components/tabs/Home";
 import { SecurityTab } from "./components/tabs/Security";
 import { LabsTab } from "./components/tabs/Lab";
 import { DefiTab } from "./components/tabs/Defi";
-import { Profile } from "./components/tabs/Profile";
 import { Notifications } from "./components/tabs/Notifications";
+import { Rewards } from "./components/tabs/Rewards";
 
 function App(): JSX.Element {
   const { initData } = useLaunchParams();
@@ -31,7 +31,7 @@ function App(): JSX.Element {
   const { openAppDrawer } = useAppDrawer();
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const { showsuccesssnack } = useSnackbar();
-  const { currTab } = useTabs();
+  const { switchtab, currTab } = useTabs();
 
   const tgUsername = initData?.user?.username as string;
 
@@ -64,7 +64,7 @@ function App(): JSX.Element {
     }
 
     if (airdropId !== null) {
-      navigate(`/rewards/${airdropId}`);
+      switchtab("rewards");
     }
 
     if (utxoId !== null && utxoVal !== null) {
@@ -138,14 +138,14 @@ function App(): JSX.Element {
         <HomeTab />
       ) : currTab == "security" ? (
         <SecurityTab />
-      ) : currTab == "earn" ? ( // earn -> defi (staking+coins)
+      ) : currTab == "earn" ? (
         <DefiTab />
       ) : currTab == "labs" ? (
         <LabsTab />
-      ) : currTab == "notifications" ? (
-        <Notifications />
+      ) : currTab == "rewards" ? (
+        <Rewards />
       ) : (
-        <Profile />
+        <Notifications />
       )}
 
       <BottomTabNavigation />

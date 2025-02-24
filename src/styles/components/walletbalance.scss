@@ -27,7 +27,7 @@
       @include mixins.useButton();
       @include mixins.useBaseFont();
       padding: 0.375rem 1.5rem;
-      border-radius: 1rem;
+      border-radius: 0.25rem;
       font-size: 0.75rem;
       font-weight: bold;
       color: colors.$textprimary;
@@ -37,28 +37,6 @@
 
   .toggle-bal {
     margin-left: 0.25rem;
-  }
-
-  .actions {
-    @include mixins.useFlex(row, wrap, center, flex-start, 0.375rem);
-    width: 100%;
-    margin-top: 1rem;
-
-    ._action {
-      @include mixins.useFlex(row, nowrap, center, flex-start, 0.25rem);
-      width: 32%;
-      height: 3rem;
-      padding: 0 0.375rem;
-      border: 2px solid colors.$divider;
-      border-radius: 0.375rem;
-      font-size: 0.75rem;
-      font-weight: bold;
-      color: colors.$textprimary;
-
-      .icon {
-        font-size: 0.625rem;
-      }
-    }
   }
 
   ._asset {
@@ -107,15 +85,6 @@
         .price_change {
           font-size: 0.625rem;
           font-weight: bold;
-          font-style: normal;
-        }
-
-        .positive {
-          color: colors.$success;
-        }
-
-        .negative {
-          color: colors.$danger;
         }
       }
     }

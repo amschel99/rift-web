@@ -1,61 +1,79 @@
-import { JSX } from "react";
-import { useNavigate } from "react-router";
-import { useTabs } from "../hooks/tabs";
+import { JSX, ReactNode } from "react";
+import { useTabs, tabsType } from "../hooks/tabs";
 import { Labs, Security, Home, Market } from "../assets/icons/tabs";
 import { colors } from "../constants";
 import "../styles/components/tabs/bottomtab.scss";
 
+type tabMenus = {
+  menu: tabsType;
+  title: string;
+  icon: ReactNode;
+};
+
 export const BottomTabNavigation = (): JSX.Element => {
-  const navigate = useNavigate();
   const { currTab, switchtab } = useTabs();
 
-  return (
-    <div id="bottomtab">
-      <button onClick={() => switchtab("home")}>
+  const bottomtabMenus: tabMenus[] = [
+    {
+      menu: "home",
+      title: "Home",
+      icon: (
         <Home
           width={20}
           height={20}
           color={currTab == "home" ? colors.accent : colors.textprimary}
         />
-        <span
-          style={{
-            color: currTab == "home" ? colors.accent : colors.textprimary,
-          }}
-        >
-          Home
-        </span>
-      </button>
-
-      <button onClick={() => switchtab("security")}>
+      ),
+    },
+    {
+      menu: "security",
+      title: "Security",
+      icon: (
         <Security
           color={currTab == "security" ? colors.accent : colors.textprimary}
         />
-        <span
-          style={{
-            color: currTab == "security" ? colors.accent : colors.textprimary,
-          }}
-        >
-          Security
-        </span>
-      </button>
-
-      <button onClick={() => navigate("/rewards/nil")}>
-        <Labs width={20} height={20} color={colors.textprimary} />
-        <span style={{ color: colors.textprimary }}>Rewards</span>
-      </button>
-
-      <button onClick={() => switchtab("earn")}>
+      ),
+    },
+    {
+      menu: "rewards",
+      title: "Rewards",
+      icon: (
+        <Labs
+          width={20}
+          height={20}
+          color={currTab == "rewards" ? colors.accent : colors.textprimary}
+        />
+      ),
+    },
+    {
+      menu: "earn",
+      title: "Markets",
+      icon: (
         <Market
           color={currTab == "earn" ? colors.accent : colors.textprimary}
         />
-        <span
-          style={{
-            color: currTab == "earn" ? colors.accent : colors.textprimary,
-          }}
+      ),
+    },
+  ];
+
+  return (
+    <div id="bottomtab">
+      {bottomtabMenus?.map((bottomtab, index) => (
+        <button
+          key={index + bottomtab?.title}
+          onClick={() => switchtab(bottomtab.menu)}
         >
-          Markets
-        </span>
-      </button>
+          {bottomtab?.icon}
+          <span
+            style={{
+              color:
+                currTab == bottomtab?.menu ? colors.accent : colors.textprimary,
+            }}
+          >
+            {bottomtab?.title}
+          </span>
+        </button>
+      ))}
     </div>
   );
 };

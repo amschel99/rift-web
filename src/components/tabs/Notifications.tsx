@@ -18,17 +18,8 @@ export const Notifications = (): JSX.Element => {
   };
 
   const claimAirdrop = () => {
+    localStorage.setItem("claimedstartairdrop", "true");
     openTelegramLink("https://t.me/strato_vault_bot?start=start");
-    // if (claimedstartairdrop == null) {
-    //https://strato-vault.com/airdrop?id=C2OjYx6Bu0aE
-    // localStorage.setItem("claimedstartairdrop", "true");
-    // navigate("/rewards/om-oMntqMk7o6hW");
-    // } else {
-    // openAppDialog(
-    // "failure",
-    // "Sorry, you have already claimed your Airdrop rewards (:"
-    // );
-    // }
   };
 
   useEffect(() => {

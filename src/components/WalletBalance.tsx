@@ -4,22 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import {
-  faExchangeAlt,
-  faLayerGroup,
-  faCrown,
-  faGlobe,
-  faFlask,
-  faGift,
-  faArrowsRotate,
-} from "@fortawesome/free-solid-svg-icons";
-import { openTelegramLink } from "@telegram-apps/sdk-react";
-import { useTabs } from "../hooks/tabs";
 import { walletBalance, mantraBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { getMantraUsdVal } from "../utils/api/mantra";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
-import { Stake } from "../assets/icons/actions";
+import { Add } from "../assets/icons/actions";
 import { colors } from "../constants";
 import btclogo from "../assets/images/btc.png";
 import ethlogo from "../assets/images/eth.png";
@@ -30,16 +19,7 @@ import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = (): JSX.Element => {
   const navigate = useNavigate();
-  const { switchtab } = useTabs();
   const [showBalances, setShowBalance] = useState<boolean>(true);
-
-  const actionButtons = [
-    { icon: faGlobe, text: "Web2", screen: "web2" },
-    { icon: faGift, text: "Airdrops", screen: "rewards/nil" },
-    { icon: faLayerGroup, text: "Stake", screen: "staking" },
-    { icon: faCrown, text: "Premium", screen: "premiums" },
-    { icon: faArrowsRotate, text: "Lend", screen: "lend" },
-  ];
 
   const { data: btcethbalance, isLoading: btcethLoading } = useQuery({
     queryKey: ["btceth"],
@@ -85,14 +65,6 @@ export const WalletBalance = (): JSX.Element => {
   localStorage.setItem("mantrausdval", String(mantrausdval));
   localStorage.setItem("ethvalue", String(ethusdval));
 
-  const onLabs = () => {
-    switchtab("labs");
-  };
-
-  const onSwap = () => {
-    openTelegramLink("https://t.me/stratospherex_bot/stratospherex");
-  };
-
   const onPoe = () => {
     navigate("/web2");
   };
@@ -127,9 +99,9 @@ export const WalletBalance = (): JSX.Element => {
                 height="2.5rem"
                 animation="wave"
               />
-            ) : String(walletusdbalance).split(".")[0]?.length - 1 >= 7 ? (
+            ) : String(walletusdbalance).split(".")[0]?.length - 1 >= 5 ? (
               "$" +
-              numberFormat(Math.abs(walletusdbalance)).replace(/[()]/g, "") // Fixes parentheses issue
+              numberFormat(Math.abs(walletusdbalance)).replace(/[()]/g, "")
             ) : (
               formatUsd(walletusdbalance)
             )
@@ -139,7 +111,8 @@ export const WalletBalance = (): JSX.Element => {
         </p>
 
         <button className="addfunds" onClick={() => navigate("/deposit")}>
-          Add funds <Stake width={6} height={11} color={colors.textprimary} />
+          Add funds
+          <Add width={14} height={14} color={colors.textprimary} />
         </button>
       </div>
 
@@ -194,9 +167,7 @@ export const WalletBalance = (): JSX.Element => {
 
             <p className="balance">
               <span>{formatNumber(Number(mantrabalance?.data?.balance))}</span>
-
               <span className="fiat">
-                <em className="price_change positive">+0.4%</em>&nbsp;
                 {formatUsd(
                   Number(mantrabalance?.data?.balance) * Number(mantrausdval)
                 )}
@@ -218,7 +189,6 @@ export const WalletBalance = (): JSX.Element => {
               <span>{formatNumber(Number(btcethbalance?.btcBalance))}</span>
 
               <span className="fiat">
-                <em className="price_change negative">-0.1%</em>&nbsp;
                 {formatUsd(
                   Number(btcethbalance?.btcBalance) * Number(btcusdval)
                 )}
@@ -240,7 +210,6 @@ export const WalletBalance = (): JSX.Element => {
               <span>{formatNumber(Number(btcethbalance?.balance))}</span>
 
               <span className="fiat">
-                <em className="price_change positive">+0.009%</em>&nbsp;
                 {formatUsd(Number(btcethbalance?.balance) * Number(ethusdval))}
               </span>
             </p>
@@ -259,10 +228,7 @@ export const WalletBalance = (): JSX.Element => {
             <p className="balance">
               <span>0</span>
 
-              <span className="fiat">
-                <em className="price_change positive">+0.001%</em>&nbsp;
-                {formatUsd(0)}
-              </span>
+              <span className="fiat">{formatUsd(0)}</span>
             </p>
           </div>
 
@@ -282,33 +248,6 @@ export const WalletBalance = (): JSX.Element => {
           </div>
         </>
       )}
-
-      <div className="actions">
-        <div className="_action" onClick={onLabs}>
-          <span>Labs</span>
-          <FontAwesomeIcon icon={faFlask} className="icon" />
-        </div>
-
-        <div className="_action" onClick={onSwap}>
-          <span>Swap</span>
-          <FontAwesomeIcon icon={faExchangeAlt} className="icon" />
-        </div>
-
-        {actionButtons.map((btn, index) => (
-          <div
-            key={index}
-            className="_action"
-            onClick={() => {
-              if (btn?.screen) {
-                navigate(`/${btn?.screen}`);
-              }
-            }}
-          >
-            <span>{btn.text}</span>
-            <FontAwesomeIcon icon={btn.icon} className="icon" />
-          </div>
-        ))}
-      </div>
     </div>
   );
 };

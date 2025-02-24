@@ -1,5 +1,5 @@
-@use "../constants/colors" as colors;
-@use "../constants/mixins" as mixins;
+@use "../../constants/colors" as colors;
+@use "../../constants/mixins" as mixins;
 
 #rewards {
   padding: 1rem;
@@ -81,12 +81,22 @@
         );
         font-size: 0.875rem;
         font-weight: bold;
-      }
 
-      span {
-        font-size: 0.75rem;
-        font-weight: 300;
-        color: colors.$textsecondary;
+        span {
+          font-weight: 300;
+
+          em {
+            @include mixins.useAltFont();
+            font-style: normal;
+            font-weight: bold;
+
+            img {
+              width: 0.875rem;
+              height: 0.875rem;
+              border-radius: 50%;
+            }
+          }
+        }
       }
     }
   }
@@ -123,6 +133,7 @@
 
   .history {
     margin-top: 1rem;
+    margin-bottom: 3rem;
 
     .history_title {
       font-size: 1.25rem;

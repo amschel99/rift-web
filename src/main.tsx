@@ -44,7 +44,6 @@ import LendToUse from "./pages/lend/LendToUse.tsx";
 import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import Referral from "./pages/Referral.tsx";
-import Rewards from "./pages/Rewards.tsx";
 import Premium from "./pages/Premium.tsx";
 import Business from "./pages/business/Index.tsx";
 import StartCampaign from "./pages/business/StartCampaign.tsx";
@@ -55,7 +54,6 @@ import DepositToAddress from "./pages/deposit/DepositToAddress.tsx";
 import DepositFromAwx from "./pages/deposit/DepositFromAwx.tsx";
 import Staking from "./pages/Staking.tsx";
 import SpherePremium from "./pages/premium/SpherePremium.tsx";
-import TelegramPremium from "./pages/premium/TgPremium.tsx";
 import "./styles/index.scss";
 
 // eruda.init();
@@ -134,7 +132,6 @@ createRoot(document.getElementById("root")!).render(
                       path="/lend/secret/:type"
                       element={<CreateLendSecret />}
                     />
-                    <Route path="/rewards/:id" element={<Rewards />} />
                     <Route path="/deposit" element={<Deposit />} />
                     <Route
                       path="/deposit-address"
@@ -149,7 +146,6 @@ createRoot(document.getElementById("root")!).render(
                       path="/premiums/sphere"
                       element={<SpherePremium />}
                     />
-                    <Route path="/premiums/tg" element={<TelegramPremium />} />
                     <Route path="/business" element={<Business />} />
                     <Route path="/start-campaign" element={<StartCampaign />} />
                     <Route path="/staking" element={<Staking />} />

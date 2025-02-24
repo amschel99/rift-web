@@ -6,13 +6,10 @@ import { useParams, useNavigate } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../hooks/snackbar";
 import { useTabs } from "../hooks/tabs";
-import { CoinPriceChart } from "../components/PriceChart";
-import {
-  coinInfoType,
-  fetchCoinPrices,
-  fetchCoinInfo,
-} from "../utils/api/market";
+import { coinInfoType } from "../types/earn";
+import { fetchCoinPrices, fetchCoinInfo } from "../utils/api/market";
 import { numberFormat, formatUsd } from "../utils/formatters";
+import { CoinPriceChart } from "../components/PriceChart";
 import { colors } from "../constants";
 import "../styles/pages/coininfo.scss";
 
