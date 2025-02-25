@@ -82,7 +82,6 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: colors.$textsecondary;
-    // background-color: colors.$divider;
 
     span {
       @include mixins.useFlex(row, nowrap, center, center, 0.25rem);

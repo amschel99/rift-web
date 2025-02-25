@@ -1,27 +1,28 @@
 import { JSX, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useTabs } from "../../hooks/tabs";
 import { formatUsd, formatNumber } from "../../utils/formatters";
 import { Copy, Send, Telegram } from "../../assets/icons/actions";
 import { colors } from "../../constants";
-import btclogo from "../../assets/images/btc.png";
+import usdclogo from "../../assets/images/labs/usdc.png";
 import "../../styles/pages/assets/assets.scss";
 
-export default function BtcAsset(): JSX.Element {
+export default function EthAsset(): JSX.Element {
   const navigate = useNavigate();
-  const { switchtab } = useTabs();
+  const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
+  const { switchtab } = useTabs();
 
-  const backbuttonclick = () => {
+  const goBack = () => {
     switchtab("home");
     navigate("/app");
   };
 
-  let walletAddress = localStorage.getItem("btcaddress");
-  let btcbal = localStorage.getItem("btcbal");
-  let btcbalUsd = localStorage.getItem("btcbalUsd");
+  let walletAddress = localStorage.getItem("address");
+  let ethbal = 0;
+  let ethbalUsd = 0;
 
   const onCopyAddr = () => {
     if (walletAddress !== null) {
@@ -37,17 +38,18 @@ export default function BtcAsset(): JSX.Element {
     }
 
     if (backButton.isMounted()) {
-      backButton.onClick(backbuttonclick);
+      backButton.onClick(goBack);
     }
 
     return () => {
+      backButton.offClick(goBack);
       backButton.unmount();
     };
   }, []);
 
   return (
-    <section id="btc-asset">
-      <img src={btclogo} alt="btc" />
+    <section id="eth-asset">
+      <img src={usdclogo} alt="eth" />
 
       <button className="address" onClick={onCopyAddr}>
         {walletAddress?.substring(0, 3)}...{walletAddress?.substring(4, 7)}
@@ -55,14 +57,14 @@ export default function BtcAsset(): JSX.Element {
       </button>
 
       <div className="balance">
-        <p>{formatUsd(Number(btcbalUsd))}</p>
-        <span>{formatNumber(Number(btcbal))} BTC</span>
+        <p>{formatUsd(ethbalUsd)}</p>
+        <span>{formatNumber(ethbal)} USDC</span>
       </div>
 
       <div className="actions">
         <p>
-          You can Send BTC directly to an address or create a link that allows
-          other users to collect BTC from your wallet
+          You can Send USDC directly to an address or create a link that allows
+          other users to collect USDC from your wallet
         </p>
 
         <span className="divider" />
@@ -70,7 +72,7 @@ export default function BtcAsset(): JSX.Element {
         <div className="buttons">
           <button
             className="receive"
-            onClick={() => navigate(`/sendcollectlink/BTC/send`)}
+            onClick={() => navigate(`/sendcollectlink/USDC/${intent}`)}
           >
             Create Link
             <Telegram width={18} height={18} color={colors.textprimary} />
@@ -78,9 +80,9 @@ export default function BtcAsset(): JSX.Element {
 
           <button
             className="send"
-            onClick={() => navigate("/send-crypto/BTC/send")}
+            onClick={() => navigate(`/send-crypto/USDC/${intent}`)}
           >
-            Send BTC <Send width={18} height={18} color={colors.textprimary} />
+            Send USDC <Send width={18} height={18} color={colors.textprimary} />
           </button>
         </div>
       </div>

@@ -64,6 +64,7 @@ export const WalletBalance = (): JSX.Element => {
   );
   localStorage.setItem("mantrausdval", String(mantrausdval));
   localStorage.setItem("ethvalue", String(ethusdval));
+  localStorage.setItem("btcvalue", String(btcusdval));
 
   const onPoe = () => {
     navigate("/web2");
@@ -215,7 +216,7 @@ export const WalletBalance = (): JSX.Element => {
             </p>
           </div>
 
-          <div className="_asset">
+          <div className="_asset" onClick={() => navigate("/usdc-asset")}>
             <div>
               <img src={usdclogo} alt="usdc" />
 

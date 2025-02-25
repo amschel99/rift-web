@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// import eruda from "eruda";
+import eruda from "eruda";
 import { init } from "@telegram-apps/sdk-react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -19,17 +19,11 @@ import Logout from "./pages/Logout.tsx";
 import BtcAsset from "./pages/assets/BtcAsset.tsx";
 import EthAsset from "./pages/assets/EthAsset.tsx";
 import OmAsset from "./pages/assets/OmAsset.tsx";
-import UsdAsset from "./pages/assets/UsdAsset.tsx";
-import HkdAsset from "./pages/assets/HkdAsset.tsx";
+import UsdcAsset from "./pages/assets/UsdcAsset.tsx";
 import ChatBot from "./pages/ChatBot.tsx";
-import SendBtc from "./pages/transactions/SendBtc.tsx";
-import SendEth from "./pages/transactions/SendEth.tsx";
-import SendEthLink from "./pages/transactions/SendEthLink.tsx";
-import SendUsdc from "./pages/transactions/SendUsdc.tsx";
+import SendCrypto from "./pages/transactions/SendCrypto.tsx";
+import SendCollectLink from "./pages/transactions/SendCollectLink.tsx";
 import BuyOm from "./pages/transactions/BuyOm.tsx";
-import SendHkd from "./pages/transactions/SendHkd.tsx";
-import SendUsd from "./pages/transactions/SendUsd.tsx";
-import Convert from "./pages/assets/Convert.tsx";
 import CoinInfo from "./pages/CoinInfo.tsx";
 import ImportSecret from "./pages/secrets/ImportSecret.tsx";
 import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
@@ -56,7 +50,7 @@ import Staking from "./pages/Staking.tsx";
 import SpherePremium from "./pages/premium/SpherePremium.tsx";
 import "./styles/index.scss";
 
-// eruda.init();
+eruda.init();
 init();
 
 const queryclient = new QueryClient();
@@ -78,30 +72,18 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/coin/:coinId" element={<CoinInfo />} />
                     <Route path="/btc-asset" element={<BtcAsset />} />
                     <Route path="/web2" element={<Web2Tab />} />
-                    <Route path="/send-btc/:intent" element={<SendBtc />} />
-                    <Route path="/eth-asset/:intent" element={<EthAsset />} />
-                    <Route path="/send-eth/:intent" element={<SendEth />} />
                     <Route
-                      path="/sendcollectlink/:intent"
-                      element={<SendEthLink />}
+                      path="/send-crypto/:srccurrency/:intent"
+                      element={<SendCrypto />}
+                    />
+                    <Route path="/eth-asset/:intent" element={<EthAsset />} />
+                    <Route
+                      path="/sendcollectlink/:srccurrency/:intent"
+                      element={<SendCollectLink />}
                     />
                     <Route path="/om-asset" element={<OmAsset />} />
-                    <Route path="/send-usdc/:intent" element={<SendUsdc />} />
                     <Route path="/get-om" element={<BuyOm />} />
-                    <Route path="/hkd-asset/:balance" element={<HkdAsset />} />
-                    <Route path="/usd-asset/:balance" element={<UsdAsset />} />
-                    <Route
-                      path="/send-hkd/:intent/:balance"
-                      element={<SendHkd />}
-                    />
-                    <Route
-                      path="/send-usd/:intent/:balance"
-                      element={<SendUsd />}
-                    />
-                    <Route
-                      path="/convert/:currency/:availableamount"
-                      element={<Convert />}
-                    />
+                    <Route path="/usdc-asset" element={<UsdcAsset />} />
                     <Route
                       path="/chat/:conversationId/:chatAccessToken/:initialMessage/:nonce"
                       element={<ChatBot />}

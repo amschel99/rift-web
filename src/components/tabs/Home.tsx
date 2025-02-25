@@ -122,7 +122,7 @@ export const HomeTab = (): JSX.Element => {
           <div className="profile_actions">
             <div className="description">
               <p>
-                Sphere for Business
+                Sphere for Businesses
                 <span>The Sphere Business Suite</span>
               </p>
             </div>

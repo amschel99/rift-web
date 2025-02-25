@@ -17,7 +17,8 @@ import { dateDistance, formatDateToStr } from "../../utils/dates";
 import { Lock } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import referearn from "../../assets/images/icons/refer.png";
-import rewards from "../../assets/images/labs/mantralogo.jpeg";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+import rewardsicon from "../../assets/images/icons/rewards.png";
 import staketokens from "../../assets/images/icons/lendto.png";
 import transaction from "../../assets/images/obhehalfspend.png";
 import dailycheckin from "../../assets/images/icons/acc-recovery.png";
@@ -111,20 +112,23 @@ export const Rewards = (): JSX.Element => {
 
   return (
     <section id="rewards">
-      <div className="balances">
-        <div>
+      <div className="locked_balances">
+        <div className="icon_ctr">
           <span className="icon">
-            <Lock width={20} height={22} color={colors.textsecondary} />
+            <img src={rewardsicon} alt="rewards" />
           </span>
+        </div>
 
+        <div className="locked_amount">
           <p>
-            Locked
-            <span>
-              {unlocked?.amount || 0} OM <img src={rewards} alt="mantra" />
-              ~&nbsp;
-              {formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
-            </span>
+            Locked <Lock width={12} height={14} color={colors.danger} />
           </p>
+
+          <span>
+            {unlocked?.amount || 0} OM <img src={mantralogo} alt="mantra" />
+            ~&nbsp;
+            {formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
+          </span>
         </div>
       </div>
 
@@ -139,7 +143,7 @@ export const Rewards = (): JSX.Element => {
             <span>
               Refer & earn&nbsp;
               <em>
-                1 OM <img src={rewards} alt="mantra" />
+                1 OM <img src={mantralogo} alt="mantra" />
               </em>
             </span>
           </p>
@@ -153,7 +157,7 @@ export const Rewards = (): JSX.Element => {
             <span>
               Stake crypto asset(s) & unlock&nbsp;
               <em>
-                4 OM <img src={rewards} alt="mantra" />
+                4 OM <img src={mantralogo} alt="mantra" />
               </em>
             </span>
           </p>
@@ -172,7 +176,7 @@ export const Rewards = (): JSX.Element => {
             <span>
               Perform a transaction & unlock&nbsp;
               <em>
-                1 OM <img src={rewards} alt="mantra" />
+                1 OM <img src={mantralogo} alt="mantra" />
               </em>
             </span>
           </p>
@@ -186,7 +190,7 @@ export const Rewards = (): JSX.Element => {
             <span>
               Claim a daily check-in reward of&nbsp;
               <em>
-                1 OM <img src={rewards} alt="mantra" />
+                1 OM <img src={mantralogo} alt="mantra" />
               </em>
             </span>
           </p>

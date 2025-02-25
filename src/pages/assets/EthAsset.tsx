@@ -72,7 +72,7 @@ export default function EthAsset(): JSX.Element {
         <div className="buttons">
           <button
             className="receive"
-            onClick={() => navigate(`/sendcollectlink/${intent}`)}
+            onClick={() => navigate(`/sendcollectlink/ETH/${intent}`)}
           >
             Create Link
             <Telegram width={18} height={18} color={colors.textprimary} />
@@ -80,7 +80,7 @@ export default function EthAsset(): JSX.Element {
 
           <button
             className="send"
-            onClick={() => navigate(`/send-eth/${intent}`)}
+            onClick={() => navigate(`/send-crypto/ETH/${intent}`)}
           >
             Send ETH <Send width={18} height={18} color={colors.textprimary} />
           </button>

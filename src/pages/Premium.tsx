@@ -78,6 +78,12 @@ export default function Premium(): JSX.Element {
 
       <div className="benefits">
         <PremiumFeature
+          title="Telegram Premium"
+          description="Experience Telegram Premium at 50% off"
+          price={1.99}
+        />
+
+        <PremiumFeature
           title="Multiple Addresses"
           description="Get multiple adresses per chain for improved security"
           price={0.75}
@@ -105,12 +111,6 @@ export default function Premium(): JSX.Element {
           title="Enhanced Key Splitting"
           description="Increase the threshold of your key shards (upto 7 shards)"
           price={0.85}
-        />
-
-        <PremiumFeature
-          title="Telegram Premium"
-          description="Experience Telegram Premium at 50% off"
-          price={1.99}
         />
       </div>
 

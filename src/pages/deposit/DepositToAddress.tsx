@@ -10,13 +10,14 @@ import { ChevronLeft, Copy } from "../../assets/icons/actions";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
-import "../../styles/pages/paymentlinks/deposittoaddres.scss";
+import "../../styles/pages/deposit/deposittoaddres.scss";
 
 export default function DepositToAddress(): JSX.Element {
   const navigate = useNavigate();
   const { showsuccesssnack } = useSnackbar();
 
-  const [depositAsset, setDepositAsset] = useState<assetType>("BTC");
+  const [depositAsset, setDepositAsset] =
+    useState<Exclude<assetType, "HKD" | "USD" | "HKDA">>("BTC");
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   let btcaddress = localStorage.getItem("btcaddress") as string;

@@ -4,51 +4,58 @@
 #rewards {
   padding: 1rem;
 
-  .balances {
-    @include mixins.useFlex(row, nowrap, center, space-around, 0);
-    margin-top: 2.5rem;
+  .locked_balances {
+    margin-top: 3rem;
     padding-bottom: 0.375rem;
     border-bottom: 1px solid colors.$divider;
 
-    div {
-      @include mixins.useFlex(column, nowrap, center, center, 0.5rem);
+    .icon_ctr {
+      @include mixins.useFlex(row, nowrap, center, space-around, 0);
       width: 100%;
 
       .icon {
-        @include mixins.useFlex(column, nowrap, center, center, 0);
-        width: 4rem;
-        height: 4rem;
-        border-radius: 50%;
+        @include mixins.useFlex(row, nowrap, center, space-around, 0);
+        width: 4.875rem;
+        height: 4.875rem;
+        border-radius: 1.25rem;
         background-color: colors.$divider;
+
+        img {
+          width: 70%;
+          height: 70%;
+        }
       }
+    }
+
+    .locked_amount {
+      margin-top: 0.875rem;
 
       p {
-        @include mixins.useFlex(column, nowrap, flex-start, flex-start, 0.5rem);
-        width: 100%;
+        @include mixins.useFlex(row, nowrap, center, flex-start, 0.375rem);
         font-size: 1.25rem;
         font-weight: 300;
+      }
 
-        span {
-          @include mixins.useFlex(row, nowrap, center, center, 0.25rem);
-          @include mixins.useAltFont();
-          font-weight: 600;
-          color: colors.$textsecondary;
+      span {
+        @include mixins.useFlex(row, nowrap, center, flex-start, 0.25rem);
+        @include mixins.useAltFont();
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: colors.$textsecondary;
 
-          img {
-            width: 1.25rem;
-            height: 1.25rem;
-            border-radius: 50%;
-          }
+        img {
+          width: 1.25rem;
+          height: 1.25rem;
+          border-radius: 50%;
         }
       }
     }
   }
 
   .tasks {
-    margin-top: 1rem;
+    margin-top: 0.375rem;
 
     .tasks_title {
-      margin-top: 1rem;
       font-size: small;
       font-weight: bold;
       color: colors.$textsecondary;
@@ -111,11 +118,11 @@
     }
 
     .available {
+      @include mixins.useAltFont();
       font-size: 0.875rem;
       font-weight: bold;
 
       span {
-        @include mixins.useAltFont();
         font-weight: inherit;
       }
     }
