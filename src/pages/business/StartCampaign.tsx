@@ -7,9 +7,10 @@ import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDialog } from "../../hooks/dialog";
 import { useAppDrawer } from "../../hooks/drawer";
 import { createAirdropCampaign } from "../../utils/api/airdrop";
-import airdrop from "../../assets/images/icons/campaing.png";
+import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
 import { NFT } from "../../assets/icons/actions";
+import airdrop from "../../assets/images/icons/campaing.png";
 import "../../styles/pages/business/startcampaign.scss";
 
 export default function StartCampaign(): JSX.Element {
@@ -187,15 +188,30 @@ export default function StartCampaign(): JSX.Element {
         />
       </div>
 
-      <button disabled={isPending} onClick={onSubmitAirdrop} className="submit">
-        Create Camapign&nbsp;
-        <NFT
-          width={10}
-          height={17}
-          color={isPending ? colors.textsecondary : colors.textprimary}
-        />
-        &nbsp;
-      </button>
+      <SubmitButton
+        text="Create Campaign"
+        icon={
+          <NFT
+            width={10}
+            height={17}
+            color={
+              campaignName == "" ||
+              maxSupply == "" ||
+              qtyPerUser == "" ||
+              isPending ||
+              isPending
+                ? colors.textsecondary
+                : colors.textprimary
+            }
+          />
+        }
+        isDisabled={
+          campaignName == "" || maxSupply == "" || qtyPerUser == "" || isPending
+        }
+        isLoading={isPending}
+        sxstyles={{ marginTop: "2rem" }}
+        onclick={onSubmitAirdrop}
+      />
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useTabs } from "../../hooks/tabs";
 import { formatUsd, formatNumber } from "../../utils/formatters";
-import { Copy, Receive } from "../../assets/icons/actions";
+import { Copy, Send } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import usdclogo from "../../assets/images/labs/mantralogo.jpeg";
 import "../../styles/pages/assets/assets.scss";
@@ -47,14 +47,17 @@ export default function OmAsset(): JSX.Element {
       </div>
 
       <div className="actions">
-        <p>Receive & buy OM</p>
+        <p>Send & buy OM</p>
 
         <span className="divider" />
 
         <div className="buttons">
-          <button className="receive" onClick={onCopyAddr}>
-            Receive
-            <Receive width={18} height={18} color={colors.textprimary} />
+          <button
+            className="receive"
+            onClick={() => navigate("/send-crypto/OM/send")}
+          >
+            Send
+            <Send width={18} height={18} color={colors.textprimary} />
           </button>
 
           <button className="send" onClick={() => navigate("/get-om")}>

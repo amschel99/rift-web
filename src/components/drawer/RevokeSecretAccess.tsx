@@ -1,7 +1,8 @@
 import { JSX } from "react";
 import { useAppDrawer } from "../../hooks/drawer";
-import "../../styles/components/drawer/revokesecret.scss";
 import { useSnackbar } from "../../hooks/snackbar";
+import { SubmitButton } from "../global/Buttons";
+import "../../styles/components/drawer/revokesecret.scss";
 
 export const RevokeSecretAccess = (): JSX.Element => {
   const { showsuccesssnack } = useSnackbar();
@@ -19,7 +20,12 @@ export const RevokeSecretAccess = (): JSX.Element => {
         Are you sure you want to revoke access to your POE key ?
         <span>The receipient will not be able to use it again !</span>
       </p>
-      <button onClick={onRevoke}>Yes, Revoke Access</button>
+
+      <SubmitButton
+        text="Yes, Revoke Access"
+        sxstyles={{ padding: "0.625rem" }}
+        onclick={onRevoke}
+      />
     </div>
   );
 };

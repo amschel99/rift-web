@@ -2,6 +2,7 @@ import { JSX, useState } from "react";
 import { TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
+import { SubmitButton } from "../global/Buttons";
 import { Wallet } from "../../assets/icons/security";
 import { colors } from "../../constants";
 import "../../styles/components/drawer/transactionlimit.scss";
@@ -66,10 +67,12 @@ export const TransactionLimit = (): JSX.Element => {
         }}
       />
 
-      <button className="submitlimit" onClick={onSubmit}>
-        Save Limit
-        <Wallet width={20} height={18} color={colors.textprimary} />
-      </button>
+      <SubmitButton
+        text="Save Limit"
+        icon={<Wallet width={20} height={18} color={colors.textprimary} />}
+        sxstyles={{ gap: "0.5rem", marginTop: "1rem" }}
+        onclick={onSubmit}
+      />
     </div>
   );
 };

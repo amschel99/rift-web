@@ -4,8 +4,8 @@ import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
 import { TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { importKey } from "../../utils/api/keys";
+import { SubmitButton } from "../global/Buttons";
 import { colors } from "../../constants";
-import { Loading } from "../../assets/animations";
 import { Add } from "../../assets/icons/actions";
 import secrets from "../../assets/images/secrets.png";
 import openai from "../../assets/images/openai-alt.png";
@@ -132,24 +132,23 @@ export const ImportSecret = (): JSX.Element => {
         </div>
       </div>
 
-      <button disabled={importedKey == "" || processing} onClick={onImportKey}>
-        {processing ? (
-          <Loading width="1.5rem" height="1.5rem" />
-        ) : (
-          <>
-            Import Secret
-            <Add
-              width={16}
-              height={16}
-              color={
-                importedKey == "" || processing
-                  ? colors.textsecondary
-                  : colors.textprimary
-              }
-            />
-          </>
-        )}
-      </button>
+      <SubmitButton
+        text="Import Secret"
+        icon={
+          <Add
+            width={16}
+            height={16}
+            color={
+              importedKey == "" || processing
+                ? colors.textsecondary
+                : colors.textprimary
+            }
+          />
+        }
+        isDisabled={importedKey == "" || processing}
+        isLoading={processing}
+        onclick={onImportKey}
+      />
     </div>
   );
 };

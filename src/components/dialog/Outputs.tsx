@@ -1,6 +1,7 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
 import { useAppDialog } from "../../hooks/dialog";
+import { SubmitButton } from "../global/Buttons";
 import { Loading, Success, Error } from "../../assets/animations";
 import "../../styles/components/dialog.scss";
 
@@ -33,7 +34,8 @@ export const ErrorOutput = (): JSX.Element => {
     <div className="outputs errroutput">
       <Error width="6rem" height="6rem" />
       <p>{dialogMessage}</p>
-      <button onClick={() => closeAppDialog()}>Ok, Close</button>
+
+      <SubmitButton text="Ok, Close" onclick={closeAppDialog} />
     </div>
   );
 };

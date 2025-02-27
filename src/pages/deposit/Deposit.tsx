@@ -4,6 +4,8 @@ import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { colors } from "../../constants";
 import "../../styles/pages/deposit/deposit.scss";
+import { SubmitButton } from "../../components/global/Buttons";
+import { Send } from "../../assets/icons/actions";
 
 export default function Deposit(): JSX.Element {
   const navigate = useNavigate();
@@ -102,9 +104,18 @@ export default function Deposit(): JSX.Element {
         </div>
       </div>
 
-      <button className="deposit_btn" onClick={onDeposit}>
-        Deposit Now
-      </button>
+      <SubmitButton
+        text="Deposit Now"
+        icon={<Send width={16} height={16} color={colors.textprimary} />}
+        sxstyles={{
+          width: "unset",
+          position: "fixed",
+          bottom: "1rem",
+          left: "1rem",
+          right: "1rem",
+        }}
+        onclick={onDeposit}
+      />
     </section>
   );
 }

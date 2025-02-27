@@ -3,7 +3,7 @@
 
 #labstab {
   margin-bottom: 4.25rem;
-  padding: 1rem;
+  padding: 1rem 0.5rem;
 
   .projects {
     @include mixins.useFlex(row, wrap, center, space-between, 0.375rem);

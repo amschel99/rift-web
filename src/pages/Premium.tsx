@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useBackButton } from "../hooks/backbutton";
 import { useTabs } from "../hooks/tabs";
 import { formatUsd } from "../utils/formatters";
+import { SubmitButton } from "../components/global/Buttons";
 import { colors } from "../constants";
 import { Premium as PremiumAnimation } from "../assets/animations";
 import { CheckAlt, QuickActions } from "../assets/icons/actions";
@@ -100,10 +101,22 @@ export default function Premium(): JSX.Element {
         />
       </div>
 
-      <button className="onsubscribe" onClick={onSubscribe}>
-        Get Sphere Premium
-        <QuickActions width={12} height={12} color={colors.textprimary} />
-      </button>
+      <SubmitButton
+        text="Get Sphere Premium"
+        icon={
+          <QuickActions width={12} height={12} color={colors.textprimary} />
+        }
+        sxstyles={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          gap: "0.5rem",
+          height: "2.65rem",
+          borderRadius: 0,
+        }}
+        onclick={onSubscribe}
+      />
     </section>
   );
 }

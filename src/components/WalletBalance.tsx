@@ -8,6 +8,7 @@ import { walletBalance, mantraBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { getMantraUsdVal } from "../utils/api/mantra";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
+import { SubmitButton } from "./global/Buttons";
 import { Add } from "../assets/icons/actions";
 import { colors } from "../constants";
 import btclogo from "../assets/images/btc.png";
@@ -111,10 +112,12 @@ export const WalletBalance = (): JSX.Element => {
           )}
         </p>
 
-        <button className="addfunds" onClick={() => navigate("/deposit")}>
-          Add funds
-          <Add width={14} height={14} color={colors.textprimary} />
-        </button>
+        <SubmitButton
+          text="Deposit"
+          icon={<Add width={14} height={14} color={colors.textprimary} />}
+          sxstyles={{ width: "fit-content", padding: "0.375rem 2.5rem" }}
+          onclick={() => navigate("/deposit")}
+        />
       </div>
 
       {btcethLoading ||

@@ -1,14 +1,14 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
 import { stakeproducttype, yieldtokentype } from "../types/earn";
-import { formatUsd } from "../utils/formatters";
+import { useBackButton } from "../hooks/backbutton";
 import { useTabs } from "../hooks/tabs";
+import { formatUsd } from "../utils/formatters";
 import dollar from "../assets/icons/dollar.svg";
 import { Lock } from "../assets/icons/actions";
 import { colors } from "../constants";
 import friendsduel from "../assets/images/labs/friendsduel.png";
 import "../styles/pages/staking.scss";
-import { useBackButton } from "../hooks/backbutton";
 
 export default function Staking(): JSX.Element {
   const navigate = useNavigate();
@@ -120,14 +120,14 @@ const products: stakeproducttype[] = [
     apy: "Fixed (11%)",
     currentTvl: "$22,698,886.84",
     maxCapacity: "$26,000,000",
-    network: "Polygon",
+    network: "Mantra",
   },
   {
     name: "Junior",
-    apy: "Variable (7%)",
+    apy: "Variable (15%)",
     currentTvl: "$22,698,886.84",
     maxCapacity: "$26,000,000",
-    network: "Polygon",
+    network: "Mantra",
   },
 ];
 

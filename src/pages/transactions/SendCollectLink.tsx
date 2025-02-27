@@ -13,6 +13,7 @@ import { Loading } from "../../assets/animations";
 import { ChevronLeft, Telegram } from "../../assets/icons/actions";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import "../../styles/pages/sendcollectlink.scss";
 
@@ -31,6 +32,9 @@ export default function SendCollectLink(): JSX.Element {
   let localUSDCBal = "0";
   let localUsdcUsdBal = "0";
   let localUsdcValue = "0.99";
+  let localMantraBal = localStorage.getItem("mantrabal");
+  let localMantraUsdBal = localStorage.getItem("mantrabalusd");
+  let localMantraValue = localStorage.getItem("mantrausdval");
 
   const [depositAsset, setDepositAsset] = useState<string>(
     srccurrency as string
@@ -69,7 +73,9 @@ export default function SendCollectLink(): JSX.Element {
       accessAmnt !== "" &&
       Number(accessAmnt) >=
         Number(
-          depositAsset == "BTC"
+          depositAsset == "OM"
+            ? localMantraUsdBal
+            : depositAsset == "BTC"
             ? localBtcUsdBal
             : depositAsset == "ETH"
             ? localethUsdBal
@@ -130,7 +136,9 @@ export default function SendCollectLink(): JSX.Element {
         <div className="img_desc">
           <img
             src={
-              depositAsset == "BTC"
+              depositAsset == "OM"
+                ? mantralogo
+                : depositAsset == "BTC"
                 ? btclogo
                 : depositAsset == "ETH"
                 ? ethlogo
@@ -142,7 +150,9 @@ export default function SendCollectLink(): JSX.Element {
           <p className="desc">
             {depositAsset}
             <span>
-              {depositAsset == "BTC"
+              {depositAsset == "OM"
+                ? "Mantra"
+                : depositAsset == "BTC"
                 ? "Bitcoin"
                 : depositAsset == "ETH"
                 ? "Ethereum"
@@ -157,6 +167,20 @@ export default function SendCollectLink(): JSX.Element {
       </div>
       <PopOver anchorEl={anchorEl} setAnchorEl={setAnchorEl}>
         <div className="select_assets">
+          <div
+            className="img_desc"
+            onClick={() => {
+              setDepositAsset("OM");
+              setAnchorEl(null);
+            }}
+          >
+            <img src={mantralogo} alt="asset" />
+
+            <p className="desc">
+              OM <br /> <span>Mantra</span>
+            </p>
+          </div>
+
           <div
             className="img_desc"
             onClick={() => {
@@ -206,7 +230,9 @@ export default function SendCollectLink(): JSX.Element {
       <p className="usd_balance ethereum_balance">
         <span className="my_bal">Balance</span> <br />
         {Number(
-          depositAsset == "BTC"
+          depositAsset == "OM"
+            ? localMantraBal
+            : depositAsset == "BTC"
             ? localBtcBal
             : depositAsset == "ETH"
             ? localethBal
@@ -255,7 +281,9 @@ export default function SendCollectLink(): JSX.Element {
         value={ethQty == "" ? "" : accessAmnt}
         onChange={(ev) => {
           const assetUsdValue =
-            depositAsset == "BTC"
+            depositAsset == "OM"
+              ? localMantraValue
+              : depositAsset == "BTC"
               ? localBtcValue
               : depositAsset == "ETH"
               ? localethValue

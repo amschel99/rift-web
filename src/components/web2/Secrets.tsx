@@ -26,7 +26,7 @@ export const Secrets = ({ mykeys }: props): JSX.Element => {
     (_scret: { type: string; expired: any }) =>
       _scret.type == "foreign" && !_scret?.expired
   );
-  const claimedgpt = localStorage.getItem("claimedgpt");
+  const claimedfreegpt = localStorage.getItem("claimedfreegpt");
 
   const onClaimGptAccess = async () => {
     openAppDialog("loading", "Claiming your free GPT4 access, please wait...");
@@ -47,7 +47,7 @@ export const Secrets = ({ mykeys }: props): JSX.Element => {
     );
 
     if (isOk) {
-      localStorage.setItem("claimedgpt", "true");
+      localStorage.setItem("claimedfreegpt", "true");
       showsuccesssnack("Successfully claimed your free GPT4 Access");
       queryclient.invalidateQueries({ queryKey: ["secrets"] });
       closeAppDialog();
@@ -60,7 +60,7 @@ export const Secrets = ({ mykeys }: props): JSX.Element => {
     <div id="secrets_container">
       <p className="title">Web2 Assets</p>
 
-      {claimedgpt == null && (
+      {claimedfreegpt == null && (
         <div onClick={onClaimGptAccess} className="claim-gpt">
           <span>Claim your free GPT-4o Key</span>
           <img src={claimgpt} alt="gpt" />

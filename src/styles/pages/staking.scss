@@ -6,9 +6,9 @@
 
   .stakeproduct {
     margin-bottom: 0.75rem;
-    padding-top: 0.375rem;
-    border: 2px solid colors.$accent;
-    border-radius: 0.375rem;
+    padding: 0.375rem;
+    border: 1px solid colors.$accent;
+    border-radius: 0.5rem;
 
     .subject_title {
       font-size: 0.75rem;
@@ -46,7 +46,6 @@
 
     .value {
       @include mixins.useFlex(row, nowrap, center, space-between, 0);
-      margin: 0 0.5rem;
       margin-top: 0.375rem;
       border-top: 1px solid colors.$divider;
       padding: 0.5rem 0;
@@ -72,7 +71,6 @@
 
     .network {
       @include mixins.useFlex(row, nowrap, center, space-between, 0);
-      margin: 0 0.5rem;
       padding: 0.5rem 0;
       border-top: 1px solid colors.$divider;
       font-size: 0.875rem;
@@ -91,16 +89,16 @@
       @include mixins.useBaseFont();
       width: 100%;
       padding: 0.5rem;
-      border-radius: 0 0 0.25rem 0.25rem;
-      background-color: colors.$accent;
-      color: colors.$textprimary;
-      font-size: 0.75rem;
-      font-weight: bold;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: colors.$primary;
+      background-image: colors.$omgradient;
     }
   }
 
   .section_title {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     font-size: 1.125rem;
   }
 
@@ -114,12 +112,12 @@
       width: 80vw;
       height: 9rem;
       flex: 0 0 auto;
+      padding: 0.375rem;
       border: 1px solid colors.$divider;
-      border-radius: 0.375rem;
+      border-radius: 0.5rem;
 
       .stakedetails {
         @include mixins.useFlex(row, nowrap, flex-start, flex-start, 0.5rem);
-        padding: 0.5rem;
 
         img {
           width: 2.75rem;
@@ -174,9 +172,9 @@
         @include mixins.useButton();
         width: 100%;
         padding: 0.5rem;
-        border-radius: 0 0 0.25rem 0.25rem;
+        border-radius: 0.25rem;
         font-size: 0.875rem;
-        font-weight: bold;
+        font-weight: 500;
         color: colors.$textprimary;
         background-color: colors.$divider;
       }

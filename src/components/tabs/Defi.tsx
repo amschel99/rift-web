@@ -27,7 +27,7 @@ export const DefiTab = (): JSX.Element => {
 
   return (
     <section id="defitab">
-      <Coins coinsLoading={isLoading} coinsdata={data as coinType[]} />
+      <Coins coinsLoading={isLoading} coinsdata={(data as coinType[]) || []} />
     </section>
   );
 };

@@ -3,9 +3,12 @@ import { useNavigate } from "react-router";
 import { assetType } from "../../pages/lend/CreateLendAsset";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
+import { SubmitButton } from "../global/Buttons";
 import { colors } from "../../constants";
+import { Send } from "../../assets/icons/actions";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import sendtoaddress from "../../assets/images/obhehalfspend.png";
 import sendtolink from "../../assets/images/sharewallet.png";
@@ -17,7 +20,7 @@ export const SendCryptoTab = (): JSX.Element => {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
 
-  const [selectCurrency, setSelectCurrency] = useState<sendcryptotype>("BTC");
+  const [selectCurrency, setSelectCurrency] = useState<sendcryptotype>("OM");
   const [sendOPtion, setSendOPtion] = useState<"link" | "address">("address");
 
   const goBack = () => {
@@ -40,11 +43,14 @@ export const SendCryptoTab = (): JSX.Element => {
         Send Crypto
         <span>Send crypto instantly to another address or via Telegram</span>
       </p>
+
       <SendCryptoPicker
         selectCrypto={selectCurrency}
         setSelectCrypto={setSelectCurrency}
       />
+
       <p className="description">Choose the crypto to send</p>
+
       <p className="options_title">
         How would you like to send <span>{selectCurrency}</span> ?
       </p>
@@ -73,9 +79,19 @@ export const SendCryptoTab = (): JSX.Element => {
         <img src={sendtolink} alt="send claim link" />
       </div>
 
-      <button className="send_now" onClick={onSend}>
-        Send {selectCurrency}
-      </button>
+      <SubmitButton
+        text={`Send ${selectCurrency}`}
+        icon={<Send width={16} height={16} color={colors.textprimary} />}
+        sxstyles={{
+          width: "unset",
+          position: "absolute",
+          bottom: "4rem",
+          left: "1rem",
+          right: "1rem",
+          fontWeight: "bold",
+        }}
+        onclick={onSend}
+      />
     </section>
   );
 };
@@ -92,6 +108,28 @@ const SendCryptoPicker = ({
   return (
     <div className="select_currency_ctr">
       <div className="select_currency">
+        <div
+          className="currency_img_desc"
+          onClick={() => setSelectCrypto("OM")}
+        >
+          <div className="flag_balance">
+            <img src={mantralogo} alt="asset" />
+
+            <p className="desc">
+              OM <br /> <span>Mantra</span>
+            </p>
+          </div>
+
+          <div className="radioctr">
+            <div
+              style={{
+                backgroundColor:
+                  selectCrypto == "OM" ? colors.textprimary : colors.primary,
+              }}
+            ></div>
+          </div>
+        </div>
+
         <div
           className="currency_img_desc"
           onClick={() => setSelectCrypto("BTC")}
@@ -144,7 +182,7 @@ const SendCryptoPicker = ({
             <img src={usdclogo} alt="asset" />
 
             <p className="desc">
-              USDC <br /> <span>USDC Coin</span>
+              USDC <br /> <span>USD Coin</span>
             </p>
           </div>
 

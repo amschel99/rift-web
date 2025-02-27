@@ -9,6 +9,7 @@ import { colors } from "../../constants";
 import { ChevronLeft, Copy } from "../../assets/icons/actions";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import "../../styles/pages/deposit/deposittoaddres.scss";
 
@@ -17,7 +18,7 @@ export default function DepositToAddress(): JSX.Element {
   const { showsuccesssnack } = useSnackbar();
 
   const [depositAsset, setDepositAsset] =
-    useState<Exclude<assetType, "HKD" | "USD" | "HKDA">>("BTC");
+    useState<Exclude<assetType, "HKD" | "USD" | "HKDA">>("OM");
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   let btcaddress = localStorage.getItem("btcaddress") as string;
@@ -58,7 +59,9 @@ export default function DepositToAddress(): JSX.Element {
         <div className="img_desc">
           <img
             src={
-              depositAsset == "BTC"
+              depositAsset == "OM"
+                ? mantralogo
+                : depositAsset == "BTC"
                 ? btclogo
                 : depositAsset == "ETH"
                 ? ethlogo
@@ -70,7 +73,9 @@ export default function DepositToAddress(): JSX.Element {
           <p className="desc">
             {depositAsset} <br />
             <span>
-              {depositAsset == "BTC"
+              {depositAsset == "OM"
+                ? "Mantra"
+                : depositAsset == "BTC"
                 ? "Bitcoin"
                 : depositAsset == "ETH"
                 ? "Ethereum"
@@ -84,55 +89,63 @@ export default function DepositToAddress(): JSX.Element {
         </span>
       </div>
       <PopOver anchorEl={anchorEl} setAnchorEl={setAnchorEl}>
-        {
-          <div className="select_assets">
-            <div
-              className="img_desc"
-              onClick={() => {
-                setDepositAsset("BTC");
-                setAnchorEl(null);
-              }}
-            >
-              <img src={btclogo} alt="asset" />
+        <div className="select_assets">
+          <div
+            className="img_desc"
+            onClick={() => {
+              setDepositAsset("OM");
+              setAnchorEl(null);
+            }}
+          >
+            <img src={mantralogo} alt="asset" />
 
-              <p className="desc">
-                BTC <br /> <span>Bitcoin</span>
-              </p>
-            </div>
-
-            <div
-              className="img_desc"
-              onClick={() => {
-                setDepositAsset("ETH");
-                setAnchorEl(null);
-              }}
-            >
-              <img src={ethlogo} alt="asset" />
-
-              <p className="desc">
-                ETH <br /> <span>Ethereum</span>
-              </p>
-            </div>
-
-            <div
-              className="img_desc"
-              onClick={() => {
-                setDepositAsset("USDC");
-                setAnchorEl(null);
-              }}
-            >
-              <img src={usdclogo} alt="asset" />
-
-              <p className="desc">
-                USDC <br /> <span>USD Coin</span>
-              </p>
-            </div>
-
-            <p className="asset_tle">
-              Select an asset you would like to deposit
+            <p className="desc">
+              OM <br /> <span>Mantra</span>
             </p>
           </div>
-        }
+
+          <div
+            className="img_desc"
+            onClick={() => {
+              setDepositAsset("BTC");
+              setAnchorEl(null);
+            }}
+          >
+            <img src={btclogo} alt="asset" />
+
+            <p className="desc">
+              BTC <br /> <span>Bitcoin</span>
+            </p>
+          </div>
+
+          <div
+            className="img_desc"
+            onClick={() => {
+              setDepositAsset("ETH");
+              setAnchorEl(null);
+            }}
+          >
+            <img src={ethlogo} alt="asset" />
+
+            <p className="desc">
+              ETH <br /> <span>Ethereum</span>
+            </p>
+          </div>
+
+          <div
+            className="img_desc"
+            onClick={() => {
+              setDepositAsset("USDC");
+              setAnchorEl(null);
+            }}
+          >
+            <img src={usdclogo} alt="asset" />
+
+            <p className="desc">
+              USDC <br /> <span>USD Coin</span>
+            </p>
+          </div>
+        </div>
       </PopOver>
 
       <p className="asset_title">Deposit Address</p>

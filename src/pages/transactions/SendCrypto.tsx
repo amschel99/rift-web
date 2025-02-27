@@ -14,6 +14,7 @@ import { Send, Info, ChevronLeft } from "../../assets/icons/actions";
 import { Loading } from "../../assets/animations";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import "../../styles/pages/sendcrypto.scss";
 
@@ -25,7 +26,9 @@ export default function SendCrypto(): JSX.Element {
   const { closeAppDrawer } = useAppDrawer();
 
   const goBack = () => {
-    srccurrency == "BTC"
+    srccurrency == "OM"
+      ? navigate("/om-asset")
+      : srccurrency == "BTC"
       ? navigate("/btc-asset")
       : srccurrency == "ETH"
       ? navigate("/eth-asset/send")
@@ -44,8 +47,12 @@ export default function SendCrypto(): JSX.Element {
   let btcbalance = localStorage.getItem("btcbal");
   let ethbalance = localStorage.getItem("ethbal");
   let usdcbalance = "0";
+  let mantrabalance = localStorage.getItem("mantrabal");
+
   let availableBalance =
-    depositAsset == "BTC"
+    depositAsset == "OM"
+      ? mantrabalance
+      : depositAsset == "BTC"
       ? btcbalance
       : depositAsset == "ETH"
       ? ethbalance
@@ -113,6 +120,11 @@ export default function SendCrypto(): JSX.Element {
       showerrorsnack("Send USDC coming soon...");
       return;
     }
+
+    if (depositAsset == "OM") {
+      showerrorsnack("Send OM coming soon...");
+      return;
+    }
   };
 
   const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
@@ -158,7 +170,9 @@ export default function SendCrypto(): JSX.Element {
         <div className="img_desc">
           <img
             src={
-              depositAsset == "BTC"
+              depositAsset == "OM"
+                ? mantralogo
+                : depositAsset == "BTC"
                 ? btclogo
                 : depositAsset == "ETH"
                 ? ethlogo
@@ -170,7 +184,9 @@ export default function SendCrypto(): JSX.Element {
           <p className="desc">
             {depositAsset}
             <span>
-              {depositAsset == "BTC"
+              {depositAsset == "OM"
+                ? "Mantra"
+                : depositAsset == "BTC"
                 ? "Bitcoin"
                 : depositAsset == "ETH"
                 ? "Ethereum"
@@ -185,6 +201,20 @@ export default function SendCrypto(): JSX.Element {
       </div>
       <PopOver anchorEl={anchorEl} setAnchorEl={setAnchorEl}>
         <div className="select_assets">
+          <div
+            className="img_desc"
+            onClick={() => {
+              setDepositAsset("OM");
+              setAnchorEl(null);
+            }}
+          >
+            <img src={mantralogo} alt="asset" />
+
+            <p className="desc">
+              OM <br /> <span>Mantra</span>
+            </p>
+          </div>
+
           <div
             className="img_desc"
             onClick={() => {
@@ -226,8 +256,6 @@ export default function SendCrypto(): JSX.Element {
               USDC <br /> <span>USD Coin</span>
             </p>
           </div>
-
-          <p className="asset_tle">Choose the crypto you would like to send</p>
         </div>
       </PopOver>
 

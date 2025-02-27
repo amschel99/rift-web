@@ -24,14 +24,15 @@
       @include mixins.useBaseFont();
       width: 48%;
       padding: 0.375rem;
-      border-radius: 0.25rem;
+      border-radius: 1rem;
       font-size: 0.75rem;
-      font-weight: 500;
+      font-weight: bold;
       color: colors.$textprimary;
     }
 
     ._select_target {
-      background-color: colors.$accent;
+      color: colors.$primary;
+      background-color: colors.$textprimary;
     }
   }
 
@@ -50,11 +51,9 @@
       height: 3.75rem;
       margin-top: 0.75rem;
       padding: 0.5rem;
+      border: 1px solid colors.$divider;
       border-radius: 0.375rem;
       background-color: colors.$divider;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: right;
 
       .radioctr {
         @include mixins.useFlex(row, nowrap, center, center, 0);
@@ -85,20 +84,5 @@
         }
       }
     }
-  }
-
-  .deposit_btn {
-    @include mixins.useButton();
-    @include mixins.useBaseFont();
-    position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: colors.$textprimary;
-    background-color: colors.$accent;
   }
 }
