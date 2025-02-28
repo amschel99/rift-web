@@ -51,23 +51,9 @@
     right: 1rem;
     left: 1rem;
     height: 2.875rem;
+    padding: 0.5rem 0.25rem;
     border-radius: 0.375rem;
     background-color: colors.$accent;
-
-    .divider {
-      width: 1px;
-      height: 60%;
-      background-color: colors.$textsecondary;
-    }
-
-    .newlend {
-      @include mixins.useFlex(row, nowrap, center, center, 0.5rem);
-      @include mixins.useButton();
-      width: 48%;
-      height: 100%;
-      color: colors.$textprimary;
-      z-index: 1000;
-    }
   }
 
   #assets {

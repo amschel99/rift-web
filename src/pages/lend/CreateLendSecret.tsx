@@ -169,9 +169,10 @@ export default function CreateLendSecret(): JSX.Element {
               </p>
             </div>
             {/* other secrets/keys */}
-            {mysecrets?.map((_key) => (
+            {mysecrets?.map((_key, index) => (
               <div
                 className="img_desc"
+                key={_key?.type + index}
                 onClick={() => {
                   setSelSecretType(
                     _key?.purpose == "OPENAI" ? "POE" : _key?.purpose
