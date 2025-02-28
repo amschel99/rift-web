@@ -14,6 +14,7 @@ type inputProps = {
   inputlabalel: string;
   inputState: string;
   setInputState: Dispatch<SetStateAction<string>>;
+  onkeyup?: () => void;
   hasError?: boolean;
   isDisabled?: boolean;
   sxstyles?: CSSProperties;
@@ -25,6 +26,7 @@ export const OutlinedTextInput = ({
   inputlabalel,
   inputState,
   setInputState,
+  onkeyup,
   hasError,
   isDisabled,
   sxstyles,
@@ -41,6 +43,7 @@ export const OutlinedTextInput = ({
       variant="outlined"
       autoComplete="off"
       type={inputType}
+      onKeyUp={onkeyup}
       sx={{
         marginTop: "1.5rem",
         "& .MuiOutlinedInput-root": {

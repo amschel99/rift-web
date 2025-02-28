@@ -1,7 +1,7 @@
 import { JSX, MouseEvent, useState } from "react";
 import { openTelegramLink, useLaunchParams } from "@telegram-apps/sdk-react";
 import { useNavigate, useParams } from "react-router";
-import { Checkbox, Slider, TextField } from "@mui/material";
+import { Checkbox, Slider } from "@mui/material";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { shareWalletAccess } from "../../utils/api/wallet";
@@ -9,6 +9,7 @@ import { colors } from "../../constants";
 import { PopOver } from "../../components/global/PopOver";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import sharewallet from "../../assets/images/sharewallet.png";
 import { formatUsd } from "../../utils/formatters";
 import { ChevronLeft, Telegram } from "../../assets/icons/actions";
@@ -46,6 +47,15 @@ export default function SendCollectLink(): JSX.Element {
   const [time, setTime] = useState<number>(30);
   const [processing, setProcessing] = useState<boolean>(false);
   const [noExpiry, setNoExpiry] = useState<boolean>(false);
+
+  const assetUsdValue =
+    depositAsset == "OM"
+      ? localMantraValue
+      : depositAsset == "BTC"
+      ? localBtcValue
+      : depositAsset == "ETH"
+      ? localethValue
+      : localUsdcValue;
 
   const marks = [
     { value: 30, label: "30" },
@@ -242,92 +252,30 @@ export default function SendCollectLink(): JSX.Element {
         {depositAsset}
       </p>
 
-      <TextField
-        value={accessAmnt == "" ? "" : ethQty}
-        onChange={(ev) => {
-          const assetUsdValue =
-            depositAsset == "OM"
-              ? localMantraValue
-              : depositAsset == "BTC"
-              ? localBtcValue
-              : depositAsset == "ETH"
-              ? localethValue
-              : localUsdcValue;
-          setEthQty(ev.target.value);
-          setAccessAmnt(
-            (Number(ev.target.value) * Number(assetUsdValue)).toFixed(2)
-          );
-        }}
-        onKeyUp={() => errorInUSDVal()}
-        error={errorInUSDVal()}
-        label={`Quantity (${depositAsset})`}
+      <OutlinedTextInput
+        inputType="number"
         placeholder="0.05"
-        fullWidth
-        variant="standard"
-        autoComplete="off"
-        type="number"
-        sx={{
-          marginTop: "0.375rem",
-          "& .MuiInputBase-input": {
-            color: colors.textprimary,
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-          },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: colors.accent,
-          },
+        inputlabalel={`Quantity (${depositAsset})`}
+        inputState={accessAmnt == "" ? "" : ethQty}
+        setInputState={setEthQty}
+        onkeyup={() => {
+          setAccessAmnt((Number(ethQty) * Number(assetUsdValue)).toFixed(2));
         }}
+        hasError={errorInUSDVal()}
+        sxstyles={{ marginTop: "0.875rem" }}
       />
 
-      <TextField
-        value={ethQty == "" ? "" : accessAmnt}
-        onChange={(ev) => {
-          const assetUsdValue =
-            depositAsset == "OM"
-              ? localMantraValue
-              : depositAsset == "BTC"
-              ? localBtcValue
-              : depositAsset == "ETH"
-              ? localethValue
-              : localUsdcValue;
-          setAccessAmnt(ev.target.value);
-          setEthQty(
-            (Number(ev.target.value) / Number(assetUsdValue)).toFixed(5)
-          );
+      <OutlinedTextInput
+        inputType="number"
+        placeholder="100"
+        inputlabalel="Amount (USD)"
+        inputState={ethQty == "" ? "" : accessAmnt}
+        setInputState={setAccessAmnt}
+        onkeyup={() => {
+          setEthQty((Number(accessAmnt) / Number(assetUsdValue)).toFixed(5));
         }}
-        onKeyUp={() => errorInUSDVal()}
-        error={errorInUSDVal()}
-        label="Amount (USD)"
-        placeholder="1.0"
-        fullWidth
-        variant="standard"
-        autoComplete="off"
-        type="number"
-        sx={{
-          marginTop: "0.875rem",
-          "& .MuiInputBase-input": {
-            color: colors.textprimary,
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-          },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: colors.textsecondary,
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: colors.accent,
-          },
-        }}
+        hasError={errorInUSDVal()}
+        sxstyles={{ marginTop: "0.875rem" }}
       />
 
       <p className="usd_balance">
