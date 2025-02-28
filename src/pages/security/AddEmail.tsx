@@ -1,10 +1,10 @@
 import { JSX, useState } from "react";
 import { useNavigate } from "react-router";
-import { TextField } from "@mui/material";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { SubmitButton } from "../../components/global/Buttons";
 import { DigitsInput } from "../../components/security/DigitsInput";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import { colors } from "../../constants";
 import { Email } from "../../assets/icons/security";
 import emailaddr from "../../assets/images/icons/email.png";
@@ -84,37 +84,12 @@ export default function AddEmail(): JSX.Element {
             message="Verify your email with the OTP we sent you"
           />
         ) : (
-          <TextField
-            value={userEmail}
-            onChange={(ev) => setUserEmail(ev.target.value)}
-            label="Email Address"
+          <OutlinedTextInput
+            inputType="email"
             placeholder="your-email@domain.com"
-            fullWidth
-            variant="outlined"
-            type="email"
-            autoComplete="off"
-            sx={{
-              marginTop: "1.5rem",
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: colors.divider,
-                },
-                "& input": {
-                  color: colors.textprimary,
-                },
-                "&::placeholder": {
-                  color: colors.textsecondary,
-                  opacity: 1,
-                },
-              },
-              "& .MuiInputLabel-root": {
-                color: colors.textsecondary,
-                fontSize: "0.875rem",
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: colors.accent,
-              },
-            }}
+            inputlabalel="Email Address"
+            inputState={userEmail}
+            setInputState={setUserEmail}
           />
         )}
 

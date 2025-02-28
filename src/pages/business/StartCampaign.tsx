@@ -1,5 +1,4 @@
 import { JSX, useState } from "react";
-import { TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
@@ -7,6 +6,7 @@ import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDialog } from "../../hooks/dialog";
 import { useAppDrawer } from "../../hooks/drawer";
 import { createAirdropCampaign } from "../../utils/api/airdrop";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
 import { NFT } from "../../assets/icons/actions";
@@ -77,36 +77,13 @@ export default function StartCampaign(): JSX.Element {
           <span>Give your airdrop campaign a name</span>
         </p>
 
-        <TextField
-          value={campaignName}
-          onChange={(ev) => setCampaignName(ev.target.value)}
-          label="Airdrop Campaign Name"
-          placeholder="campaign name"
-          fullWidth
-          variant="outlined"
-          autoComplete="off"
-          type="text"
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: colors.divider,
-              },
-              "& input": {
-                color: colors.textprimary,
-              },
-              "&::placeholder": {
-                color: colors.textsecondary,
-                opacity: 1,
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: colors.textsecondary,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputLabel-root.Mui-focused": {
-              color: colors.accent,
-            },
-          }}
+        <OutlinedTextInput
+          inputType="text"
+          placeholder="Airdrop Campaign Name"
+          inputlabalel="Campaign Name"
+          inputState={campaignName}
+          setInputState={setCampaignName}
+          sxstyles={{ marginTop: "0" }}
         />
       </div>
 
@@ -116,36 +93,13 @@ export default function StartCampaign(): JSX.Element {
           <span>Set a max number of tokens for your campaign</span>
         </p>
 
-        <TextField
-          value={maxSupply}
-          onChange={(ev) => setMaxSupply(ev.target.value)}
-          label="Max Supply"
-          placeholder="2000"
-          fullWidth
-          variant="outlined"
-          autoComplete="off"
-          type="number"
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: colors.divider,
-              },
-              "& input": {
-                color: colors.textprimary,
-              },
-              "&::placeholder": {
-                color: colors.textsecondary,
-                opacity: 1,
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: colors.textsecondary,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputLabel-root.Mui-focused": {
-              color: colors.accent,
-            },
-          }}
+        <OutlinedTextInput
+          inputType="number"
+          placeholder="20,000"
+          inputlabalel="Max Supply"
+          inputState={maxSupply}
+          setInputState={setMaxSupply}
+          sxstyles={{ marginTop: "0" }}
         />
       </div>
 
@@ -155,36 +109,13 @@ export default function StartCampaign(): JSX.Element {
           <span>How many tokens will each participant receive ?</span>
         </p>
 
-        <TextField
-          value={qtyPerUser}
-          onChange={(ev) => setQtyPerUser(ev.target.value)}
-          label="Tokens Per User"
+        <OutlinedTextInput
+          inputType="number"
           placeholder="10"
-          fullWidth
-          variant="outlined"
-          autoComplete="off"
-          type="number"
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: colors.divider,
-              },
-              "& input": {
-                color: colors.textprimary,
-              },
-              "&::placeholder": {
-                color: colors.textsecondary,
-                opacity: 1,
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: colors.textsecondary,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputLabel-root.Mui-focused": {
-              color: colors.accent,
-            },
-          }}
+          inputlabalel="Tokens Per User"
+          inputState={qtyPerUser}
+          setInputState={setQtyPerUser}
+          sxstyles={{ marginTop: "0" }}
         />
       </div>
 

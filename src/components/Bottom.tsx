@@ -92,6 +92,7 @@ export const BottomButtonContainer = ({
         right: 0,
         padding: "0.5rem 0.875rem",
         backgroundColor: colors.primary,
+        zIndex: 1000,
       }}
     >
       {children}

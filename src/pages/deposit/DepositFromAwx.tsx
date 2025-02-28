@@ -2,18 +2,19 @@ import { JSX, MouseEvent, useState } from "react";
 import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { TextField } from "@mui/material";
 import { fetchAirWllxBalances } from "../../utils/api/awllx";
 import { useBackButton } from "../../hooks/backbutton";
 import { useAppDialog } from "../../hooks/dialog";
 import { useSnackbar } from "../../hooks/snackbar";
 import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
+import { SubmitButton } from "../../components/global/Buttons";
+import { BottomButtonContainer } from "../../components/Bottom";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import { PopOver, PopOverAlt } from "../../components/global/PopOver";
 import { ChevronLeft } from "../../assets/icons/actions";
 import airwallex from "../../assets/images/awx.png";
 import { colors } from "../../constants";
 import "../../styles/pages/deposit/depositfromawx.scss";
-import { SubmitButton } from "../../components/global/Buttons";
 
 export default function DepositFromAwx(): JSX.Element {
   const navigate = useNavigate();
@@ -227,59 +228,30 @@ export default function DepositFromAwx(): JSX.Element {
                 <span>You can use their Telegram username</span>
               </p>
 
-              <TextField
-                value={receipient}
-                onChange={(ev) => setReceipient(ev.target.value)}
-                label="Receipient"
+              <OutlinedTextInput
+                inputType="text"
                 placeholder="telegram username"
-                fullWidth
-                variant="outlined"
-                autoComplete="off"
-                type="text"
-                sx={{
-                  marginTop: "0.75rem",
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: colors.divider,
-                    },
-                    "& input": {
-                      color: colors.textprimary,
-                    },
-                    "&::placeholder": {
-                      color: colors.textsecondary,
-                      opacity: 1,
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: colors.textsecondary,
-                    fontSize: "0.875rem",
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: colors.accent,
-                  },
-                }}
+                inputlabalel="Receipient"
+                inputState={receipient}
+                setInputState={setReceipient}
+                sxstyles={{ marginTop: "0.75rem" }}
               />
             </div>
           )}
         </>
       )}
 
-      <SubmitButton
-        text="Deposit"
-        sxstyles={{
-          width: "unset",
-          position: "fixed",
-          bottom: "1rem",
-          left: "1rem",
-          right: "1rem",
-        }}
-        isDisabled={
-          airwallexData?.status == 404 ||
-          selectKey == "" ||
-          selectCurrencyAmount == ""
-        }
-        onclick={onSubmitDeposit}
-      />
+      <BottomButtonContainer>
+        <SubmitButton
+          text={`Deposit with ${selectCurrency}`}
+          isDisabled={
+            airwallexData?.status == 404 ||
+            selectKey == "" ||
+            selectCurrencyAmount == ""
+          }
+          onclick={onSubmitDeposit}
+        />
+      </BottomButtonContainer>
     </section>
   );
 }

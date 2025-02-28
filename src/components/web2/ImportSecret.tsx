@@ -1,9 +1,9 @@
 import { JSX, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
-import { TextField } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { importKey } from "../../utils/api/keys";
+import { OutlinedTextInput } from "../global/Inputs";
 import { SubmitButton } from "../global/Buttons";
 import { colors } from "../../constants";
 import { Add } from "../../assets/icons/actions";
@@ -55,37 +55,13 @@ export const ImportSecret = (): JSX.Element => {
 
       <p className="title">Import your Web2 secrets and Keys</p>
 
-      <TextField
-        value={importedKey}
-        onChange={(ev) => setImportedKey(ev.target.value)}
-        label="Your Secret/Key"
-        placeholder="Secret/key"
-        fullWidth
-        variant="outlined"
-        autoComplete="off"
-        type="text"
-        sx={{
-          marginTop: "0.25rem",
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: colors.divider,
-            },
-            "& input": {
-              color: colors.textprimary,
-            },
-            "&::placeholder": {
-              color: colors.textsecondary,
-              opacity: 1,
-            },
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-            fontSize: "0.875rem",
-          },
-          "& .MuiInputLabel-root.Mui-focused": {
-            color: colors.accent,
-          },
-        }}
+      <OutlinedTextInput
+        inputType="text"
+        placeholder="Secret/Key"
+        inputlabalel="Your Web2 Secret/Key"
+        inputState={importedKey}
+        setInputState={setImportedKey}
+        sxstyles={{ marginTop: "0.25rem" }}
       />
 
       <div className="keyutil">

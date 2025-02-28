@@ -1,11 +1,11 @@
 import { JSX, useState, MouseEvent } from "react";
 import { useNavigate } from "react-router";
-import { TextField } from "@mui/material";
 import { useBackButton } from "../../hooks/backbutton";
 import { formatNumber, formatUsd } from "../../utils/formatters";
 import { PopOver } from "../../components/global/PopOver";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import { ChevronLeft, Stake } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import btclogo from "../../assets/images/btc.png";
@@ -182,37 +182,13 @@ export default function CreateLendAsset(): JSX.Element {
           <span>How much of your {assetType} would you like to lend ?</span>
         </p>
 
-        <TextField
-          value={lendAmount}
-          onChange={(ev) => setLendAmount(ev.target.value)}
-          label={`Loan Amount (${assetType})`}
+        <OutlinedTextInput
+          inputType="text"
           placeholder={`amount (${assetType})`}
-          fullWidth
-          variant="outlined"
-          autoComplete="off"
-          type="number"
-          sx={{
-            marginTop: "0.75rem",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: colors.divider,
-              },
-              "& input": {
-                color: colors.textprimary,
-              },
-              "&::placeholder": {
-                color: colors.textsecondary,
-                opacity: 1,
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: colors.textsecondary,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputLabel-root.Mui-focused": {
-              color: colors.accent,
-            },
-          }}
+          inputlabalel={`Loan Amount (${assetType})`}
+          inputState={lendAmount}
+          setInputState={setLendAmount}
+          sxstyles={{ marginTop: "0.75rem" }}
         />
 
         <div className="amntpercent">
@@ -228,37 +204,13 @@ export default function CreateLendAsset(): JSX.Element {
           <span>You can use their Telegram username</span>
         </p>
 
-        <TextField
-          value={assetReceipient}
-          onChange={(ev) => setAssetReceipient(ev.target.value)}
-          label="Receipient"
+        <OutlinedTextInput
+          inputType="text"
           placeholder="telegram username"
-          fullWidth
-          variant="outlined"
-          autoComplete="off"
-          type="text"
-          sx={{
-            marginTop: "0.75rem",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: colors.divider,
-              },
-              "& input": {
-                color: colors.textprimary,
-              },
-              "&::placeholder": {
-                color: colors.textsecondary,
-                opacity: 1,
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: colors.textsecondary,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputLabel-root.Mui-focused": {
-              color: colors.accent,
-            },
-          }}
+          inputlabalel="Receipient"
+          inputState={assetReceipient}
+          setInputState={setAssetReceipient}
+          sxstyles={{ marginTop: "0.75rem" }}
         />
       </div>
 

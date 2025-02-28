@@ -1,7 +1,7 @@
 import { JSX, MouseEvent, useState } from "react";
 import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
 import { useNavigate, useParams } from "react-router";
-import { Checkbox, Slider, TextField } from "@mui/material";
+import { Checkbox, Slider } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
@@ -15,6 +15,7 @@ import { formatUsd } from "../../utils/formatters";
 import { PopOver } from "../../components/global/PopOver";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import { colors } from "../../constants";
 import { assetType } from "./CreateLendAsset";
 import { ChevronLeft, Import } from "../../assets/icons/actions";
@@ -201,37 +202,13 @@ export default function CreateLendSecret(): JSX.Element {
           <span>You can use their Telegram username</span>
         </p>
 
-        <TextField
-          value={secretReceipient}
-          onChange={(ev) => setSecretReceipient(ev.target.value)}
-          label="Receipient"
+        <OutlinedTextInput
+          inputType="text"
           placeholder="telegram username"
-          fullWidth
-          variant="outlined"
-          autoComplete="off"
-          type="text"
-          sx={{
-            marginTop: "0.75rem",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: colors.divider,
-              },
-              "& input": {
-                color: colors.textprimary,
-              },
-              "&::placeholder": {
-                color: colors.textsecondary,
-                opacity: 1,
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: colors.textsecondary,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputLabel-root.Mui-focused": {
-              color: colors.accent,
-            },
-          }}
+          inputlabalel="Receipient"
+          inputState={secretReceipient}
+          setInputState={setSecretReceipient}
+          sxstyles={{ marginTop: "0.75rem" }}
         />
       </div>
 
@@ -343,37 +320,13 @@ export default function CreateLendSecret(): JSX.Element {
               <span>Set a custom fee for the secret</span>
             </p>
 
-            <TextField
-              value={customFee}
-              onChange={(ev) => setCustomFee(ev.target.value)}
-              label="Custom fee"
-              placeholder="custom secret fee"
-              fullWidth
-              variant="outlined"
-              autoComplete="off"
-              type="number"
-              sx={{
-                marginTop: "0.875rem",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: colors.divider,
-                  },
-                  "& input": {
-                    color: colors.textprimary,
-                  },
-                  "&::placeholder": {
-                    color: colors.textsecondary,
-                    opacity: 1,
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: colors.textsecondary,
-                  fontSize: "0.875rem",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: colors.accent,
-                },
-              }}
+            <OutlinedTextInput
+              inputType="number"
+              placeholder="custom secret fee ($10)"
+              inputlabalel="Custom fee"
+              inputState={customFee}
+              setInputState={setCustomFee}
+              sxstyles={{ marginTop: "0.875rem" }}
             />
 
             <p className="feeem">

@@ -1,6 +1,5 @@
 import { JSX, useState, useEffect, MouseEvent } from "react";
 import { useNavigate, useParams } from "react-router";
-import { TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useSocket } from "../../utils/SocketProvider";
 import { formatNumber } from "../../utils/formatters";
@@ -11,6 +10,7 @@ import { PopOver } from "../../components/global/PopOver";
 import { sendBTC, sendEth } from "../../utils/api/wallet";
 import { BottomButtonContainer } from "../../components/Bottom";
 import { SubmitButton } from "../../components/global/Buttons";
+import { OutlinedTextInput } from "../../components/global/Inputs";
 import { colors } from "../../constants";
 import { Send, Info, ChevronLeft } from "../../assets/icons/actions";
 import btclogo from "../../assets/images/btc.png";
@@ -260,72 +260,21 @@ export default function SendCrypto(): JSX.Element {
         </div>
       </PopOver>
 
-      <TextField
-        value={receiverAddress}
-        onChange={(ev) => setReceiverAddress(ev.target.value)}
-        label={`${depositAsset} Address`}
-        placeholder="1. . ."
-        fullWidth
-        variant="outlined"
-        autoComplete="off"
-        type="text"
-        sx={{
-          marginTop: "1.5rem",
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: colors.divider,
-            },
-            "& input": {
-              color: colors.textprimary,
-            },
-            "&::placeholder": {
-              color: colors.textsecondary,
-              opacity: 1,
-            },
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-            fontSize: "0.875rem",
-          },
-          "& .MuiInputLabel-root.Mui-focused": {
-            color: colors.accent,
-          },
-        }}
+      <OutlinedTextInput
+        inputType="text"
+        placeholder="address"
+        inputlabalel={`${depositAsset} Address`}
+        inputState={receiverAddress}
+        setInputState={setReceiverAddress}
       />
 
-      <TextField
-        value={sendAmnt}
-        onChange={(ev) => setSendAmnt(ev.target.value)}
-        onKeyUp={() => errorInSendAmount()}
-        error={errorInSendAmount()}
-        label="Amount"
+      <OutlinedTextInput
+        inputType="text"
         placeholder="0.05"
-        fullWidth
-        variant="outlined"
-        autoComplete="off"
-        type="number"
-        sx={{
-          marginTop: "1.5rem",
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: colors.divider,
-            },
-            "& input": {
-              color: colors.textprimary,
-            },
-            "&::placeholder": {
-              color: colors.textsecondary,
-              opacity: 1,
-            },
-          },
-          "& .MuiInputLabel-root": {
-            color: colors.textsecondary,
-            fontSize: "0.875rem",
-          },
-          "& .MuiInputLabel-root.Mui-focused": {
-            color: colors.accent,
-          },
-        }}
+        inputlabalel="Amount"
+        inputState={sendAmnt}
+        setInputState={setSendAmnt}
+        hasError={errorInSendAmount()}
       />
 
       <p className="availablebalance">
