@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { SubmitButton } from "../../components/global/Buttons";
+import { RadioButton } from "../../components/global/Radios";
 import { colors } from "../../constants";
 import { Send } from "../../assets/icons/actions";
 import "../../styles/pages/deposit/deposit.scss";
@@ -71,47 +72,22 @@ export default function Deposit(): JSX.Element {
       </p>
 
       <div className="methods">
-        <div className="util" onClick={() => setDepositMethod("airwallex")}>
-          <div className="radioctr">
-            <div
-              style={{
-                backgroundColor:
-                  depositMethod == "airwallex"
-                    ? colors.textprimary
-                    : colors.primary,
-              }}
-            />
-          </div>
+        <RadioButton
+          title="Airwallex"
+          description="Deposit from your Airwallex balances"
+          ischecked={depositMethod == "airwallex"}
+          onclick={() => setDepositMethod("airwallex")}
+        />
 
-          <p className="purpose">
-            Airwallex
-            <span>Deposit from your Airwallex balances</span>
-          </p>
-        </div>
-
-        <div
-          className="util"
-          onClick={() => {
+        <RadioButton
+          title="External Network"
+          description="Deposit from an external network"
+          ischecked={depositMethod == "external"}
+          onclick={() => {
             setDepositMethod("external");
             setDepositTarget("me");
           }}
-        >
-          <div className="radioctr">
-            <div
-              style={{
-                backgroundColor:
-                  depositMethod == "external"
-                    ? colors.textprimary
-                    : colors.primary,
-              }}
-            />
-          </div>
-
-          <p className="purpose">
-            External Network
-            <span>Deposit from an external network</span>
-          </p>
-        </div>
+        />
       </div>
 
       <SubmitButton
