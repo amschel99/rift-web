@@ -20,6 +20,7 @@ import { DefiTab } from "./components/tabs/Defi";
 import { Notifications } from "./components/tabs/Notifications";
 import { Rewards } from "./components/tabs/Rewards";
 import { SendCryptoTab } from "./components/tabs/SendCrypto";
+import { ProfileTab } from "./components/tabs/Profile";
 
 function App(): JSX.Element {
   const navigate = useNavigate();
@@ -109,6 +110,8 @@ function App(): JSX.Element {
         <Rewards />
       ) : currTab == "sendcrypto" ? (
         <SendCryptoTab />
+      ) : currTab == "profile" ? (
+        <ProfileTab />
       ) : (
         <Notifications />
       )}
