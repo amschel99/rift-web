@@ -75,7 +75,7 @@ export default function Premium(): JSX.Element {
         
         {showReference && (
           <div className="reference-info">
-            <p>Based on industry standards</p>
+            <p>Ref: Ledger Recovery and Casa Multi-sig Vault</p>
           </div>
         )}
       </div>
