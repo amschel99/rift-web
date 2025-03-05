@@ -127,7 +127,7 @@
     background-color: colors.$divider;
 
     .node_locations {
-      @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);
+      @include mixins.useFlex(row, wrap, center, flex-start, 0.5rem);
       margin-top: 0.5rem;
       padding-bottom: 0.125rem;
       overflow-x: auto;
