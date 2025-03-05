@@ -37,7 +37,8 @@ export const Rewards = (): JSX.Element => {
   const { switchtab } = useTabs();
 
   const airdropId = localStorage.getItem("airdropId");
-  const airdropReferId = airdropId?.split("-")[1];
+  const airdropUid = airdropId?.split("-")[1];
+  const airdropReferId = airdropId?.split("-")[2];
   const localdailycheckintime = localStorage.getItem("nextdailychekin");
 
   // -> unlocked amount -> daily checkin
@@ -69,7 +70,7 @@ export const Rewards = (): JSX.Element => {
 
   // claim airdrop
   const { mutate: mutateClaimAirdrop } = useMutation({
-    mutationFn: () => claimAirdrop(airdropId as string, airdropReferId),
+    mutationFn: () => claimAirdrop(airdropUid as string, airdropReferId),
 
     onSuccess: () => {
       localStorage.removeItem("airdropId");
