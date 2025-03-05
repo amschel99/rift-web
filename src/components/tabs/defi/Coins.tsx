@@ -17,11 +17,10 @@ export const Coins = ({ coinsdata, coinsLoading }: props): JSX.Element => {
   const indexOfOM = coinsdata?.findIndex((_coin) => _coin?.symbol == "om");
   const [arrWithoutOM] = coinsdata?.splice(indexOfOM, 1);
   coinsdata.unshift(arrWithoutOM);
-  console.log(arrWithoutOM);
 
   return (
     <section id="markettab">
-      <p className="title">Coins</p>
+      <p className="title">Your Portal to Web3</p>
 
       {coinsLoading ? (
         <div className="skeletons">
