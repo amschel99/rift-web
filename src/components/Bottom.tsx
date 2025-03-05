@@ -1,6 +1,8 @@
 import { JSX, ReactNode } from "react";
 import { useTabs, tabsType } from "../hooks/tabs";
-import { Labs, Security, Home, Market } from "../assets/icons/tabs";
+import { Labs, Security, Home, Market, Notification } from "../assets/icons/tabs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFlask, faFileContract } from "@fortawesome/free-solid-svg-icons";
 import { colors } from "../constants";
 import "../styles/components/tabs/bottomtab.scss";
 
@@ -26,12 +28,29 @@ export const BottomTabNavigation = (): JSX.Element => {
       ),
     },
     {
-      menu: "security",
-      title: "Security",
+      menu: "earn",
+      title: "DeFi",
       icon: (
-        <Security
-          color={currTab == "security" ? colors.accent : colors.textprimary}
-        />
+        <div className="fa-icon-container">
+          <FontAwesomeIcon
+            icon={faFileContract}
+            color={currTab == "earn" ? colors.accent : colors.textprimary}
+            fontSize={18}
+          />
+        </div>
+      ),
+    },
+    {
+      menu: "labs",
+      title: "Labs",
+      icon: (
+        <div className="fa-icon-container">
+          <FontAwesomeIcon
+            icon={faFlask}
+            color={currTab == "labs" ? colors.accent : colors.textprimary}
+            fontSize={18}
+          />
+        </div>
       ),
     },
     {
@@ -46,11 +65,11 @@ export const BottomTabNavigation = (): JSX.Element => {
       ),
     },
     {
-      menu: "earn",
-      title: "Markets",
+      menu: "security",
+      title: "Key",
       icon: (
-        <Market
-          color={currTab == "earn" ? colors.accent : colors.textprimary}
+        <Security
+          color={currTab == "security" ? colors.accent : colors.textprimary}
         />
       ),
     },
@@ -62,6 +81,7 @@ export const BottomTabNavigation = (): JSX.Element => {
         <button
           key={index + bottomtab?.title}
           onClick={() => switchtab(bottomtab.menu)}
+          className={currTab === bottomtab.menu ? "active" : ""}
         >
           {bottomtab?.icon}
           <span

@@ -21,7 +21,7 @@ export const Coins = ({ coinsdata, coinsLoading }: props): JSX.Element => {
 
   return (
     <section id="markettab">
-      <p className="title">Coins</p>
+      <p className="title">Your Portal to Web3</p>
 
       {coinsLoading ? (
         <div className="skeletons">
