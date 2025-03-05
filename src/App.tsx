@@ -91,7 +91,7 @@ function App(): JSX.Element {
   }, []);
 
   return (
-    <section>
+    <section className="app-container">
       {currTab == "home" ? (
         <HomeTab />
       ) : currTab == "security" ? (
