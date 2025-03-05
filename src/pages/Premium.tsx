@@ -26,16 +26,20 @@ export default function Premium(): JSX.Element {
   const infoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const goBack = () => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const returnPath = queryParams.get('returnPath');
-    
-    if (returnPath === 'rewards') {
-      switchtab('rewards');
-      navigate('/app');
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnPath = urlParams.get("returnPath");
+
+    if (returnPath === "rewards") {
+      switchtab("rewards");
+    } else if (returnPath === "earn") {
+      switchtab("earn");
+    } else if (returnPath === "security") {
+      switchtab("security");
     } else {
       switchtab("home");
-      navigate("/app");
     }
+    
+    navigate("/app");
   };
 
   const onSubscribe = () => {

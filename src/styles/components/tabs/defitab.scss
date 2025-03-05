@@ -714,20 +714,65 @@ $strategy-degen: #ffccbc;
 
             .boosted-action {
               @include mixins.useFlex(row, nowrap, center, center, 0.25rem);
-              background: linear-gradient(to right, colors.$accent, rgba($color: colors.$accent, $alpha: 0.1));
-              color: colors.$primary;
+              background: linear-gradient(to right, colors.$accent, darken(colors.$accent, 15%));
+              color: white;
               box-shadow: 0 2px 4px rgba(colors.$accent, 0.3);
               position: relative;
               overflow: hidden;
 
               svg {
                 font-size: 0.75rem;
+                color: white;
                 animation: sparkle 2s infinite;
               }
 
               span {
-            font-size: 0.75rem;
-            font-weight: 500;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: white;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+              }
+              
+              &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(colors.$accent, 0.4);
+              }
+              
+              &::after {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(
+                  to right,
+                  rgba(255, 255, 255, 0) 0%,
+                  rgba(255, 255, 255, 0.3) 50%,
+                  rgba(255, 255, 255, 0) 100%
+                );
+                transform: rotate(30deg);
+                animation: shine 3s infinite linear;
+              }
+              
+              @keyframes shine {
+                0% {
+                  transform: rotate(30deg) translateX(-100%);
+                }
+                100% {
+                  transform: rotate(30deg) translateX(100%);
+                }
+              }
+              
+              @keyframes sparkle {
+                0%, 100% {
+                  opacity: 1;
+                  transform: scale(1);
+                }
+                50% {
+                  opacity: 0.8;
+                  transform: scale(1.2);
+                }
               }
             }
           }
@@ -843,18 +888,39 @@ $strategy-degen: #ffccbc;
 
       button.subscribe-button {
         padding: 0.75rem 1.5rem;
-        background: linear-gradient(to right, colors.$accent, rgba($color: colors.$accent, $alpha: 0.1));
-        color: colors.$primary;
+        background: linear-gradient(to right, colors.$accent, darken(colors.$accent, 15%));
+        color: white;
         border: none;
         border-radius: 0.5rem;
         font-weight: 600;
         font-size: 0.9rem;
         cursor: pointer;
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(colors.$accent, 0.3);
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(colors.$accent, 0.3);
+          box-shadow: 0 4px 8px rgba(colors.$accent, 0.4);
+        }
+        
+        &::after {
+          content: "";
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          transform: rotate(30deg);
+          animation: shine 3s infinite linear;
         }
       }
 
