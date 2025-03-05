@@ -75,9 +75,33 @@
     }
   }
 
+  .boost {
+    @include mixins.useFlex(row, nowrap, center, flex-start, 0.375rem);
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    background-color: colors.$divider;
+
+    img {
+      width: 1.875rem;
+      height: 1.875rem;
+      border-radius: 50%;
+    }
+
+    p {
+      @include mixins.useFlex(column, nowrap, flex-start, flex-start, 0);
+      font-size: 0.875rem;
+
+      span {
+        @include mixins.useAltFont();
+        font-weight: bold;
+      }
+    }
+  }
+
   .tasks_title {
     @include mixins.useFlex(row, nowrap, center, flex-start, 0.25rem);
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
 

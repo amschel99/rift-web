@@ -136,6 +136,14 @@ export const Rewards = (): JSX.Element => {
         </p>
       </div>
 
+      <div className="boost" onClick={() => navigate("/premiums")}>
+        <img src={mantralogo} alt="mantra" />
+        <p>
+          Boost
+          <span>+100 OM</span>
+        </p>
+      </div>
+
       <p className="tasks_title">
         Unlock More <img src={mantralogo} alt="mantra" />
       </p>
