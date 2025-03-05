@@ -32,9 +32,8 @@ export default function SpherePremium(): JSX.Element {
     const returnPath = queryParams.get('returnPath');
     
     if (returnPath === 'defi') {
-      // Return to the DeFi tab
-      navigate("/app");
-      // The tab will be set by the Premium.tsx component
+      // Return to the Premium page with the returnPath preserved
+      navigate(`/premiums?returnPath=${returnPath}`);
     } else {
       // Default behavior
       navigate("/premiums");

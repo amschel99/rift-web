@@ -76,10 +76,10 @@ export const DefiTab = (): JSX.Element => {
 
   useBackButton(goBack);
 
-  // Fix premium page navigation - using the correct path found in Premium.tsx
+  // Fix premium page navigation - navigate to Premium page to show benefits
   const goToPremium = () => {
-    // Navigate to the Premium page using the proper path with a return path parameter
-    navigate("/premiums/sphere?returnPath=defi");
+    // Navigate to the Premium page with a return path parameter
+    navigate("/premiums?returnPath=defi");
   };
 
   const filterProducts = (filterType: ProductFilterType) => {
