@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { addDays, isAfter } from "date-fns";
+import { Skeleton } from "@mui/material";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDialog } from "../../hooks/dialog";
@@ -52,12 +53,12 @@ export const Rewards = (): JSX.Element => {
     }, 3000);
   };
 
-  const { data: mantrausdval } = useQuery({
+  const { data: mantrausdval, isLoading: mantraUsdLoading } = useQuery({
     queryKey: ["mantrausd"],
     queryFn: getMantraUsdVal,
   });
 
-  const { data: unlocked } = useQuery({
+  const { data: unlocked, isLoading: unlockedLoading } = useQuery({
     queryKey: ["getunlocked"],
     queryFn: getUnlockedTokens,
   });
@@ -166,27 +167,45 @@ export const Rewards = (): JSX.Element => {
           <div className="unlocked-stats">
             <div className="stat-label">Total Unlocked</div>
             <div className="stat-value">
-              {unlocked?.unlocked}
-              <img src={mantralogo} alt="OM" />
-              <span className="usd-equivalent">
-                ≈
-                {formatUsd(
-                  Number(unlocked?.unlocked || 0) * Number(mantrausdval)
-                )}
-              </span>
+              {unlockedLoading ? (
+                <Skeleton variant="text" width={30} height={20} animation="wave" sx={{ bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+              ) : (
+                <>
+                  {unlocked?.unlocked}
+                  <img src={mantralogo} alt="OM" />
+                  <span className="usd-equivalent">
+                    ≈
+                    {formatUsd(
+                      Number(unlocked?.unlocked || 0) * Number(mantrausdval)
+                    )}
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
 
         <div className="vault-content">
           <div className="token-amount" key={unlockedAmount}>
-            <span className="amount-value">
-              {Number(unlocked?.amount) + unlockedAmount}
-            </span>
-            <img src={mantralogo} alt="OM Token" className="om-token" />
+            {unlockedLoading || mantraUsdLoading ? (
+              <div className="loading-amount">
+                <Skeleton variant="text" width={100} height={60} animation="wave" sx={{ bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+              </div>
+            ) : (
+              <>
+                <span className="amount-value">
+                  {Number(unlocked?.amount) + unlockedAmount}
+                </span>
+                <img src={mantralogo} alt="OM Token" className="om-token" />
+              </>
+            )}
           </div>
           <div className="usd-value">
-            ≈{formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
+            {unlockedLoading || mantraUsdLoading ? (
+              <Skeleton variant="text" width={80} height={24} animation="wave" sx={{ bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+            ) : (
+              <>≈{formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}</>
+            )}
           </div>
         </div>
 

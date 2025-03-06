@@ -65,7 +65,7 @@ export const SecurityTab = (): JSX.Element => {
   return (
     <section id="securitytab">
       <div className="defi-header">
-        <h1 className="title">Your Keys</h1>
+        <h1 className="title" style={{ color: "#ffffff", WebkitTextFillColor: "white" }}>Your Keys</h1>
         <div className="premium-boost" onClick={onGetPremium}>
           <FontAwesomeIcon icon={faGem} className="gem-icon" />
           <span>Free</span>
