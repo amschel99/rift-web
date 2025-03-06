@@ -12,7 +12,6 @@ import evidentlogo from "../../assets/images/labs/evident.png";
 import yieldfarmcover from "../../assets/images/labs/yieldfarmcover.jpg";
 import yieldfarmlogo from "../../assets/images/icons/lendto.png";
 import airshipLogo from "../../assets/images/airship.png";
-import { colors } from "../../constants";
 import "../../styles/components/tabs/labstab.scss";
 
 export const LabsTab = (): JSX.Element => {
@@ -33,9 +32,7 @@ export const LabsTab = (): JSX.Element => {
     if (activeFilter === "ALL") {
       return projects;
     }
-    return projects.filter(project => 
-      project.category === activeFilter
-    );
+    return projects.filter((project) => project.category === activeFilter);
   };
 
   // Define fixed categories for better control
@@ -45,15 +42,15 @@ export const LabsTab = (): JSX.Element => {
 
   return (
     <section id="labstab">
-      <h1 className="labs-title">
-        Stratosphere Labs
-      </h1>
-      
+      <h1 className="labs-title">Stratosphere Labs</h1>
+
       <div className="filter-tabs">
-        {categories.map(category => (
-          <button 
+        {categories.map((category) => (
+          <button
             key={category}
-            className={`filter-tab ${activeFilter === category ? 'active' : ''}`}
+            className={`filter-tab ${
+              activeFilter === category ? "active" : ""
+            }`}
             onClick={() => filterProjects(category)}
           >
             {category}

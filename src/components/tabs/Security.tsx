@@ -23,7 +23,7 @@ export const SecurityTab = (): JSX.Element => {
   const [showNodeInfoModal, setShowNodeInfoModal] = useState<boolean>(false);
   const [showMigrateModal, setShowMigrateModal] = useState<boolean>(false);
   const [showPinSetupModal, setShowPinSetupModal] = useState<boolean>(false);
-  const [spendingLimit, setSpendingLimit] = useState<number>(1000);
+  const [spendingLimit, _setSpendingLimit] = useState<number>(1000);
 
   const goBack = () => {
     switchtab("home");
@@ -70,7 +70,7 @@ export const SecurityTab = (): JSX.Element => {
     navigate("/premiums?returnPath=security");
   };
 
-  const handleSetupPin = (pin: string) => {
+  const handleSetupPin = (_pin: string) => {
     closePinSetupModal();
   };
 
@@ -79,7 +79,12 @@ export const SecurityTab = (): JSX.Element => {
   return (
     <section id="securitytab">
       <div className="defi-header">
-        <h1 className="title" style={{ color: "#ffffff", WebkitTextFillColor: "white" }}>Your Keys</h1>
+        <h1
+          className="title"
+          style={{ color: "#ffffff", WebkitTextFillColor: "white" }}
+        >
+          Your Keys
+        </h1>
         <div className="premium-boost" onClick={onGetPremium}>
           <FontAwesomeIcon icon={faGem} className="gem-icon" />
           <span>Free</span>
@@ -263,16 +268,25 @@ export const SecurityTab = (): JSX.Element => {
           marginBottom: "1.5rem",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-          <div style={{ 
-            backgroundColor: "rgba(74, 109, 167, 0.15)", 
-            borderRadius: "50%", 
-            width: "1.75rem", 
-            height: "1.75rem", 
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center" 
-          }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "1rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "rgba(74, 109, 167, 0.15)",
+              borderRadius: "50%",
+              width: "1.75rem",
+              height: "1.75rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Refresh color={colors.accent} width={14} height={14} />
           </div>
           <p
@@ -315,16 +329,25 @@ export const SecurityTab = (): JSX.Element => {
           marginBottom: "1.5rem",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-          <div style={{ 
-            backgroundColor: "rgba(76, 175, 80, 0.15)", 
-            borderRadius: "50%", 
-            width: "1.75rem", 
-            height: "1.75rem", 
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center" 
-          }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "1rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "rgba(76, 175, 80, 0.15)",
+              borderRadius: "50%",
+              width: "1.75rem",
+              height: "1.75rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Security color={colors.success} width={14} height={14} />
           </div>
           <p
@@ -354,7 +377,7 @@ export const SecurityTab = (): JSX.Element => {
           description="Amount that requires 2FA"
           limitvalue={spendingLimit}
           icon={<Import width={16} height={16} color={colors.accent} />}
-          onclick={() => { }}
+          onclick={() => {}}
           formatDecimals={false}
         />
         <SecuritySettings
@@ -498,8 +521,8 @@ export const SecurityTab = (): JSX.Element => {
       )}
 
       {showPinSetupModal && (
-        <PinSetupModal 
-          onClose={closePinSetupModal} 
+        <PinSetupModal
+          onClose={closePinSetupModal}
           onSetPin={handleSetupPin}
           spendingLimit={spendingLimit}
         />
@@ -750,49 +773,58 @@ const SecuritySettings = ({
   isSetup?: boolean;
 }): JSX.Element => {
   return (
-    <div 
-      className="settings" 
-      onClick={onclick} 
-      style={{ 
-        display: "flex", 
+    <div
+      className="settings"
+      onClick={onclick}
+      style={{
+        display: "flex",
         alignItems: "center",
         padding: "0.5rem 0",
         borderBottom: `1px solid ${colors.divider}`,
       }}
     >
-      {icon && <div style={{ marginRight: "0.75rem", flexShrink: 0 }}>{icon}</div>}
+      {icon && (
+        <div style={{ marginRight: "0.75rem", flexShrink: 0 }}>{icon}</div>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p className="title_desc" style={{ margin: 0 }}>
-          <span style={{ 
-            display: "block", 
-            fontSize: "0.9rem", 
-            fontWeight: "500", 
-            color: colors.textprimary,
-            marginBottom: "0.25rem" 
-          }}>
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.9rem",
+              fontWeight: "500",
+              color: colors.textprimary,
+              marginBottom: "0.25rem",
+            }}
+          >
             {title}
           </span>
-          <span style={{ 
-            display: "block", 
-            fontSize: "0.75rem", 
-            color: colors.textsecondary 
-          }}>
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.75rem",
+              color: colors.textsecondary,
+            }}
+          >
             {description}
           </span>
         </p>
       </div>
-      <p className="limit" style={{ 
-        margin: 0, 
-        display: "flex", 
-        alignItems: "center",
-        fontWeight: "600",
-        color: isSetup ? colors.accent : colors.textprimary,
-        fontSize: "0.9rem",
-        flexShrink: 0
-      }}>
-        {typeof limitvalue === "number" 
-          ? formatDecimals 
-            ? formatUsd(limitvalue) 
+      <p
+        className="limit"
+        style={{
+          margin: 0,
+          display: "flex",
+          alignItems: "center",
+          fontWeight: "600",
+          color: isSetup ? colors.accent : colors.textprimary,
+          fontSize: "0.9rem",
+          flexShrink: 0,
+        }}
+      >
+        {typeof limitvalue === "number"
+          ? formatDecimals
+            ? formatUsd(limitvalue)
             : `$${limitvalue.toLocaleString()}`
           : limitvalue}
         <span className="icons" style={{ marginLeft: "0.5rem" }}>
@@ -819,11 +851,11 @@ const RecoveryOption = ({
   onclick: () => void;
 }): JSX.Element => {
   return (
-    <div 
-      className="recovery" 
+    <div
+      className="recovery"
       onClick={onclick}
-      style={{ 
-        display: "flex", 
+      style={{
+        display: "flex",
         alignItems: "center",
         opacity: disabled ? 0.6 : 1,
         cursor: disabled ? "default" : "pointer",
@@ -831,52 +863,63 @@ const RecoveryOption = ({
         borderBottom: `1px solid ${colors.divider}`,
       }}
     >
-      {icon && <div style={{ marginRight: "0.75rem", flexShrink: 0 }}>{icon}</div>}
+      {icon && (
+        <div style={{ marginRight: "0.75rem", flexShrink: 0 }}>{icon}</div>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p className="title_desc" style={{ margin: 0 }}>
-          <span style={{ 
-            display: "block", 
-            fontSize: "0.9rem", 
-            fontWeight: "500", 
-            color: colors.textprimary,
-            marginBottom: "0.25rem" 
-          }}>
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.9rem",
+              fontWeight: "500",
+              color: colors.textprimary,
+              marginBottom: "0.25rem",
+            }}
+          >
             {title}
           </span>
-          <span style={{ 
-            display: "block", 
-            fontSize: "0.75rem", 
-            color: colors.textsecondary 
-          }}>
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.75rem",
+              color: colors.textsecondary,
+            }}
+          >
             {description}
           </span>
         </p>
       </div>
-      <p className="value" style={{ 
-        margin: 0,
-        display: "flex", 
-        alignItems: "center", 
-        gap: "0.5rem",
-        color: value === "premium" ? colors.accent : colors.success,
-        fontWeight: "600",
-        fontSize: "0.9rem",
-        flexShrink: 0
-      }}>
+      <p
+        className="value"
+        style={{
+          margin: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          color: value === "premium" ? colors.accent : colors.success,
+          fontWeight: "600",
+          fontSize: "0.9rem",
+          flexShrink: 0,
+        }}
+      >
         {value}
-        {value === "premium" && <FontAwesomeIcon icon={faGem} style={{ fontSize: "0.75rem" }} />}
+        {value === "premium" && (
+          <FontAwesomeIcon icon={faGem} style={{ fontSize: "0.75rem" }} />
+        )}
       </p>
     </div>
   );
 };
 
-const PinSetupModal = ({ 
-  onClose, 
+const PinSetupModal = ({
+  onClose,
   onSetPin,
-  spendingLimit
-}: { 
-  onClose: () => void, 
-  onSetPin: (pin: string) => void,
-  spendingLimit: number
+  spendingLimit,
+}: {
+  onClose: () => void;
+  onSetPin: (pin: string) => void;
+  spendingLimit: number;
 }): JSX.Element => {
   const [pin, setPin] = useState<string>("");
   const [confirmPin, setConfirmPin] = useState<string>("");
@@ -902,47 +945,57 @@ const PinSetupModal = ({
       setConfirmPin("");
       return;
     }
-    
+
     onSetPin(pin);
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "350px" }}>
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: "350px" }}
+      >
         <div className="modal-header">
           <h3>Setup Payment PIN</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
         <div className="modal-body" style={{ textAlign: "center" }}>
-          <div style={{ 
-            backgroundColor: "rgba(74, 109, 167, 0.15)", 
-            borderRadius: "50%", 
-            width: "4rem", 
-            height: "4rem", 
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center",
-            margin: "0 auto 1rem"
-          }}>
+          <div
+            style={{
+              backgroundColor: "rgba(74, 109, 167, 0.15)",
+              borderRadius: "50%",
+              width: "4rem",
+              height: "4rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "0 auto 1rem",
+            }}
+          >
             <Pin color={colors.accent} width={24} height={24} />
           </div>
-          
+
           <p style={{ marginBottom: "1.5rem" }}>
-            {step === "create" 
+            {step === "create"
               ? `Create a 4-digit PIN for transactions over $${spendingLimit.toLocaleString()}`
               : "Confirm your PIN"}
           </p>
-          
-          {error && <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>}
-          
+
+          {error && (
+            <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>
+          )}
+
           <div style={{ marginBottom: "1.5rem" }}>
-            <PinInput 
-              value={step === "create" ? pin : confirmPin} 
-              onChange={handlePinChange} 
+            <PinInput
+              value={step === "create" ? pin : confirmPin}
+              onChange={handlePinChange}
               length={4}
             />
           </div>
-          
+
           {step === "confirm" && (
             <button
               onClick={handleSubmit}
@@ -956,19 +1009,22 @@ const PinSetupModal = ({
                 fontWeight: "600",
                 fontSize: "0.9rem",
                 cursor: "pointer",
-                marginTop: "1rem"
+                marginTop: "1rem",
               }}
             >
               Set PIN
             </button>
           )}
-          
-          <p style={{ 
-            fontSize: "0.75rem", 
-            color: colors.textsecondary, 
-            marginTop: "1rem" 
-          }}>
-            This PIN will be required for all transactions exceeding your spending limit.
+
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: colors.textsecondary,
+              marginTop: "1rem",
+            }}
+          >
+            This PIN will be required for all transactions exceeding your
+            spending limit.
           </p>
         </div>
       </div>
@@ -976,14 +1032,14 @@ const PinSetupModal = ({
   );
 };
 
-const PinInput = ({ 
-  value, 
-  onChange, 
-  length 
-}: { 
-  value: string, 
-  onChange: (value: string) => void, 
-  length: number 
+const PinInput = ({
+  value,
+  onChange,
+  length,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  length: number;
 }): JSX.Element => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -1004,7 +1060,7 @@ const PinInput = ({
           width: "0",
           height: "0",
           position: "absolute",
-          opacity: "0"
+          opacity: "0",
         }}
         autoFocus
       />
@@ -1015,16 +1071,21 @@ const PinInput = ({
             style={{
               width: "3rem",
               height: "3rem",
-              border: `2px solid ${index < value.length ? colors.accent : colors.divider}`,
+              border: `2px solid ${
+                index < value.length ? colors.accent : colors.divider
+              }`,
               borderRadius: "0.5rem",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: "1.5rem",
               fontWeight: "bold",
-              backgroundColor: index < value.length ? "rgba(74, 109, 167, 0.1)" : "transparent"
+              backgroundColor:
+                index < value.length
+                  ? "rgba(74, 109, 167, 0.1)"
+                  : "transparent",
             }}
-            onClick={() => document.querySelector('input')?.focus()}
+            onClick={() => document.querySelector("input")?.focus()}
           >
             {index < value.length ? "•" : ""}
           </div>
@@ -1034,12 +1095,35 @@ const PinInput = ({
   );
 };
 
-const Pin = ({ width, height, color }: { width: number, height: number, color: string }): JSX.Element => {
+const Pin = ({
+  width,
+  height,
+  color,
+}: {
+  width: number;
+  height: number;
+  color: string;
+}): JSX.Element => {
   return (
-    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C8.13 2 5 5.13 5 9C5 11.38 6.19 13.47 8 14.74V17C8 17.55 8.45 18 9 18H15C15.55 18 16 17.55 16 17V14.74C17.81 13.47 19 11.38 19 9C19 5.13 15.87 2 12 2ZM14 13.58V16H10V13.58C8.2 12.81 7 11.05 7 9C7 6.24 9.24 4 12 4C14.76 4 17 6.24 17 9C17 11.05 15.8 12.81 14 13.58Z" fill={color}/>
-      <path d="M12 6C10.9 6 10 6.9 10 8C10 9.1 10.9 10 12 10C13.1 10 14 9.1 14 8C14 6.9 13.1 6 12 6Z" fill={color}/>
-      <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22Z" fill={color}/>
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 2C8.13 2 5 5.13 5 9C5 11.38 6.19 13.47 8 14.74V17C8 17.55 8.45 18 9 18H15C15.55 18 16 17.55 16 17V14.74C17.81 13.47 19 11.38 19 9C19 5.13 15.87 2 12 2ZM14 13.58V16H10V13.58C8.2 12.81 7 11.05 7 9C7 6.24 9.24 4 12 4C14.76 4 17 6.24 17 9C17 11.05 15.8 12.81 14 13.58Z"
+        fill={color}
+      />
+      <path
+        d="M12 6C10.9 6 10 6.9 10 8C10 9.1 10.9 10 12 10C13.1 10 14 9.1 14 8C14 6.9 13.1 6 12 6Z"
+        fill={color}
+      />
+      <path
+        d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22Z"
+        fill={color}
+      />
     </svg>
   );
 };
