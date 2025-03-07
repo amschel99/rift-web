@@ -233,6 +233,7 @@ export const CryptoPopOver = ({
 
           <p className="desc">
             OM <br />
+            <span>Mantra</span>
           </p>
         </div>
 
@@ -247,6 +248,7 @@ export const CryptoPopOver = ({
 
           <p className="desc">
             HKDA <br />
+            <span>HKDA</span>
           </p>
         </div>
 
@@ -261,6 +263,7 @@ export const CryptoPopOver = ({
 
           <p className="desc">
             WUSD <br />
+            <span>Worldwide USD</span>
           </p>
         </div>
 
@@ -275,6 +278,7 @@ export const CryptoPopOver = ({
 
           <p className="desc">
             USDC <br />
+            <span>USD Coin</span>
           </p>
         </div>
 
@@ -289,6 +293,7 @@ export const CryptoPopOver = ({
 
           <p className="desc">
             ETH <br />
+            <span>Ethereum</span>
           </p>
         </div>
 
@@ -303,6 +308,7 @@ export const CryptoPopOver = ({
 
           <p className="desc">
             BTC <br />
+            <span>Bitcoin</span>
           </p>
         </div>
       </div>
