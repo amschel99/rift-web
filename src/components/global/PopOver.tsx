@@ -5,24 +5,32 @@ import { colors } from "../../constants";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
+import wusdlogo from "../../assets/images/wusd.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 
-interface props {
+interface popOverProps {
   children: ReactNode;
   anchorEl: HTMLDivElement | null;
   setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>;
 }
 
-interface currencyPopOverProps {
+interface allCurrencyPopOverProps {
   anchorEl: HTMLDivElement | null;
   setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>;
   setCurrency: Dispatch<SetStateAction<assetType>>;
+}
+
+interface cryptoPopOverProps {
+  anchorEl: HTMLDivElement | null;
+  setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>;
+  setCurrency: Dispatch<SetStateAction<Exclude<assetType, "USD" | "HKD">>>;
 }
 
 export const PopOver = ({
   children,
   anchorEl,
   setAnchorEl,
-}: props): JSX.Element => {
+}: popOverProps): JSX.Element => {
   const popOverOPen = Boolean(anchorEl);
   const popOverId = popOverOPen ? "generic-popover" : undefined;
 
@@ -51,7 +59,7 @@ export const PopOverAlt = ({
   children,
   anchorEl,
   setAnchorEl,
-}: props): JSX.Element => {
+}: popOverProps): JSX.Element => {
   const popOverOPen = Boolean(anchorEl);
   const popOverId = popOverOPen ? "generic-popover" : undefined;
 
@@ -80,7 +88,7 @@ export const CurrencyPopOver = ({
   anchorEl,
   setAnchorEl,
   setCurrency,
-}: currencyPopOverProps): JSX.Element => {
+}: allCurrencyPopOverProps): JSX.Element => {
   const popOverOPen = Boolean(anchorEl);
   const popOverId = popOverOPen ? "generic-popover" : undefined;
 
@@ -182,6 +190,119 @@ export const CurrencyPopOver = ({
 
           <p className="desc">
             BTC <br /> <span>Crypto</span>
+          </p>
+        </div>
+      </div>
+    </Popover>
+  );
+};
+
+export const CryptoPopOver = ({
+  anchorEl,
+  setAnchorEl,
+  setCurrency,
+}: cryptoPopOverProps): JSX.Element => {
+  const popOverOPen = Boolean(anchorEl);
+  const popOverId = popOverOPen ? "generic-popover" : undefined;
+
+  const onClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <Popover
+      id={popOverId}
+      open={popOverOPen}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      elevation={0}
+      slotProps={{
+        paper: { style: { ...popOverStyles, width: "12rem" } },
+      }}
+    >
+      <div className="select_secrets">
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("OM");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={mantralogo} alt="secret" />
+
+          <p className="desc">
+            OM <br />
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("HKDA");
+            setAnchorEl(null);
+          }}
+        >
+          <span className="_icons">🇭🇰</span>
+
+          <p className="desc">
+            HKDA <br />
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("WUSD");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={wusdlogo} alt="secret" />
+
+          <p className="desc">
+            WUSD <br />
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("USDC");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={usdclogo} alt="secret" />
+
+          <p className="desc">
+            USDC <br />
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("ETH");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={ethlogo} alt="secret" />
+
+          <p className="desc">
+            ETH <br />
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("BTC");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={btclogo} alt="secret" />
+
+          <p className="desc">
+            BTC <br />
           </p>
         </div>
       </div>

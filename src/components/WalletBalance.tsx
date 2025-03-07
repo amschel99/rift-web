@@ -2,7 +2,6 @@ import { JSX, useState } from "react";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mui/material";
-import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
@@ -282,32 +281,21 @@ const AppActions = (): JSX.Element => {
   const navigate = useNavigate();
 
   const actionButtons = [
-    { icon: faGlobe, text: "Web2", screen: "web2" },
-    { icon: faArrowsRotate, text: "Lend", screen: "lend" },
-    { icon: faCrown, text: "Premi..", screen: "premiums" },
+    { icon: faExchangeAlt, text: "Swap", screen: "/swap" },
+    { icon: faGlobe, text: "Web2", screen: "/web2" },
+    { icon: faArrowsRotate, text: "Lend", screen: "/lend" },
+    { icon: faCrown, text: "Premi..", screen: "/premiums" },
   ];
-
-  const onSwap = () => {
-    openTelegramLink("https://t.me/stratospherex_bot/stratospherex");
-  };
 
   return (
     <div className="actions">
-      <div className="_action" onClick={onSwap}>
-        <span>Swap</span>
-
-        <span className="icons">
-          <FontAwesomeIcon icon={faExchangeAlt} className="icon" />
-        </span>
-      </div>
-
       {actionButtons.map((btn, index) => (
         <div
           key={index}
           className="_action"
           onClick={() => {
             if (btn?.screen) {
-              navigate(`/${btn?.screen}`);
+              navigate(btn.screen);
             }
           }}
         >
