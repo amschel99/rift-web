@@ -23,6 +23,7 @@ import OmAsset from "./pages/assets/OmAsset.tsx";
 import UsdcAsset from "./pages/assets/UsdcAsset.tsx";
 import SendCrypto from "./pages/transactions/SendCrypto.tsx";
 import SendCollectLink from "./pages/transactions/SendCollectLink.tsx";
+import SwapCrypto from "./pages/transactions/Swap.tsx";
 import BuyOm from "./pages/transactions/BuyOm.tsx";
 import CoinInfo from "./pages/CoinInfo.tsx";
 import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
@@ -85,6 +86,7 @@ createRoot(document.getElementById("root")!).render(
                         path="/sendcollectlink/:srccurrency/:intent"
                         element={<SendCollectLink />}
                       />
+                      <Route path="/swap" element={<SwapCrypto />} />
                       <Route path="/om-asset" element={<OmAsset />} />
                       <Route path="/get-om" element={<BuyOm />} />
                       <Route path="/usdc-asset" element={<UsdcAsset />} />

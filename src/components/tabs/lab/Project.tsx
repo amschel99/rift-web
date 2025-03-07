@@ -1,8 +1,8 @@
 import { JSX } from "react";
 import { openLink } from "@telegram-apps/sdk-react";
 import { useSnackbar } from "../../../hooks/snackbar";
-import { ComingSoon } from "../../../assets/icons/actions";
-import { colors } from "../../../constants";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
 export type projectType = {
   images: string[]; // [cover, logo]
@@ -17,6 +17,7 @@ export const Project = ({
   images,
   title,
   description,
+  category,
   comingSoon,
   link,
 }: projectType): JSX.Element => {
@@ -31,25 +32,38 @@ export const Project = ({
   };
 
   return (
-    <div
-      className="project"
-      style={{ backgroundImage: `url(${images[0]})` }}
-      onClick={handleClick}
-    >
-      <div className="project_cover">
-        <div className="project_logo">
+    <div className="project-card" onClick={handleClick}>
+      <div
+        className="project-image"
+        style={{ backgroundImage: `url(${images[0]})` }}
+      >
+        <div className="project-overlay">
+          {comingSoon && (
+            <div className="coming-soon-badge">
+              <span>Coming Soon</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="project-content">
+        <div className="project-logo">
           <img src={images[1]} alt={title} />
         </div>
 
-        <div className="about">
-          <p>
-            {title}
-            {comingSoon && (
-              <ComingSoon width={14} height={16} color={colors.textprimary} />
-            )}
-          </p>
+        <div className="project-info">
+          <h3 className="project-title">{title}</h3>
+          <p className="project-description">{description}</p>
 
-          <p className="description">{description}</p>
+          <div className="project-footer">
+            <span className="project-category">{category}</span>
+
+            {link && (
+              <button className="project-link-btn">
+                <FontAwesomeIcon icon={faExternalLinkAlt} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

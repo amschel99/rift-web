@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { CSSProperties, JSX } from "react";
 import { PrivateNode, PublicNode } from "../../../assets/icons/security";
 import { colors } from "../../../constants";
 import "../../../styles/components/tabs/security/node.scss";
@@ -21,6 +21,8 @@ export type nodeType = {
 
 interface props {
   selectedNode: nodeType;
+  aumvalue?: number;
+  sxstyles?: CSSProperties;
 }
 
 export const Nodes = ({ selectedNode }: props): JSX.Element => {
@@ -43,6 +45,29 @@ export const Nodes = ({ selectedNode }: props): JSX.Element => {
             <PublicNode color={colors.textprimary} />
           )}
         </span>
+      </div>
+    </div>
+  );
+};
+
+export const AltNodes = ({
+  selectedNode,
+  aumvalue,
+  sxstyles,
+}: props): JSX.Element => {
+  return (
+    <div className="nodee altnodee" style={sxstyles}>
+      <p className="name_location">
+        {selectedNode?.name}
+        <span>{selectedNode?.location}</span>
+      </p>
+
+      <div className="aum_holds">
+        <p className="aum">
+          AUM: <span>${aumvalue}M</span>
+        </p>
+
+        <span className="holds">Holds 1 shard</span>
       </div>
     </div>
   );

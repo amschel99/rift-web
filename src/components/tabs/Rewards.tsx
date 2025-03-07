@@ -4,7 +4,6 @@ import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { addDays, isAfter } from "date-fns";
 import { useBackButton } from "../../hooks/backbutton";
-import { useAppDrawer } from "../../hooks/drawer";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDialog } from "../../hooks/dialog";
 import { useTabs } from "../../hooks/tabs";
@@ -17,36 +16,48 @@ import { formatUsd } from "../../utils/formatters";
 import { getMantraUsdVal } from "../../utils/api/mantra";
 import { createReferralLink } from "../../utils/api/refer";
 import { dateDistance, formatDateToStr } from "../../utils/dates";
-import { Copy, Lock, Telegram } from "../../assets/icons/actions";
+import { Copy, Telegram } from "../../assets/icons/actions";
 import { colors } from "../../constants";
 import { Confetti } from "../../assets/animations";
 import referearn from "../../assets/images/icons/refer.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import staketokens from "../../assets/images/icons/lendto.png";
 import transaction from "../../assets/images/obhehalfspend.png";
-import dailycheckin from "../../assets/images/icons/acc-recovery.png";
+import rewardsimg from "../../assets/images/icons/rewards.png";
 import "../../styles/components/tabs/rewards.scss";
 
 export const Rewards = (): JSX.Element => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { openAppDrawer } = useAppDrawer();
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const { switchtab } = useTabs();
 
   const airdropId = localStorage.getItem("airdropId");
-  const airdropReferId = airdropId?.split("-")[1];
+  const airdropUid = airdropId?.split("-")[1];
+  const airdropReferId = airdropId?.split("-")[2];
   const localdailycheckintime = localStorage.getItem("nextdailychekin");
 
+  // -> unlocked amount -> daily checkin
+  const [unlockedAmount, setUnlockedAmount] = useState<number>(0);
   const [showanimation, setshowanimation] = useState<boolean>(false);
+  const [isCheckInDisabled, setIsCheckInDisabled] = useState<boolean>(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
-  const { data: mantrausdval } = useQuery({
+  const toggleAnimation = () => {
+    setshowanimation(true);
+
+    setTimeout(() => {
+      setshowanimation(false);
+    }, 3000);
+  };
+
+  const { data: mantrausdval, isLoading: isMantraUsdLoading } = useQuery({
     queryKey: ["mantrausd"],
     queryFn: getMantraUsdVal,
   });
 
-  const { data: unlocked } = useQuery({
+  const { data: unlocked, isLoading: isUnlockedLoading } = useQuery({
     queryKey: ["getunlocked"],
     queryFn: getUnlockedTokens,
   });
@@ -58,11 +69,12 @@ export const Rewards = (): JSX.Element => {
 
   // claim airdrop
   const { mutate: mutateClaimAirdrop } = useMutation({
-    mutationFn: () => claimAirdrop(airdropId as string, airdropReferId),
+    mutationFn: () => claimAirdrop(airdropUid as string, airdropReferId),
 
     onSuccess: () => {
       localStorage.removeItem("airdropId");
       showsuccesssnack("You Successfully claimed Airdrop Tokens");
+      toggleAnimation();
 
       queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
       queryClient.invalidateQueries({ queryKey: ["getunlocked"] }).then(() => {
@@ -81,37 +93,52 @@ export const Rewards = (): JSX.Element => {
   });
 
   const { data: referLink, mutate: mutateReferalLink } = useMutation({
-    mutationFn: () => createReferralLink("unlock"),
+    mutationFn: () => createReferralLink(),
   });
 
   const onStake = () => {
-    navigate("/staking");
+    switchtab("earn");
+  };
+
+  const onTransaction = () => {
+    switchtab("sendcrypto");
   };
 
   const onDailyCheckin = () => {
+    if (isCheckInDisabled) {
+      showerrorsnack(`Check in again ${timeRemaining}`);
+      return;
+    }
+
+    const nextdailycheckin = addDays(new Date(), 1);
+    localStorage.setItem("nextdailychekin", nextdailycheckin.toISOString());
+
+    setUnlockedAmount(unlockedAmount + 1);
+    toggleAnimation();
+    setIsCheckInDisabled(true);
+    updateTimeRemaining();
+  };
+
+  const updateTimeRemaining = () => {
     if (
-      localdailycheckintime == null ||
-      isAfter(new Date(), new Date(localdailycheckintime))
+      localdailycheckintime &&
+      isAfter(new Date(localdailycheckintime), new Date())
     ) {
-      const nextdailycheckin = addDays(new Date(), 1);
-      localStorage.setItem("nextdailychekin", nextdailycheckin.toISOString());
-
-      setshowanimation(true);
-
-      setTimeout(() => {
-        setshowanimation(false);
-      }, 1000);
-    } else {
       const datediff = dateDistance(localdailycheckintime);
-      showerrorsnack(
-        `Check in again ${datediff.includes("in") ? datediff : "in" + datediff}`
-      );
+      setTimeRemaining(datediff.includes("in") ? datediff : "in " + datediff);
+      setIsCheckInDisabled(true);
+    } else {
+      setTimeRemaining("");
+      setIsCheckInDisabled(false);
     }
   };
 
   const goBack = () => {
     switchtab("home");
+    navigate("/app");
   };
+
+  useBackButton(goBack);
 
   useEffect(() => {
     if (airdropId !== null) {
@@ -120,211 +147,226 @@ export const Rewards = (): JSX.Element => {
     }
 
     mutateReferalLink();
-  }, [airdropId]);
+    updateTimeRemaining();
 
-  useBackButton(goBack);
+    const timer = setInterval(updateTimeRemaining, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, [airdropId, localdailycheckintime]);
 
   return (
     <section id="rewards">
-      <div className="icon_ctr">
-        <img src={mantralogo} alt="rewards" />
+      {/* Locked Rewards Card */}
+      <div className="rewards-vault-card">
+        <div className="vault-header">
+          <div className="vault-icon">
+            <img src={rewardsimg} alt="rewards" className="gift-box" />
+          </div>
+          <h2>Locked Rewards</h2>
+
+          <div className="unlocked-stats">
+            <div className="stat-label">Total Unlocked</div>
+            {isUnlockedLoading || isMantraUsdLoading ? (
+              <div className="stat-value loading">
+                <div className="loading-animation">
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                </div>
+              </div>
+            ) : (
+              <div className="stat-value">
+                {unlocked?.unlocked}
+                <img src={mantralogo} alt="OM" />
+                <span className="usd-equivalent">
+                  ≈
+                  {formatUsd(
+                    Number(unlocked?.unlocked || 0) * Number(mantrausdval)
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="vault-content">
+          {isUnlockedLoading || isMantraUsdLoading ? (
+            <div className="token-amount-loading">
+              <div className="loading-pulse"></div>
+              <img src={mantralogo} alt="OM Token" className="om-token" />
+            </div>
+          ) : (
+            <>
+              <div className="token-amount" key={unlockedAmount}>
+                <span className="amount-value">
+                  {Number(unlocked?.amount) + unlockedAmount}
+                </span>
+                <img src={mantralogo} alt="OM Token" className="om-token" />
+              </div>
+              <div className="usd-value">
+                ≈{formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="vault-actions">
+          <button
+            className={`daily-checkin-btn ${
+              isCheckInDisabled ? "disabled" : ""
+            }`}
+            onClick={onDailyCheckin}
+            disabled={isCheckInDisabled}
+          >
+            <span>
+              Daily Check-in{" "}
+              <small className="inline-small">
+                +1 Locked <img src={mantralogo} alt="OM" />
+              </small>
+              {isCheckInDisabled && (
+                <div className="countdown">Next Check-in: {timeRemaining}</div>
+              )}
+            </span>
+          </button>
+
+          <button
+            className="boost-btn"
+            onClick={() => navigate("/premiums?returnPath=rewards")}
+          >
+            <span>x2 Boost</span>
+          </button>
+        </div>
       </div>
 
-      <div className="locked_balances">
-        <p className="icon_desc">
-          <span>
-            <Lock width={12} height={14} color={colors.textprimary} />
-          </span>
-          Locked Rewards
+      {/* Unlock Tasks Card */}
+      <div className="missions-card">
+        <h3 className="missions-title">Unlock Tasks</h3>
+        <p className="missions-description">
+          Complete tasks to unlock{" "}
+          <img src={mantralogo} alt="OM" className="inline-om-icon" /> tokens to
+          your wallet
         </p>
 
-        <p className="locked_amount" key={unlocked?.amount || 0}>
-          {unlocked?.amount || 0} <img src={mantralogo} alt="mantra" />
-          &nbsp;~&nbsp;
-          {formatUsd(Number(unlocked?.amount || 0) * Number(mantrausdval))}
-        </p>
+        <div className="mission-list">
+          <div className="mission-item refer-mission">
+            <div className="mission-info">
+              <img src={referearn} alt="Refer" className="mission-icon" />
+              <div className="mission-details">
+                <div className="mission-name">Refer & Earn</div>
+                <div className="mission-description">
+                  Earn from each successful referral
+                </div>
+              </div>
+            </div>
+            <div className="mission-reward">
+              <span>1</span>
+              <img src={mantralogo} alt="OM" />
+            </div>
+          </div>
 
-        <div className="progress" />
-        <p className="progress_txt">
-          <span className="value">30%</span>
-          <span>Unlocks in 24 Hours</span>
-        </p>
-      </div>
-
-      <div className="boost" onClick={() => navigate("/premiums")}>
-        <img src={mantralogo} alt="mantra" />
-        <p>
-          Boost
-          <span>+100 OM</span>
-        </p>
-      </div>
-
-      <p className="tasks_title">
-        Unlock More <img src={mantralogo} alt="mantra" />
-      </p>
-
-      <ReferTask referalUrl={referLink} />
-      <UnlockTask
-        image={dailycheckin}
-        title="Daily Check-in"
-        description="Claim a daily check-in reward of"
-        unlockamount={1}
-        onclick={onDailyCheckin}
-      />
-      <UnlockTask
-        image={staketokens}
-        title="Stake"
-        description="Stake crypto asset(s) & unlock"
-        unlockamount={4}
-        onclick={onStake}
-      />
-
-      <p className="tasks_title">
-        Earn More <img src={mantralogo} alt="mantra" />
-      </p>
-      <UnlockTask
-        image={transaction}
-        title="Make a transaction"
-        description="Perform a transaction & unlock"
-        unlockamount={1}
-        onclick={() => openAppDrawer("unlocktransactions")}
-      />
-
-      <div className="unlockedamount">
-        <span className="desc">Unlocked</span>
-
-        <p className="available">
-          {unlocked?.unlocked}&nbsp;
-          <img src={mantralogo} alt="mantra" />
-          &nbsp;~&nbsp;
-          <span>
-            {formatUsd(Number(unlocked?.unlocked || 0) * Number(mantrausdval))}
-          </span>
-        </p>
-        <p className="aboutunlocked">
-          Any unlocked amount is sent to your wallet
-        </p>
-      </div>
-
-      <div className="history">
-        <p className="history_title">History</p>
-
-        {unlockhistorydata ? (
-          unlockhistorydata[0]?.message?.map((message, index) => {
-            const datestr = message.split(" ").pop() as string;
-
-            return (
-              <p
-                style={{
-                  borderBottom:
-                    index == unlockhistorydata[0]?.message?.length - 1
-                      ? `1px solid ${colors.divider}`
-                      : "",
+          <div className="referral-actions">
+            <div className="referral-link">
+              {referLink?.substring(0, 32) || "Creating your link"}...
+            </div>
+            <div className="referral-buttons">
+              <button
+                className="copy-btn"
+                onClick={() => {
+                  if (typeof referLink == undefined) {
+                    showerrorsnack("Generating your link, please wait");
+                  } else {
+                    navigator.clipboard.writeText(referLink as string);
+                    showsuccesssnack("Link copied to clipboard...");
+                  }
                 }}
-                className="message"
-                key={index}
               >
-                {message.split(" ").slice(0, -1).join(" ")}&nbsp;
-                {formatDateToStr(datestr)} <br />
-                <span>{dateDistance(datestr)}</span>
-              </p>
-            );
-          })
-        ) : (
-          <p className="nohistory">
-            Your history will appear here as you complete tasks
-          </p>
-        )}
+                <Copy width={16} height={18} color={colors.textprimary} />
+              </button>
+              <button
+                className="share-btn"
+                onClick={() => {
+                  if (typeof referLink == undefined) {
+                    showerrorsnack("Generating your link, please wait");
+                  } else {
+                    openTelegramLink(`https://t.me/share/url?url=${referLink}`);
+                  }
+                }}
+              >
+                <Telegram width={20} height={20} color={colors.textprimary} />
+              </button>
+            </div>
+          </div>
+
+          <div className="mission-item" onClick={() => onStake()}>
+            <div className="mission-info">
+              <img src={staketokens} alt="Stake" className="mission-icon" />
+              <div className="mission-details">
+                <div className="mission-name">Stake</div>
+                <div className="mission-description">
+                  Stake crypto asset(s) & unlock
+                </div>
+              </div>
+            </div>
+            <div className="mission-reward">
+              <span>3</span>
+              <img src={mantralogo} alt="OM" />
+            </div>
+          </div>
+
+          <div className="mission-item" onClick={() => onTransaction()}>
+            <div className="mission-info">
+              <img
+                src={transaction}
+                alt="Transaction"
+                className="mission-icon"
+              />
+              <div className="mission-details">
+                <div className="mission-name">Make a transaction</div>
+                <div className="mission-description">
+                  Perform a transaction & unlock
+                </div>
+              </div>
+            </div>
+            <div className="mission-reward">
+              <span>1</span>
+              <img src={mantralogo} alt="OM" />
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* History Section */}
+      <div className="history-section">
+        <h3 className="history-title">History</h3>
+        <div className="history-content">
+          {unlockhistorydata && unlockhistorydata[0]?.message?.length > 0 ? (
+            unlockhistorydata[0]?.message?.map((message, index) => {
+              const datestr = message.split(" ").pop() as string;
+              return (
+                <div className="history-item" key={index}>
+                  <div className="history-message">
+                    {message.split(" ").slice(0, -1).join(" ")}
+                  </div>
+                  <div className="history-date">
+                    {formatDateToStr(datestr)}
+                    <span className="history-time">
+                      {dateDistance(datestr)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="no-history">No history available</div>
+          )}
+        </div>
+      </div>
+
+      {/* Confetti Animation */}
       {showanimation && (
-        <div className="animation_ctr">
+        <div className="confetti-animation">
           <Confetti width="100%" height="100%" />
         </div>
       )}
     </section>
-  );
-};
-
-const ReferTask = ({ referalUrl }: { referalUrl?: string }): JSX.Element => {
-  const { showerrorsnack, showsuccesssnack } = useSnackbar();
-
-  const onCopyLink = () => {
-    if (typeof referalUrl == undefined) {
-      showerrorsnack("Generating your link, please wait");
-    } else {
-      navigator.clipboard.writeText(referalUrl as string);
-      showsuccesssnack("Link copied to clipboard...");
-    }
-  };
-
-  const onShareTg = () => {
-    if (typeof referalUrl == undefined) {
-      showerrorsnack("Generating your link, please wait");
-    } else {
-      openTelegramLink(`https://t.me/share/url?url=${referalUrl}`);
-    }
-  };
-
-  return (
-    <div className="refer_task">
-      <div className="_task">
-        <img src={referearn} alt="refer" />
-
-        <p>
-          Refer & Earn
-          <span>
-            Earn 1&nbsp;
-            <img src={mantralogo} alt="mantra" />
-            &nbsp; from each successfull referral
-          </span>
-        </p>
-      </div>
-
-      <div className="task_actions">
-        <span className="url">
-          {referalUrl?.substring(0, 32) || "Creating your link"}...
-        </span>
-
-        <div className="actions">
-          <button className="copy" onClick={onCopyLink}>
-            <Copy width={16} height={18} color={colors.textsecondary} />
-          </button>
-
-          <button className="send_tg" onClick={onShareTg}>
-            <Telegram width={20} height={20} color={colors.textprimary} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const UnlockTask = ({
-  image,
-  title,
-  description,
-  unlockamount,
-  onclick,
-}: {
-  image: string;
-  title: string;
-  description: string;
-  unlockamount: number;
-  onclick: () => void;
-}): JSX.Element => {
-  return (
-    <div className="unlock_task" onClick={onclick}>
-      <img className="image" src={image} alt="rewards" />
-
-      <p>
-        {title}
-        <span>
-          {description}&nbsp;
-          {unlockamount}&nbsp;
-          <img src={mantralogo} alt="mantra" />
-        </span>
-      </p>
-    </div>
   );
 };
