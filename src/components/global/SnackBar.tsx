@@ -1,4 +1,4 @@
-import { Fragment, SyntheticEvent } from "react";
+import { Fragment } from "react";
 import { Snackbar, IconButton } from "@mui/material";
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { useSnackbar } from "../../hooks/snackbar";
@@ -10,11 +10,7 @@ export const SnackBar = (): JSX.Element => {
   const { snackbaropen, snackbarmsg, snacksuccess, hidesnackbar } =
     useSnackbar();
 
-  const handleClose = (_event: SyntheticEvent | Event, reason?: string) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
+  const handleClose = () => {
     hidesnackbar();
   };
 

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mui/material";
 import {
-  faXmark,
   faCircleArrowUp,
   faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
@@ -34,7 +33,9 @@ export const WalletBalance = (): JSX.Element => {
   const { switchtab } = useTabs();
 
   const [showBalance, setShowBalance] = useState<boolean>(true);
-  const [filter, setFilter] = useState<"all" | "pst">("all");
+  const [assetsFilter, setAssetsFilter] = useState<"all" | "web2" | "web3">(
+    "all"
+  );
 
   const { data: btcethbalance, isLoading: btcethLoading } = useQuery({
     queryKey: ["btceth"],
@@ -145,20 +146,23 @@ export const WalletBalance = (): JSX.Element => {
       <AppActions />
 
       <div className="filters">
-        {filter !== "all" && (
-          <button className="_cancel" onClick={() => setFilter("all")}>
-            <FaIcon faIcon={faXmark} color={colors.primary} />
-          </button>
-        )}
         <button
-          className="_filter"
-          style={{
-            backgroundColor: filter == "pst" ? colors.textprimary : "",
-            color: filter == "pst" ? colors.primary : "",
-          }}
-          onClick={() => setFilter("pst")}
+          className={assetsFilter == "all" ? "active" : ""}
+          onClick={() => setAssetsFilter("all")}
         >
-          Profit Share Tokens
+          All
+        </button>
+        <button
+          className={assetsFilter == "web3" ? "active" : ""}
+          onClick={() => setAssetsFilter("web3")}
+        >
+          Web3
+        </button>
+        <button
+          className={assetsFilter == "web2" ? "active" : ""}
+          onClick={() => setAssetsFilter("web2")}
+        >
+          Web2
         </button>
       </div>
 
@@ -201,7 +205,7 @@ export const WalletBalance = (): JSX.Element => {
         </>
       ) : (
         <>
-          {filter == "all" ? (
+          {(assetsFilter == "all" || assetsFilter == "web3") && (
             <>
               <Asset
                 name="Mantra"
@@ -239,45 +243,17 @@ export const WalletBalance = (): JSX.Element => {
                 balance={0}
                 balanceusd={0}
               />
-              <Asset
-                name="POE"
-                symbol="GPT Powered Chatbot"
-                image={poelogo}
-                navigatelink="/web2"
-                balanceusd={240}
-              />
-              <Asset
-                name="PST-0"
-                symbol="Profit SHare Token - 0"
-                image={poelogo}
-                navigatelink="/swap"
-                balanceusd={10}
-              />
-              <Asset
-                name="PST-1"
-                symbol="Profit SHare Token - 1"
-                image={poelogo}
-                navigatelink="/swap"
-                balanceusd={8}
-              />
             </>
-          ) : (
-            <>
-              <Asset
-                name="PST-0"
-                symbol="Profit SHare Token - 0"
-                image={poelogo}
-                navigatelink="/swap"
-                balanceusd={10}
-              />
-              <Asset
-                name="PST-1"
-                symbol="Profit SHare Token - 1"
-                image={poelogo}
-                navigatelink="/swap"
-                balanceusd={8}
-              />
-            </>
+          )}
+
+          {(assetsFilter == "all" || assetsFilter == "web2") && (
+            <Asset
+              name="POE"
+              symbol="GPT Powered Chatbot"
+              image={poelogo}
+              navigatelink="/web2"
+              balanceusd={240}
+            />
           )}
         </>
       )}
@@ -292,7 +268,7 @@ const AppActions = (): JSX.Element => {
     { icon: faExchangeAlt, text: "Swap", screen: "/swap" },
     { icon: faGlobe, text: "Web2", screen: "/web2" },
     { icon: faArrowsRotate, text: "Lend", screen: "/lend" },
-    { icon: faCrown, text: "Premi..", screen: "/premiums" },
+    { icon: faCrown, text: "Premium", screen: "/premiums" },
   ];
 
   return (
@@ -309,7 +285,11 @@ const AppActions = (): JSX.Element => {
         >
           <span>{btn.text}</span>
           <span className="icons">
-            <FaIcon faIcon={btn.icon} color={colors.textsecondary} />
+            <FaIcon
+              faIcon={btn.icon}
+              color={colors.textsecondary}
+              fontsize={12}
+            />
           </span>
         </div>
       ))}
