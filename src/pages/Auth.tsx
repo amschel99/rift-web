@@ -17,14 +17,15 @@ export default function Authentication(): JSX.Element {
   const { socket } = useSocket();
   const navigate = useNavigate();
 
-  const tgUsername: string = initData?.user?.username as string;
+  const tgUserId: string = String(initData?.user?.id as number);
+  // const tgUsername: string = initData?.user?.username as string;
 
   const { mutate: mutatecreatewallet, isSuccess: createwalletsuccess } =
     useMutation({
-      mutationFn: () => createEVMWallet(tgUsername),
+      mutationFn: () => createEVMWallet(tgUserId),
     });
   const { mutate: mutateSignup, isSuccess: signupsuccess } = useMutation({
-    mutationFn: () => signupUser(tgUsername),
+    mutationFn: () => signupUser(tgUserId),
     onSuccess: () => {
       mutatecreatewallet();
     },
@@ -33,7 +34,7 @@ export default function Authentication(): JSX.Element {
   // const { mutate: createquvaultaccount, isSuccess: createquvaultsuccess } =
   //   useMutation({
   //     mutationFn: () =>
-  //       signupQuvaultUser(tgUsername, `${tgUsername}@sphere.app`, tgUsername),
+  //       signupQuvaultUser(tgUserId, `${tgUsername}@sphereid.app`, tgUsername),
   //     onSuccess: (data) => {
   //       localStorage.setItem("quvaulttoken", data?.token);
   //     },
@@ -80,7 +81,7 @@ export default function Authentication(): JSX.Element {
 
         const retries = 8;
 
-        if (data?.user == tgUsername) {
+        if (data?.user == tgUserId) {
           socket.off("AccountCreationSuccess");
           socket.off("AccountCreationFailed");
 
