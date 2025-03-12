@@ -1,6 +1,6 @@
 import { QUVAULT_BASEURL, QUVAULT_ENDPOINTS } from "../config";
 
-export type launchproject = {
+export type launchpadstore = {
   store_id: string;
   store_name: string;
   merchant_email: string;
@@ -25,8 +25,8 @@ export type launchproject = {
   updated_at: string;
 };
 
-export const getLaunchPadProjects = async (): Promise<{
-  data: launchproject[];
+export const getLaunchPadStores = async (): Promise<{
+  data: launchpadstore[];
 }> => {
   let URL = QUVAULT_BASEURL + QUVAULT_ENDPOINTS.launchpad;
   let quvaultToken = localStorage.getItem("quvaulttoken");
@@ -40,4 +40,23 @@ export const getLaunchPadProjects = async (): Promise<{
   });
 
   return res.json();
+};
+
+export const launchPadStoreSubscribe = async (
+  storeId: string,
+  subscribeAmount: number
+): Promise<{ status: number }> => {
+  let URL = QUVAULT_BASEURL + QUVAULT_ENDPOINTS.launchpadsubscribe + storeId;
+  let quvaultToken = localStorage.getItem("quvaulttoken");
+
+  const res = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${quvaultToken}`,
+    },
+    body: JSON.stringify({ amount: subscribeAmount }),
+  });
+
+  return { status: res.status };
 };
