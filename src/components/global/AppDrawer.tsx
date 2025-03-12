@@ -10,8 +10,9 @@ import { TransactionLimit } from "../drawer/TransactionLimit";
 import { DeleteRecovery } from "../drawer/DeleteRecovery";
 import { RevokeSecretAccess } from "../drawer/RevokeSecretAccess";
 import { CreateKey } from "../drawer/CreateKey";
-import { colors } from "../../constants";
 import { SwapPst } from "../drawer/SwapPst";
+import { LaunchPadSubscribe } from "../drawer/LaunchPadSubscribe";
+import { colors } from "../../constants";
 
 export const AppDrawer = (): JSX.Element => {
   const { action, drawerOpen, closeAppDrawer } = useAppDrawer();
@@ -25,7 +26,7 @@ export const AppDrawer = (): JSX.Element => {
           sx: {
             ...drawerstyles,
             height:
-              action == "stakepst"
+              action == "swappst" || action == "launchpadsubscribe"
                 ? "65vh"
                 : action == "transactionlimit"
                 ? "45vh"
@@ -36,7 +37,9 @@ export const AppDrawer = (): JSX.Element => {
       open={drawerOpen}
       onClose={() => closeAppDrawer()}
     >
-      {action !== "stakepst" && <div style={barstyles} />}
+      {action !== "swappst" && action !== "launchpadsubscribe" && (
+        <div style={barstyles} />
+      )}
 
       {action == "collectfromwallet" ? (
         <SendEthFromToken />
@@ -54,8 +57,10 @@ export const AppDrawer = (): JSX.Element => {
         <RevokeSecretAccess />
       ) : action == "createkey" ? (
         <CreateKey />
-      ) : action == "stakepst" ? (
+      ) : action == "swappst" ? (
         <SwapPst />
+      ) : action == "launchpadsubscribe" ? (
+        <LaunchPadSubscribe />
       ) : (
         <NodeTeeSelector />
       )}

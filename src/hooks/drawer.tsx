@@ -12,7 +12,8 @@ export type draweraction =
   | "deletephone"
   | "paymentlink"
   | "revokesecretaccess"
-  | "stakepst"
+  | "swappst"
+  | "launchpadsubscribe"
   | "unlocktransactions";
 
 interface draerctxtype {

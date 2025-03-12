@@ -316,6 +316,8 @@ const LaunchPadProduct = ({
 }: {
   store: launchpadstore;
 }): JSX.Element => {
+  const { openAppDrawerWithUrl } = useAppDrawer();
+
   return (
     <div className="launchpadproduct">
       <div className="img_status">
@@ -353,7 +355,7 @@ const LaunchPadProduct = ({
             backgroundColor: colors.success,
           }}
           icon={<FaIcon faIcon={faPlusCircle} color={colors.textprimary} />}
-          onclick={() => {}}
+          onclick={() => openAppDrawerWithUrl("launchpadsubscribe", store?.id)}
         />
       </div>
 
@@ -393,11 +395,7 @@ const TokenProduct = ({ token }: { token: psttoken }): JSX.Element => {
             backgroundColor: colors.success,
           }}
           onclick={() =>
-            openAppDrawerWithKey(
-              "stakepst",
-              token?.symbol,
-              String(token?.price)
-            )
+            openAppDrawerWithKey("swappst", token?.symbol, String(token?.price))
           }
         />
       </div>

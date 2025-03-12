@@ -41,3 +41,22 @@ export const getLaunchPadStores = async (): Promise<{
 
   return res.json();
 };
+
+export const launchPadStoreSubscribe = async (
+  storeId: string,
+  subscribeAmount: number
+): Promise<{ status: number }> => {
+  let URL = QUVAULT_BASEURL + QUVAULT_ENDPOINTS.launchpadsubscribe + storeId;
+  let quvaultToken = localStorage.getItem("quvaulttoken");
+
+  const res = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${quvaultToken}`,
+    },
+    body: JSON.stringify({ amount: subscribeAmount }),
+  });
+
+  return { status: res.status };
+};

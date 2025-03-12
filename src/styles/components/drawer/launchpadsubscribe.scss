@@ -1,0 +1,79 @@
+@use '../../constants/colors' as colors;
+@use '../../constants/mixins' as mixins;
+
+#launchpadsubscribe {
+    width: 100%;
+    padding: 1rem;
+    padding-top: 0.75rem;
+    color: colors.$textprimary;
+
+    .img_name {
+        @include mixins.useFlex(column, nowrap, center, center, 0.25rem);
+        width: 100%;
+        padding-bottom: 0.375rem;
+
+        img {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+        }
+
+        p {
+            @include mixins.useFlex(column, nowrap, center, center, 0);
+            @include mixins.useAltFont();
+            font-size: 0.875rem;
+            font-weight: bold;
+
+            span {
+                font-size: 0.75rem;
+                font-weight: 300;
+                color: colors.$textsecondary;
+            }
+        }
+    }
+
+    .storedetail {
+        margin-bottom: 6.25rem;
+
+        .detail {
+            @include mixins.useFlex(row, nowrap, center, space-between, 0);
+            padding: 0.625rem 0;
+            border-top: 1px dashed colors.$divider;
+            font-size: 0.75rem;
+
+            span {
+                @include mixins.useAltFont();
+                font-size: 0.875rem;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .input_submit {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid colors.$divider;
+        background-color: colors.$primary;
+
+        input {
+            @include mixins.useAltFont();
+            @include mixins.useButton();
+            @include mixins.useNumberInput();
+            width: 100%;
+            padding: 0.75rem 0.5rem;
+            border: 1px solid colors.$divider;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: colors.$textprimary;
+            background-color: colors.$divider;
+
+            &::placeholder {
+                color: colors.$textsecondary;
+            }
+        }
+    }
+}
