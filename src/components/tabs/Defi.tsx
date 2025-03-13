@@ -14,6 +14,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { stakeproducttype } from "../../types/earn";
 import { useAppDrawer } from "../../hooks/drawer";
+import { useBackButton } from "../../hooks/backbutton";
+import { useTabs } from "../../hooks/tabs";
 import { psttoken, getPstTokens } from "../../utils/api/quvault/psttokens";
 import {
   launchpadstore,
@@ -22,6 +24,7 @@ import {
 import { getMyDividends } from "../../utils/api/quvault/dividends";
 import { formatUsdSimple } from "../../utils/formatters";
 import { SubmitButton } from "../global/Buttons";
+import { Loading } from "../../assets/animations";
 import { FaIcon } from "../../assets/faicon";
 import { colors } from "../../constants";
 import stakeicon from "../../assets/images/icons/lendto.png";
@@ -46,6 +49,9 @@ type ammPoolType = {
 };
 
 export const DefiTab = (): JSX.Element => {
+  const navigate = useNavigate();
+  const { switchtab } = useTabs();
+
   const [filter, setFilter] = useState<
     "portfolio" | "yield" | "amm" | "tokens" | "launchpad"
   >("portfolio");
@@ -55,20 +61,26 @@ export const DefiTab = (): JSX.Element => {
     queryFn: getMyDividends,
   });
 
-  const { data: pstTokensdata } = useQuery({
+  const { data: pstTokensdata, isFetching: pstLoading } = useQuery({
     queryKey: ["psttokens"],
     queryFn: getPstTokens,
   });
 
-  const { data: launchPaddata } = useQuery({
+  const { data: launchPaddata, isFetching: launchpadLoading } = useQuery({
     queryKey: ["launchpad"],
     queryFn: getLaunchPadStores,
   });
 
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
+
+  useBackButton(goBack);
+
   return (
     <section id="defitab">
       <p className="title">Defi Hub</p>
-
       <div className="filters">
         <FilterButton
           text="Portfolio"
@@ -149,6 +161,12 @@ export const DefiTab = (): JSX.Element => {
           onclick={() => setFilter("launchpad")}
         />
       </div>
+
+      {dividendsloading && pstLoading && launchpadLoading && (
+        <div className="loading_ctr">
+          <Loading width="2rem" height="2rem" />
+        </div>
+      )}
 
       {filter == "portfolio" && !dividendsloading && (
         <>
@@ -259,7 +277,6 @@ export const DefiTab = (): JSX.Element => {
           </div>
         </>
       )}
-
       {filter == "amm" && (
         <div className="tokens_ctr">
           {ammPools?.map((_product, index) => (
@@ -267,7 +284,6 @@ export const DefiTab = (): JSX.Element => {
           ))}
         </div>
       )}
-
       {filter == "yield" && (
         <div className="tokens_ctr">
           {sphereVaults?.map((_product) => (
@@ -275,7 +291,6 @@ export const DefiTab = (): JSX.Element => {
           ))}
         </div>
       )}
-
       {filter == "launchpad" && (
         <div className="tokens_ctr">
           {launchPaddata?.data?.map((_store) => (
@@ -283,7 +298,6 @@ export const DefiTab = (): JSX.Element => {
           ))}
         </div>
       )}
-
       {filter == "tokens" && (
         <div className="tokens_ctr">
           {pstTokensdata?.data?.map((_token) => (
@@ -291,7 +305,6 @@ export const DefiTab = (): JSX.Element => {
           ))}
         </div>
       )}
-
       <p className="desc">
         Discover and track tokens, Automated Market Maker(AMM) assets, yield
         opportunities, launchpad, and your portfolio.

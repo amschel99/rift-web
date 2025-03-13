@@ -4,6 +4,8 @@
 #defitab {
   margin-bottom: 5rem;
 
+
+
   .title {
     padding: 1rem;
     padding-bottom: 0.5rem;
@@ -32,6 +34,12 @@
       border-bottom-color: colors.$textprimary;
       color: colors.$textprimary;
     }
+  }
+
+  .loading_ctr {
+    @include mixins.useFlex(row, nowrap, center, center, 0);
+    width: 100%;
+    margin-top: 2.5rem;
   }
 
   .dividends_ctr {
