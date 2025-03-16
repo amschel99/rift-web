@@ -2,7 +2,7 @@ import { JSX, useState, MouseEvent } from "react";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { formatNumber, formatUsd } from "../../utils/formatters";
-import { PopOver } from "../../components/global/PopOver";
+import { CryptoPopOver } from "../../components/global/PopOver";
 import { SubmitButton } from "../../components/global/Buttons";
 import { RadioButton } from "../../components/global/Radios";
 import { BottomButtonContainer } from "../../components/Bottom";
@@ -12,6 +12,8 @@ import { colors } from "../../constants";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+import wusdlogo from "../../assets/images/wusd.png";
 import "../../styles/pages/createlend.scss";
 
 export type assetType =
@@ -29,7 +31,8 @@ export default function CreateLendAsset(): JSX.Element {
   const navigate = useNavigate();
 
   const [lendAmount, setLendAmount] = useState<string>("");
-  const [assetType, setAssetType] = useState<assetType>("ETH");
+  const [assetType, setAssetType] =
+    useState<Exclude<assetType, "USD" | "HKD">>("ETH");
   const [selectAssetUtility, setSelectAssetUtility] =
     useState<assetUtility>("staking");
   const [assetAnchorEl, setAssetAnchorEl] = useState<HTMLDivElement | null>(
@@ -76,21 +79,29 @@ export default function CreateLendAsset(): JSX.Element {
       <p className="title">
         Lend Crypto
         <br />
-        <span>Earn yields by letting others use your crypto assets</span>
+        <span>Earn profits by letting others use your crypto assets</span>
       </p>
 
       <div className="assetselector" onClick={openAssetPopOver}>
         <div className="img_desc">
-          <img
-            src={
-              assetType == "BTC"
-                ? btclogo
-                : assetType == "ETH"
-                ? ethlogo
-                : usdclogo
-            }
-            alt="asset"
-          />
+          {assetType == "HKDA" ? (
+            <span className="hkda">🇭🇰</span>
+          ) : (
+            <img
+              src={
+                assetType == "BTC"
+                  ? btclogo
+                  : assetType == "ETH"
+                  ? ethlogo
+                  : assetType == "OM"
+                  ? mantralogo
+                  : assetType == "WUSD"
+                  ? wusdlogo
+                  : usdclogo
+              }
+              alt="asset"
+            />
+          )}
 
           <p className="desc">
             {assetType} <br />
@@ -99,6 +110,12 @@ export default function CreateLendAsset(): JSX.Element {
                 ? "Bitcoin"
                 : assetType == "ETH"
                 ? "Ethereum"
+                : assetType == "HKDA"
+                ? "HKDA"
+                : assetType == "OM"
+                ? "Mantra"
+                : assetType == "WUSD"
+                ? "Worldwide USD"
                 : "USD Coin"}
             </span>
           </p>
@@ -108,55 +125,12 @@ export default function CreateLendAsset(): JSX.Element {
           <ChevronLeft width={6} height={11} color={colors.textsecondary} />
         </span>
       </div>
-      <PopOver anchorEl={assetAnchorEl} setAnchorEl={setAssetAnchorEl}>
-        {
-          <div className="select_assets">
-            <div
-              className="img_desc"
-              onClick={() => {
-                setAssetType("BTC");
-                setAssetAnchorEl(null);
-              }}
-            >
-              <img src={btclogo} alt="asset" />
-
-              <p className="desc">
-                BTC <br /> <span>Bitcoin</span>
-              </p>
-            </div>
-
-            <div
-              className="img_desc"
-              onClick={() => {
-                setAssetType("ETH");
-                setAssetAnchorEl(null);
-              }}
-            >
-              <img src={ethlogo} alt="asset" />
-
-              <p className="desc">
-                ETH <br /> <span>Ethereum</span>
-              </p>
-            </div>
-
-            <div
-              className="img_desc"
-              onClick={() => {
-                setAssetType("USDC");
-                setAssetAnchorEl(null);
-              }}
-            >
-              <img src={usdclogo} alt="asset" />
-
-              <p className="desc">
-                USDC <br /> <span>USD Coin</span>
-              </p>
-            </div>
-
-            <p className="asset_tle">Select an asset you would like to lend</p>
-          </div>
-        }
-      </PopOver>
+      <CryptoPopOver
+        anchorEl={assetAnchorEl}
+        setAnchorEl={setAssetAnchorEl}
+        setCurrency={setAssetType}
+        sxstyles={{ width: "100%" }}
+      />
 
       <div className="balances">
         <p className="tle">Balance</p>
@@ -207,7 +181,7 @@ export default function CreateLendAsset(): JSX.Element {
         </p>
 
         <RadioButton
-          title="Staking"
+          title="Staking Delegation"
           description="Asset will be staked in a DEX (StratosphereX)"
           ischecked={selectAssetUtility == "staking"}
           sxstyles={{ marginTop: "0.5rem" }}
@@ -215,7 +189,7 @@ export default function CreateLendAsset(): JSX.Element {
         />
 
         <RadioButton
-          title="Liquidity"
+          title="Liquidity Provision"
           description="Asset will provide liquidity for pools"
           ischecked={selectAssetUtility == "liquidity"}
           sxstyles={{ marginTop: "0.5rem" }}
@@ -223,18 +197,28 @@ export default function CreateLendAsset(): JSX.Element {
         />
 
         <RadioButton
-          title="Trading"
-          description="Asset will be traded in a DEX (StratosphereX)"
+          title="Marketplace purchases"
+          description="Asset will be used for marketplace purchases"
           ischecked={selectAssetUtility == "trading"}
           sxstyles={{ marginTop: "0.5rem" }}
           onclick={() => setSelectAssetUtility("trading")}
+        />
+
+        <RadioButton
+          title="Governance voting"
+          description="Asset will be used for governance voting"
+          ischecked={selectAssetUtility == "governance"}
+          sxstyles={{ marginTop: "0.5rem" }}
+          onclick={() => setSelectAssetUtility("governance")}
         />
       </div>
 
       <div className="yields">
         <p className="yielcase">
           Profits distribution <br />
-          <span>How much would you like to keep from the profits ?</span>
+          <span>
+            How much would you like to keep from the profits realised ?
+          </span>
         </p>
 
         <div className="keeps">

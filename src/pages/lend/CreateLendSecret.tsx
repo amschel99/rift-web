@@ -26,6 +26,7 @@ import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import wusdlogo from "../../assets/images/wusd.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import "../../styles/pages/createlendsecret.scss";
 
 export type secretType = "POE" | "SPHERE" | "AIRWALLEX";
@@ -345,6 +346,8 @@ export default function CreateLendSecret(): JSX.Element {
                       ? ethlogo
                       : repayAsset == "WUSD"
                       ? wusdlogo
+                      : repayAsset == "OM"
+                      ? mantralogo
                       : usdclogo
                   }
                   alt="secret"

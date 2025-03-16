@@ -24,6 +24,7 @@ interface cryptoPopOverProps {
   anchorEl: HTMLDivElement | null;
   setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>;
   setCurrency: Dispatch<SetStateAction<Exclude<assetType, "USD" | "HKD">>>;
+  sxstyles?: CSSProperties;
 }
 
 export const PopOver = ({
@@ -231,6 +232,7 @@ export const CryptoPopOver = ({
   anchorEl,
   setAnchorEl,
   setCurrency,
+  sxstyles,
 }: cryptoPopOverProps): JSX.Element => {
   const popOverOPen = Boolean(anchorEl);
   const popOverId = popOverOPen ? "generic-popover" : undefined;
@@ -248,7 +250,7 @@ export const CryptoPopOver = ({
       anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       elevation={0}
       slotProps={{
-        paper: { style: { ...popOverStyles, width: "12rem" } },
+        paper: { style: { ...popOverStyles, width: "12rem", ...sxstyles } },
       }}
     >
       <div className="select_secrets">
