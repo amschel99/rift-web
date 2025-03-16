@@ -1,4 +1,4 @@
-import { CSSProperties, JSX, useState } from "react";
+import { CSSProperties, JSX, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
@@ -32,6 +32,14 @@ export default function LendToUse(): JSX.Element {
   };
 
   useBackButton(goBack);
+
+  useEffect(() => {
+    const firsttimelend = localStorage.getItem("firsttimelend");
+
+    if (firsttimelend == null) {
+      navigate("/lend/info");
+    }
+  }, []);
 
   return (
     <section id="lendtospend">
