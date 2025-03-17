@@ -1,10 +1,12 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
+import { faCheckCircle, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
 import { Import } from "../../assets/icons/actions";
+import { FaIcon } from "../../assets/faicon";
 import poelogo from "../../assets/images/icons/poe.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import "../../styles/pages/transactions/claimlendkeylink.scss";
@@ -29,7 +31,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
       <div className="received_key">
         <img src={poelogo} alt="received-key" />
         <p className="key_val">
-          POE / OPENAI KEY <span>skpo9...</span>
+          POE / OPENAI KEY <span>skpo9***</span>
         </p>
         <p className="desc">
           You have received a paid POE / OPENAI key. <br /> Click claim to pay
@@ -50,9 +52,14 @@ export default function ClaimLendKeyLink(): JSX.Element {
           </p>
         </div>
 
+        <p className="deducts">
+          <FaIcon faIcon={faInfoCircle} fontsize={12} color={colors.danger} />
+          Amount will be deducted from your balance
+        </p>
+
         <SubmitButton
           text="Claim Key"
-          icon={<Import width={16} height={16} color={colors.textprimary} />}
+          icon={<FaIcon faIcon={faCheckCircle} color={colors.textprimary} />}
           sxstyles={{
             padding: "0.625rem",
             borderRadius: "0.375rem",
