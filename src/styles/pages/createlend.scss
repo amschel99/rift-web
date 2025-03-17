@@ -3,6 +3,7 @@
 
 #createlend {
   padding: 1rem;
+  margin-bottom: 4rem;
 
   .title {
     font-size: 1.125rem;
@@ -25,9 +26,18 @@
       @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);
       gap: 0.5rem;
 
+      .hkda {
+        @include mixins.useFlex(row, nowrap, center, center, 0);
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        background-color: colors.$textprimary;
+      }
+
       img {
         width: 1.75rem;
         height: 1.75rem;
+        border-radius: 50%;
         object-fit: contain;
         object-position: center;
       }
@@ -123,7 +133,6 @@
 
   .yields {
     margin-top: 1rem;
-    margin-bottom: 2.5rem;
 
     .yielcase {
       font-size: 0.875rem;
@@ -206,4 +215,5 @@
     color: colors.$textsecondary;
   }
 }
+
 /* ---popover--- */

@@ -111,7 +111,7 @@ export const SendEthFromToken = (): JSX.Element => {
       <img src={foreignspend} alt="Foreign spend" />
 
       <p>
-        Click 'Receive' to collect&nbsp;
+        Click <span>'Receive'</span> to collect&nbsp;
         {isPending ? "- - -" : `${collectValue} USD`}
       </p>
 
@@ -120,6 +120,12 @@ export const SendEthFromToken = (): JSX.Element => {
         icon={<FaIcon faIcon={faCircleArrowDown} color={colors.textprimary} />}
         isLoading={isSuccess || processing}
         isDisabled={isSuccess || processing}
+        sxstyles={{
+          marginTop: "0.5rem",
+          padding: "0.625rem",
+          borderRadius: "1.5rem",
+          backgroundColor: colors.success,
+        }}
         onclick={mutateCollectEth}
       />
     </div>

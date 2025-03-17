@@ -7,6 +7,7 @@ import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { formatDateToStr } from "../../utils/dates";
 import { SubmitButton } from "../../components/global/Buttons";
+import { BottomButtonContainer } from "../../components/Bottom";
 import { sphereVaults, techgrityProducts } from "../../components/tabs/Defi";
 import { HorizontalDivider } from "../../components/global/Divider";
 import { FaIcon } from "../../assets/faicon";
@@ -131,7 +132,7 @@ export default function StakeTokens(): JSX.Element {
         </div>
       </div>
 
-      <div className="btn_ctr">
+      <BottomButtonContainer>
         <SubmitButton
           text="Stake"
           icon={
@@ -143,10 +144,15 @@ export default function StakeTokens(): JSX.Element {
             />
           }
           isDisabled={stakeAmount == ""}
-          sxstyles={{ padding: "0.625rem", borderRadius: "0.375rem" }}
+          sxstyles={{
+            padding: "0.625rem",
+            borderRadius: "1.5rem",
+            backgroundColor:
+              stakeAmount == "" ? colors.divider : colors.success,
+          }}
           onclick={onSubmitStake}
         />
-      </div>
+      </BottomButtonContainer>
     </section>
   );
 }

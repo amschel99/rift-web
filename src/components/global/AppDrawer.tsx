@@ -2,7 +2,6 @@ import { JSX, CSSProperties } from "react";
 import { Drawer } from "@mui/material";
 import { useAppDrawer } from "../../hooks/drawer";
 import { SendEthFromToken } from "../forms/SendFromToken";
-import { ConsumeSharedKey } from "../forms/ConsumeKey";
 import { UnlockTransactions } from "../drawer/UnlockTransactions";
 import { NodeTeeSelector } from "../tabs/security/NodeTeeSelector";
 import { SendAirdropLink } from "../drawer/SendAirdropLink";
@@ -11,6 +10,9 @@ import { DeleteRecovery } from "../drawer/DeleteRecovery";
 import { RevokeSecretAccess } from "../drawer/RevokeSecretAccess";
 import { CreateKey } from "../drawer/CreateKey";
 import { SwapPst } from "../drawer/SwapPst";
+import { SendLendLink } from "../drawer/SendLendLink";
+import { ClaimLendCryptoLink } from "../drawer/ClaimLendCryptoLink";
+import { ConsumeAwxKey } from "../forms/ConsumeAwxKey";
 import { colors } from "../../constants";
 
 export const AppDrawer = (): JSX.Element => {
@@ -25,7 +27,7 @@ export const AppDrawer = (): JSX.Element => {
           sx: {
             ...drawerstyles,
             height:
-              action == "swappst" || action == "launchpadsubscribe"
+              action == "swappst"
                 ? "65vh"
                 : action == "transactionlimit"
                 ? "45vh"
@@ -36,14 +38,10 @@ export const AppDrawer = (): JSX.Element => {
       open={drawerOpen}
       onClose={() => closeAppDrawer()}
     >
-      {action !== "swappst" && action !== "launchpadsubscribe" && (
-        <div style={barstyles} />
-      )}
+      {action !== "swappst" && <div style={barstyles} />}
 
       {action == "collectfromwallet" ? (
         <SendEthFromToken />
-      ) : action == "consumekey" ? (
-        <ConsumeSharedKey />
       ) : action == "unlocktransactions" ? (
         <UnlockTransactions />
       ) : action == "sendairdroplink" ? (
@@ -58,6 +56,12 @@ export const AppDrawer = (): JSX.Element => {
         <CreateKey />
       ) : action == "swappst" ? (
         <SwapPst />
+      ) : action == "sendlendlink" ? (
+        <SendLendLink />
+      ) : action == "claimlendcryptolink" ? (
+        <ClaimLendCryptoLink />
+      ) : action == "consumeawxkey" ? (
+        <ConsumeAwxKey />
       ) : (
         <NodeTeeSelector />
       )}

@@ -1,4 +1,4 @@
-import { CSSProperties, JSX, useState } from "react";
+import { CSSProperties, JSX, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
@@ -28,10 +28,18 @@ export default function LendToUse(): JSX.Element {
   };
 
   const lendSecret = () => {
-    navigate("/lend/secret/SPHERE");
+    navigate("/lend/secret/nil/nil");
   };
 
   useBackButton(goBack);
+
+  useEffect(() => {
+    const firsttimelend = localStorage.getItem("firsttimelend");
+
+    if (firsttimelend == null) {
+      navigate("/lend/info");
+    }
+  }, []);
 
   return (
     <section id="lendtospend">
@@ -135,10 +143,10 @@ export default function LendToUse(): JSX.Element {
           onclick={lendAsset}
         />
 
-        <VerticalDivider />
+        <VerticalDivider sxstyles={{ backgroundColor: colors.textprimary }} />
 
         <SubmitButton
-          text="Lend Keys"
+          text="Lend Web2 Keys"
           icon={<Import width={16} height={16} color={colors.textprimary} />}
           sxstyles={buttonstyles}
           onclick={lendSecret}

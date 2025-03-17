@@ -24,6 +24,7 @@ interface cryptoPopOverProps {
   anchorEl: HTMLDivElement | null;
   setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>;
   setCurrency: Dispatch<SetStateAction<Exclude<assetType, "USD" | "HKD">>>;
+  sxstyles?: CSSProperties;
 }
 
 export const PopOver = ({
@@ -109,6 +110,36 @@ export const CurrencyPopOver = ({
       }}
     >
       <div className="select_secrets">
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("WUSD");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={wusdlogo} alt="secret" />
+
+          <p className="desc">
+            WUSD <br />
+            <span>Crypto</span>
+          </p>
+        </div>
+
+        <div
+          className="img_desc"
+          onClick={() => {
+            setCurrency("OM");
+            setAnchorEl(null);
+          }}
+        >
+          <img src={mantralogo} alt="secret" />
+
+          <p className="desc">
+            OM <br />
+            <span>Crypto</span>
+          </p>
+        </div>
+
         <div
           className="img_desc"
           onClick={() => {
@@ -201,6 +232,7 @@ export const CryptoPopOver = ({
   anchorEl,
   setAnchorEl,
   setCurrency,
+  sxstyles,
 }: cryptoPopOverProps): JSX.Element => {
   const popOverOPen = Boolean(anchorEl);
   const popOverId = popOverOPen ? "generic-popover" : undefined;
@@ -218,7 +250,7 @@ export const CryptoPopOver = ({
       anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       elevation={0}
       slotProps={{
-        paper: { style: { ...popOverStyles, width: "12rem" } },
+        paper: { style: { ...popOverStyles, width: "12rem", ...sxstyles } },
       }}
     >
       <div className="select_secrets">
@@ -318,7 +350,7 @@ export const CryptoPopOver = ({
 
 const popOverStyles: CSSProperties = {
   width: "100%",
-  height: "13.5rem",
+  height: "14rem",
   marginTop: 6,
   border: `1px solid ${colors.divider}`,
   borderRadius: "0.5rem",
