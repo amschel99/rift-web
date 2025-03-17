@@ -1,0 +1,15 @@
+@use '../../constants/colors' as colors;
+@use '../../constants/mixins' as mixins;
+
+#claimlendkeylink {
+    padding: 1rem;
+
+    .title {
+        font-size: 1.25rem;
+        text-align: center;
+
+        span {
+            font-weight: bold;
+        }
+    }
+}

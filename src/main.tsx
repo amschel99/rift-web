@@ -28,8 +28,8 @@ import SwapCrypto from "./pages/transactions/Swap.tsx";
 import StakeTokens from "./pages/transactions/StakeTokens.tsx";
 import Polymarket from "./pages/transactions/Polymarket.tsx";
 import BuyOm from "./pages/transactions/BuyOm.tsx";
+import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
 import CoinInfo from "./pages/CoinInfo.tsx";
-import ImportAirwllxKey from "./pages/secrets/ImportAwxKey.tsx";
 import AboutSecurity from "./pages/security/AboutSecurity.tsx";
 import SecuritySetup from "./pages/security/SecuritySetup.tsx";
 import RecoverySetup from "./pages/security/Recovery.tsx";
@@ -102,6 +102,10 @@ createRoot(document.getElementById("root")!).render(
                       <Route path="/get-om" element={<BuyOm />} />
                       <Route path="/usdc-asset" element={<UsdcAsset />} />
                       <Route
+                        path="/claimlendkey"
+                        element={<ClaimLendKeyLink />}
+                      />
+                      <Route
                         path="/chatwithbot/:poekey"
                         element={<ChatWithBot />}
                       />
@@ -124,7 +128,6 @@ createRoot(document.getElementById("root")!).render(
                         path="/security/selector/:type"
                         element={<NodesTeeSelector />}
                       />
-                      <Route path="/importawx" element={<ImportAirwllxKey />} />
                       <Route path="/lend/info" element={<AboutLend />} />
                       <Route path="/lend" element={<LendToUse />} />
                       <Route path="/lend/asset" element={<CreateLendAsset />} />
