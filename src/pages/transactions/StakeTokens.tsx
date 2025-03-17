@@ -147,7 +147,8 @@ export default function StakeTokens(): JSX.Element {
           sxstyles={{
             padding: "0.625rem",
             borderRadius: "1.5rem",
-            backgroundColor: colors.success,
+            backgroundColor:
+              stakeAmount == "" ? colors.divider : colors.success,
           }}
           onclick={onSubmitStake}
         />
