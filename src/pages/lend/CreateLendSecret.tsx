@@ -25,7 +25,7 @@ import wusdlogo from "../../assets/images/wusd.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import "../../styles/pages/createlendsecret.scss";
 
-export type secretType = "POE" | "SPHERE" | "AIRWALLEX";
+export type secretType = "POE" | "OPENAI" | "AIRWALLEX" | "POLYMARKET";
 
 export default function CreateLendSecret(): JSX.Element {
   const navigate = useNavigate();
@@ -97,7 +97,10 @@ export default function CreateLendSecret(): JSX.Element {
       {mysecrets?.length >= 1 ? (
         <div className="secretselector" onClick={openPopOver}>
           {selSecretType === "nil" || selSecretValue === "nil" ? (
-            <p className="choose_key">Please choose a key to lend</p>
+            <p className="choose_key">
+              Please choose a key to lend{" "}
+              <span>You have {mysecrets?.length} key(s)</span>{" "}
+            </p>
           ) : (
             <>
               <div className="img_desc">
