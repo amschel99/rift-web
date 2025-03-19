@@ -49,10 +49,10 @@ export default function PhoneAuth(): JSX.Element {
     isPending: signupsphere,
     isSuccess: signupsuccess,
   } = useMutation({
-    mutationFn: () =>
-      signupUser(tgUserId, devicetoken, devicename, otpCode).then(() => {
-        mutatecreatewallet();
-      }),
+    mutationFn: () => signupUser(tgUserId, devicetoken, devicename, otpCode),
+    onSuccess: () => {
+      mutatecreatewallet();
+    },
   });
 
   // quvault (pst & launchpad)
@@ -141,7 +141,13 @@ export default function PhoneAuth(): JSX.Element {
         socket.off("AccountCreationFailed");
       };
     }
-  }, [signupsuccess, createwalletsuccess]);
+  }, [
+    signupsuccess,
+    createwalletsuccess,
+    quvaultloginsuccess,
+    createquvaultsuccess,
+    socket,
+  ]);
 
   return (
     <section id="phoneauth">
