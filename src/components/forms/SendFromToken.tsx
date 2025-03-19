@@ -32,10 +32,10 @@ export const SendEthFromToken = (): JSX.Element => {
     Number(base64ToString(utxoVal)) * Number(ethusdval)
   ).toFixed(2);
 
-  let access = localStorage.getItem("token");
+  let access = localStorage.getItem("spheretoken");
   let utxoId = localStorage.getItem("utxoId");
   let utxoIntent = localStorage.getItem("utxoIntent");
-  let address = localStorage.getItem("address");
+  let address = localStorage.getItem("ethaddress");
 
   const { mutate: mutateCollectEth, isSuccess } = useMutation({
     mutationFn: () =>

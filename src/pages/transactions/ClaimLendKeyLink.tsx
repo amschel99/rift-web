@@ -1,24 +1,154 @@
-import { JSX } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { faCheckCircle, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { useMutation } from "@tanstack/react-query";
+import {
+  faArrowRight,
+  faCheckCircle,
+  faInfoCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
+import { useAppDrawer } from "../../hooks/drawer";
+import { base64ToString } from "../../utils/base64";
+import { useSocket } from "../../utils/SocketProvider";
+import { useSnackbar } from "../../hooks/snackbar";
+import { numberFormat } from "../../utils/formatters";
+import { doKeyPayment } from "../../utils/api/keys";
+import { KeyPaymentTransactionStatus } from "../../components/TransactionStatus";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
 import { Import } from "../../assets/icons/actions";
 import { FaIcon } from "../../assets/faicon";
 import poelogo from "../../assets/images/icons/poe.png";
+import airwallexlogo from "../../assets/images/awx.png";
+import polymarketlogo from "../../assets/images/icons/polymarket.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+import usdclogo from "../../assets/images/labs/usdc.png";
+import ethlogo from "../../assets/images/eth.png";
+import btclogo from "../../assets/images/btc.png";
 import "../../styles/pages/transactions/claimlendkeylink.scss";
 
 export default function ClaimLendKeyLink(): JSX.Element {
   const navigate = useNavigate();
+  const { socket } = useSocket();
   const { switchtab } = useTabs();
+  const { openAppDrawerWithKey } = useAppDrawer();
+  const { showerrorsnack, showsuccesssnack } = useSnackbar();
+
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [userGotKey, setUserGotKey] = useState<boolean>(false);
+  const [showTxStatus, setShowTxStatus] = useState<boolean>(false);
+  const [txStatus, setTxStatus] = useState<"PENDING" | "PROCESSED" | "FAILED">(
+    "PENDING"
+  );
+  const [txMessage, setTxMessage] = useState<string>("");
+
+  let paysecretreceiver = localStorage.getItem("paysecretreceiver");
+  let paysecretid = localStorage.getItem("paysecretid");
+  let paysecretnonce = localStorage.getItem("paysecretnonce");
+  let paysecretpurpose = localStorage.getItem("paysecretpurpose");
+  let paysecretamount = localStorage.getItem("paysecretamount");
+  let paysecretcurrency = localStorage.getItem("paysecretcurrency");
+  let prev_page = localStorage.getItem("prev_page");
+
+  const { mutate: mutatekeypayment, isPending: keypaymentloading } =
+    useMutation({
+      mutationFn: () =>
+        doKeyPayment(paysecretnonce as string)
+          .then((res) => {
+            if (res?.status !== 400) {
+              setTxStatus("PENDING");
+              setTxMessage(
+                `Transferring ${numberFormat(
+                  Number(paysecretamount)
+                )} ${paysecretcurrency}`
+              );
+              setShowTxStatus(true);
+              setProcessing(true);
+            } else {
+              setProcessing(false);
+              showerrorsnack("You cannot pay for your own key!");
+            }
+          })
+          .catch(() => {
+            setProcessing(false);
+            showerrorsnack("An error occurred, please try again");
+          }),
+    });
 
   const goBack = () => {
-    switchtab("home");
-    navigate("/app");
+    localStorage.removeItem("paysecretid");
+    localStorage.removeItem("paysecretnonce");
+    localStorage.removeItem("paysecretpurpose");
+    localStorage.removeItem("paysecretamount");
+    localStorage.removeItem("paysecretcurrency");
+
+    if (prev_page == null) {
+      switchtab("home");
+      navigate("/app");
+    } else {
+      navigate(prev_page);
+    }
   };
+
+  const onStartUseKey = () => {
+    if (paysecretpurpose === "OPENAI") {
+    } else {
+      openAppDrawerWithKey(
+        "consumeawxkey",
+        paysecretid as string,
+        paysecretnonce as string
+      ); //keyToshare: secretid, purpose: secretnonce
+    }
+  };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("TXConfirmed", () => {
+      setTxStatus("PROCESSED");
+      setTxMessage("Transaction completed");
+      setShowTxStatus(true);
+
+      setTimeout(() => {
+        setShowTxStatus(false);
+      }, 4500);
+
+      socket.emit("paymentKeySuccess", {
+        email: paysecretreceiver?.includes("==")
+          ? base64ToString(paysecretreceiver)
+          : paysecretreceiver,
+        nonce: paysecretnonce,
+      });
+
+      socket.on("KeyUnlocked", () => {
+        showsuccesssnack("Key was unlocked successfully");
+        setProcessing(false);
+        setUserGotKey(true);
+      });
+    });
+
+    socket.on("TXFailed", () => {
+      setTxStatus("FAILED");
+      setTxMessage("Transaction failed");
+      setShowTxStatus(true);
+
+      showerrorsnack("Transaction failed, please try again");
+      setProcessing(false);
+
+      setTimeout(() => {
+        setShowTxStatus(false);
+      }, 4500);
+    });
+
+    return () => {
+      if (!socket) return;
+
+      socket.off("TXConfirmed");
+      socket.off("TXFailed");
+      socket.off("KeyUnlocked");
+    };
+  }, [showTxStatus]);
 
   useBackButton(goBack);
 
@@ -29,26 +159,70 @@ export default function ClaimLendKeyLink(): JSX.Element {
       </span>
 
       <div className="received_key">
-        <img src={poelogo} alt="received-key" />
+        <img
+          src={
+            paysecretpurpose === "OPENAI"
+              ? poelogo
+              : paysecretpurpose
+              ? airwallexlogo
+              : polymarketlogo
+          }
+          alt="received-key"
+        />
         <p className="key_val">
-          POE / OPENAI KEY <span>skpo9***</span>
+          {paysecretpurpose} <span>{paysecretid}</span>
         </p>
         <p className="desc">
-          You have received a paid POE / OPENAI key. <br /> Click claim to pay
-          for the key, access and use the key.
+          You have received a paid {paysecretpurpose} key. <br /> Click&nbsp;
+          <span>'Get {paysecretpurpose} Key'</span> to pay for the key, <br />
+          get access and use the key.
         </p>
+
+        {userGotKey && (
+          <>
+            <p className="unlocks">
+              You successfully paid for the {paysecretpurpose} key
+            </p>
+            <SubmitButton
+              text="Start Using Key"
+              icon={<FaIcon faIcon={faArrowRight} color={colors.textprimary} />}
+              sxstyles={{
+                padding: "0.625rem",
+                borderRadius: "0.375rem",
+                backgroundColor: colors.success,
+              }}
+              onclick={onStartUseKey}
+            />
+          </>
+        )}
       </div>
 
       <div className="pay_key_ctr">
         <p className="title">
-          Pay <span>$18</span> To Use Key
+          Pay&nbsp;
+          <span>
+            {paysecretamount}&nbsp;
+            {paysecretcurrency === "USDT" ? "USDC" : paysecretcurrency}
+          </span>
+          &nbsp;To Use Key
         </p>
 
         <div className="amount">
-          <img src={mantralogo} alt="mantra" />
+          <img
+            src={
+              paysecretcurrency === "USDT"
+                ? usdclogo
+                : paysecretcurrency === "OM"
+                ? mantralogo
+                : paysecretcurrency === "ETH"
+                ? ethlogo
+                : btclogo
+            }
+            alt="mantra"
+          />
           <p>
-            2.5 OM
-            <span>$18</span>
+            {paysecretamount}&nbsp;
+            {paysecretcurrency === "USDT" ? "USDC" : paysecretcurrency}
           </p>
         </div>
 
@@ -58,16 +232,37 @@ export default function ClaimLendKeyLink(): JSX.Element {
         </p>
 
         <SubmitButton
-          text="Claim Key"
-          icon={<FaIcon faIcon={faCheckCircle} color={colors.textprimary} />}
+          text={`Get ${paysecretpurpose} Key`}
+          icon={
+            <FaIcon
+              faIcon={faCheckCircle}
+              color={
+                processing || userGotKey || keypaymentloading
+                  ? colors.textsecondary
+                  : colors.textprimary
+              }
+            />
+          }
           sxstyles={{
             padding: "0.625rem",
             borderRadius: "0.375rem",
-            backgroundColor: colors.success,
+            backgroundColor:
+              processing || userGotKey || keypaymentloading
+                ? colors.divider
+                : colors.success,
           }}
-          onclick={() => {}}
+          isDisabled={processing || userGotKey || keypaymentloading}
+          isLoading={processing || keypaymentloading}
+          onclick={mutatekeypayment}
         />
       </div>
+
+      {showTxStatus && (
+        <KeyPaymentTransactionStatus
+          transactionStatus={txStatus}
+          transactionMessage={txMessage}
+        />
+      )}
     </section>
   );
 }

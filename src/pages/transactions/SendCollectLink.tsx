@@ -80,29 +80,26 @@ export default function SendCollectLink(): JSX.Element {
   };
 
   const errorInUSDVal = (): boolean => {
-    if (
-      accessAmnt !== "" &&
-      Number(accessAmnt) >=
-        Number(
-          depositAsset == "OM"
-            ? localMantraUsdBal
-            : depositAsset == "BTC"
-            ? localBtcUsdBal
-            : depositAsset == "ETH"
-            ? localethUsdBal
-            : localUsdcUsdBal
-        )
-    )
-      return true;
-    else return false;
+    // if (
+    //   accessAmnt !== "" &&
+    //   Number(accessAmnt) >=
+    //     Number(
+    //       depositAsset == "OM"
+    //         ? localMantraUsdBal
+    //         : depositAsset == "BTC"
+    //         ? localBtcUsdBal
+    //         : depositAsset == "ETH"
+    //         ? localethUsdBal
+    //         : localUsdcUsdBal
+    //     )
+    // )
+    //   return true;
+    // else return false;
+
+    return false;
   };
 
   const onShareWallet = async () => {
-    if (depositAsset !== "ETH") {
-      showerrorsnack("Feature coming soon, try sending ETH...");
-      return;
-    }
-
     if (accessAmnt == "" || errorInUSDVal()) {
       showerrorsnack(`Enter a valid amount`);
     } else {
@@ -112,13 +109,16 @@ export default function SendCollectLink(): JSX.Element {
         5
       );
 
-      const { token } = await shareWalletAccess(
-        noExpiry ? "1000d" : `${time}m`,
-        usdAmountInETH
+      const { token: collectlink } = await shareWalletAccess(
+        noExpiry ? "8700d" : `${time}m`,
+        usdAmountInETH,
+        depositAsset
       );
 
-      if (token) {
-        const shareUrl = token + `%26intent=${intent}`;
+      if (collectlink) {
+        console.log(collectlink);
+
+        const shareUrl = collectlink + `%26intent=${intent}`;
         openTelegramLink(
           `https://t.me/share/url?url=${shareUrl}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
         );
@@ -233,8 +233,6 @@ export default function SendCollectLink(): JSX.Element {
               USDC <br /> <span>USD Coin</span>
             </p>
           </div>
-
-          <p className="asset_tle">Choose the crypto you would like to send</p>
         </div>
       </PopOver>
 
@@ -248,7 +246,8 @@ export default function SendCollectLink(): JSX.Element {
             : depositAsset == "ETH"
             ? localethBal
             : localUSDCBal
-        ).toFixed(5)}{" "}
+        ).toFixed(5)}
+        &nbsp;
         {depositAsset}
       </p>
 
@@ -367,7 +366,15 @@ export default function SendCollectLink(): JSX.Element {
               }
             />
           }
-          sxstyles={{ gap: "0.5rem" }}
+          sxstyles={{
+            gap: "0.5rem",
+            borderRadius: "1.25rem",
+
+            backgroundColor:
+              processing || ethQty == "" || accessAmnt == "" || errorInUSDVal()
+                ? colors.divider
+                : colors.success,
+          }}
           isDisabled={
             processing || ethQty == "" || accessAmnt == "" || errorInUSDVal()
           }

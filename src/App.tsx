@@ -32,11 +32,17 @@ function App(): JSX.Element {
   const utxoVal = localStorage.getItem("utxoVal");
 
   const checkAccessUser = useCallback(async () => {
-    let address: string | null = localStorage.getItem("address");
-    let token: string | null = localStorage.getItem("token");
+    let address: string | null = localStorage.getItem("ethaddress");
+    let token: string | null = localStorage.getItem("spheretoken");
     let airdropId = localStorage.getItem("airdropId");
     let starttab = localStorage.getItem("starttab");
     let startpage = localStorage.getItem("startpage");
+    // paid key/secret values
+    let paysecretid = localStorage.getItem("paysecretid");
+    let paysecretnonce = localStorage.getItem("paysecretnonce");
+    let paysecretpurpose = localStorage.getItem("paysecretpurpose");
+    let paysecretamount = localStorage.getItem("paysecretamount");
+    let paysecretcurrency = localStorage.getItem("paysecretcurrency");
 
     if (address == null || token == null) {
       navigate("/auth");
@@ -60,6 +66,17 @@ function App(): JSX.Element {
 
     if (utxoId !== null && utxoVal !== null) {
       openAppDrawer("collectfromwallet");
+      return;
+    }
+
+    if (
+      paysecretid !== null &&
+      paysecretnonce !== null &&
+      paysecretpurpose !== null &&
+      paysecretamount !== null &&
+      paysecretcurrency !== null
+    ) {
+      navigate("/claimlendkey");
       return;
     }
   }, []);

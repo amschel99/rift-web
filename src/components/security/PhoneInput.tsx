@@ -44,8 +44,9 @@ export const PhoneInput = ({ setPhoneVal, sxstyles }: props): JSX.Element => {
         <div className="countrycodes">
           <p className="desc">Choose a Country</p>
 
-          {countryCodes?.map((country_code) => (
+          {countryCodes?.map((country_code, index) => (
             <button
+              key={country_code?.code + index}
               onClick={() => {
                 setSelectCallCode(country_code);
                 setCountryCodesAnchorEl(null);

@@ -24,7 +24,7 @@ export default function EthAsset(): JSX.Element {
     navigate("/app");
   };
 
-  let walletAddress = localStorage.getItem("address");
+  let walletAddress = localStorage.getItem("ethaddress");
   let ethbal = 0;
   let ethbalUsd = 0;
 

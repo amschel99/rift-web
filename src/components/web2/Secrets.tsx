@@ -1,5 +1,4 @@
 import { JSX, useState } from "react";
-import { retrieveLaunchParams } from "@telegram-apps/sdk-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { importKey, keyType } from "../../utils/api/keys";
 import { useSnackbar } from "../../hooks/snackbar";
@@ -19,13 +18,9 @@ export const Secrets = ({ mykeys }: props): JSX.Element => {
 
   const [secretsTab, setSecretsTab] = useState<"all" | "me" | "shared">("all");
 
-  let mysecrets = mykeys?.filter(
-    (_scret: { type: string }) => _scret.type == "own"
-  );
-  let sharedsecrets = mykeys?.filter(
-    (_scret: { type: string; expired: any }) =>
-      _scret.type == "foreign" && !_scret?.expired
-  );
+  let mysecrets = mykeys?.filter((_key) => _key?.nonce == null);
+  let sharedsecrets = mykeys?.filter((_key) => _key?.nonce !== null);
+
   const claimedfreegpt = localStorage.getItem("claimedfreegpt");
 
   const onClaimGptAccess = async () => {
@@ -33,18 +28,8 @@ export const Secrets = ({ mykeys }: props): JSX.Element => {
 
     const importedKey =
       "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";
-    let token: string | null = localStorage.getItem("token");
 
-    let { initData } = retrieveLaunchParams();
-
-    const { isOk } = await importKey(
-      token as string,
-      importedKey.substring(0, 4),
-      "own",
-      importedKey,
-      initData?.user?.username as string,
-      "OPENAI"
-    );
+    const { isOk } = await importKey(importedKey, "OPENAI");
 
     if (isOk) {
       localStorage.setItem("claimedfreegpt", "true");

@@ -1,18 +1,22 @@
 import { BASEURL, ENDPOINTS } from "./config";
 
 export type keyType = {
-  name: string;
-  type: string; // "own" | "foreign";
+  id: string;
+  email: string;
   value: string;
-  owner: string;
   token: string;
-  url: string;
-  purpose: string; // "AIRWALLEX" | "OPENAI"
-  expired: boolean;
-};
-
-export type getkeysType = {
-  keys: string[];
+  purpose: string; // "AIRWALLEX" | "OPENAI" | "POLYMARKET"
+  url: string | null;
+  nonce: string | null;
+  expiresAt: string | null;
+  locked: boolean;
+  paymentValue: number;
+  paymentCurrency: string;
+  time: string | null;
+  owner: string | null;
+  ownerAdress: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type airWlxbalType = {
@@ -23,8 +27,8 @@ export type airWlxbalType = {
   total_amount: number;
 };
 
-export const fetchMyKeys = async (): Promise<getkeysType> => {
-  let token: string | null = localStorage.getItem("token");
+export const fetchMyKeys = async (): Promise<keyType[]> => {
+  let token: string | null = localStorage.getItem("spheretoken");
 
   let URL = BASEURL + ENDPOINTS.getkeys;
 
@@ -39,68 +43,52 @@ export const fetchMyKeys = async (): Promise<getkeysType> => {
   return res?.json();
 };
 
-// keytpe -> own
-// keyowner -> self
 export const importKey = async (
-  accessToken: string,
-  keyname: string,
-  keytype: string,
   keyval: string,
-  keyowner: string,
   keyUtilType: string
 ): Promise<{ isOk: boolean }> => {
+  let token: string | null = localStorage.getItem("spheretoken");
   const URL = BASEURL + ENDPOINTS.importkey;
 
-  const keyObject = JSON.stringify({
-    name: keyname,
-    type: keytype,
-    value: keyval,
-    owner: keyowner,
-  });
+  const keyObject = JSON.stringify({ value: keyval });
 
   let res: Response = await fetch(URL, {
     method: "POST",
     body: JSON.stringify({
       key: keyObject,
-      type: keytype,
-      purpose: keyUtilType, // airwallex - openai
+      purpose: keyUtilType, // airwallex - openai - polymarket
     }),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
   return { isOk: res.ok };
 };
 
-// keytype -> foreign
-// keyowner -> self
-export const ShareKeyWithOtherUser = async (
-  accessToken: string,
-  keyname: string,
-  keytype: string,
+export const lendmyKey = async (
   keyval: string,
-  keyowner: string,
+  targetemail: string,
   timevalidFor: string,
-  keyUtilType: string
-): Promise<{ isOk: boolean }> => {
+  keyUtilType: string,
+  payAmount: string,
+  payCurrency: string
+): Promise<{ message: string; data: string }> => {
   const URL = BASEURL + ENDPOINTS.sharekey;
+  let accessToken: string | null = localStorage.getItem("spheretoken");
 
-  const keyObject = JSON.stringify({
-    name: keyname,
-    type: keytype,
-    value: keyval,
-    owner: keyowner,
-  });
+  const keyObject = JSON.stringify({ value: keyval });
 
   let res: Response = await fetch(URL, {
     method: "POST",
     body: JSON.stringify({
+      email: targetemail,
       key: keyObject,
       time: timevalidFor,
-      type: keytype,
       purpose: keyUtilType,
+      charge: payAmount,
+      currency: payCurrency,
     }),
     headers: {
       "Content-Type": "application/json",
@@ -108,20 +96,41 @@ export const ShareKeyWithOtherUser = async (
     },
   });
 
-  return { isOk: res.ok };
+  return res.json();
 };
 
-// use key with purpose -> "AIRWALLEX"
-export const UseKeyFromSecret = async (
+export const doKeyPayment = async (
+  secretNonce: string
+): Promise<{ status: number }> => {
+  const URL = BASEURL + ENDPOINTS.keypayment;
+  let accessToken: string | null = localStorage.getItem("spheretoken");
+
+  let res: Response = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      nonce: secretNonce,
+    }),
+  });
+
+  return { status: res?.status };
+};
+
+export const UseAirWallexKey = async (
   id: string,
   nonce: string
 ): Promise<{ airWlx: airWlxbalType[]; isOk: boolean; status: number }> => {
   const URL = BASEURL + ENDPOINTS.usekey + `?id=${id}&nonce=${nonce}`;
+  let accessToken: string | null = localStorage.getItem("spheretoken");
 
   let res: Response = await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 
@@ -130,30 +139,25 @@ export const UseKeyFromSecret = async (
   return { airWlx: data, isOk: res.ok, status: res.status };
 };
 
-// use key with purpose -> "OPENAI"
 export const UseOpenAiKey = async (
   id: string,
   nonce: string
 ): Promise<{
+  response: string;
   accessToken: string;
-  conversationID: string;
-  initialMessage: string;
+  conversationId: string;
 }> => {
   const URL = BASEURL + ENDPOINTS.usekey + `?id=${id}&nonce=${nonce}`;
+  let accessToken: string | null = localStorage.getItem("spheretoken");
 
   let res: Response = await fetch(URL, {
     method: "POST",
     body: JSON.stringify({ nonce: nonce }),
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 
-  const data = await res.json();
-
-  return {
-    accessToken: data?.accessToken,
-    conversationID: data?.conversation_id,
-    initialMessage: data?.response?.content ?? data?.response,
-  };
+  return res.json();
 };

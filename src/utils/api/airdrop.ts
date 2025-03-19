@@ -13,7 +13,7 @@ export const createAirdropCampaign = async (
 ): Promise<string> => {
   // return airdrop url
   const URL = BASEURL + ENDPOINTS.createairdrop;
-  const accessToken = localStorage.getItem("token");
+  const accessToken = localStorage.getItem("spheretoken");
 
   const res: Response = await fetch(URL, {
     method: "POST",
@@ -36,7 +36,7 @@ export const claimAirdrop = async (airDropid: string, refer_code?: string) => {
     BASEURL +
     ENDPOINTS.claimairdrop +
     `?id=${airDropid}&refer_code=${refer_code}`;
-  const accessToken = localStorage.getItem("token");
+  const accessToken = localStorage.getItem("spheretoken");
 
   await fetch(URL, {
     method: "POST",
@@ -54,7 +54,7 @@ export type unlockTokensType = {
 
 export const getUnlockedTokens = async (): Promise<unlockTokensType> => {
   const URL = BASEURL + ENDPOINTS.getunlockedtokens;
-  const accessToken = localStorage.getItem("token");
+  const accessToken = localStorage.getItem("spheretoken");
 
   const res: Response = await fetch(URL, {
     method: "GET",
@@ -69,7 +69,7 @@ export const getUnlockedTokens = async (): Promise<unlockTokensType> => {
 
 export const unlockTokens = async (amount: number) => {
   const URL = BASEURL + ENDPOINTS.unlocktokens;
-  const accessToken = localStorage.getItem("token");
+  const accessToken = localStorage.getItem("spheretoken");
 
   await fetch(URL, {
     method: "POST",
@@ -82,7 +82,7 @@ export const unlockTokens = async (amount: number) => {
 };
 
 export const unlockTokensHistory = async (): Promise<unlockhistorytype[]> => {
-  const accessToken = localStorage.getItem("token");
+  const accessToken = localStorage.getItem("spheretoken");
   const URL = BASEURL + ENDPOINTS.unlockhistory;
 
   const res: Response = await fetch(URL, {

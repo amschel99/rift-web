@@ -57,3 +57,25 @@ export const TransactionStatus = (): JSX.Element => {
     </Fragment>
   );
 };
+
+export const KeyPaymentTransactionStatus = ({
+  transactionMessage,
+  transactionStatus,
+}: {
+  transactionMessage: string;
+  transactionStatus: string;
+}): JSX.Element => {
+  return (
+    <Fragment>
+      <div id="transactionstatus">
+        <div className="animation_ctr">
+          <Notification width="1.75rem" height="1.75rem" />
+
+          <p>{transactionMessage}</p>
+        </div>
+
+        <p className="tx_status">{transactionStatus}</p>
+      </div>
+    </Fragment>
+  );
+};

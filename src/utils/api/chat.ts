@@ -11,13 +11,13 @@ export type promptHistoryType = {
 };
 
 export const UseGptPrompt = async (
-  userAccessToken: string,
   chatAccessToken: string,
   prompt: string,
   conversationId: string,
   nonce: string
 ): Promise<{ message: string }> => {
   const URL = BASEURL + ENDPOINTS.promptgpt;
+  let userAccessToken: string | null = localStorage.getItem("spheretoken");
 
   let res: Response = await fetch(URL, {
     method: "POST",
@@ -39,11 +39,11 @@ export const UseGptPrompt = async (
 };
 
 export const GetPromptHistory = async (
-  userAccessToken: string,
   conversationId: string
 ): Promise<{ history: promptHistoryType[] }> => {
   const URL =
     BASEURL + ENDPOINTS.prompthistory + `?conversation_id=${conversationId}`;
+  let userAccessToken: string | null = localStorage.getItem("spheretoken");
 
   let res: Response = await fetch(URL, {
     method: "GET",
@@ -59,42 +59,42 @@ export const GetPromptHistory = async (
 };
 
 // chat with bot !->from shared secret
-export const ChatWithBotFromKey = async (
-  secret: string,
-  prompt: string
-): Promise<{ response: string }> => {
-  const URL = BASEURL + ENDPOINTS.chatwithbot;
-  const authToken = localStorage.getItem("token");
+// export const ChatWithBotFromKey = async (
+//   secret: string,
+//   prompt: string
+// ): Promise<{ response: string }> => {
+//   const URL = BASEURL + ENDPOINTS.chatwithbot;
+//   const authToken = localStorage.getItem("spheretoken");
 
-  const res: Response = await fetch(URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
-    body: JSON.stringify({ secret, prompt }),
-  });
+//   const res: Response = await fetch(URL, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${authToken}`,
+//     },
+//     body: JSON.stringify({ secret, prompt }),
+//   });
 
-  const data = await res.json();
-  return data;
-};
+//   const data = await res.json();
+//   return data;
+// };
 
 // chat with bot !-> from shared secret
-export const ChatWithBotFromKeyHistory = async (
-  secret: string
-): Promise<{ history: promptHistoryType[] }> => {
-  const URL = BASEURL + ENDPOINTS.chatbothistory;
-  const authToken = localStorage.getItem("token");
+// export const ChatWithBotFromKeyHistory = async (
+//   secret: string
+// ): Promise<{ history: promptHistoryType[] }> => {
+//   const URL = BASEURL + ENDPOINTS.chatbothistory;
+//   const authToken = localStorage.getItem("spheretoken");
 
-  const res: Response = await fetch(URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
-    body: JSON.stringify({ secret }),
-  });
+//   const res: Response = await fetch(URL, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${authToken}`,
+//     },
+//     body: JSON.stringify({ secret }),
+//   });
 
-  const data: promptHistoryType[] = await res.json();
-  return { history: data };
-};
+//   const data: promptHistoryType[] = await res.json();
+//   return { history: data };
+// };

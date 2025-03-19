@@ -97,7 +97,7 @@ export const ProfileTab = (): JSX.Element => {
       <div className="tguname">
         <p>
           <Telegram width={14} height={14} color={colors.textprimary} />@
-          {initData?.user?.username}
+          {initData?.user?.username || initData?.user?.id}
         </p>
       </div>
     </section>

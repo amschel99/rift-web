@@ -1,6 +1,8 @@
 import { JSX, useState } from "react";
+import { openLink } from "@telegram-apps/sdk-react";
 import {
   faArrowRight,
+  faArrowUpRightFromSquare,
   faCircleQuestion,
   faFlag,
   faLock,
@@ -90,9 +92,9 @@ export default function AboutLend(): JSX.Element {
           <p>
             3. Set Expiry
             <span>
-              To prevent abuse of free keys (Keys lent at no cost, $0), you have
-              to set an access time indicating when the shared link will be
-              valid.
+              To prevent abuse of free keys (Keys lent at no cost to the
+              receipient), you have to set an access time indicating when the
+              shared key will be available to them.
             </span>
           </p>
           <p>
@@ -155,6 +157,22 @@ export default function AboutLend(): JSX.Element {
           </p>
         </div>
       )}
+
+      <p
+        className="learn_more"
+        onClick={() =>
+          openLink(
+            "https://2fa-distributed-login-gm9b.vercel.app/lend-to-spend.html"
+          )
+        }
+      >
+        Learn More
+        <FaIcon
+          faIcon={faArrowUpRightFromSquare}
+          color={colors.accent}
+          fontsize={12}
+        />
+      </p>
 
       <BottomButtonContainer>
         <SubmitButton

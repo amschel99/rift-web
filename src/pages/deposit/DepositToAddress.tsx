@@ -22,7 +22,7 @@ export default function DepositToAddress(): JSX.Element {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   let btcaddress = localStorage.getItem("btcaddress") as string;
-  let ethaddress = localStorage.getItem("address") as string;
+  let ethaddress = localStorage.getItem("ethaddress") as string;
 
   const onCopyAddr = () => {
     if (depositAsset == "BTC") {

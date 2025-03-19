@@ -41,7 +41,7 @@ export const HomeTab = (): JSX.Element => {
     switchtab("profile");
   };
 
-  let ethAddr = localStorage.getItem("address");
+  let ethAddr = localStorage.getItem("ethaddress");
   let btcAddr = localStorage.getItem("btcaddress");
   let claimedstartairdrop = localStorage.getItem("claimedstartairdrop");
 

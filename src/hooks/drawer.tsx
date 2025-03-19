@@ -17,7 +17,7 @@ export type draweraction =
   | "consumeawxkey"
   | "unlocktransactions";
 
-interface draerctxtype {
+interface drawerctxtype {
   action: draweraction;
   drawerOpen: boolean;
   keyToshare?: string;
@@ -30,10 +30,10 @@ interface draerctxtype {
     purpose?: string
   ) => void;
   openAppDrawerWithUrl: (drawerAction: draweraction, linkUrl?: string) => void;
-  closeAppDrawer: () => void;
+  onClose?: () => void;
 }
 
-const appdrawerctx = createContext<draerctxtype>({} as draerctxtype);
+const appdrawerctx = createContext<drawerctxtype>({} as drawerctxtype);
 
 interface providerProps {
   children: ReactNode;
@@ -73,6 +73,14 @@ export const AppDrawerProvider = ({ children }: providerProps): JSX.Element => {
   };
 
   const closeAppDrawer = () => {
+    const utxoId = localStorage.getItem("utxoId");
+    const utxoVal = localStorage.getItem("utxoVal");
+
+    if (utxoId !== null && utxoVal !== null) {
+      localStorage.removeItem("utxoId");
+      localStorage.removeItem("utxoVal");
+    }
+
     setDrawerOpen(false);
   };
 
@@ -93,4 +101,4 @@ export const AppDrawerProvider = ({ children }: providerProps): JSX.Element => {
   );
 };
 
-export const useAppDrawer = () => useContext<draerctxtype>(appdrawerctx);
+export const useAppDrawer = () => useContext<drawerctxtype>(appdrawerctx);

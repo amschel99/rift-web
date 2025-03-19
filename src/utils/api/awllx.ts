@@ -13,7 +13,7 @@ export const fetchAirWllxBalances = async (
   ownerUsername: string
 ): Promise<{ balances: awxbalType; status: number }> => {
   const URL = BASEURL + ENDPOINTS.awxbalances;
-  let accessToken: string | null = localStorage.getItem("token");
+  let accessToken: string | null = localStorage.getItem("spheretoken");
 
   const res: Response = await fetch(URL, {
     method: "POST",

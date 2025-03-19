@@ -1,10 +1,10 @@
 import { JSX, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useBackButton } from "../../hooks/backbutton";
+import { backButton } from "@telegram-apps/sdk-react";
 import {
-  ChatWithBotFromKey,
-  ChatWithBotFromKeyHistory,
+  GetPromptHistory,
   messagesType,
+  UseGptPrompt,
 } from "../../utils/api/chat";
 import { UserMessage, BotMessage } from "../../components/chat/Messages";
 import { ChatInput } from "../../components/chat/ChatInput";
@@ -12,13 +12,13 @@ import { LoadingAlt } from "../../assets/animations";
 import gptlogo from "../../assets/images/gpt.png";
 import "../../styles/pages/chatbot.scss";
 
-export default function ChatWithBot(): JSX.Element {
+export default function ChatBot(): JSX.Element {
   const navigate = useNavigate();
-  const { poekey } = useParams();
+  const { conversationId, chatAccessToken, nonce } = useParams();
 
   const [botLoading, setBotLoading] = useState<boolean>(false);
   const [chatMessages, setChatMessages] = useState<messagesType[]>([
-    { role: "assistant", content: "How may I assist you today?" },
+    { role: "assistant", content: "Hello how may I help you today ?" },
   ]);
 
   const goBack = () => {
@@ -30,20 +30,29 @@ export default function ChatWithBot(): JSX.Element {
 
     setChatMessages((prev) => [...prev, { role: "user", content: userPrompt }]);
 
-    ChatWithBotFromKey(poekey as string, userPrompt).then((res) => {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: res?.response,
-        },
-      ]);
-      setBotLoading(false);
-    });
+    UseGptPrompt(
+      chatAccessToken as string,
+      userPrompt,
+      conversationId as string,
+      nonce as string
+    )
+      .then((res) => {
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: res?.message,
+          },
+        ]);
+        setBotLoading(false);
+      })
+      .catch(() => {
+        setBotLoading(false);
+      });
   };
 
   const onGetPromptHistory = useCallback(async () => {
-    const { history } = await ChatWithBotFromKeyHistory(poekey as string);
+    const { history } = await GetPromptHistory(conversationId as string);
 
     if (history?.length > 0) {
       let messages: messagesType[] = [];
@@ -63,10 +72,24 @@ export default function ChatWithBot(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    onGetPromptHistory();
+    if (backButton.isSupported()) {
+      backButton.mount();
+      backButton.show();
+    }
+
+    if (backButton.isMounted()) {
+      backButton.onClick(goBack);
+    }
+
+    return () => {
+      backButton.offClick(goBack);
+      backButton.unmount();
+    };
   }, []);
 
-  useBackButton(goBack);
+  useEffect(() => {
+    onGetPromptHistory();
+  }, []);
 
   return (
     <section id="chatbot">
@@ -82,7 +105,10 @@ export default function ChatWithBot(): JSX.Element {
           responses.
         </p>
 
-        <p className="powered">Powered by OpenAI</p>
+        <p className="powered">
+          Powered by OpenAI
+          <span>{conversationId}</span>
+        </p>
       </div>
 
       <div className="messages">

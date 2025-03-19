@@ -15,7 +15,6 @@ import { AppDialog } from "./components/global/AppDialog.tsx";
 import { AppDrawer } from "./components/global/AppDrawer.tsx";
 import App from "./App.tsx";
 import Splash from "./pages/Splash.tsx";
-import Authentication from "./pages/Auth.tsx";
 import PhoneAuth from "./pages/PhoneAuth.tsx";
 import Logout from "./pages/Logout.tsx";
 import BtcAsset from "./pages/assets/BtcAsset.tsx";
@@ -24,6 +23,7 @@ import OmAsset from "./pages/assets/OmAsset.tsx";
 import UsdcAsset from "./pages/assets/UsdcAsset.tsx";
 import SendCrypto from "./pages/transactions/SendCrypto.tsx";
 import SendCollectLink from "./pages/transactions/SendCollectLink.tsx";
+import ConvertFiat from "./pages/transactions/ConvertFiat.tsx";
 import SwapCrypto from "./pages/transactions/Swap.tsx";
 import StakeTokens from "./pages/transactions/StakeTokens.tsx";
 import Polymarket from "./pages/transactions/Polymarket.tsx";
@@ -76,7 +76,6 @@ createRoot(document.getElementById("root")!).render(
                   <BrowserRouter>
                     <Routes>
                       <Route path="/" index element={<Splash />} />
-                      <Route path="/auth" element={<Authentication />} />
                       <Route path="/auth/phone" element={<PhoneAuth />} />
                       <Route path="/app" element={<App />} />
                       <Route path="/logout" element={<Logout />} />
@@ -92,6 +91,7 @@ createRoot(document.getElementById("root")!).render(
                         path="/sendcollectlink/:srccurrency/:intent"
                         element={<SendCollectLink />}
                       />
+                      <Route path="/convertfiat" element={<ConvertFiat />} />
                       <Route path="/swap" element={<SwapCrypto />} />
                       <Route
                         path="/stake/:srctoken"
@@ -106,7 +106,7 @@ createRoot(document.getElementById("root")!).render(
                         element={<ClaimLendKeyLink />}
                       />
                       <Route
-                        path="/chatwithbot/:poekey"
+                        path="/chat/:conversationId/:chatAccessToken/:nonce"
                         element={<ChatWithBot />}
                       />
                       <Route
