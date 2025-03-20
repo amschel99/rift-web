@@ -105,17 +105,22 @@ export const CollectCryptoFromLink = (): JSX.Element => {
       setTxMessage("Transaction completed");
       setShowTxStatus(true);
 
-      queryclient.invalidateQueries({
-        queryKey: ["btceth", "mantrabalance", "usdcbalance"],
-      });
+      queryclient
+        .invalidateQueries({
+          queryKey: ["btceth", "mantrabalance", "usdcbalance"],
+          refetchType: "all",
+          exact: true,
+        })
+        .then(() => {
+          showsuccesssnack(
+            `Successfully collected ${base64ToString(utxoVal)} ETH`
+          );
 
-      showsuccesssnack(`Successfully collected ${base64ToString(utxoVal)} ETH`);
-
-      closeAppDrawer();
-
-      setTimeout(() => {
-        setShowTxStatus(false);
-      }, 4500);
+          setTimeout(() => {
+            setShowTxStatus(false);
+            closeAppDrawer();
+          }, 4500);
+        });
     });
     socket.on("TXFailed", () => {
       setTxStatus("FAILED");
