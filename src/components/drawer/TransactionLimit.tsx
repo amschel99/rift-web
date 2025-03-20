@@ -41,6 +41,7 @@ export const TransactionLimit = (): JSX.Element => {
         inputlabalel="Daily Transaction Limit (HKD)"
         inputState={txLimit}
         setInputState={setTxLimit}
+        autofocus
       />
 
       <SubmitButton

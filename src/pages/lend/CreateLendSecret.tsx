@@ -1,12 +1,12 @@
 import { JSX, MouseEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Checkbox, Slider } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { useAppDrawer } from "../../hooks/drawer";
-import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
-import { formatUsd } from "../../utils/formatters";
+import { useSnackbar } from "../../hooks/snackbar";
+import { fetchMyKeys, lendmyKey } from "../../utils/api/keys";
 import { CurrencyPopOver, PopOver } from "../../components/global/PopOver";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
@@ -31,6 +31,7 @@ export default function CreateLendSecret(): JSX.Element {
   const navigate = useNavigate();
   const { type, secretvalue } = useParams();
   const { openAppDrawerWithKey } = useAppDrawer();
+  const { showerrorsnack } = useSnackbar();
 
   const [selSecretType, setSelSecretType] = useState<string>(type as string);
   const [selSecretValue, setSelSecretValue] = useState<string>(
@@ -38,6 +39,7 @@ export default function CreateLendSecret(): JSX.Element {
   );
   const [secretFee, setSecretFee] = useState<string>("1");
   const [customFee, setCustomFee] = useState<string>("");
+  const [receipient, setReceipient] = useState<string>("");
   const [anchorEl, setanchorEl] = useState<HTMLDivElement | null>(null);
   const [repayAsset, setRepayAsset] = useState<assetType>("WUSD");
   const [repaymentAnchorEl, setRepaymentAnchorEl] =
@@ -67,22 +69,34 @@ export default function CreateLendSecret(): JSX.Element {
     navigate("/lend");
   };
 
-  const { data } = useQuery({
+  const { data: mykeys } = useQuery({
     queryKey: ["secrets"],
     queryFn: fetchMyKeys,
   });
 
-  const onShareKey = async () => {
-    openAppDrawerWithKey("sendlendlink", "lend-link-goes-here", "Key"); // action : link : Key or Crypto
-  };
+  const { mutate: onLendKey, isPending: lendloading } = useMutation({
+    mutationFn: () =>
+      lendmyKey(
+        selSecretValue,
+        receipient,
+        noExpiry ? `8700h` : `${time}m`,
+        selSecretType,
+        secretFee,
+        repayAsset
+      )
+        .then((res) => {
+          if (res?.data) {
+            openAppDrawerWithKey("sendlendlink", res?.data, "Key"); // action : link : Key or Crypto
+          } else {
+            showerrorsnack("Failed to lend you key, please try again");
+          }
+        })
+        .catch(() => {
+          showerrorsnack("Failed to lend your key, please try again");
+        }),
+  });
 
-  let allKeys = data as getkeysType;
-  let mykeys: keyType[] = allKeys?.keys?.map((_key: string) =>
-    JSON.parse(_key)
-  );
-  let mysecrets = mykeys?.filter(
-    (_scret: { type: string }) => _scret.type == "own"
-  );
+  const mysecrets = mykeys?.filter((_key) => _key?.url == null);
 
   useBackButton(goBack);
 
@@ -94,11 +108,11 @@ export default function CreateLendSecret(): JSX.Element {
         <span>Let others use your keys at a fee</span>
       </p>
 
-      {mysecrets?.length >= 1 ? (
+      {mysecrets || [].length >= 1 ? (
         <div className="secretselector" onClick={openPopOver}>
           {selSecretType === "nil" || selSecretValue === "nil" ? (
             <p className="choose_key">
-              Please choose a key to lend{" "}
+              Please choose a key to lend
               <span>You have {mysecrets?.length} key(s)</span>{" "}
             </p>
           ) : (
@@ -116,7 +130,7 @@ export default function CreateLendSecret(): JSX.Element {
                 />
 
                 <p className="desc">
-                  {selSecretType === "OPENAI" ? "POE" : selSecretType}
+                  {selSecretType}
                   <br />
                   <span>{selSecretValue?.substring(0, 4) + "..."}</span>
                 </p>
@@ -144,14 +158,12 @@ export default function CreateLendSecret(): JSX.Element {
       )}
       <PopOver anchorEl={anchorEl} setAnchorEl={setanchorEl}>
         <div className="select_secrets">
-          {mysecrets?.map((_key, index) => (
+          {mysecrets?.map((_key) => (
             <div
               className="img_desc"
-              key={_key?.type + index}
+              key={_key?.id}
               onClick={() => {
-                setSelSecretType(
-                  _key?.purpose == "OPENAI" ? "POE" : _key?.purpose
-                );
+                setSelSecretType(_key?.purpose);
                 setSelSecretValue(_key?.value);
                 setanchorEl(null);
               }}
@@ -168,13 +180,25 @@ export default function CreateLendSecret(): JSX.Element {
               />
 
               <p className="desc">
-                {_key?.purpose == "OPENAI" ? "POE" : _key?.purpose} <br />
+                {_key?.purpose} <br />
                 <span>{_key?.value?.substring(0, 4) + "..."}</span>
               </p>
             </div>
           ))}
         </div>
       </PopOver>
+
+      <p className="fee_ttle">
+        Receipient <br /> <span>You can use their Telegram ID</span>
+      </p>
+      <OutlinedTextInput
+        inputType="text"
+        placeholder="Telegram ID"
+        inputlabalel="Telegram ID"
+        inputState={receipient}
+        setInputState={setReceipient}
+        sxstyles={{ marginTop: "0.875rem" }}
+      />
 
       <p className="fee_ttle">
         Fee <br />
@@ -188,7 +212,7 @@ export default function CreateLendSecret(): JSX.Element {
               backgroundColor: Number(secretFee) == 0 ? colors.accent : "",
             }}
           >
-            {formatUsd(0)} (Free)
+            0 {repayAsset} (Free)
           </button>
           <button
             onClick={() => setSecretFee("1")}
@@ -196,7 +220,7 @@ export default function CreateLendSecret(): JSX.Element {
               backgroundColor: Number(secretFee) == 1 ? colors.accent : "",
             }}
           >
-            {formatUsd(1)}
+            1 {repayAsset}
           </button>
           <button
             onClick={() => setSecretFee("12")}
@@ -204,7 +228,7 @@ export default function CreateLendSecret(): JSX.Element {
               backgroundColor: Number(secretFee) == 12 ? colors.accent : "",
             }}
           >
-            {formatUsd(12)}
+            12 {repayAsset}
           </button>
           <button
             onClick={() => setSecretFee("18")}
@@ -212,7 +236,7 @@ export default function CreateLendSecret(): JSX.Element {
               backgroundColor: Number(secretFee) == 18 ? colors.accent : "",
             }}
           >
-            {formatUsd(18)}
+            18 {repayAsset}
           </button>
         </div>
       </div>
@@ -285,7 +309,7 @@ export default function CreateLendSecret(): JSX.Element {
 
             <OutlinedTextInput
               inputType="number"
-              placeholder="custom secret fee ($10)"
+              placeholder={`10 ${repayAsset}`}
               inputlabalel="Custom fee"
               inputState={customFee}
               setInputState={setCustomFee}
@@ -296,8 +320,8 @@ export default function CreateLendSecret(): JSX.Element {
               The receipient will pay&nbsp;
               <span>
                 {customFee !== ""
-                  ? formatUsd(Number(customFee))
-                  : formatUsd(Number(secretFee))}
+                  ? `${customFee} ${repayAsset}`
+                  : `${secretFee} ${repayAsset}`}
               </span>
               &nbsp;to use the secret
             </p>
@@ -312,9 +336,11 @@ export default function CreateLendSecret(): JSX.Element {
             onClick={secretFee == "0" ? () => {} : openRepaymentPopOver}
           >
             <div className="img_desc">
-              {repayAsset == "HKD" || repayAsset == "USD" ? (
+              {repayAsset == "HKD" ||
+              repayAsset == "USD" ||
+              repayAsset == "HKDA" ? (
                 <span className="country_flag">
-                  {repayAsset == "HKD" ? "🇭🇰" : "🇺🇸"}
+                  {repayAsset == "HKD" || repayAsset == "HKDA" ? "🇭🇰" : "🇺🇸"}
                 </span>
               ) : (
                 <img
@@ -351,13 +377,32 @@ export default function CreateLendSecret(): JSX.Element {
       <BottomButtonContainer>
         <SubmitButton
           text="Lend Key"
-          icon={<Import width={16} height={16} color={colors.textprimary} />}
+          icon={
+            <Import
+              width={16}
+              height={16}
+              color={
+                selSecretType === "nil" ||
+                selSecretValue === "nil" ||
+                lendloading
+                  ? colors.textsecondary
+                  : colors.textprimary
+              }
+            />
+          }
           sxstyles={{
             padding: "0.625rem",
             borderRadius: "1.5rem",
-            backgroundColor: colors.success,
+            backgroundColor:
+              selSecretType === "nil" || selSecretValue === "nil" || lendloading
+                ? colors.divider
+                : colors.success,
           }}
-          onclick={onShareKey}
+          isDisabled={
+            selSecretType === "nil" || selSecretValue === "nil" || lendloading
+          }
+          isLoading={lendloading}
+          onclick={onLendKey}
         />
       </BottomButtonContainer>
     </section>

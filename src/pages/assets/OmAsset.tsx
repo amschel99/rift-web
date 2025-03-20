@@ -22,7 +22,7 @@ export default function OmAsset(): JSX.Element {
     navigate("/app");
   };
 
-  let walletAddress = localStorage.getItem("address");
+  let walletAddress = localStorage.getItem("ethaddress");
   let mantrabal = localStorage.getItem("mantrabal");
   let mantrabalusd = localStorage.getItem("mantrabalusd");
 

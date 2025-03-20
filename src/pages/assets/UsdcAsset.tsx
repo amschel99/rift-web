@@ -24,9 +24,8 @@ export default function EthAsset(): JSX.Element {
     navigate("/app");
   };
 
-  let walletAddress = localStorage.getItem("address");
-  let ethbal = 0;
-  let ethbalUsd = 0;
+  let walletAddress = localStorage.getItem("ethaddress");
+  let ethbal = localStorage.getItem("usdcbal");
 
   const onCopyAddr = () => {
     if (walletAddress !== null) {
@@ -47,8 +46,8 @@ export default function EthAsset(): JSX.Element {
       </button>
 
       <div className="balance">
-        <p>{formatUsd(ethbalUsd)}</p>
-        <span>{formatNumber(ethbal)} USDC</span>
+        <p>{formatUsd(Number(ethbal))}</p>
+        <span>{formatNumber(Number(ethbal))} USDC</span>
         <CreateNewKey />
       </div>
 

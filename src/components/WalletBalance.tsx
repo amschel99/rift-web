@@ -7,15 +7,13 @@ import {
   faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
 import {
-  faEye,
-  faEyeSlash,
   faExchangeAlt,
   faCrown,
   faGlobe,
   faArrowsRotate,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTabs } from "../hooks/tabs";
-import { walletBalance, mantraBalance } from "../utils/api/wallet";
+import { walletBalance, mantraBalance, usdtBalance } from "../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import { getMantraUsdVal } from "../utils/api/mantra";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
@@ -34,7 +32,6 @@ export const WalletBalance = (): JSX.Element => {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
 
-  const [showBalance, setShowBalance] = useState<boolean>(true);
   const [assetsFilter, setAssetsFilter] = useState<"all" | "web2" | "web3">(
     "all"
   );
@@ -44,8 +41,12 @@ export const WalletBalance = (): JSX.Element => {
     queryFn: walletBalance,
   });
   const { data: mantrabalance, isLoading: mantraLoading } = useQuery({
-    queryKey: ["mantra"],
+    queryKey: ["mantrabalance"],
     queryFn: mantraBalance,
+  });
+  const { data: usdtbalance, isLoading: usdtballoading } = useQuery({
+    queryKey: ["usdcbalance"],
+    queryFn: usdtBalance,
   });
   const { data: mantrausdval, isLoading: mantrausdloading } = useQuery({
     queryKey: ["mantrausd"],
@@ -60,10 +61,16 @@ export const WalletBalance = (): JSX.Element => {
     queryFn: getEthUsdVal,
   });
 
+  // TODO: Remove convert usd
+  const convertusdc = localStorage.getItem("convertusdc");
+  const convertusdcnum = Number(convertusdc) || 0;
+  //
   const walletusdbalance: number =
     Number(btcethbalance?.btcBalance) * Number(btcusdval) +
     Number(btcethbalance?.balance) * Number(ethusdval) +
-    Number(mantrabalance?.data?.balance) * Number(mantrausdval);
+    Number(mantrabalance?.data?.balance) * Number(mantrausdval) +
+    Number(usdtbalance?.data?.balance) +
+    convertusdcnum;
 
   localStorage.setItem("btcbal", String(btcethbalance?.btcBalance));
   localStorage.setItem(
@@ -80,6 +87,7 @@ export const WalletBalance = (): JSX.Element => {
     "mantrabalusd",
     String(Number(mantrabalance?.data?.balance) * Number(mantrausdval))
   );
+  localStorage.setItem("usdcbal", usdtbalance?.data?.balance as string);
   localStorage.setItem("mantrausdval", String(mantrausdval));
   localStorage.setItem("ethvalue", String(ethusdval));
   localStorage.setItem("btcvalue", String(btcusdval));
@@ -92,45 +100,31 @@ export const WalletBalance = (): JSX.Element => {
     navigate("/deposit");
   };
 
-  const toggleTotalBalance = () => {
-    setShowBalance(!showBalance);
+  const onConvertFiat = () => {
+    navigate("/convertfiat");
   };
 
   return (
     <div id="walletbalance">
-      <p className="bal" onClick={toggleTotalBalance}>
-        Estimated Total Value(USD)&nbsp;
-        <span className="toggle-bal">
-          <FaIcon
-            faIcon={showBalance ? faEye : faEyeSlash}
-            color={colors.textsecondary}
-            fontsize={12}
-          />
-        </span>
-      </p>
+      <p className="bal">Estimated Total Value(USD)&nbsp;</p>
 
       <div className="balusd_addfunds">
         <p className="balinusd">
-          {showBalance ? (
-            btcethLoading ||
-            mantraLoading ||
-            mantrausdloading ||
-            btcusdloading ||
-            ethusdloading ? (
-              <Skeleton
-                variant="text"
-                width={64}
-                height="2.5rem"
-                animation="wave"
-              />
-            ) : String(walletusdbalance).split(".")[0]?.length - 1 >= 5 ? (
-              "$" +
-              numberFormat(Math.abs(walletusdbalance)).replace(/[()]/g, "")
-            ) : (
-              formatUsd(walletusdbalance)
-            )
+          {btcethLoading ||
+          mantraLoading ||
+          mantrausdloading ||
+          btcusdloading ||
+          ethusdloading ? (
+            <Skeleton
+              variant="text"
+              width={64}
+              height="2.5rem"
+              animation="wave"
+            />
+          ) : String(walletusdbalance).split(".")[0]?.length - 1 >= 5 ? (
+            "$" + numberFormat(Math.abs(walletusdbalance)).replace(/[()]/g, "")
           ) : (
-            "******"
+            formatUsd(walletusdbalance)
           )}
         </p>
 
@@ -141,6 +135,10 @@ export const WalletBalance = (): JSX.Element => {
 
           <button onClick={onDeposit}>
             <FaIcon faIcon={faCirclePlus} color={colors.textprimary} />
+          </button>
+
+          <button onClick={onConvertFiat}>
+            <FaIcon faIcon={faArrowsRotate} color={colors.textprimary} />
           </button>
         </div>
       </div>
@@ -177,6 +175,7 @@ export const WalletBalance = (): JSX.Element => {
 
       {btcethLoading ||
       mantraLoading ||
+      usdtballoading ||
       mantrausdloading ||
       btcusdloading ||
       ethusdloading ? (
@@ -249,8 +248,8 @@ export const WalletBalance = (): JSX.Element => {
                 symbol="USDC"
                 image={usdclogo}
                 navigatelink="/usdc-asset"
-                balance={0}
-                balanceusd={0}
+                balance={Number(usdtbalance?.data?.balance) + convertusdcnum}
+                balanceusd={Number(usdtbalance?.data?.balance) + convertusdcnum}
               />
               <Asset
                 name="stIndexVault"

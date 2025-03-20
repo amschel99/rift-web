@@ -5,7 +5,7 @@ export const createReferralLink = async (): Promise<string> => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${localStorage.getItem("spheretoken")}`,
     },
   });
 

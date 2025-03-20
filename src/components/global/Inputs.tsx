@@ -13,6 +13,7 @@ type inputProps = {
   placeholder: string;
   inputlabalel: string;
   inputState: string;
+  autofocus?: boolean;
   setInputState: Dispatch<SetStateAction<string>>;
   onkeyup?: () => void;
   hasError?: boolean;
@@ -25,6 +26,7 @@ export const OutlinedTextInput = ({
   placeholder,
   inputlabalel,
   inputState,
+  autofocus,
   setInputState,
   onkeyup,
   hasError,
@@ -42,6 +44,7 @@ export const OutlinedTextInput = ({
       error={hasError}
       variant="outlined"
       autoComplete="off"
+      autoFocus={autofocus}
       type={inputType}
       onKeyUp={onkeyup}
       sx={{

@@ -6,7 +6,7 @@ import { fetchAirWllxBalances } from "../../utils/api/awllx";
 import { useBackButton } from "../../hooks/backbutton";
 import { useAppDialog } from "../../hooks/dialog";
 import { useSnackbar } from "../../hooks/snackbar";
-import { fetchMyKeys, getkeysType, keyType } from "../../utils/api/keys";
+import { fetchMyKeys } from "../../utils/api/keys";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
 import { OutlinedTextInput } from "../../components/global/Inputs";
@@ -35,15 +35,11 @@ export default function DepositFromAwx(): JSX.Element {
     queryKey: ["airwallexbalances"],
     queryFn: () => fetchAirWllxBalances(initData?.user?.username as string),
   });
-  const { data } = useQuery({
+  const { data: mykeys } = useQuery({
     queryKey: ["secrets"],
     queryFn: fetchMyKeys,
   });
 
-  let allKeys = data as getkeysType;
-  let mykeys: keyType[] = allKeys?.keys?.map((_key: string) =>
-    JSON.parse(_key)
-  );
   let myAwxKeys = mykeys?.filter((key) => key.purpose !== "OPENAI");
 
   const openPopOver = (event: MouseEvent<HTMLDivElement>) => {

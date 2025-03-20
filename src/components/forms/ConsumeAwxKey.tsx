@@ -1,7 +1,8 @@
-import { JSX, useCallback, useState } from "react";
+import { JSX, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
-import { airWlxbalType, UseKeyFromSecret } from "../../utils/api/keys";
+import { airWlxbalType, UseAirWallexKey } from "../../utils/api/keys";
 import { SubmitButton } from "../global/Buttons";
 import { Import } from "../../assets/icons/actions";
 import { colors } from "../../constants";
@@ -9,37 +10,27 @@ import consumekey from "../../assets/images/consumesecret.png";
 import "../../styles/components/forms.scss";
 
 export const ConsumeAwxKey = (): JSX.Element => {
-  const { closeAppDrawer, linkUrl } = useAppDrawer();
+  const { closeAppDrawer, keyToshare, secretPurpose } = useAppDrawer(); //keyToshare: secretid, purpose: secretnonce
   const { showerrorsnack } = useSnackbar();
 
-  const [loading, setLoading] = useState<boolean>(false);
   const [airwlxdata, setairwlxdata] = useState<airWlxbalType[]>([]);
 
-  const onConsumeKey = useCallback(async () => {
-    setLoading(true);
-
-    const parsedUrl = new URL(linkUrl as string);
-    const params = parsedUrl.searchParams;
-    const scrtId = params.get("id");
-    const scrtNonce = params.get("nonce");
-
-    const { isOk, status, airWlx } = await UseKeyFromSecret(
-      scrtId as string,
-      scrtNonce as string
-    );
-
-    if (isOk && status == 200) {
-      localStorage.removeItem("scId");
-      localStorage.removeItem("scNonce");
-
-      setairwlxdata(airWlx);
-    } else {
-      showerrorsnack("Sorry, unable to access balances");
-      closeAppDrawer();
-    }
-
-    setLoading(false);
-  }, []);
+  const { mutate: onConsumeKey, isPending: loading } = useMutation({
+    mutationFn: () =>
+      UseAirWallexKey(keyToshare as string, secretPurpose as string)
+        .then((res) => {
+          if (res?.isOk && res?.status == 200) {
+            setairwlxdata(res?.airWlx);
+          } else {
+            showerrorsnack("Sorry, unable to access balances");
+            closeAppDrawer();
+          }
+        })
+        .catch(() => {
+          showerrorsnack("Sorry, unable to access balances");
+          closeAppDrawer();
+        }),
+  });
 
   return (
     <div id="consumesharedkey">
@@ -47,17 +38,23 @@ export const ConsumeAwxKey = (): JSX.Element => {
 
       <p>Use the AirWallex Key to access balances</p>
 
-      {airwlxdata.length == 0 ? (
+      {airwlxdata?.length == 0 ? (
         <SubmitButton
           text="Get Airwallex Balances"
-          icon={<Import width={18} height={18} color={colors.textprimary} />}
+          icon={
+            <Import
+              width={18}
+              height={18}
+              color={loading ? colors.textsecondary : colors.textprimary}
+            />
+          }
           isDisabled={loading}
           isLoading={loading}
           sxstyles={{
             marginTop: "0.5rem",
             padding: "0.625rem",
             borderRadius: "1.5rem",
-            backgroundColor: colors.success,
+            backgroundColor: loading ? colors.divider : colors.success,
           }}
           onclick={onConsumeKey}
         />

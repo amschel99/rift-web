@@ -9,6 +9,8 @@ export type walletBalTtype = {
 export type usdtBalTYpe = {
   message: string;
   data: {
+    email: string;
+    address: string;
     balance: string;
   };
 };
@@ -20,19 +22,29 @@ export type authoriseSpendType = {
 
 // HTTP - Create wallet
 // io events - AccountCreationSuccess, AccountCreationFailed
-export const createEVMWallet = async (tgUsername: string) => {
+export const createAccount = async (
+  email: string,
+  password: string,
+  deviceToken: string,
+  sphereid_index: number
+) => {
   let URL = BASEURL + ENDPOINTS.createwallet;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ email: tgUsername, password: tgUsername }),
+    body: JSON.stringify({
+      telegramId: email,
+      password,
+      deviceToken,
+      sphereid_index,
+    }),
     headers: { "Content-Type": "application/json" },
   });
 };
 
 // HTTP - Get eth wallet balance
 export const walletBalance = async (): Promise<walletBalTtype> => {
-  let token: string | null = localStorage.getItem("token");
+  let token: string | null = localStorage.getItem("spheretoken");
 
   let URL = BASEURL + ENDPOINTS.balance;
 
@@ -48,9 +60,25 @@ export const walletBalance = async (): Promise<walletBalTtype> => {
 };
 
 export const mantraBalance = async (): Promise<usdtBalTYpe> => {
-  let token: string | null = localStorage.getItem("token");
+  let token: string | null = localStorage.getItem("spheretoken");
 
-  let URL = BASEURL + ENDPOINTS.ombalance;
+  let URL = BASEURL + ENDPOINTS.usdtbalance;
+
+  let res: Response = await fetch(URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return res.json();
+};
+
+export const usdtBalance = async (): Promise<usdtBalTYpe> => {
+  let token: string | null = localStorage.getItem("spheretoken");
+
+  let URL = BASEURL + ENDPOINTS.usdtbalance;
 
   let res: Response = await fetch(URL, {
     method: "POST",
@@ -70,13 +98,18 @@ export const sendEth = async (
   ethValStr: string,
   intent: string
 ) => {
-  let token: string | null = localStorage.getItem("token");
+  let token: string | null = localStorage.getItem("spheretoken");
 
-  let URL = BASEURL + ENDPOINTS.spend;
+  let URL = BASEURL + ENDPOINTS.sendeth;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to: toAddr, value: ethValStr, intent }),
+    body: JSON.stringify({
+      to: toAddr,
+      value: ethValStr,
+      intent,
+      otpCode: "1580",
+    }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -89,13 +122,18 @@ export const sendUSDC = async (
   usdtCalStr: string,
   intent: string
 ) => {
-  let token: string | null = localStorage.getItem("token");
+  let token: string | null = localStorage.getItem("spheretoken");
 
-  let URL = BASEURL + ENDPOINTS.sendusdt;
+  let URL = BASEURL + ENDPOINTS.sendusdc;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to: toAddr, value: usdtCalStr, intent }),
+    body: JSON.stringify({
+      to: toAddr,
+      value: usdtCalStr,
+      intent,
+      otpCode: "1580",
+    }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -108,13 +146,41 @@ export const sendBTC = async (
   btcValStr: string,
   intent: string
 ) => {
-  let token: string | null = localStorage.getItem("token");
+  let token: string | null = localStorage.getItem("spheretoken");
 
   let URL = BASEURL + ENDPOINTS.sendbtc;
 
   await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to: toAddr, value: btcValStr, intent }),
+    body: JSON.stringify({
+      to: toAddr,
+      value: btcValStr,
+      intent,
+      otpCode: "1580",
+    }),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+export const sendOM = async (
+  toAddr: string,
+  omValStr: string,
+  intent: string
+) => {
+  let URL = BASEURL + ENDPOINTS.sendom;
+  let token: string | null = localStorage.getItem("spheretoken");
+
+  await fetch(URL, {
+    method: "POST",
+    body: JSON.stringify({
+      to: toAddr,
+      value: omValStr,
+      intent,
+      otpCode: "1580",
+    }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -125,15 +191,20 @@ export const sendBTC = async (
 // HTTP - Get an access token to authorise spend on behalf
 export const shareWalletAccess = async (
   timeValidFor: string,
-  accessAmount: string
+  accessAmount: string,
+  assetType: string
 ): Promise<authoriseSpendType> => {
-  let token: string | null = localStorage.getItem("token");
-
   let URL = BASEURL + ENDPOINTS.sharewallet;
+  let token: string | null = localStorage.getItem("spheretoken");
 
   let res: Response = await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ time: timeValidFor, value: accessAmount }),
+    body: JSON.stringify({
+      value: accessAmount,
+      time: timeValidFor,
+      type: assetType, // ETH, BTC, OM, USDC
+      otpCode: "1580",
+    }),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -157,7 +228,7 @@ export const spendOnBehalf = async (
 
   let res: Response = await fetch(URL, {
     method: "POST",
-    body: JSON.stringify({ to }),
+    body: JSON.stringify({ to, otpCode: "1580" }),
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",

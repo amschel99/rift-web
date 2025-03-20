@@ -31,8 +31,8 @@ export default function SendCollectLink(): JSX.Element {
   let localBtcBal = localStorage.getItem("btcbal");
   let localBtcUsdBal = localStorage.getItem("btcbalUsd");
   let localBtcValue = localStorage.getItem("btcvalue");
-  let localUSDCBal = "0";
-  let localUsdcUsdBal = "0";
+  let localUSDCBal = localStorage.getItem("usdcbal");
+  let localUsdcUsdBal = localStorage.getItem("usdcbal");
   let localUsdcValue = "0.99";
   let localMantraBal = localStorage.getItem("mantrabal");
   let localMantraUsdBal = localStorage.getItem("mantrabalusd");
@@ -95,30 +95,24 @@ export default function SendCollectLink(): JSX.Element {
     )
       return true;
     else return false;
+
+    return false;
   };
 
   const onShareWallet = async () => {
-    if (depositAsset !== "ETH") {
-      showerrorsnack("Feature coming soon, try sending ETH...");
-      return;
-    }
-
     if (accessAmnt == "" || errorInUSDVal()) {
       showerrorsnack(`Enter a valid amount`);
     } else {
       setProcessing(true);
 
-      let usdAmountInETH = (Number(accessAmnt) / Number(localethValue)).toFixed(
-        5
+      const { token: collectlink } = await shareWalletAccess(
+        noExpiry ? "8700h" : `${time}m`,
+        ethQty,
+        depositAsset
       );
 
-      const { token } = await shareWalletAccess(
-        noExpiry ? "1000d" : `${time}m`,
-        usdAmountInETH
-      );
-
-      if (token) {
-        const shareUrl = token + `%26intent=${intent}`;
+      if (collectlink) {
+        const shareUrl = collectlink + `%26intent=${intent}`;
         openTelegramLink(
           `https://t.me/share/url?url=${shareUrl}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
         );
@@ -233,8 +227,6 @@ export default function SendCollectLink(): JSX.Element {
               USDC <br /> <span>USD Coin</span>
             </p>
           </div>
-
-          <p className="asset_tle">Choose the crypto you would like to send</p>
         </div>
       </PopOver>
 
@@ -248,7 +240,8 @@ export default function SendCollectLink(): JSX.Element {
             : depositAsset == "ETH"
             ? localethBal
             : localUSDCBal
-        ).toFixed(5)}{" "}
+        ).toFixed(5)}
+        &nbsp;
         {depositAsset}
       </p>
 
@@ -367,7 +360,15 @@ export default function SendCollectLink(): JSX.Element {
               }
             />
           }
-          sxstyles={{ gap: "0.5rem" }}
+          sxstyles={{
+            gap: "0.5rem",
+            borderRadius: "1.25rem",
+
+            backgroundColor:
+              processing || ethQty == "" || accessAmnt == "" || errorInUSDVal()
+                ? colors.divider
+                : colors.success,
+          }}
           isDisabled={
             processing || ethQty == "" || accessAmnt == "" || errorInUSDVal()
           }

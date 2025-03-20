@@ -31,10 +31,12 @@ export const SnackBar = (): JSX.Element => {
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
       open={snackbaropen}
       message={snackbarmsg}
-      autoHideDuration={2000}
+      autoHideDuration={4000}
       onClose={handleClose}
       action={snackAction}
-      slotProps={{ clickAwayListener: { disableReactTree: true } }}
+      slotProps={{
+        clickAwayListener: { onClickAway: () => {}, disableReactTree: true },
+      }}
       sx={{
         zIndex: 4000,
         "& .MuiSnackbarContent-root": {

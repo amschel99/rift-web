@@ -22,7 +22,7 @@ export const TransactionStatus = (): JSX.Element => {
 
       setTimeout(() => {
         hideTxStatusBar();
-      }, 3500);
+      }, 5000);
     });
 
     socket.on("TXFailed", () => {
@@ -30,7 +30,7 @@ export const TransactionStatus = (): JSX.Element => {
 
       setTimeout(() => {
         hideTxStatusBar();
-      }, 3500);
+      }, 5000);
     });
 
     return () => {
@@ -39,7 +39,7 @@ export const TransactionStatus = (): JSX.Element => {
       socket.off("TXConfirmed");
       socket.off("TXFailed");
     };
-  }, []);
+  }, [showTxStatusBar]);
 
   return (
     <Fragment>
@@ -54,6 +54,28 @@ export const TransactionStatus = (): JSX.Element => {
           <p className="tx_status">{transactionStatus}</p>
         </div>
       )}
+    </Fragment>
+  );
+};
+
+export const TransactionStatusWithoutSocket = ({
+  transactionMessage,
+  transactionStatus,
+}: {
+  transactionMessage: string;
+  transactionStatus: string;
+}): JSX.Element => {
+  return (
+    <Fragment>
+      <div id="transactionstatus">
+        <div className="animation_ctr">
+          <Notification width="1.75rem" height="1.75rem" />
+
+          <p>{transactionMessage}</p>
+        </div>
+
+        <p className="tx_status">{transactionStatus}</p>
+      </div>
     </Fragment>
   );
 };
