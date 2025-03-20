@@ -100,29 +100,46 @@ export const CollectCryptoFromLink = (): JSX.Element => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("TXConfirmed", () => {
+    const handleTxConfirmed = () => {
       setTxStatus("PROCESSED");
       setTxMessage("Transaction completed");
       setShowTxStatus(true);
 
-      queryclient
-        .invalidateQueries({
-          queryKey: ["btceth", "mantrabalance", "usdcbalance"],
-          refetchType: "all",
-          exact: true,
-        })
+      // Invalidate all relevant queries
+      Promise.all([
+        queryclient.invalidateQueries({ queryKey: ["ethusd"] }),
+        queryclient.invalidateQueries({ queryKey: ["mantrausd"] }),
+        queryclient.invalidateQueries({ queryKey: ["btcusd"] }),
+        queryclient.invalidateQueries({ queryKey: ["btceth"] }),
+        queryclient.invalidateQueries({ queryKey: ["mantrabalance"] }),
+        queryclient.invalidateQueries({ queryKey: ["usdcbalance"] }),
+      ])
         .then(() => {
           showsuccesssnack(
-            `Successfully collected ${base64ToString(utxoVal)} ETH`
+            `Successfully collected ${base64ToString(utxoVal)} ${utxoCurrency}`
           );
 
           setTimeout(() => {
             setShowTxStatus(false);
             closeAppDrawer();
           }, 4500);
+        })
+        .catch((error) => {
+          console.error("Failed to refresh balances:", error);
+          // Still show success since the transaction completed
+          showsuccesssnack(
+            `Successfully collected ${base64ToString(
+              utxoVal
+            )} ${utxoCurrency}. Please refresh for updated balances.`
+          );
+          setTimeout(() => {
+            setShowTxStatus(false);
+            closeAppDrawer();
+          }, 4500);
         });
-    });
-    socket.on("TXFailed", () => {
+    };
+
+    const handleTxFailed = () => {
       setTxStatus("FAILED");
       setTxMessage("Transaction failed");
       setShowTxStatus(true);
@@ -130,13 +147,23 @@ export const CollectCryptoFromLink = (): JSX.Element => {
       setProcessing(false);
       showerrorsnack("The transaction could not be completed");
       closeAppDrawer();
-    });
+    };
+
+    socket.on("TXConfirmed", handleTxConfirmed);
+    socket.on("TXFailed", handleTxFailed);
 
     return () => {
-      socket.off("TXConfirmed");
-      socket.off("TXFailed");
+      socket.off("TXConfirmed", handleTxConfirmed);
+      socket.off("TXFailed", handleTxFailed);
     };
-  }, [showTxStatus]);
+  }, [
+    socket,
+    queryclient,
+    utxoVal,
+    showsuccesssnack,
+    showerrorsnack,
+    closeAppDrawer,
+  ]);
 
   return (
     <div id="sendethfromtoken">

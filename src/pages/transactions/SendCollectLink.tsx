@@ -108,9 +108,9 @@ export default function SendCollectLink(): JSX.Element {
       let usdAmountInETH = (Number(accessAmnt) / Number(localethValue)).toFixed(
         5
       );
-
+      alert(depositAsset);
       const { token: collectlink } = await shareWalletAccess(
-        noExpiry ? "8700d" : `${time}m`,
+        noExpiry ? "8700h" : `${time}m`,
         usdAmountInETH,
         depositAsset
       );
@@ -221,7 +221,7 @@ export default function SendCollectLink(): JSX.Element {
           <div
             className="img_desc"
             onClick={() => {
-              setDepositAsset("USDC");
+              setDepositAsset("USDT");
               setAnchorEl(null);
             }}
           >
