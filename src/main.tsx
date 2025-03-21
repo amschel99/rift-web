@@ -57,7 +57,7 @@ import "./styles/index.scss";
 init();
 const queryclient = new QueryClient();
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+if (true) {
   import("eruda").then((erudadev) => {
     const eruda = erudadev.default;
     eruda.init();
