@@ -15,6 +15,8 @@ export type draweraction =
   | "sendlendlink"
   | "claimlendcryptolink"
   | "consumeawxkey"
+  | "stakevault"
+  | "unstakevault"
   | "unlocktransactions";
 
 interface drawerctxtype {
