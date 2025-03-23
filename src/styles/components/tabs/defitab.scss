@@ -375,6 +375,14 @@
   .container {
     padding-top: 0.5rem;
     border-top: 1px solid colors.$divider;
+
+    .rebase {
+      span {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: colors.$success;
+      }
+    }
   }
 }
 
