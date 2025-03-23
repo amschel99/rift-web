@@ -379,7 +379,6 @@ const StakingVault = ({
 }): JSX.Element => {
   const navigate = useNavigate();
 
-  
   return (
     <div className="yieldproduct stakeingvault">
       <p className="name_apy">
@@ -388,11 +387,11 @@ const StakingVault = ({
       </p>
 
       <div className="container">
-        <p>
+        <p className="rebase">
           Last Rebase <span>{lastrebase}</span>
         </p>
         <p>
-          Total Staked <span>{lstvalue}</span>
+          Total Staked <span>{lstvalue} LST</span>
         </p>
       </div>
 
