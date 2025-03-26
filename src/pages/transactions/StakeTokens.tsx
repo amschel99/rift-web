@@ -1,14 +1,16 @@
-import { JSX, useState } from "react";
+import { JSX, MouseEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { faLayerGroup, faCalendarDay } from "@fortawesome/free-solid-svg-icons";
 import { addDays } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { formatDateToStr } from "../../utils/dates";
+import { fetchMyKeys } from "../../utils/api/keys";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
-import { CurrencyPopOver } from "../../components/global/PopOver";
+import { CurrencyPopOver, PopOver } from "../../components/global/PopOver";
 import { assetType } from "../lend/CreateLendAsset";
 import { sphereVaults, techgrityProducts } from "../../components/tabs/Defi";
 import { HorizontalDivider } from "../../components/global/Divider";
@@ -19,6 +21,7 @@ import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import wusdlogo from "../../assets/images/wusd.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+import airwallexlogo from "../../assets/images/awx.png";
 import "../../styles/pages/transactions/stakecrypto.scss";
 
 export default function StakeTokens(): JSX.Element {
@@ -31,12 +34,23 @@ export default function StakeTokens(): JSX.Element {
   const [stakeCurrency, setStakeCurrency] = useState<assetType>("WUSD");
   const [currencyAnchorEl, setCurrencyAnchorEl] =
     useState<HTMLDivElement | null>(null);
+  const [keysAnchorEl, setKeysAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [selectKeyValue, setSelectKeyValue] = useState<string | null>(null);
 
   const selecttoken = srctoken?.startsWith("st")
     ? sphereVaults.find((token) => token?.id === srctoken)
     : techgrityProducts.find((token) => token?.id === srctoken);
   const currentDate = new Date();
   const nextDay = addDays(currentDate, 1);
+
+  const { data: mykeys } = useQuery({
+    queryKey: ["secrets"],
+    queryFn: fetchMyKeys,
+  });
+
+  const myairwallexkeys = mykeys?.filter(
+    (_key) => _key?.purpose == "AIRWALLEX"
+  );
 
   const onSubmitStake = () => {
     showerrorsnack("Staking coming soon...");
@@ -45,6 +59,14 @@ export default function StakeTokens(): JSX.Element {
   const goBack = () => {
     switchtab("earn");
     navigate("/app");
+  };
+
+  const onSelectKey = (e: MouseEvent<HTMLDivElement>) => {
+    if (Number(myairwallexkeys?.length) > 0) {
+      setKeysAnchorEl(e.currentTarget);
+    } else {
+      showerrorsnack(`Import an Airwallex Key to stake with ${stakeCurrency}`);
+    }
   };
 
   useBackButton(goBack);
@@ -103,6 +125,49 @@ export default function StakeTokens(): JSX.Element {
         Available Balance&nbsp;
         <span>0 {selecttoken?.name?.split(" ").join("")}</span>
       </p>
+
+      {stakeCurrency == "HKD" || stakeCurrency == "USD" ? (
+        <>
+          <div className="source_key" onClick={onSelectKey}>
+            <img src={airwallexlogo} alt="AirWallex" />
+            <p>
+              Choose an AirWallex Key
+              <span>
+                {selectKeyValue == null
+                  ? `You have ${myairwallexkeys?.length || 0} AirWallex Key(s)`
+                  : selectKeyValue?.substring(0, selectKeyValue.length / 2.5) +
+                    "..."}
+              </span>
+            </p>
+          </div>
+          <PopOver anchorEl={keysAnchorEl} setAnchorEl={setKeysAnchorEl}>
+            <div className="select_secrets">
+              {myairwallexkeys?.map((_key) => (
+                <div
+                  className="img_desc"
+                  key={_key?.id}
+                  onClick={() => {
+                    setSelectKeyValue(_key?.value);
+                    setKeysAnchorEl(null);
+                  }}
+                >
+                  <img src={airwallexlogo} alt="secret" />
+
+                  <p className="desc">
+                    AIRWALLEX <br />
+                    <span>
+                      {_key?.value?.substring(0, _key?.value?.length / 2.5) +
+                        "..."}
+                    </span>
+                  </p>
+                </div>
+              ))}
+            </div>
+          </PopOver>
+        </>
+      ) : (
+        <></>
+      )}
 
       <div className="receive_ctr">
         <p>

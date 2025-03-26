@@ -97,7 +97,7 @@ export const DefiTab = (): JSX.Element => {
         />
 
         <FilterButton
-          text="Yield"
+          text="Stake"
           icon={
             <FaIcon
               faIcon={faLayerGroup}
@@ -175,7 +175,7 @@ export const DefiTab = (): JSX.Element => {
                 name="Super Senior"
                 symbol="SENIOR"
                 navigatelink="/stakevault/senior"
-                balance={100}
+                balance="100 LST"
                 balanceusd={100}
               />
               <Asset
@@ -183,7 +183,7 @@ export const DefiTab = (): JSX.Element => {
                 name="Junior"
                 symbol="JUNIOR"
                 navigatelink="/stakevault/junior"
-                balance={100}
+                balance="100 LST"
                 balanceusd={100}
               />
             </div>
@@ -213,17 +213,25 @@ export const DefiTab = (): JSX.Element => {
               />
             </div>
 
-            <Asset image={stakeicon} name="CMT" symbol="CMT" balanceusd={34} />
+            <Asset
+              image={stakeicon}
+              name="CMT"
+              symbol="CMT"
+              balance="300 CMT"
+              balanceusd={34}
+            />
             <Asset
               image={stakeicon}
               name="STRAT"
               symbol="STRAT"
+              balance="100 STRAT"
               balanceusd={10}
             />
             <Asset
               image={stakeicon}
               name="CHEAP"
               symbol="CHEAP"
+              balance="200 CHEAP"
               balanceusd={5}
             />
 
@@ -255,14 +263,14 @@ export const DefiTab = (): JSX.Element => {
       {filter == "amm" && (
         <div className="tokens_ctr">
           {ammPools?.map((_product, index) => (
-            <AMMProduct key={index} product={_product} />
+            <AMMProduct key={index + _product?.name} product={_product} />
           ))}
         </div>
       )}
       {filter == "yield" && (
         <div className="tokens_ctr">
-          {sphereVaults?.map((_product) => (
-            <YieldProduct key={_product?.id} product={_product} />
+          {sphereVaults?.map((_product, index) => (
+            <YieldProduct key={_product?.id + index} product={_product} />
           ))}
         </div>
       )}
@@ -270,9 +278,9 @@ export const DefiTab = (): JSX.Element => {
         <div className="tokens_ctr">
           {launchPaddata?.data?.map((_store) => (
             <Asset
+              key={_store?.id}
               image={_store?.logo_url}
               name={_store?.store_name}
-              balance={_store?.total_supply}
               balanceusd={_store?.price}
               navigatelink={`/launchpad/${_store?.id}`}
               symbol={_store?.symbol}
@@ -282,8 +290,9 @@ export const DefiTab = (): JSX.Element => {
       )}
       {filter == "tokens" && (
         <div className="tokens_ctr">
-          {pstTokensdata?.data?.map((_token) => (
+          {pstTokensdata?.data?.map((_token, index) => (
             <Asset
+              key={_token?.symbol + index}
               image={_token?.logo_url}
               name={_token?.symbol}
               symbol={_token?.symbol}
