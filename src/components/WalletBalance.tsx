@@ -304,7 +304,7 @@ const AppActions = (): JSX.Element => {
   );
 };
 
-const Asset = ({
+export const Asset = ({
   name,
   symbol,
   image,
@@ -315,14 +315,17 @@ const Asset = ({
   name: string;
   symbol: string;
   image: string;
-  navigatelink: string;
+  navigatelink?: string;
   balance?: number;
   balanceusd: number;
 }): JSX.Element => {
   const navigate = useNavigate();
 
   return (
-    <div className="_asset" onClick={() => navigate(navigatelink)}>
+    <div
+      className="_asset"
+      onClick={() => (navigatelink ? navigate(navigatelink) : () => {})}
+    >
       <div>
         <img src={image} alt="btc" />
 

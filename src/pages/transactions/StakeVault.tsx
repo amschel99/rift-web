@@ -30,11 +30,6 @@ export default function StakeVault(): JSX.Element {
         </p>
       </div>
 
-      <p className="wallet">
-        Connected Wallet
-        <span>0xAbc...1234</span>
-      </p>
-
       <div className="stakedetails">
         <p className="total">
           Total Staked

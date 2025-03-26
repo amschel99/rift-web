@@ -8,11 +8,17 @@ import { useSnackbar } from "../../hooks/snackbar";
 import { formatDateToStr } from "../../utils/dates";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
+import { CurrencyPopOver } from "../../components/global/PopOver";
+import { assetType } from "../lend/CreateLendAsset";
 import { sphereVaults, techgrityProducts } from "../../components/tabs/Defi";
 import { HorizontalDivider } from "../../components/global/Divider";
 import { FaIcon } from "../../assets/faicon";
 import { colors } from "../../constants";
-import staketokenlogo from "../../assets/images/icons/lendto.png";
+import btclogo from "../../assets/images/btc.png";
+import ethlogo from "../../assets/images/eth.png";
+import usdclogo from "../../assets/images/labs/usdc.png";
+import wusdlogo from "../../assets/images/wusd.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import "../../styles/pages/transactions/stakecrypto.scss";
 
 export default function StakeTokens(): JSX.Element {
@@ -22,6 +28,9 @@ export default function StakeTokens(): JSX.Element {
   const { showerrorsnack } = useSnackbar();
 
   const [stakeAmount, setStakeAmount] = useState<string>("");
+  const [stakeCurrency, setStakeCurrency] = useState<assetType>("WUSD");
+  const [currencyAnchorEl, setCurrencyAnchorEl] =
+    useState<HTMLDivElement | null>(null);
 
   const selecttoken = srctoken?.startsWith("st")
     ? sphereVaults.find((token) => token?.id === srctoken)
@@ -54,9 +63,36 @@ export default function StakeTokens(): JSX.Element {
         />
 
         <div className="selector_maxout">
-          <div className="crypto_selector">
-            <img src={staketokenlogo} alt="select token" />
+          <div
+            className="crypto_selector"
+            onClick={(e) => setCurrencyAnchorEl(e.currentTarget)}
+          >
+            {stakeCurrency == "HKD" || stakeCurrency == "HKDA" ? (
+              "🇭🇰"
+            ) : stakeCurrency == "USD" ? (
+              "🇺🇸"
+            ) : (
+              <img
+                src={
+                  stakeCurrency == "BTC"
+                    ? btclogo
+                    : stakeCurrency == "ETH"
+                    ? ethlogo
+                    : stakeCurrency == "OM"
+                    ? mantralogo
+                    : stakeCurrency == "USDC"
+                    ? usdclogo
+                    : wusdlogo
+                }
+                alt="stake-token"
+              />
+            )}
           </div>
+          <CurrencyPopOver
+            anchorEl={currencyAnchorEl}
+            setAnchorEl={setCurrencyAnchorEl}
+            setCurrency={setStakeCurrency}
+          />
           <button className="max_out" onClick={() => setStakeAmount(String(0))}>
             Max
           </button>
@@ -76,7 +112,7 @@ export default function StakeTokens(): JSX.Element {
         <p>
           Conversion Ratio
           <span>
-            1 {selecttoken?.name?.split(" ").join("")} ≈ 1 st
+            1 {stakeCurrency} ≈ 1 st
             {selecttoken?.name?.split(" ").join("")}
           </span>
         </p>
