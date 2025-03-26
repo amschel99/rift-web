@@ -20,6 +20,7 @@ export const ENDPOINTS = {
   sendusdc: "/transaction/spend-usdt",
   sendbtc: "/transaction/spend-btc",
   sendom: "/transaction/spend-om",
+  getfaucet: "/wallet/faucet/",
   promptgpt: "/conversation/ai",
   prompthistory: "/conversation/history",
   // chatwithbot: "/chat-with-bot",
@@ -32,6 +33,9 @@ export const ENDPOINTS = {
   getunlockedtokens: "/referral/fetch-unlocked",
   importawxkey: "/import-airwallex",
   awxbalances: "/get-airwallex-balances",
+  stakinginfo: "/staking/info",
+  stakebalance: "/staking/user/",
+  stakelst: "/staking/stake",
 };
 
 export const QUVAULT_ENDPOINTS = {

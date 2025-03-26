@@ -241,3 +241,14 @@ export const spendOnBehalf = async (
     return { status: res?.status };
   }
 };
+
+export const getUsdcFromFaucet = async (amount: string, address: string) => {
+  const URL = BASEURL + ENDPOINTS.getfaucet;
+
+  const res = await fetch(URL, {
+    method: "POST",
+    headers: { "COntent-Type": "application/json" },
+    body: JSON.stringify({ amount, address }),
+  });
+  return res.json();
+};

@@ -304,7 +304,7 @@ const AppActions = (): JSX.Element => {
   );
 };
 
-const Asset = ({
+export const Asset = ({
   name,
   symbol,
   image,
@@ -315,14 +315,17 @@ const Asset = ({
   name: string;
   symbol: string;
   image: string;
-  navigatelink: string;
-  balance?: number;
-  balanceusd: number;
+  navigatelink?: string;
+  balance?: number | string;
+  balanceusd: number | string;
 }): JSX.Element => {
   const navigate = useNavigate();
 
   return (
-    <div className="_asset" onClick={() => navigate(navigatelink)}>
+    <div
+      className="_asset"
+      onClick={() => (navigatelink ? navigate(navigatelink) : () => {})}
+    >
       <div>
         <img src={image} alt="btc" />
 
@@ -333,8 +336,16 @@ const Asset = ({
       </div>
 
       <p className="balance">
-        {balance && <span>{formatNumber(Number(balance))}</span>}
-        <span className="fiat">{formatUsd(balanceusd)}</span>
+        {balance && (
+          <span>
+            {typeof balance == "number"
+              ? formatNumber(Number(balance))
+              : balance}
+          </span>
+        )}
+        <span className="fiat">
+          {typeof balanceusd == "number" ? formatUsd(balanceusd) : balanceusd}
+        </span>
       </p>
     </div>
   );

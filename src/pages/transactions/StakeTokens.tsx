@@ -1,27 +1,43 @@
-import { JSX, useState } from "react";
+import { JSX, MouseEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { faLayerGroup, faCalendarDay } from "@fortawesome/free-solid-svg-icons";
 import { addDays } from "date-fns";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { formatDateToStr } from "../../utils/dates";
+import { fetchMyKeys } from "../../utils/api/keys";
 import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
+import { CurrencyPopOver, PopOver } from "../../components/global/PopOver";
+import { assetType } from "../lend/CreateLendAsset";
 import { sphereVaults, techgrityProducts } from "../../components/tabs/Defi";
 import { HorizontalDivider } from "../../components/global/Divider";
+import { APYChart } from "./StakeVault";
 import { FaIcon } from "../../assets/faicon";
 import { colors } from "../../constants";
-import staketokenlogo from "../../assets/images/icons/lendto.png";
+import btclogo from "../../assets/images/btc.png";
+import ethlogo from "../../assets/images/eth.png";
+import usdclogo from "../../assets/images/labs/usdc.png";
+import wusdlogo from "../../assets/images/wusd.png";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+import airwallexlogo from "../../assets/images/awx.png";
 import "../../styles/pages/transactions/stakecrypto.scss";
+import { stakeLST } from "../../utils/api/staking";
 
 export default function StakeTokens(): JSX.Element {
   const navigate = useNavigate();
   const { srctoken } = useParams();
   const { switchtab } = useTabs();
-  const { showerrorsnack } = useSnackbar();
+  const { showerrorsnack, showsuccesssnack } = useSnackbar();
 
   const [stakeAmount, setStakeAmount] = useState<string>("");
+  const [stakeCurrency, setStakeCurrency] = useState<assetType>("WUSD");
+  const [currencyAnchorEl, setCurrencyAnchorEl] =
+    useState<HTMLDivElement | null>(null);
+  const [keysAnchorEl, setKeysAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [selectKeyValue, setSelectKeyValue] = useState<string | null>(null);
 
   const selecttoken = srctoken?.startsWith("st")
     ? sphereVaults.find((token) => token?.id === srctoken)
@@ -29,14 +45,39 @@ export default function StakeTokens(): JSX.Element {
   const currentDate = new Date();
   const nextDay = addDays(currentDate, 1);
 
-  const onSubmitStake = () => {
-    showerrorsnack("Staking coming soon...");
-  };
+  const { data: mykeys } = useQuery({
+    queryKey: ["secrets"],
+    queryFn: fetchMyKeys,
+  });
+
+  const myairwallexkeys = mykeys?.filter(
+    (_key) => _key?.purpose == "AIRWALLEX"
+  );
 
   const goBack = () => {
     switchtab("earn");
     navigate("/app");
   };
+
+  const onSelectKey = (e: MouseEvent<HTMLDivElement>) => {
+    if (Number(myairwallexkeys?.length) > 0) {
+      setKeysAnchorEl(e.currentTarget);
+    } else {
+      showerrorsnack(`Import an Airwallex Key to stake with ${stakeCurrency}`);
+    }
+  };
+
+  const { mutate: onSubmitStake, isPending } = useMutation({
+    mutationFn: () =>
+      stakeLST(Number(stakeAmount))
+        .then(() => {
+          setStakeAmount("");
+          showsuccesssnack(`Succeesffully staked ${stakeAmount} USDC`);
+        })
+        .catch(() => {
+          showerrorsnack("Failed to stake, please try again");
+        }),
+  });
 
   useBackButton(goBack);
 
@@ -54,9 +95,36 @@ export default function StakeTokens(): JSX.Element {
         />
 
         <div className="selector_maxout">
-          <div className="crypto_selector">
-            <img src={staketokenlogo} alt="select token" />
+          <div
+            className="crypto_selector"
+            onClick={(e) => setCurrencyAnchorEl(e.currentTarget)}
+          >
+            {stakeCurrency == "HKD" || stakeCurrency == "HKDA" ? (
+              "🇭🇰"
+            ) : stakeCurrency == "USD" ? (
+              "🇺🇸"
+            ) : (
+              <img
+                src={
+                  stakeCurrency == "BTC"
+                    ? btclogo
+                    : stakeCurrency == "ETH"
+                    ? ethlogo
+                    : stakeCurrency == "OM"
+                    ? mantralogo
+                    : stakeCurrency == "USDC"
+                    ? usdclogo
+                    : wusdlogo
+                }
+                alt="stake-token"
+              />
+            )}
           </div>
+          <CurrencyPopOver
+            anchorEl={currencyAnchorEl}
+            setAnchorEl={setCurrencyAnchorEl}
+            setCurrency={setStakeCurrency}
+          />
           <button className="max_out" onClick={() => setStakeAmount(String(0))}>
             Max
           </button>
@@ -68,6 +136,49 @@ export default function StakeTokens(): JSX.Element {
         <span>0 {selecttoken?.name?.split(" ").join("")}</span>
       </p>
 
+      {stakeCurrency == "HKD" || stakeCurrency == "USD" ? (
+        <>
+          <div className="source_key" onClick={onSelectKey}>
+            <img src={airwallexlogo} alt="AirWallex" />
+            <p>
+              Choose an AirWallex Key
+              <span>
+                {selectKeyValue == null
+                  ? `You have ${myairwallexkeys?.length || 0} AirWallex Key(s)`
+                  : selectKeyValue?.substring(0, selectKeyValue.length / 2.5) +
+                    "..."}
+              </span>
+            </p>
+          </div>
+          <PopOver anchorEl={keysAnchorEl} setAnchorEl={setKeysAnchorEl}>
+            <div className="select_secrets">
+              {myairwallexkeys?.map((_key) => (
+                <div
+                  className="img_desc"
+                  key={_key?.id}
+                  onClick={() => {
+                    setSelectKeyValue(_key?.value);
+                    setKeysAnchorEl(null);
+                  }}
+                >
+                  <img src={airwallexlogo} alt="secret" />
+
+                  <p className="desc">
+                    AIRWALLEX <br />
+                    <span>
+                      {_key?.value?.substring(0, _key?.value?.length / 2.5) +
+                        "..."}
+                    </span>
+                  </p>
+                </div>
+              ))}
+            </div>
+          </PopOver>
+        </>
+      ) : (
+        <></>
+      )}
+
       <div className="receive_ctr">
         <p>
           Receive <span>0.125 st{selecttoken?.name?.split(" ").join("")}</span>
@@ -76,7 +187,7 @@ export default function StakeTokens(): JSX.Element {
         <p>
           Conversion Ratio
           <span>
-            1 {selecttoken?.name?.split(" ").join("")} ≈ 1 st
+            1 {stakeCurrency} ≈ 1 st
             {selecttoken?.name?.split(" ").join("")}
           </span>
         </p>
@@ -99,7 +210,6 @@ export default function StakeTokens(): JSX.Element {
       </div>
 
       <HorizontalDivider sxstyles={{ marginTop: "0.875rem" }} />
-
       <div className="info">
         <div className="info_ctr">
           <p>
@@ -131,6 +241,15 @@ export default function StakeTokens(): JSX.Element {
           {formatDateToStr(nextDay.toString(), true)}
         </div>
       </div>
+      <HorizontalDivider sxstyles={{ margin: "0.875rem 0" }} />
+
+      {/* <TokenAPYDetails
+        tokenName={srctoken as string}
+        thirtyDyavg="4%"
+        avgFunding="5.5%"
+        apyValue="11%"
+      /> */}
+      <APYChart legendTitle={`${selecttoken?.name} APY`} />
 
       <BottomButtonContainer>
         <SubmitButton
@@ -139,16 +258,19 @@ export default function StakeTokens(): JSX.Element {
             <FaIcon
               faIcon={faLayerGroup}
               color={
-                stakeAmount == "" ? colors.textsecondary : colors.textprimary
+                stakeAmount == "" || isPending
+                  ? colors.textsecondary
+                  : colors.textprimary
               }
             />
           }
-          isDisabled={stakeAmount == ""}
+          isLoading={isPending}
+          isDisabled={stakeAmount == "" || isPending}
           sxstyles={{
             padding: "0.625rem",
             borderRadius: "1.5rem",
             backgroundColor:
-              stakeAmount == "" ? colors.divider : colors.success,
+              stakeAmount == "" || isPending ? colors.divider : colors.success,
           }}
           onclick={onSubmitStake}
         />

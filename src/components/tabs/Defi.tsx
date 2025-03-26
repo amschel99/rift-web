@@ -3,26 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import {
   faCoins,
-  faDotCircle,
   faFolderOpen,
   faLayerGroup,
-  faLock,
   faPlusCircle,
-  faRotate,
   faSquareUpRight,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/free-solid-svg-icons";
 import { stakeproducttype } from "../../types/earn";
-import { TokenomicsChart } from "../../pages/quvault/LaunchpadInfo";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
-import { psttoken, getPstTokens } from "../../utils/api/quvault/psttokens";
-import {
-  launchpadstore,
-  getLaunchPadStores,
-} from "../../utils/api/quvault/launchpad";
+import { getPstTokens } from "../../utils/api/quvault/psttokens";
+import { getLaunchPadStores } from "../../utils/api/quvault/launchpad";
 import { getMyDividends } from "../../utils/api/quvault/dividends";
+import { getStakingInfo, getStakeingBalance } from "../../utils/api/staking";
 import { formatUsdSimple } from "../../utils/formatters";
+import { TokenomicsChart } from "../../pages/quvault/LaunchpadInfo";
+import { Asset } from "../WalletBalance";
 import { SubmitButton } from "../global/Buttons";
 import { Loading } from "../../assets/animations";
 import { FaIcon } from "../../assets/faicon";
@@ -30,12 +26,15 @@ import { colors } from "../../constants";
 import stakeicon from "../../assets/images/icons/lendto.png";
 import "../../styles/components/tabs/defitab.scss";
 
-interface sphereVaultType extends stakeproducttype {
-  strategy: "index" | "buffet" | "degen";
-  description: string;
-  risk: "low" | "medium" | "high";
-  popularity: number;
-  lockPeriod?: string;
+interface sphereVaultType {
+  id: string;
+  name: string;
+  strategy: string;
+  apy: string;
+  currentTvl: string;
+  maxCapacity: string;
+  network: string;
+  lockPeriod: string;
 }
 
 type ammPoolType = {
@@ -71,10 +70,22 @@ export const DefiTab = (): JSX.Element => {
     queryFn: getLaunchPadStores,
   });
 
+  const { data: stakinginfo, isFetching: stakinginfoloading } = useQuery({
+    queryKey: ["stkinginfo"],
+    queryFn: getStakingInfo,
+  });
+
+  const { data: stakingbalance, isFetching: stakingbalanceloading } = useQuery({
+    queryKey: ["stkingbalance"],
+    queryFn: getStakeingBalance,
+  });
+
   const goBack = () => {
     switchtab("home");
     navigate("/app");
   };
+
+  // 1 - {trasuryvalue / totalstaked}
 
   useBackButton(goBack);
 
@@ -100,7 +111,7 @@ export const DefiTab = (): JSX.Element => {
         />
 
         <FilterButton
-          text="Yield"
+          text="Stake"
           icon={
             <FaIcon
               faIcon={faLayerGroup}
@@ -162,30 +173,50 @@ export const DefiTab = (): JSX.Element => {
         />
       </div>
 
-      {dividendsloading && pstLoading && launchpadLoading && (
-        <div className="loading_ctr">
-          <Loading width="2rem" height="2rem" />
-        </div>
-      )}
+      {dividendsloading ||
+        pstLoading ||
+        launchpadLoading ||
+        stakinginfoloading ||
+        (stakingbalanceloading && (
+          <div className="loading_ctr">
+            <Loading width="2rem" height="2rem" />
+          </div>
+        ))}
 
       {filter == "portfolio" && !dividendsloading && (
         <>
           <div className="stakingrewards_ctr">
             <p className="title">Staking Rewards</p>
             <div className="myrewards">
-              <StakingVault
-                apy="12%"
-                lastrebase="1.2%"
-                vaultid="senior"
-                tokenname="Senior"
-                lstvalue={100}
+              <Asset
+                image={stakeicon}
+                name="Buffet Vault"
+                symbol="BUFFET"
+                navigatelink="/stakevault/buffet"
+                balance={stakingbalance?.data?.lstBalance}
+                balanceusd={
+                  String(
+                    1 -
+                      Number(stakinginfo?.data?.treasuryValue) /
+                        Number(stakinginfo?.data?.totalStaked)
+                  ) + "%"
+                }
               />
-              <StakingVault
-                apy="12%"
-                lastrebase="1.2%"
-                vaultid="junior"
-                tokenname="Junior"
-                lstvalue={120}
+              <Asset
+                image={stakeicon}
+                name="Super Senior"
+                symbol="SENIOR"
+                navigatelink="/stakevault/senior"
+                balance="100 LST"
+                balanceusd={100}
+              />
+              <Asset
+                image={stakeicon}
+                name="Junior"
+                symbol="JUNIOR"
+                navigatelink="/stakevault/junior"
+                balance="100 LST"
+                balanceusd={100}
               />
             </div>
           </div>
@@ -214,69 +245,48 @@ export const DefiTab = (): JSX.Element => {
               />
             </div>
 
-            <div className="my_dividens">
-              <Dividend
-                title="Approved"
-                totalamount={
-                  mydividends?.data?.summary?.approved?.total_amount as number
-                }
-                totaltokens={
-                  mydividends?.data?.summary?.approved
-                    ?.total_dividends as number
-                }
-                totaldividend={
-                  mydividends?.data?.summary?.approved?.total_tokens as number
-                }
-              />
-              <Dividend
-                title="Pending Accumulated"
-                totalamount={
-                  mydividends?.data?.summary?.pending_accumulated
-                    ?.total_amount as number
-                }
-                totaltokens={
-                  mydividends?.data?.summary?.pending_accumulated
-                    ?.total_amount as number
-                }
-                totaldividend={
-                  mydividends?.data?.summary?.pending_accumulated
-                    ?.total_amount as number
-                }
-              />
-              <Dividend
-                title="Sent"
-                totalamount={
-                  mydividends?.data?.summary?.sent?.total_amount as number
-                }
-                totaltokens={
-                  mydividends?.data?.summary?.sent?.total_amount as number
-                }
-                totaldividend={
-                  mydividends?.data?.summary?.sent?.total_amount as number
-                }
-              />
+            <Asset
+              image={stakeicon}
+              name="CMT"
+              symbol="CMT"
+              balance="300 CMT"
+              balanceusd={34}
+            />
+            <Asset
+              image={stakeicon}
+              name="STRAT"
+              symbol="STRAT"
+              balance="100 STRAT"
+              balanceusd={10}
+            />
+            <Asset
+              image={stakeicon}
+              name="CHEAP"
+              symbol="CHEAP"
+              balance="200 CHEAP"
+              balanceusd={5}
+            />
 
-              <div className="earn_more">
-                <div onClick={() => setFilter("launchpad")}>
-                  <span>
-                    Earn More <br /> Dividends
-                  </span>
-                  <FaIcon
-                    faIcon={faUpRightAndDownLeftFromCenter}
-                    fontsize={18}
-                    color={colors.textprimary}
-                  />
-                </div>
-                <div className="tokens" onClick={() => setFilter("tokens")}>
-                  <span>
-                    Get More <br /> Tokens
-                  </span>
-                  <FaIcon
-                    faIcon={faCoins}
-                    fontsize={18}
-                    color={colors.textprimary}
-                  />
-                </div>
+            <div className="earn_more">
+              <div onClick={() => setFilter("launchpad")}>
+                <span>
+                  Earn More <br /> Dividends
+                </span>
+                <FaIcon
+                  faIcon={faUpRightAndDownLeftFromCenter}
+                  fontsize={18}
+                  color={colors.textprimary}
+                />
+              </div>
+              <div className="tokens" onClick={() => setFilter("tokens")}>
+                <span>
+                  Get More <br /> Tokens
+                </span>
+                <FaIcon
+                  faIcon={faCoins}
+                  fontsize={18}
+                  color={colors.textprimary}
+                />
               </div>
             </div>
           </div>
@@ -285,28 +295,56 @@ export const DefiTab = (): JSX.Element => {
       {filter == "amm" && (
         <div className="tokens_ctr">
           {ammPools?.map((_product, index) => (
-            <AMMProduct key={index} product={_product} />
+            <AMMProduct key={index + _product?.name} product={_product} />
           ))}
         </div>
       )}
       {filter == "yield" && (
         <div className="tokens_ctr">
-          {sphereVaults?.map((_product) => (
-            <YieldProduct key={_product?.id} product={_product} />
+          <YieldProduct
+            product={{
+              name: "Buffet Vault",
+              apy: "10%",
+              currentTvl: String(
+                formatUsdSimple(Number(stakinginfo?.data?.treasuryValue))
+              ),
+              id: "buffet",
+              lockPeriod: "7 days",
+              maxCapacity: "20,000",
+              network: "Polygon",
+              strategy: "buffet",
+            }}
+          />
+          {sphereVaults?.map((_product, index) => (
+            <YieldProduct key={_product?.id + index} product={_product} />
           ))}
         </div>
       )}
       {filter == "launchpad" && (
         <div className="tokens_ctr">
           {launchPaddata?.data?.map((_store) => (
-            <LaunchPadProduct key={_store?.store_id} store={_store} />
+            <Asset
+              key={_store?.id}
+              image={_store?.logo_url}
+              name={_store?.store_name}
+              balanceusd={_store?.price}
+              navigatelink={`/launchpad/${_store?.id}`}
+              symbol={_store?.symbol}
+            />
           ))}
         </div>
       )}
       {filter == "tokens" && (
         <div className="tokens_ctr">
-          {pstTokensdata?.data?.map((_token) => (
-            <TokenProduct key={_token?.symbol} token={_token} />
+          {pstTokensdata?.data?.map((_token, index) => (
+            <Asset
+              key={_token?.symbol + index}
+              image={_token?.logo_url}
+              name={_token?.symbol}
+              symbol={_token?.symbol}
+              balanceusd={_token?.price}
+              navigatelink={`/pst/${_token?.symbol}/${_token?.price}`}
+            />
           ))}
         </div>
       )}
@@ -334,85 +372,6 @@ const FilterButton = ({
       {icon}
       {text}
     </button>
-  );
-};
-
-const Dividend = ({
-  title,
-  totalamount,
-  totaltokens,
-  totaldividend,
-}: {
-  title: string;
-  totalamount: number;
-  totaltokens: number;
-  totaldividend: number;
-}): JSX.Element => {
-  return (
-    <div className="dividendctr">
-      <p className="div_title">{title}</p>
-      <p className="detail">
-        Total Amount <span>{totalamount} USD</span>
-      </p>
-      <p className="detail">
-        Total Tokens <span>{totaltokens}</span>
-      </p>
-      <p className="detail">
-        Total Dividends <span>{totaldividend}</span>
-      </p>
-    </div>
-  );
-};
-
-const StakingVault = ({
-  vaultid,
-  tokenname,
-  apy,
-  lastrebase,
-  lstvalue,
-}: {
-  vaultid: string;
-  tokenname: string;
-  apy:string
-  lastrebase:string
-  lstvalue: number;
-}): JSX.Element => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="yieldproduct stakeingvault">
-      <p className="name_apy">
-        {tokenname}
-        <span>{apy} APY</span>
-      </p>
-
-      <div className="container">
-        <p className="rebase">
-          Last Rebase <span>{lastrebase}</span>
-        </p>
-        <p>
-          Total Staked <span>{lstvalue} LST</span>
-        </p>
-      </div>
-
-      <SubmitButton
-        text="Stake"
-        icon={
-          <FaIcon
-            faIcon={faLayerGroup}
-            fontsize={14}
-            color={colors.textprimary}
-          />
-        }
-        sxstyles={{
-          padding: "0.625rem",
-          borderRadius: "0 0 0.375rem 0.375rem",
-          borderTop: `1px solid ${colors.divider}`,
-          backgroundColor: "transparent",
-        }}
-        onclick={() => navigate(`/stakevault/${vaultid}`)}
-      />
-    </div>
   );
 };
 
@@ -466,33 +425,27 @@ const YieldProduct = ({
 
   return (
     <div className="yieldproduct">
-      <p className="name_apy">
-        {product?.name}
-        <span>{product?.apy}</span>
+      <p className="name">{product?.name}</p>
+
+      <p className="apy">
+        APY <span>{product?.apy}</span>
       </p>
 
-      <p className="description">{product?.description}</p>
-
-      <div className="container">
-        <p>
-          Strategy <span>{product?.strategy}</span>
+      <div className="tvl_progress">
+        <p className="tvl_max_cap">
+          <span>Current TVL</span> <span>Max Capacity</span>
         </p>
+        <div className="progress_ctr">
+          <div className="progress" />
+        </div>
         <p>
-          Risk Level <span>{product?.risk}</span>
-        </p>
-        <p>
-          Network <span>{product?.network}</span>
-        </p>
-        <p>
-          Current TVL <span>{product?.currentTvl}</span>
-        </p>
-        <p>
-          Unstaking Period <span>{product?.lockPeriod}</span>
-        </p>
-        <p>
-          Max Capacity <span>{product?.maxCapacity}</span>
+          <span>{product?.currentTvl}</span> <span>{product?.maxCapacity}</span>
         </p>
       </div>
+
+      <p className="network">
+        Network <span>{product?.network}</span>
+      </p>
 
       <SubmitButton
         text="Stake"
@@ -562,112 +515,6 @@ const AMMProduct = ({ product }: { product: ammPoolType }): JSX.Element => {
   );
 };
 
-const LaunchPadProduct = ({
-  store,
-}: {
-  store: launchpadstore;
-}): JSX.Element => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="launchpadproduct">
-      <div className="img_status">
-        <img src={store?.logo_url} alt={store?.symbol} />
-
-        <span
-          style={{
-            color: store?.status === "ended" ? colors.danger : colors.success,
-          }}
-        >
-          <FaIcon
-            faIcon={store?.status === "ended" ? faLock : faDotCircle}
-            color={store?.status === "ended" ? colors.danger : colors.success}
-            fontsize={14}
-          />
-          {store?.status === "ended" ? "Ended" : "Sale Live"}
-        </span>
-      </div>
-
-      <div className="price_sub">
-        <div className="symbol_price">
-          <p className="symbol">{store?.symbol}</p>
-          <span className="price">
-            1 {store?.symbol} ≈ {store?.price} USDC
-          </span>
-        </div>
-
-        <SubmitButton
-          text="Subscribe"
-          sxstyles={{
-            width: "fit-content",
-            padding: "0.25rem 0.875rem",
-            borderRadius: "1rem",
-            fontWeight: 300,
-            backgroundColor: colors.success,
-          }}
-          icon={<FaIcon faIcon={faPlusCircle} color={colors.textprimary} />}
-          onclick={() => navigate(`/launchpad/${store?.id}`)}
-        />
-      </div>
-
-      <p className="detail">
-        Liquidity <span>{store?.liquidity_percentage}%</span>
-      </p>
-      <p className="detail">
-        APY <span>{store?.apy}%</span>
-      </p>
-      <p className="detail">
-        {store?.status === "ended" ? "Presale" : "Sale Ends In"}
-        <span>{store?.status === "ended" ? "Ended" : "0 Days"}</span>
-      </p>
-    </div>
-  );
-};
-
-const TokenProduct = ({ token }: { token: psttoken }): JSX.Element => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="tokenproduct">
-      <div className="img_symbol">
-        <div className="img">
-          <img src={token?.logo_url} alt={token?.symbol} />
-          <p>{token?.symbol}</p>
-        </div>
-
-        <SubmitButton
-          text="Swap"
-          icon={<FaIcon faIcon={faRotate} color={colors.textprimary} />}
-          sxstyles={{
-            width: "fit-content",
-            padding: "0.25rem 0.875rem",
-            borderRadius: "1rem",
-            fontWeight: 300,
-            backgroundColor: colors.success,
-          }}
-          onclick={() => navigate(`/pst/${token?.symbol}/${token?.price}`)}
-        />
-      </div>
-
-      <p className="detail">
-        Price <span> {formatUsdSimple(token?.price)}</span>
-      </p>
-      <p className="detail">
-        Market Cap <span> {formatUsdSimple(token?.market_cap)}</span>
-      </p>
-      <p className="detail">
-        Total Supply <span> {token?.total_supply}</span>
-      </p>
-      <p className="detail">
-        APY <span>{token?.apy}%</span>
-      </p>
-      <p className="detail">
-        TVL <span>{formatUsdSimple(token?.tvl)}</span>
-      </p>
-    </div>
-  );
-};
-
 // eslint-disable-next-line react-refresh/only-export-components
 export const techgrityProducts: (stakeproducttype & {
   popularity: number;
@@ -733,42 +580,42 @@ export const ammPools: ammPoolType[] = [
 export const sphereVaults: sphereVaultType[] = [
   {
     id: "st00",
-    name: "Index Vault",
-    strategy: "index",
-    description: "Diversified investments in top market cap tokens",
-    apy: "13%",
-    currentTvl: "$15,432,678",
-    maxCapacity: "$30,000,000",
-    network: "Sphere",
-    risk: "low",
-    popularity: 1,
-    lockPeriod: "7 days",
+    name: "Super Senior",
+    strategy: "super-senior",
+    apy: "11%",
+    currentTvl: "$22,698,886.84",
+    maxCapacity: "26,000,000",
+    network: "Mantra",
+    lockPeriod: "30 days",
   },
   {
     id: "st01",
-    name: "Buffet Vault",
-    strategy: "buffet",
-    description:
-      "Value investing in underpriced tokens with strong fundamentals",
-    apy: "17%",
-    currentTvl: "$8,765,432",
-    maxCapacity: "$20,000,000",
-    network: "Sphere",
-    risk: "medium",
-    popularity: 3,
-    lockPeriod: "7 days",
+    name: "Junior",
+    strategy: "junior",
+    apy: "29%",
+    currentTvl: "$22,698,886.84",
+    maxCapacity: "26,000,000",
+    network: "Mantra",
+    lockPeriod: "30 days",
   },
   {
-    id: "st02",
-    name: "Degen Vault",
-    strategy: "degen",
-    description: "High-risk high-reward AMM investments for maximum yield",
-    apy: "31%",
-    currentTvl: "$5,432,109",
-    maxCapacity: "$10,000,000",
-    network: "Sphere",
-    risk: "high",
-    popularity: 7,
-    lockPeriod: "7 days",
+    id: "st00",
+    name: "Super Senior",
+    strategy: "super-senior",
+    apy: "11%",
+    currentTvl: "$22,698,886.84",
+    maxCapacity: "26,000,000",
+    network: "Berachain",
+    lockPeriod: "30 days",
+  },
+  {
+    id: "st01",
+    name: "Junior",
+    strategy: "junior",
+    apy: "29%",
+    currentTvl: "$22,698,886.84",
+    maxCapacity: "26,000,000",
+    network: "Berachain",
+    lockPeriod: "30 days",
   },
 ];
