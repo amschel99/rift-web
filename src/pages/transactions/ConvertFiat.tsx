@@ -1,11 +1,13 @@
 import { JSX, useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import { TextField } from "@mui/material";
 import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { useSnackbar } from "../../hooks/snackbar";
 import { formatNumber, formatUsd } from "../../utils/formatters";
+import { getUsdcFromFaucet } from "../../utils/api/wallet";
 import { BottomButtonContainer } from "../../components/Bottom";
 import { SubmitButton } from "../../components/global/Buttons";
 import { FaIcon } from "../../assets/faicon";
@@ -16,7 +18,7 @@ import "../../styles/pages/transactions/convertfiat.scss";
 export default function ConvertFiat(): JSX.Element {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
-  const { showsuccesssnack } = useSnackbar();
+  const { showsuccesssnack, showerrorsnack } = useSnackbar();
 
   const [selectCurrency, setSelectCurrency] = useState<"USD" | "HKD">("USD");
   const [getQty, setGetQty] = useState<string>("");
@@ -30,6 +32,7 @@ export default function ConvertFiat(): JSX.Element {
   const selectedcurrencyBalance =
     selectCurrency == "USD" ? usdBalance : hkdBalance;
   const selectedcurrencyUsdValue = selectCurrency == "USD" ? 1 : 7.79;
+  const usdcaddress = localStorage.getItem("ethaddress");
 
   const goBack = () => {
     switchtab("home");
@@ -40,6 +43,35 @@ export default function ConvertFiat(): JSX.Element {
     setSelectCurrency(currency);
   };
 
+  const { mutate: mutateUsdcFromFaucet, isPending } = useMutation({
+    mutationFn: () =>
+      getUsdcFromFaucet(
+        String(Number(getQty) / selectedcurrencyUsdValue),
+        usdcaddress as string
+      )
+        .then(() => {
+          const convertusdc = localStorage.getItem("convertusdc");
+          const prevconvertusdc = convertusdc == null ? 0 : Number(convertusdc);
+
+          const usdcreceive = formatNumber(
+            Number(getQty) / selectedcurrencyUsdValue
+          );
+          localStorage.setItem(
+            "convertusdc",
+            String(prevconvertusdc - usdcreceive)
+          );
+
+          showsuccesssnack(
+            `Successfully converted ${getQty} ${selectCurrency}`
+          );
+
+          setGetQty("");
+        })
+        .catch(() => {
+          showerrorsnack("An error occurred, please try again");
+        }),
+  });
+
   const onConvertFiat = () => {
     if (selectCurrency == "USD") {
       localStorage.setItem("usedusd", getQty);
@@ -47,14 +79,7 @@ export default function ConvertFiat(): JSX.Element {
       localStorage.setItem("usedhkd", getQty);
     }
 
-    const convertusdc = localStorage.getItem("convertusdc");
-    const prevconvertusdc = convertusdc == null ? 0 : Number(convertusdc);
-
-    const usdcreceive = formatNumber(Number(getQty) / selectedcurrencyUsdValue);
-    localStorage.setItem("convertusdc", String(usdcreceive + prevconvertusdc));
-
-    setGetQty("");
-    showsuccesssnack(`Successfully received ${usdcreceive} USDC`);
+    mutateUsdcFromFaucet();
   };
 
   useBackButton(goBack);
@@ -227,9 +252,11 @@ export default function ConvertFiat(): JSX.Element {
           sxstyles={{
             padding: "0.625rem",
             borderRadius: "1.5rem",
-            backgroundColor: getQty == "" ? colors.divider : colors.success,
+            backgroundColor:
+              getQty == "" || isPending ? colors.divider : colors.success,
           }}
-          isDisabled={getQty == ""}
+          isLoading={isPending}
+          isDisabled={getQty == "" || isPending}
           onclick={onConvertFiat}
         />
       </BottomButtonContainer>
