@@ -1,33 +1,53 @@
 import { JSX, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
+import {
+  getStakeingBalance,
+  getStakingInfo,
+  unstakeLST,
+} from "../../utils/api/staking";
 import { OutlinedTextInput } from "../global/Inputs";
 import { SubmitButton } from "../global/Buttons";
 import { Warning } from "../../assets/icons/actions";
 import { colors } from "../../constants";
-import staketoken from "../../assets/images/icons/lendto.png";
+import staketoken from "../../assets/images/labs/usdc.png";
 import "../../styles/components/drawer/stakeunstakeinvault.scss";
 
 export const UnStakeFromVault = (): JSX.Element => {
-  const { showsuccesssnack } = useSnackbar();
+  const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const { closeAppDrawer } = useAppDrawer();
 
   const [unstakeAmount, setUnstakeAmount] = useState<string>("");
   const [confirmed, setConfirmed] = useState<boolean>(false);
-  const [procesing, setProcessing] = useState<boolean>(false);
 
   const onConfirm = () => {
     setConfirmed(true);
   };
 
-  const onUnstake = () => {
-    setProcessing(true);
+  const { data: stakinginfo, isPending: stakinginfoloading } = useQuery({
+    queryKey: ["stakinginfo"],
+    queryFn: getStakingInfo,
+  });
 
-    setTimeout(() => {
-      showsuccesssnack("You tokens will be available in 7 days");
-      closeAppDrawer();
-    }, 3500);
-  };
+  const { data: stakingbalance, isFetching: stakingbalanceloading } = useQuery({
+    queryKey: ["stkingbalance"],
+    queryFn: getStakeingBalance,
+  });
+
+  const { mutate: onUnstake, isPending } = useMutation({
+    mutationFn: () =>
+      unstakeLST(unstakeAmount, unstakeAmount)
+        .then((res) => {
+          if (res?.success && res?.data?.transactionHash) {
+            showsuccesssnack(`${unstakeAmount} USDC unstaked successfully`);
+            closeAppDrawer();
+          }
+        })
+        .catch(() => {
+          showerrorsnack("Failed to unstake, please try again");
+        }),
+  });
 
   return (
     <div className="unstakefromvault">
@@ -48,10 +68,20 @@ export const UnStakeFromVault = (): JSX.Element => {
       <div className="balance">
         <p>
           Balance <br />
-          <span>100 LST</span>
+          <span>
+            {Math.round(Number(stakingbalance?.data?.lstBalance))}{" "}
+            {stakinginfo?.data?.tokenSymbol || "LST"}
+          </span>
         </p>
 
-        <button className="max_out" onClick={() => setUnstakeAmount("100")}>
+        <button
+          className="max_out"
+          onClick={() =>
+            setUnstakeAmount(
+              String(Math.round(Number(stakingbalance?.data?.lstBalance)))
+            )
+          }
+        >
           Max
         </button>
       </div>
@@ -104,10 +134,20 @@ export const UnStakeFromVault = (): JSX.Element => {
           marginTop: "1rem",
           padding: "0.625rem",
           backgroundColor:
-            unstakeAmount == "" || procesing ? colors.divider : colors.success,
+            unstakeAmount == "" ||
+            isPending ||
+            stakinginfoloading ||
+            stakingbalanceloading
+              ? colors.divider
+              : colors.success,
         }}
-        isDisabled={unstakeAmount == "" || procesing}
-        isLoading={procesing}
+        isDisabled={
+          unstakeAmount == "" ||
+          isPending ||
+          stakinginfoloading ||
+          stakingbalanceloading
+        }
+        isLoading={isPending}
         onclick={confirmed ? onUnstake : onConfirm}
       />
     </div>
