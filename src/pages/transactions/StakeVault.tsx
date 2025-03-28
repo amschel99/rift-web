@@ -135,6 +135,17 @@ export default function StakeVault(): JSX.Element {
               <span className="balance-usd">
                 ${Math.round(Number(totalLstBalance))}
               </span>
+              {isBuffetVault && (
+                <p
+                  style={{
+                    marginTop: "0.5rem",
+                    fontWeight: "bold",
+                    color: colors.success,
+                  }}
+                >
+                  TVL ${stakinginfo?.data?.treasuryValue || 0}
+                </p>
+              )}
             </div>
 
             <div className="apy-container">
@@ -145,9 +156,6 @@ export default function StakeVault(): JSX.Element {
                   <span className="guaranteed-badge">Fixed</span>
                 )}
               </span>
-              {isBuffetVault && (
-                <p>TVL ${stakinginfo?.data?.treasuryValue || 0}</p>
-              )}
             </div>
           </div>
 
