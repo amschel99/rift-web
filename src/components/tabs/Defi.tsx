@@ -406,7 +406,7 @@ export const DefiTab = (): JSX.Element => {
                       ? group?.totalValue
                       : 0;
                   const percentage =
-                    (totalValue || 0 / totalPortfolioValue || 0) * 100;
+                    ((totalValue || 0) / (totalPortfolioValue || 0)) * 100;
                   return (
                     <div key={group.type} className="stat-item">
                       <div className="stat-label">
