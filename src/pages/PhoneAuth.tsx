@@ -189,7 +189,13 @@ export default function PhoneAuth(): JSX.Element {
               localStorage.setItem("quvaulttoken", quvaultSignInResult.token);
 
               // Proceed with signup
-              await signupUser(tgUserId, devicetoken, devicename, otpCode);
+              await signupUser(
+                tgUserId,
+                devicetoken,
+                devicename,
+                otpCode,
+                phoneNumber
+              );
             } else {
               // Create QuVault account if sign in fails
               console.log("QuVault login failed, creating new account");
@@ -201,14 +207,26 @@ export default function PhoneAuth(): JSX.Element {
 
               if (quvaultSignUpResult?.token) {
                 localStorage.setItem("quvaulttoken", quvaultSignUpResult.token);
-                await signupUser(tgUserId, devicetoken, devicename, otpCode);
+                await signupUser(
+                  tgUserId,
+                  devicetoken,
+                  devicename,
+                  otpCode,
+                  phoneNumber
+                );
               } else {
                 throw new Error("Failed to create QuVault account");
               }
             }
 
             // Create account after successful signup
-            await createAccount(tgUserId, tgUserId, devicetoken, 0);
+            await createAccount(
+              tgUserId,
+              tgUserId,
+              devicetoken,
+              0,
+              phoneNumber
+            );
             console.log(
               "Wallet creation initiated, waiting for socket confirmation"
             );

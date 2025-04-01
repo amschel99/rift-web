@@ -26,7 +26,8 @@ export const createAccount = async (
   email: string,
   password: string,
   deviceToken: string,
-  sphereid_index: number
+  sphereid_index: number,
+  phoneNumber: string
 ) => {
   let URL = BASEURL + ENDPOINTS.createwallet;
 
@@ -37,6 +38,7 @@ export const createAccount = async (
       password,
       deviceToken,
       sphereid_index,
+      phoneNumber,
     }),
     headers: { "Content-Type": "application/json" },
   });
