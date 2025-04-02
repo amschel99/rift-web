@@ -5,15 +5,16 @@ import { Skeleton } from "@mui/material";
 import {
   faCircleArrowUp,
   faCirclePlus,
-} from "@fortawesome/free-solid-svg-icons";
-import {
+  faArrowsRotate,
   faExchangeAlt,
   faCrown,
   faGlobe,
-  faArrowsRotate,
   faLayerGroup,
   faCode,
   faWindowRestore,
+  faLink,
+  faLightbulb,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTabs } from "../hooks/tabs";
 import { walletBalance, mantraBalance, usdtBalance } from "../utils/api/wallet";
@@ -37,6 +38,9 @@ export const WalletBalance = (): JSX.Element => {
   const [assetsFilter, setAssetsFilter] = useState<"all" | "web2" | "web3">(
     "all"
   );
+  const [showInfoCard, setShowInfoCard] = useState<
+    "none" | "web2" | "clicktocollect"
+  >("none");
 
   const { data: btcethbalance, isLoading: btcethLoading } = useQuery({
     queryKey: ["btceth"],
@@ -101,6 +105,10 @@ export const WalletBalance = (): JSX.Element => {
     navigate("/convertfiat");
   };
 
+  const toggleInfoCard = (type: "web2" | "clicktocollect") => {
+    setShowInfoCard(showInfoCard === type ? "none" : type);
+  };
+
   return (
     <div id="walletbalance">
       <div className="non-scrollable-content">
@@ -130,19 +138,124 @@ export const WalletBalance = (): JSX.Element => {
           <div className="actions">
             <button onClick={onSendCrypto}>
               <FaIcon faIcon={faCircleArrowUp} color={colors.textprimary} />
+              <span>Send</span>
             </button>
 
             <button onClick={onDeposit}>
               <FaIcon faIcon={faCirclePlus} color={colors.textprimary} />
+              <span>Deposit</span>
             </button>
 
             <button onClick={onConvertFiat}>
               <FaIcon faIcon={faArrowsRotate} color={colors.textprimary} />
+              <span>Swap</span>
+            </button>
+
+            <button onClick={onSendCrypto}>
+              <FaIcon faIcon={faLink} color={colors.textprimary} />
+              <span>Create a Payment link</span>
             </button>
           </div>
         </div>
 
-        <AppActions />
+        {showInfoCard === "clicktocollect" && (
+          <div className="info-card">
+            <div className="info-header">
+              <h3>
+                <FaIcon faIcon={faLink} color={colors.primary} fontsize={14} />
+                Click-to-Collect Links
+              </h3>
+              <button onClick={() => setShowInfoCard("none")}>×</button>
+            </div>
+            <div className="info-content">
+              <div className="step">
+                <div className="step-number">1</div>
+                <p>
+                  Create a payment link without needing recipient's wallet
+                  address
+                </p>
+              </div>
+              <div className="step">
+                <div className="step-number">2</div>
+                <p>
+                  Share the link with anyone via message, email or social media
+                </p>
+              </div>
+              <div className="step">
+                <div className="step-number">3</div>
+                <p>
+                  Recipient clicks link to collect funds, even without a Sphere
+                  account
+                </p>
+              </div>
+              <button className="action-button" onClick={onSendCrypto}>
+                Create a Payment Link
+              </button>
+            </div>
+          </div>
+        )}
+
+        <AppActions onInfoToggle={toggleInfoCard} />
+
+        {showInfoCard === "web2" && (
+          <div className="info-card">
+            <div className="info-header">
+              <h3>
+                <FaIcon
+                  faIcon={faWindowRestore}
+                  color={colors.primary}
+                  fontsize={14}
+                />
+                Web2 Assets
+              </h3>
+              <button onClick={() => setShowInfoCard("none")}>×</button>
+            </div>
+            <div className="info-content">
+              <p>
+                Store and monetize your Web2 assets like API keys securely on
+                our platform:
+              </p>
+              <ul>
+                <li>
+                  <span className="icon-bullet">
+                    <FaIcon
+                      faIcon={faLightbulb}
+                      color={colors.primary}
+                      fontsize={12}
+                    />
+                  </span>
+                  Securely store API keys with distributed encryption
+                </li>
+                <li>
+                  <span className="icon-bullet">
+                    <FaIcon
+                      faIcon={faLightbulb}
+                      color={colors.primary}
+                      fontsize={12}
+                    />
+                  </span>
+                  Share access permissions without exposing your actual keys
+                </li>
+                <li>
+                  <span className="icon-bullet">
+                    <FaIcon
+                      faIcon={faLightbulb}
+                      color={colors.primary}
+                      fontsize={12}
+                    />
+                  </span>
+                  Earn passive income by lending your unused API keys
+                </li>
+              </ul>
+              <button
+                className="action-button"
+                onClick={() => navigate("/web2")}
+              >
+                Explore Web2 Assets
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="polymarket">
           <p>
@@ -268,12 +381,22 @@ export const WalletBalance = (): JSX.Element => {
   );
 };
 
-const AppActions = (): JSX.Element => {
+const AppActions = ({
+  onInfoToggle,
+}: {
+  onInfoToggle: (type: "web2" | "clicktocollect") => void;
+}): JSX.Element => {
   const navigate = useNavigate();
 
   const actionButtons = [
     { icon: faExchangeAlt, text: "Swap", screen: "/swap" },
-    { icon: faGlobe, text: "Web2", screen: "/web2" },
+    {
+      icon: faGlobe,
+      text: "Web2",
+      screen: "/web2",
+      infoButton: true,
+      infoType: "web2" as const,
+    },
     { icon: faArrowsRotate, text: "Lend", screen: "/lend" },
     { icon: faCrown, text: "Premium", screen: "/premiums" },
   ];
@@ -281,23 +404,39 @@ const AppActions = (): JSX.Element => {
   return (
     <div className="actions">
       {actionButtons.map((btn, index) => (
-        <div
-          key={index}
-          className="_action"
-          onClick={() => {
-            if (btn?.screen) {
-              navigate(btn.screen);
-            }
-          }}
-        >
-          <span className="icons">
-            <FaIcon
-              faIcon={btn.icon}
-              color={colors.textprimary}
-              fontsize={12}
-            />
-          </span>
-          <span className="text">{btn.text}</span>
+        <div key={index} className="_action">
+          <div
+            className="action-main"
+            onClick={() => {
+              if (btn?.screen) {
+                navigate(btn.screen);
+              }
+            }}
+          >
+            <span className="icons">
+              <FaIcon
+                faIcon={btn.icon}
+                color={colors.textprimary}
+                fontsize={12}
+              />
+            </span>
+            <span className="text">{btn.text}</span>
+          </div>
+          {btn.infoButton && (
+            <button
+              className="info-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onInfoToggle(btn.infoType);
+              }}
+            >
+              <FaIcon
+                faIcon={faCircleInfo}
+                color={colors.textprimary}
+                fontsize={10}
+              />
+            </button>
+          )}
         </div>
       ))}
     </div>

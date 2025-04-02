@@ -3,12 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import {
   faLayerGroup,
-  // faSquareUpRight,
-  faUpRightAndDownLeftFromCenter,
   faCheckCircle,
   faArrowRight,
-  faChevronDown,
-  faChevronUp,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   AreaChart,
@@ -241,13 +237,19 @@ export const DefiTab = (): JSX.Element => {
     return assets;
   }, [stakingbalance, stakinginfo, mydividends, launchPaddata, pstTokensdata]);
 
-  // Calculate total portfolio value
-  const totalPortfolioValue = useMemo(() => {
-    return portfolioAssets.reduce(
-      (total, asset) => total + asset?.balanceUsd || 0,
-      0
-    );
-  }, [portfolioAssets]);
+  // Fix for NaN percentage calculation
+  const getAverageStakingPercentage = () => {
+    if (!stakinginfo?.data || !stakingbalance?.data) return "0";
+
+    if (Number(stakingbalance?.data?.lstBalance) === 0) return "0";
+
+    const treasuryValue = Number(stakinginfo?.data?.treasuryValue || 0);
+    const totalStaked = Number(stakinginfo?.data?.totalStaked || 0);
+
+    if (totalStaked === 0) return "0";
+
+    return formatUsdSimple(Math.abs((treasuryValue / totalStaked - 1) * 100));
+  };
 
   // Sort assets by value (highest first) and group by type
   const sortedPortfolioAssets = useMemo(() => {
@@ -316,18 +318,6 @@ export const DefiTab = (): JSX.Element => {
 
   // Mock performance data for graphs (in real app, this would come from API)
 
-  // Get readable names for asset types
-  const getTypeDisplayName = (type: string): string => {
-    const displayNames: Record<string, string> = {
-      staking: "Staking",
-      dividend: "Dividends",
-      launchpad: "Launchpad",
-      token: "Tokens",
-      amm: "Liquidity",
-    };
-    return displayNames[type] || type.charAt(0).toUpperCase() + type.slice(1);
-  };
-
   // Get color for asset type
   const getTypeColor = (type: string): string => {
     const colors: Record<string, string> = {
@@ -359,124 +349,6 @@ export const DefiTab = (): JSX.Element => {
 
       {!isLoading && (
         <div className="portfolio-container">
-          {/* Total Portfolio Value */}
-          <div className="portfolio-summary">
-            <div className="portfolio-total">
-              <div className="total-value">
-                <div className="value-with-button">
-                  <div>
-                    <span className="label">Total Balance</span>
-                    <span className="value">
-                      $ {formatUsdSimple(totalPortfolioValue)}
-                    </span>
-                    <span className="dollar-change positive">
-                      Avg{" "}
-                      {Number(stakingbalance?.data?.lstBalance) == 0.0
-                        ? "0"
-                        : formatUsdSimple(
-                            Math.abs(
-                              (Number(stakinginfo?.data?.treasuryValue || 0) /
-                                Number(stakinginfo?.data?.totalStaked || 0) -
-                                1) *
-                                100
-                            )
-                          )}{" "}
-                      %<span className="time-period">24h</span>
-                    </span>
-                  </div>
-                  <button
-                    className="details-btn"
-                    onClick={() => navigate("/portfolio-details")}
-                  >
-                    <FaIcon
-                      faIcon={faUpRightAndDownLeftFromCenter}
-                      fontsize={12}
-                      color={colors.textprimary}
-                    />
-                    Details
-                  </button>
-                </div>
-              </div>
-
-              {/* Allocation stats row */}
-              <div className="allocation-stats">
-                {groupedAssets?.map((group) => {
-                  const totalValue =
-                    typeof group?.totalValue == "number"
-                      ? group?.totalValue
-                      : 0;
-                  const percentage =
-                    ((totalValue || 0) / (totalPortfolioValue || 0)) * 100;
-                  return (
-                    <div key={group.type} className="stat-item">
-                      <div className="stat-label">
-                        <div
-                          className="color-dot"
-                          style={{ backgroundColor: getTypeColor(group.type) }}
-                        />
-                        <span>{getTypeDisplayName(group.type)}</span>
-                      </div>
-                      <span className="stat-value">
-                        {percentage.toFixed(1)}%
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Portfolio Allocation */}
-              <div className="portfolio-allocation">
-                {groupedAssets.map((group) => {
-                  const percentage =
-                    (group.totalValue / totalPortfolioValue) * 100;
-                  return (
-                    <div
-                      key={group.type}
-                      className="allocation-bar"
-                      style={{
-                        width: `${percentage}%`,
-                        backgroundColor: getTypeColor(group.type),
-                      }}
-                      title={`${getTypeDisplayName(
-                        group.type
-                      )}: ${percentage.toFixed(1)}%`}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Asset Filters */}
-          {/* <div className="portfolio-filters">
-            <button
-              className={portfolioFilter === "all" ? "active" : ""}
-              onClick={() => setPortfolioFilter("all")}
-            >
-              All Assets
-            </button>
-            {groupedAssets.map((group) => (
-              <button
-                key={group.type}
-                className={portfolioFilter === group.type ? "active" : ""}
-                onClick={() => setPortfolioFilter(group.type)}
-              >
-                {getTypeDisplayName(group.type)}
-              </button>
-            ))}
-            <button
-              className="view-all-btn"
-              onClick={() => navigate("/portfolio-details")}
-            >
-              <FaIcon
-                faIcon={faSquareUpRight}
-                fontsize={12}
-                color={colors.textprimary}
-              />
-              View All Details
-            </button>
-          </div> */}
-
           {/* Asset List */}
           <div className="portfolio-assets">
             {filteredAssets.length === 0 ? (
@@ -495,7 +367,7 @@ export const DefiTab = (): JSX.Element => {
                           fontsize={14}
                           color={colors.accent}
                         />
-                        <h4>Sphere Vault - 11-13% Returns</h4>
+                        <h4>Sphere Vault - 11-13% Guaranteed Returns</h4>
                       </div>
                       <div className="featured-assets-list">
                         {groupedAssets
@@ -512,27 +384,16 @@ export const DefiTab = (): JSX.Element => {
                               stakinginfotvl={
                                 stakinginfo?.data?.treasuryValue || 0
                               }
+                              userBalance={
+                                Number(stakingbalance?.data?.lstBalance) || 0
+                              }
+                              totalStaked={stakinginfo?.data?.totalStaked || 0}
+                              avgAPY={getAverageStakingPercentage()}
                             />
                           ))}
                       </div>
                     </div>
                   )}
-
-                {/* {filteredAssets.map((group) => (
-                  <div key={group.type} className="asset-group">
-                    <h4 className="group-title">
-                      {getTypeDisplayName(group.type)}
-                    </h4>
-                    {group.assets.map((asset) => (
-                      <PortfolioAsset
-                        key={asset.id}
-                        asset={asset}
-                        onClick={() => navigate(asset.link)}
-                        getTypeColor={getTypeColor}
-                      />
-                    ))}
-                  </div>
-                ))} */}
               </>
             )}
           </div>
@@ -547,16 +408,21 @@ interface PortfolioAssetProps {
   onClick: () => void;
   getTypeColor: (type: string) => string;
   stakinginfotvl?: string | number;
+  userBalance: number;
+  totalStaked: number | string;
+  avgAPY: string;
 }
 
 const PortfolioAsset = ({
   asset,
   onClick,
-  getTypeColor,
+
   stakinginfotvl,
+  userBalance,
+  totalStaked,
+  avgAPY,
 }: PortfolioAssetProps): JSX.Element => {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(false);
   const [activeChart, setActiveChart] = useState<"apy" | "treasury">("apy");
 
   // Generate mock APY history data for the graph
@@ -580,42 +446,14 @@ const PortfolioAsset = ({
     return [];
   }, [asset.name]);
 
-  // Determine badge text based on asset type
-  const getBadgeText = () => {
-    switch (asset.type) {
-      case "staking":
-        if (asset.name === "Sphere Vault" || asset.name === "Super Senior") {
-          return ""; // Don't display APY badge for Sphere Vault as it's shown in guaranteed tag
-        }
-        return `APY ${asset.apy}`;
-      case "dividend":
-        return `DIV ${asset.apy}`;
-      case "launchpad":
-        return "LAUNCH";
-      case "amm":
-        return `APY ${asset.apy}`;
-      default:
-        return asset.type.toUpperCase();
-    }
-  };
-
   // Check if this is the Sphere Vault with guaranteed return
   const isSphereVault =
     asset.name === "Sphere Vault" && asset.type === "staking";
 
-  // Add additional class for Sphere Vault to make it bigger
+  // Always expanded for Sphere Vault
   const assetClasses = `portfolio-asset-item ${
-    isSphereVault ? "guaranteed buffet-vault" : ""
-  } ${expanded ? "expanded" : ""}`;
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (isSphereVault) {
-      e.stopPropagation();
-      setExpanded(!expanded);
-    } else {
-      onClick();
-    }
-  };
+    isSphereVault ? "guaranteed buffet-vault expanded" : ""
+  }`;
 
   // Get background color based on asset type for aesthetic styling
   const getBackgroundColor = () => {
@@ -639,10 +477,25 @@ const PortfolioAsset = ({
     }
   };
 
+  const formatTvl = (tvl: string | number | undefined): string => {
+    if (typeof tvl === "undefined") return "0";
+    const numValue = typeof tvl === "string" ? Number(tvl) || 0 : tvl || 0;
+    return formatUsdSimple(numValue);
+  };
+
+  const formatBalance = (balance: number): string => {
+    return formatUsd(balance || 0);
+  };
+
+  const formatNumber = (num: number | string): number => {
+    if (typeof num === "string") return Number(num) || 0;
+    return num || 0;
+  };
+
   return (
     <div
       className={assetClasses}
-      onClick={handleClick}
+      onClick={isSphereVault ? undefined : onClick}
       style={{ background: getBackgroundColor() }}
     >
       <div className="asset-main">
@@ -656,9 +509,6 @@ const PortfolioAsset = ({
                 <span className="asset-network">{asset?.network}</span>
               )}
               {isSphereVault && <span className="asset-rwa">RWA</span>}
-              {isSphereVault && (
-                <span className="asset-rwa">TVL ${stakinginfotvl}</span>
-              )}
             </div>
             {isSphereVault && (
               <div className="guaranteed-tag">
@@ -672,51 +522,73 @@ const PortfolioAsset = ({
             )}
           </div>
         </div>
-        <div className="asset-value">
-          <span className="asset-balance-usd">
-            {formatUsd(Math.round(asset?.balanceUsd || 0))}
-          </span>
-          {/* <span className="asset-balance">
-            {asset?.balance} {asset.symbol}
-          </span> */}
-          {getBadgeText() && (
-            <div
-              className={`asset-type-badge ${
-                isSphereVault ? "guaranteed-badge" : ""
-              }`}
-              style={{
-                color: isSphereVault ? colors.success : "#ffffff",
-                backgroundColor: isSphereVault
-                  ? `rgba(15, 177, 77, 0.15)`
-                  : `${getTypeColor(asset.type)}30`, // 30 = 30% opacity in hex
-                borderColor: isSphereVault
-                  ? colors.success
-                  : getTypeColor(asset.type),
-              }}
-            >
-              {getBadgeText()}
-            </div>
-          )}
-          {isSphereVault && (
-            <button
-              className="expand-toggle"
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded(!expanded);
-              }}
-            >
-              <FaIcon
-                faIcon={expanded ? faChevronUp : faChevronDown}
-                fontsize={12}
-                color={colors.textprimary}
-              />
-            </button>
-          )}
-        </div>
       </div>
 
-      {isSphereVault && expanded && (
+      {isSphereVault && (
+        <div className="staking-info">
+          <div className="staking-row">
+            <div className="staking-label">Your Balance:</div>
+            <div className="staking-value">{formatBalance(userBalance)}</div>
+          </div>
+          <div className="staking-row">
+            <div className="staking-label">24h APY:</div>
+            <div className="staking-value positive">{avgAPY}%</div>
+          </div>
+          <div className="staking-row">
+            <div className="staking-label">TVL:</div>
+            <div className="staking-value">${formatTvl(stakinginfotvl)}</div>
+          </div>
+          <div className="staking-row">
+            <div className="staking-label">Total Staked:</div>
+            <div className="staking-value">
+              ${formatUsdSimple(formatNumber(totalStaked))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isSphereVault && (
         <div className="expanded-content">
+          <div className="asset-allocation">
+            <h5>Where Your Money is Invested</h5>
+            <div className="allocation-chart">
+              <div className="allocation-item">
+                <div
+                  className="allocation-bar"
+                  style={{ width: "45%", backgroundColor: colors.success }}
+                ></div>
+                <div className="allocation-label">
+                  <span>45%</span>
+                  <p>AAVE Lending Pools</p>
+                </div>
+              </div>
+              <div className="allocation-item">
+                <div
+                  className="allocation-bar"
+                  style={{ width: "30%", backgroundColor: "#5b8def" }}
+                ></div>
+                <div className="allocation-label">
+                  <span>30%</span>
+                  <p>Compound Finance</p>
+                </div>
+              </div>
+              <div className="allocation-item">
+                <div
+                  className="allocation-bar"
+                  style={{ width: "25%", backgroundColor: "#ff9f1c" }}
+                ></div>
+                <div className="allocation-label">
+                  <span>25%</span>
+                  <p>Lido Staking Protocol</p>
+                </div>
+              </div>
+            </div>
+            <p className="allocation-note">
+              Treasury backed by real-world assets in Asia (tokenized shopping
+              centers)
+            </p>
+          </div>
+
           <div className="apy-history-graph">
             <div className="chart-header">
               <h5>Performance History</h5>
@@ -742,7 +614,7 @@ const PortfolioAsset = ({
               </div>
             </div>
             <div className="graph-container">
-              <ResponsiveContainer width="100%" height={180}>
+              <ResponsiveContainer width="100%" height={150}>
                 {activeChart === "apy" ? (
                   <LineChart
                     data={apyHistoryData}
@@ -876,47 +748,18 @@ const PortfolioAsset = ({
                 )}
               </ResponsiveContainer>
             </div>
-            <div className="expanded-footer">
-              <p>
-                {activeChart === "apy"
-                  ? "* Sphere Vault consistently outperforms other protocols by 2-3x"
-                  : "* Treasury has grown exponentially over the past year"}
-              </p>
-              <button
-                className="details-link"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(asset.link);
-                }}
-              >
-                <span>View Full Details</span>
-                <FaIcon
-                  faIcon={faArrowRight}
-                  fontsize={12}
-                  color={colors.accent}
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {isSphereVault && !expanded && (
-        <div className="buffet-info">
-          <button
-            className="learn-more-link"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(asset.link);
-            }}
-          >
-            <span>Learn More</span>
-            <FaIcon
-              faIcon={faArrowRight}
-              fontsize={10}
-              color={colors.success}
-            />
-          </button>
+            <button
+              className="stake-now-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(asset.link);
+              }}
+            >
+              <span>Stake Now</span>
+              <FaIcon faIcon={faArrowRight} fontsize={16} color="#ffffff" />
+            </button>
+          </div>
         </div>
       )}
     </div>
