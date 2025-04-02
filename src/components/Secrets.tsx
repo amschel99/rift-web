@@ -1,11 +1,16 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
-import { faLock, faLockOpen } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLock,
+  faLockOpen,
+  faPlay,
+  faHandHolding,
+  faKey,
+} from "@fortawesome/free-solid-svg-icons";
 import { useAppDrawer } from "../hooks/drawer";
 import { useAppDialog } from "../hooks/dialog";
 import { useSnackbar } from "../hooks/snackbar";
 import { keyType, UseOpenAiKey } from "../utils/api/keys";
-import { VerticalDivider } from "./global/Divider";
 import { FaIcon } from "../assets/faicon";
 import { colors } from "../constants";
 import poelogo from "../assets/images/icons/poe.png";
@@ -19,7 +24,6 @@ export const MySecrets = ({
   secretsLs: keyType[];
 }): JSX.Element => {
   const navigate = useNavigate();
-  // const { openAppDrawerWithKey } = useAppDrawer();
   const { showerrorsnack } = useSnackbar();
 
   const onUseSecret = (
@@ -32,11 +36,6 @@ export const MySecrets = ({
       navigate(`/chatbot/${secretvalue}`);
     } else if (purpose === "AIRWALLEX") {
       showerrorsnack("Feature coming soon...");
-      // openAppDrawerWithKey(
-      //   "consumeawxkey",
-      //   secretid as string,
-      //   secretnonce as string
-      // ); //keyToshare: secretid, purpose: secretnonce
     } else {
     }
   };
@@ -69,16 +68,17 @@ export const MySecrets = ({
               >
                 <span>
                   {secret?.purpose === "OPENAI" || secret?.purpose === "POE"
-                    ? "AI"
+                    ? "OpenAI API Key"
                     : secret?.purpose === "POLYMARKET"
-                    ? "Trading"
-                    : "Banking"}
+                    ? "Polymarket API"
+                    : "AirWallex Key"}
                 </span>
               </div>
             </div>
 
             <div className="secret-actions">
               <button
+                className="action-button use-button"
                 onClick={() =>
                   onUseSecret(
                     secret?.purpose,
@@ -88,15 +88,16 @@ export const MySecrets = ({
                   )
                 }
               >
-                Use
+                <FaIcon faIcon={faPlay} color="#ffffff" fontsize={12} />
+                <span>Use</span>
               </button>
 
-              <VerticalDivider />
-
               <button
+                className="action-button lend-button"
                 onClick={() => onLendSecret(secret?.purpose, secret?.value)}
               >
-                Lend
+                <FaIcon faIcon={faHandHolding} color="#ffffff" fontsize={12} />
+                <span>Lend</span>
               </button>
             </div>
           </div>
@@ -144,7 +145,7 @@ export const SharedSecrets = ({
     if (purpose === "OPENAI" || purpose === "POE") {
       decodeOpenAiKey(id as string, nonce as string);
     } else if (purpose === "AIRWALLEX") {
-      openAppDrawerWithKey("consumeawxkey", id as string, nonce as string); //keyToshare: secretid, purpose: secretnonce
+      openAppDrawerWithKey("consumeawxkey", id as string, nonce as string);
     } else {
     }
   };
@@ -185,18 +186,27 @@ export const SharedSecrets = ({
               className="secret-logo"
             />
 
-            <p className="sharedfrom">
+            <div className="sharedfrom">
               <FaIcon
                 faIcon={secret?.locked ? faLock : faLockOpen}
                 color={secret?.locked ? colors.danger : colors.success}
                 fontsize={14}
               />
-              <span>{secret?.value?.substring(0, 4)}</span>
-            </p>
+              <span>
+                {secret?.purpose === "OPENAI" || secret?.purpose === "POE"
+                  ? "OpenAI Key"
+                  : secret?.purpose === "POLYMARKET"
+                  ? "Polymarket API"
+                  : "AirWallex Key"}
+                - {secret?.value?.substring(0, 4)}
+              </span>
+            </div>
           </div>
 
           <button
-            className="usesecret"
+            className={`action-button ${
+              secret?.locked ? "get-button" : "use-button"
+            }`}
             onClick={() =>
               secret?.locked
                 ? onGetSecret(
@@ -210,7 +220,12 @@ export const SharedSecrets = ({
                 : onUseSecret(secret?.purpose, secret?.url as string)
             }
           >
-            {secret?.locked ? "Get Key" : "Use"}
+            <FaIcon
+              faIcon={secret?.locked ? faKey : faPlay}
+              color="#ffffff"
+              fontsize={12}
+            />
+            <span>{secret?.locked ? "Get Key" : "Use"}</span>
           </button>
         </div>
       ))}
