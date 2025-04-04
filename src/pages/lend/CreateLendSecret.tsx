@@ -114,8 +114,10 @@ export default function CreateLendSecret(): JSX.Element {
         <div className="secretselector" onClick={openPopOver}>
           {selSecretType === "nil" || selSecretValue === "nil" ? (
             <p className="text-sm text-[#f6f7f9]">
-              Please choose a key to lend
-              <span>You have {mysecrets?.length} key(s)</span>{" "}
+              Please choose a key to lend.{" "}
+              <span className="text-gray-400">
+                You have {mysecrets?.length} key(s)
+              </span>{" "}
             </p>
           ) : (
             <>
@@ -346,7 +348,7 @@ export default function CreateLendSecret(): JSX.Element {
             </p>
           </div>
 
-          <p className="text-sm text-[#f6f7f9] mt-2">Payment Options</p>
+          <p className="text-sm text-[#f6f7f9] mt-8">Payment Options</p>
           <span className="text-xs text-gray-400 mb-2">
             How do you wish to be paid for this secret ?
           </span>
