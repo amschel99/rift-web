@@ -6,7 +6,7 @@ import { PopOver } from "../../components/global/PopOver";
 import { useBackButton } from "../../hooks/backbutton";
 import { assetType } from "../lend/CreateLendAsset";
 import { colors } from "../../constants";
-import { ChevronLeft, Copy } from "../../assets/icons/actions";
+import { Copy } from "../../assets/icons/actions";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
@@ -21,8 +21,8 @@ export default function DepositToAddress(): JSX.Element {
     useState<Exclude<assetType, "HKD" | "USD" | "HKDA">>("OM");
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
-  let btcaddress = localStorage.getItem("btcaddress") as string;
-  let ethaddress = localStorage.getItem("ethaddress") as string;
+  const btcaddress = localStorage.getItem("btcaddress") as string;
+  const ethaddress = localStorage.getItem("ethaddress") as string;
 
   const onCopyAddr = () => {
     if (depositAsset == "BTC") {
