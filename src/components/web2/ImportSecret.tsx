@@ -54,53 +54,6 @@ export const ImportSecret = ({ onClose }: ImportSecretProps): JSX.Element => {
 
   return (
     <div id="importkey">
-      <div className="benefits-section">
-        <div className="benefit-item">
-          <div className="benefit-icon">
-            <FaIcon faIcon={faShield} color={colors.primary} fontsize={14} />
-          </div>
-          <div className="benefit-text">
-            <h4>Decentralized Security</h4>
-            <p>
-              Your keys are encrypted and distributed across our network using
-              Shamir secret sharing.
-            </p>
-          </div>
-        </div>
-
-        <div className="benefit-item">
-          <div className="benefit-icon">
-            <FaIcon
-              faIcon={faMoneyBillTransfer}
-              color={colors.primary}
-              fontsize={14}
-            />
-          </div>
-          <div className="benefit-text">
-            <h4>Monetize Idle Keys</h4>
-            <p>
-              Earn income by lending your API keys to others without revealing
-              the actual key. They get permission-based access to the service,
-              not your credentials.
-            </p>
-          </div>
-        </div>
-
-        <div className="benefit-item">
-          <div className="benefit-icon">
-            <FaIcon
-              faIcon={faLayerGroup}
-              color={colors.primary}
-              fontsize={14}
-            />
-          </div>
-          <div className="benefit-text">
-            <h4>DeFi Collateral</h4>
-            <p>Use API keys as collateral for loans and other DeFi services.</p>
-          </div>
-        </div>
-      </div>
-
       <div className="key-input">
         <label>
           <span className="label-icon">
@@ -173,7 +126,52 @@ export const ImportSecret = ({ onClose }: ImportSecretProps): JSX.Element => {
           </p>
         </div>
       </div>
+      <div className="benefits-section">
+        <div className="benefit-item">
+          <div className="benefit-icon">
+            <FaIcon faIcon={faShield} color={colors.primary} fontsize={14} />
+          </div>
+          <div className="benefit-text">
+            <h4>Decentralized Security</h4>
+            <p>
+              Your keys are encrypted and distributed across our network using
+              Shamir secret sharing.
+            </p>
+          </div>
+        </div>
 
+        <div className="benefit-item">
+          <div className="benefit-icon">
+            <FaIcon
+              faIcon={faMoneyBillTransfer}
+              color={colors.primary}
+              fontsize={14}
+            />
+          </div>
+          <div className="benefit-text">
+            <h4>Monetize Idle Keys</h4>
+            <p>
+              Earn income by lending your API keys to others without revealing
+              the actual key. They get permission-based access to the service,
+              not your credentials.
+            </p>
+          </div>
+        </div>
+
+        <div className="benefit-item">
+          <div className="benefit-icon">
+            <FaIcon
+              faIcon={faLayerGroup}
+              color={colors.primary}
+              fontsize={14}
+            />
+          </div>
+          <div className="benefit-text">
+            <h4>DeFi Collateral</h4>
+            <p>Use API keys as collateral for loans and other DeFi services.</p>
+          </div>
+        </div>
+      </div>
       <div className="import-footer">
         <p className="security-note">
           <span className="label-icon">
