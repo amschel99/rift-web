@@ -1,13 +1,9 @@
-import { CSSProperties, JSX, useState, useEffect } from "react";
+import { JSX, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { BorrowedAsset } from "../../components/lend/Assets";
-import { VerticalDivider } from "../../components/global/Divider";
 import { BorrowedSecret, LentSecret } from "../../components/lend/Secrets";
-import { SubmitButton } from "../../components/global/Buttons";
-import { Import, Stake } from "../../assets/icons/actions";
-import { colors } from "../../constants";
 import "../../styles/pages/lendspend.scss";
 
 export default function LendToUse(): JSX.Element {
@@ -43,42 +39,40 @@ export default function LendToUse(): JSX.Element {
   }, []);
 
   return (
-    <section id="lendtospend">
+    <section id="" className="bg-[#121212] h-screen px-4 relative">
       <div className="header">
-        <p className="title">
-          Lend & Earn
-          <span>Lend out your idle crypto assets and secrets</span>
-        </p>
+        <p className="text-[#f6f7f9] text-2xl font-bold mt-8">Lend & Earn</p>
+        <span className="text-sm text-gray-400">
+          Lend out your idle crypto assets and secrets
+        </span>
       </div>
 
-      <div className="filters">
+      <div className="flex items-center gap-2 my-4 justify-between bg-[#212121] border border-[#212121] p-2 rounded-2xl">
         <button
-          className={`filter-btn ${selector === "borrowed" ? "active" : ""}`}
+          className={`filter-btn ${
+            selector === "borrowed"
+              ? "bg-[#ffb386] border border-[#ffb386] p-2 rounded-xl flex items-center gap-2 text-sm w-1/2 justify-center"
+              : "text-[#f6f7f9] flex items-center gap-2 text-sm"
+          }`}
           onClick={() => setSelector("borrowed")}
         >
           Borrowed Assets
-          <span>
-            <Stake
-              color={
-                selector === "borrowed" ? colors.accent : colors.textsecondary
-              }
-            />
-          </span>
         </button>
         <button
-          className={`filter-btn ${selector === "lent" ? "active" : ""}`}
+          className={`filter-btn ${
+            selector === "lent"
+              ? "bg-[#ffb386] border border-[#ffb386] p-2 rounded-xl flex items-center gap-2 text-sm w-1/2 justify-center"
+              : "text-[#f6f7f9] flex items-center gap-2 text-sm"
+          }`}
           onClick={() => setSelector("lent")}
         >
           Lent Assets
-          <Stake
-            color={selector === "lent" ? colors.accent : colors.textsecondary}
-          />
         </button>
       </div>
 
       <div className="assets-container">
         {selector === "borrowed" ? (
-          <div className="assets-grid">
+          <div className="grid grid-cols-1 gap-4">
             <BorrowedAsset
               owner="amschelll"
               asset="USDC"
@@ -112,38 +106,33 @@ export default function LendToUse(): JSX.Element {
                 secretFee={0}
               />
             ) : (
-              <div className="no-assets">
-                <p>You have not lent any assets</p>
-                <span>Start lending your assets to earn passive income</span>
+              <div className="flex items-center justify-center flex-col gap-2">
+                <p className="text-gray-400 text-sm">
+                  You have not lent any assets
+                </p>
+                <span className="text-gray-400 text-sm">
+                  Start lending your assets to earn passive income
+                </span>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <div className="newlendctr">
-        <SubmitButton
-          text="Lend Crypto"
-          icon={<Stake width={10} height={10} color={colors.textprimary} />}
-          sxstyles={buttonstyles}
-          onclick={lendAsset}
-        />
-
-        <VerticalDivider sxstyles={{ backgroundColor: colors.textprimary }} />
-
-        <SubmitButton
-          text="Lend Keys"
-          icon={<Import width={16} height={16} color={colors.textprimary} />}
-          sxstyles={buttonstyles}
-          onclick={lendSecret}
-        />
+      <div className="flex items-center gap-2 my-4 justify-between absolute bottom-0 left-0 right-0">
+        <button
+          className="flex items-center gap-2 text-sm bg-[#ffb386] border border-[#212121] p-3 rounded-xl text-[#0e0e0e] w-1/2 justify-center"
+          onClick={lendAsset}
+        >
+          Lend Crypto
+        </button>
+        <button
+          className="flex items-center gap-2 text-sm bg-[#212121] border border-[#ffb386] p-3 rounded-xl text-[#f6f7f9] w-1/2 justify-center"
+          onClick={lendSecret}
+        >
+          Lend Keys
+        </button>
       </div>
     </section>
   );
 }
-
-const buttonstyles: CSSProperties = {
-  gap: "0.5rem",
-  borderRadius: 0,
-  backgroundColor: "transparent",
-};
