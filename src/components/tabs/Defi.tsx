@@ -342,7 +342,7 @@ export const DefiTab = (): JSX.Element => {
   return (
     <section id="defitab">
       {isLoading && (
-        <div className="loading_ctr">
+        <div className="h-screen flex justify-center items-center">
           <Loading width="2rem" height="2rem" />
         </div>
       )}
@@ -361,7 +361,7 @@ export const DefiTab = (): JSX.Element => {
                 {(portfolioFilter === "all" || portfolioFilter === "staking") &&
                   groupedAssets.find((group) => group.type === "staking") && (
                     <div className="featured-assets">
-                      <div className="featured-header">
+                      <div className="flex items-center gap-2">
                         <FaIcon
                           faIcon={faCheckCircle}
                           fontsize={14}
@@ -457,24 +457,7 @@ const PortfolioAsset = ({
 
   // Get background color based on asset type for aesthetic styling
   const getBackgroundColor = () => {
-    if (isSphereVault) {
-      return "linear-gradient(135deg, rgba(73, 107, 204, 0.1) 0%, rgba(30, 40, 80, 0.05) 100%)";
-    }
-
-    switch (asset.type) {
-      case "staking":
-        return "linear-gradient(135deg, rgba(73, 107, 204, 0.08) 0%, rgba(40, 60, 120, 0.03) 100%)";
-      case "dividend":
-        return "linear-gradient(135deg, rgba(91, 141, 239, 0.06) 0%, rgba(40, 60, 120, 0.02) 100%)";
-      case "launchpad":
-        return "linear-gradient(135deg, rgba(255, 159, 28, 0.06) 0%, rgba(100, 60, 0, 0.02) 100%)";
-      case "token":
-        return "linear-gradient(135deg, rgba(73, 107, 204, 0.06) 0%, rgba(30, 40, 80, 0.02) 100%)";
-      case "amm":
-        return "linear-gradient(135deg, rgba(91, 141, 239, 0.06) 0%, rgba(40, 60, 120, 0.02) 100%)";
-      default:
-        return "transparent";
-    }
+    return "#0e0e0e";
   };
 
   const formatTvl = (tvl: string | number | undefined): string => {
