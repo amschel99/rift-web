@@ -58,7 +58,7 @@ export function DemoPieChart() {
   }, []);
 
   return (
-    <Card className="flex flex-col bg-[#0e0e0e] mb-2">
+    <Card className="flex flex-col bg-[#212121] mb-2">
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-[#f6f7f9]">Investment Chart</CardTitle>
         <CardDescription className="text-gray-400">
@@ -116,10 +116,10 @@ export function DemoPieChart() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
+        <div className="flex text-sm items-center gap-2 font-medium leading-none text-gray-400">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
+        <div className="leading-none text-muted-foreground text-[10px]">
           Showing total investment for the last 6 months
         </div>
       </CardFooter>
