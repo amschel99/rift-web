@@ -58,7 +58,7 @@ export function DemoPieChart() {
   }, []);
 
   return (
-    <Card className="flex flex-col bg-[#212121] mb-2">
+    <Card className="flex flex-col bg-[#212121] mb-2 w-full">
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-[#f6f7f9]">Investment Chart</CardTitle>
         <CardDescription className="text-gray-400">
