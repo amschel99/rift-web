@@ -46,19 +46,6 @@ export const BottomTabNavigation = (): JSX.Element => {
       ),
     },
     {
-      menu: "labs",
-      title: "Labs",
-      icon: (
-        <div className="fa-icon-container">
-          <FaIcon
-            faIcon={faFlask}
-            color={currTab == "labs" ? "#ffb386" : colors.textprimary}
-            fontsize={currTab == "labs" ? 24 : 20}
-          />
-        </div>
-      ),
-    },
-    {
       menu: "rewards",
       title: "Rewards",
       icon: (
