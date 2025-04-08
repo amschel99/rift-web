@@ -78,7 +78,7 @@ export default function CreateLendAsset(): JSX.Element {
   useBackButton(goBack);
 
   return (
-    <section className="min-h-screen bg-[#0e0e0e] px-4 pb-20 overflow-y-auto">
+    <section className="h-screen bg-[#0e0e0e] px-4 pb-20 overflow-y-scroll">
       <ComingSoon />
 
       <div className="mt-4 mb-6">
@@ -243,7 +243,7 @@ export default function CreateLendAsset(): JSX.Element {
             Profits distribution
           </h2>
           <p className="text-gray-400 text-sm">
-            How much would you like to keep from the profits realised?
+            How much would you like to keep from the profits realized?
           </p>
         </div>
 
@@ -252,10 +252,10 @@ export default function CreateLendAsset(): JSX.Element {
             <button
               key={percent}
               onClick={() => setYieldDist(percent)}
-              className={`px-4 py-2 rounded-xl text-[#f6f7f9] text-sm transition-colors ${
+              className={`px-4 py-2 rounded-xl text-sm transition-colors ${
                 yieldDist === percent
                   ? "bg-[#ffb386] text-[#0e0e0e]"
-                  : "bg-[#212121] hover:bg-[#2a2a2a]"
+                  : "bg-[#212121] hover:bg-[#2a2a2a] text-[#f6f7f9]"
               }`}
             >
               {percent}%
