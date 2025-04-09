@@ -26,7 +26,6 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { techgrityProducts } from "../../components/tabs/Defi";
-import { colors } from "../../constants";
 import "../../styles/pages/transactions/stakevault.scss";
 
 export default function StakeVault(): JSX.Element {
