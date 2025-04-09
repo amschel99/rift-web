@@ -44,7 +44,7 @@ export const SendCryptoTab = (): JSX.Element => {
   useBackButton(goBack);
 
   return (
-    <section id="sendcrypto">
+    <section id="sendcrypto" className="h-screen overflow-y-scroll mb-16">
       <div className="header">
         <h1>Send Crypto</h1>
         <p className="subtitle">Choose your preferred method to send crypto</p>
