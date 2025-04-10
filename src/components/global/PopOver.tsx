@@ -1,12 +1,12 @@
 import { CSSProperties, Dispatch, JSX, ReactNode, SetStateAction } from "react";
 import { Popover } from "@mui/material";
-import { assetType } from "../../pages/lend/CreateLendAsset";
 import { colors } from "../../constants";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import wusdlogo from "../../assets/images/wusd.png";
 import beralogo from "../../assets/images/icons/bera.webp";
+import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 
 interface popOverProps {
   children: ReactNode;
@@ -22,10 +22,13 @@ interface allCurrencyPopOverProps<T extends string> {
   allowedCurrencies?: string[];
 }
 
+// Define the specific types used by CryptoPopOver
+type CryptoAssetType = "OM" | "HKDA" | "WUSD" | "USDC" | "ETH" | "BTC";
+
 interface cryptoPopOverProps {
   anchorEl: HTMLDivElement | null;
   setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>;
-  setCurrency: Dispatch<SetStateAction<Exclude<assetType, "USD" | "HKD">>>;
+  setCurrency: Dispatch<SetStateAction<CryptoAssetType>>;
   sxstyles?: CSSProperties;
 }
 
