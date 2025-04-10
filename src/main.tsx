@@ -38,9 +38,9 @@ import AddPin from "./pages/security/AddPin.tsx";
 import AddEmail from "./pages/security/AddEmail.tsx";
 import AddPhone from "./pages/security/AddPhone.tsx";
 import NodesTeeSelector from "./pages/security/NodesTeeSelector.tsx";
-import AboutLend from "./pages/lend/AboutLend.tsx";
+
 import LendToUse from "./pages/lend/LendToUse.tsx";
-import CreateLendAsset from "./pages/lend/CreateLendAsset.tsx";
+
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import Premium from "./pages/Premium.tsx";
 import Business from "./pages/business/Index.tsx";
@@ -143,9 +143,7 @@ createRoot(document.getElementById("root")!).render(
                         path="/security/selector/:type"
                         element={<NodesTeeSelector />}
                       />
-                      <Route path="/lend/info" element={<AboutLend />} />
-                      <Route path="/lend" element={<LendToUse />} />
-                      <Route path="/lend/asset" element={<CreateLendAsset />} />
+                      <Route path="/lend" element={<LendToUse />} />{" "}
                       <Route
                         path="/lend/secret/:type/:secretvalue"
                         element={<CreateLendSecret />}

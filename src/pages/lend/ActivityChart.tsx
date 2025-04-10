@@ -1,6 +1,5 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -18,12 +17,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 0, mobile: 0 },
+  { month: "February", desktop: 0, mobile: 0 },
+  { month: "March", desktop: 0, mobile: 0 },
+  { month: "April", desktop: 0, mobile: 0 },
+  { month: "May", desktop: 0, mobile: 0 },
+  { month: "June", desktop: 0, mobile: 0 },
 ];
 
 const chartConfig = {
@@ -67,11 +66,8 @@ export function ActivityChart() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none text-gray-400 text-sm">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
         <div className="leading-none text-gray-400 text-[10px]">
-          Showing total visitors for the last 6 months
+          No activity recorded yet.
         </div>
       </CardFooter>
     </Card>

@@ -5,7 +5,6 @@ import {
   faAddressBook,
   faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { assetType } from "../../pages/lend/CreateLendAsset";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 
@@ -18,7 +17,9 @@ import usdclogo from "../../assets/images/labs/usdc.png";
 
 import "../../styles/components/tabs/sendcrypto.scss";
 
-type sendcryptotype = Exclude<assetType, "USD" | "HKD" | "HKDA">;
+// Define type directly with allowed options
+type sendcryptotype = "WBERA" | "ETH" | "USDC";
+// type sendcryptotype = Exclude<assetType, "USD" | "HKD" | "HKDA">; // Old definition
 
 export const SendCryptoTab = (): JSX.Element => {
   const navigate = useNavigate();

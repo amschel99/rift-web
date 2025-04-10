@@ -167,12 +167,12 @@ export const sendBTC = async (
   });
 };
 
-export const sendOM = async (
+export const sendWbera = async (
   toAddr: string,
   omValStr: string,
   intent: string
 ) => {
-  let URL = BASEURL + ENDPOINTS.sendom;
+  let URL = BASEURL + ENDPOINTS.sendbera;
   let token: string | null = localStorage.getItem("spheretoken");
 
   await fetch(URL, {

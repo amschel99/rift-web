@@ -23,6 +23,7 @@ export const ENDPOINTS = {
   sendusdc: "/transaction/spend-usdt",
   sendbtc: "/transaction/spend-btc",
   sendom: "/transaction/spend-om",
+  sendbera: "/transaction/spend-wbera",
   getfaucet: "/wallet/faucet/",
   promptgpt: "/conversation/ai",
   prompthistory: "/conversation/history",

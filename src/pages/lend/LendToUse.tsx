@@ -2,7 +2,7 @@ import { JSX, useState } from "react";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
-import { BorrowedAsset } from "../../components/lend/Assets";
+
 import { BorrowedSecret, LentSecret } from "../../components/lend/Secrets";
 import "../../styles/pages/lendspend.scss";
 import { ActivityChart } from "./ActivityChart";
@@ -17,10 +17,6 @@ export default function LendToUse(): JSX.Element {
   const goBack = () => {
     switchtab("home");
     navigate("/");
-  };
-
-  const lendAsset = () => {
-    navigate("/lend/asset");
   };
 
   const lendSecret = () => {
@@ -40,26 +36,31 @@ export default function LendToUse(): JSX.Element {
   // }, []);
 
   return (
-    <section id="" className="bg-[#0e0e0e] h-screen px-4 overflow-y-scroll">
+    <section
+      id=""
+      className="bg-[#0e0e0e] h-screen px-4 overflow-y-scroll pb-20"
+    >
       <div className="mt-2">
-        <h1 className="text-[#f6f7f9] text-xl font-bold">Lend & Earn</h1>
+        <h1 className="text-[#f6f7f9] text-xl font-bold">Lend Keys & Earn</h1>
         <span className="text-sm text-gray-400 mb-2">
-          Lend out your idle crypto assets and secrets
+          Lend out your idle Web2 keys securely
         </span>
         <div className="flex items-center justify-between my-2 gap-2">
           <div className="bg-[#212121] w-1/2 rounded-2xl h-24 flex flex-col items-center justify-center">
-            <h1 className="text-[#32e15e] text-2xl font-bold my-2">$198.09</h1>
+            <h1 className="text-[#32e15e] text-2xl font-bold my-2">$0.00</h1>
             <p className="text-gray-400 text-sm">Earnings</p>
           </div>
           <div className="bg-[#212121] w-1/2 rounded-2xl h-24 flex flex-col items-center justify-center">
-            <h1 className="text-[#f41818] text-2xl font-bold my-2">$93.74</h1>
+            <h1 className="text-[#f41818] text-2xl font-bold my-2">$0.00</h1>
             <p className="text-gray-400 text-sm">Spending</p>
           </div>
         </div>
         <ActivityChart />
       </div>
       <div className="">
-        <h1 className="text-[#f6f7f9] text-xl font-bold mt-4 mb-2">Assets</h1>
+        <h1 className="text-[#f6f7f9] text-xl font-bold mt-4 mb-2">
+          Lent Keys Activity
+        </h1>
       </div>
 
       <div className="flex items-center gap-2 mb-2 justify-between bg-[#212121] border border-[#212121] p-2 px-2 rounded-2xl">
@@ -71,7 +72,7 @@ export default function LendToUse(): JSX.Element {
           }`}
           onClick={() => setSelector("borrowed")}
         >
-          Borrowed Assets
+          Borrowed Keys
         </button>
         <button
           className={`filter-btn ${
@@ -81,38 +82,27 @@ export default function LendToUse(): JSX.Element {
           }`}
           onClick={() => setSelector("lent")}
         >
-          Lent Assets
+          Lent Keys
         </button>
       </div>
 
-      <div className="assets-container">
+      <div className="assets-container mt-4">
         {selector === "borrowed" ? (
           <div className="grid grid-cols-1 gap-4">
-            <BorrowedAsset
-              owner="amschelll"
-              asset="USDC"
-              amount={200}
-              usecase="staking"
-              owneryielddist={40}
-              receipientyielddist={60}
-            />
             <BorrowedSecret
-              owner="amschelll"
-              secret="L9P0..."
-              secretFee={22}
-              secretType="POE"
+              owner="example_owner"
+              secret="BORR..."
+              secretFee={10}
+              secretType="AIRWALLEX"
             />
-            <BorrowedAsset
-              owner="mgustavh"
-              asset="ETH"
-              amount={0.75}
-              usecase="staking"
-              owneryielddist={50}
-              receipientyielddist={50}
-            />
+            <div className="flex items-center justify-center flex-col gap-2 py-10">
+              <p className="text-gray-400 text-sm">
+                You have not borrowed any keys yet.
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="assets-grid">
+          <div className="assets-grid space-y-4">
             {secretRevoked == null ? (
               <LentSecret
                 borrower="amscelll"
@@ -121,12 +111,12 @@ export default function LendToUse(): JSX.Element {
                 secretFee={0}
               />
             ) : (
-              <div className="flex items-center justify-center flex-col gap-2">
+              <div className="flex items-center justify-center flex-col gap-2 py-10">
                 <p className="text-gray-400 text-sm">
-                  You have not lent any assets
+                  You have not lent any keys yet.
                 </p>
-                <span className="text-gray-400 text-sm">
-                  Start lending your assets to earn passive income
+                <span className="text-gray-400 text-sm text-center">
+                  Start lending your keys to earn passive income.
                 </span>
               </div>
             )}
@@ -134,15 +124,9 @@ export default function LendToUse(): JSX.Element {
         )}
       </div>
 
-      <div className="flex items-center gap-2 my-4 justify-between">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#0e0e0e]">
         <button
-          className="flex items-center gap-2 text-sm bg-[#ffb386] border border-[#212121] p-3 rounded-xl text-[#0e0e0e] w-1/2 justify-center"
-          onClick={lendAsset}
-        >
-          Lend Crypto
-        </button>
-        <button
-          className="flex items-center gap-2 text-sm bg-[#212121] border border-[#ffb386] p-3 rounded-xl text-[#f6f7f9] w-1/2 justify-center"
+          className="flex items-center gap-2 text-sm bg-[#ffb386] border border-[#ffb386] p-3 rounded-xl text-[#0e0e0e] w-full justify-center font-semibold"
           onClick={lendSecret}
         >
           Lend Keys
