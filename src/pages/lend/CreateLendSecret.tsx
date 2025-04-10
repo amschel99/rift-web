@@ -12,20 +12,20 @@ import { SubmitButton } from "../../components/global/Buttons";
 import { BottomButtonContainer } from "../../components/Bottom";
 import { OutlinedTextInput } from "../../components/global/Inputs";
 import { colors } from "../../constants";
-import { assetType } from "./CreateLendAsset";
 import { FaIcon } from "../../assets/faicon";
 import { Import } from "../../assets/icons/actions";
 import poelogo from "../../assets/images/icons/poe.png";
 import awxlogo from "../../assets/images/awx.png";
 import polymarketlogo from "../../assets/images/icons/polymarket.png";
-import btclogo from "../../assets/images/btc.png";
+
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
-import wusdlogo from "../../assets/images/wusd.png";
-import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+
+import beralogo from "../../assets/images/icons/bera.webp";
 import "../../styles/pages/createlendsecret.scss";
 
 export type secretType = "POE" | "OPENAI" | "AIRWALLEX" | "POLYMARKET";
+export type RepaymentAssetType = "WBERA" | "ETH" | "USDC";
 
 export default function CreateLendSecret(): JSX.Element {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function CreateLendSecret(): JSX.Element {
   const [customFee, setCustomFee] = useState<string>("");
   const [receipient, setReceipient] = useState<string>("");
   const [anchorEl, setanchorEl] = useState<HTMLDivElement | null>(null);
-  const [repayAsset, setRepayAsset] = useState<assetType>("OM");
+  const [repayAsset, setRepayAsset] = useState<RepaymentAssetType>("WBERA");
   const [repaymentAnchorEl, setRepaymentAnchorEl] =
     useState<HTMLDivElement | null>(null);
   const [time, setTime] = useState<number>(30);
@@ -357,29 +357,26 @@ export default function CreateLendSecret(): JSX.Element {
             onClick={secretFee == "0" ? () => {} : openRepaymentPopOver}
           >
             <div className="flex items-center gap-2 bg-[#212121] border border-[#212121] p-2 rounded-2xl my-2">
-              {repayAsset == "HKD" ||
+              {/* Commented out flag logic as HKD/USD are removed */}
+              {/* {repayAsset == "HKD" ||
               repayAsset == "USD" ||
               repayAsset == "HKDA" ? (
                 <span className="country_flag">
-                  {repayAsset == "HKD" || repayAsset == "HKDA" ? "🇭🇰" : "🇺🇸"}
+                  {repayAsset == "HKD" || repayAsset == "HKDA" ? "🇭🇰" : "🇺🇸"} 
                 </span>
-              ) : (
-                <img
-                  src={
-                    repayAsset == "BTC"
-                      ? btclogo
-                      : repayAsset == "ETH"
-                      ? ethlogo
-                      : repayAsset == "WUSD"
-                      ? wusdlogo
-                      : repayAsset == "OM"
-                      ? mantralogo
-                      : usdclogo
-                  }
-                  alt="secret"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              )}
+              ) : ( */}
+              {/* Updated image logic for allowed assets */}
+              <img
+                src={
+                  repayAsset == "WBERA"
+                    ? beralogo
+                    : repayAsset == "ETH"
+                    ? ethlogo
+                    : usdclogo
+                }
+                alt="secret"
+                className="w-10 h-10 rounded-full object-cover"
+              />
 
               <p className="text-[#f6f7f9]">{repayAsset}</p>
             </div>
@@ -392,6 +389,7 @@ export default function CreateLendSecret(): JSX.Element {
             anchorEl={repaymentAnchorEl}
             setAnchorEl={setRepaymentAnchorEl}
             setCurrency={setRepayAsset}
+            allowedCurrencies={["WBERA", "ETH", "USDC"]}
           />
         </>
       )}
