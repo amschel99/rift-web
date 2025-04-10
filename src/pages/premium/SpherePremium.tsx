@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { formatUsd } from "../../utils/formatters";
-import { assetType } from "../lend/CreateLendAsset";
 import { QuickActions, CheckAlt, Info } from "../../assets/icons/actions";
 import premiuum from "../../assets/images/icons/premium.png";
 import btclogo from "../../assets/images/btc.png";
@@ -13,8 +12,9 @@ import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import hkdalogo from "../../assets/images/hkda.png";
 import wusdlogo from "../../assets/images/wusd.png";
 
-// Extended asset type to include WUSD
-type PaymentAssetType = assetType | "WUSD";
+// Redefine PaymentAssetType directly using allowed string literals
+// type PaymentAssetType = assetType | "WUSD"; // Old definition
+type PaymentAssetType = "OM" | "USDC" | "HKDA" | "WUSD" | "BTC" | "ETH";
 
 export default function SpherePremium(): JSX.Element {
   const navigate = useNavigate();

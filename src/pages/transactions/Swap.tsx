@@ -1,7 +1,6 @@
 import { JSX, useState } from "react";
 import { useNavigate } from "react-router";
 import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
-import { assetType } from "../lend/CreateLendAsset";
 import { useBackButton } from "../../hooks/backbutton";
 import { formatNumber } from "../../utils/formatters";
 import { SubmitButton } from "../../components/global/Buttons";
@@ -15,13 +14,14 @@ import wusdlogo from "../../assets/images/wusd.png";
 import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
 import "../../styles/pages/transactions/swapcrypto.scss";
 
+// Define allowed swap types directly
+type SwapAssetType = "OM" | "USDC" | "HKDA" | "WUSD" | "BTC" | "ETH";
+
 export default function SwapCrypto(): JSX.Element {
   const navigate = useNavigate();
 
-  const [sellCurrency, setSellCurrency] =
-    useState<Exclude<assetType, "USD" | "HKD">>("HKDA");
-  const [receiveCurrency, setReceiveCurrency] =
-    useState<Exclude<assetType, "USD" | "HKD">>("USDC");
+  const [sellCurrency, setSellCurrency] = useState<SwapAssetType>("HKDA");
+  const [receiveCurrency, setReceiveCurrency] = useState<SwapAssetType>("USDC");
   const [sellCurrencyValue, setSellCurrencyValue] = useState<string>("");
   const [receiveCurrencyValue, setReceiveCurrencyValue] = useState<number>(0);
   const [sellCurrencyAnchorEl, setSellCurrencyAnchorEl] =

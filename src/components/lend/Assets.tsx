@@ -1,102 +1,10 @@
 import { JSX } from "react";
 import { faCircleUser, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import btclogo from "../../assets/images/btc.png";
-import ethlogo from "../../assets/images/eth.png";
-import usdclogo from "../../assets/images/labs/usdc.png";
+
 import { FaIcon } from "../../assets/faicon";
 import { NFT } from "../../assets/icons/actions";
-import { assetType, assetUtility } from "../../pages/lend/CreateLendAsset";
+// import { assetType, assetUtility } from "../../pages/lend/CreateLendAsset"; // Already commented, ensure removed
 import "../../styles/components/lend/assets.scss";
-
-interface props {
-  owner: string;
-  asset: assetType;
-  amount: number;
-  usecase: assetUtility;
-  owneryielddist: number;
-  receipientyielddist: number;
-}
-
-export const BorrowedAsset = ({
-  owner,
-  asset,
-  amount,
-  receipientyielddist,
-}: props): JSX.Element => {
-  const getAssetImage = (assetType: string) => {
-    switch (assetType) {
-      case "BTC":
-        return btclogo;
-      case "ETH":
-        return ethlogo;
-      default:
-        return usdclogo;
-    }
-  };
-
-  return (
-    <div className="bg-[#212121] rounded-2xl p-4 shadow-lg relative overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300">
-      {/* Accent color decoration */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-[#ffb386]/10 rounded-full -mr-12 -mt-12" />
-
-      <div className="flex justify-between items-start relative">
-        {/* Left side - Asset info */}
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <img
-              src={getAssetImage(asset)}
-              alt={asset}
-              className="w-10 h-10 rounded-full object-contain border-2 border-[#ffb386]/20"
-            />
-            <div className="absolute -bottom-1 -right-1 bg-[#212121] rounded-full p-0.5">
-              <FaIcon faIcon={faCircleUser} color="#ffb386" fontsize={12} />
-            </div>
-          </div>
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-[#f6f7f9]">
-                {amount}
-              </span>
-              <span className="text-sm text-gray-400">{asset}</span>
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              <span className="text-xs text-gray-400">from</span>
-              <span className="text-sm text-[#ffb386]">@{owner}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side - Yield distribution */}
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs text-gray-400">Yield Split</span>
-            <NFT width={12} height={12} color="#ffb386" />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-32 h-1.5 bg-[#2a2a2a] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#ffb386] rounded-full"
-                style={{ width: `${receipientyielddist}%` }}
-              />
-            </div>
-            <span className="text-xs text-[#f6f7f9]">
-              {receipientyielddist}%
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom action button */}
-      <div className="mt-4 flex items-center justify-between border-t border-[#2a2a2a] pt-3">
-        <span className="text-sm text-gray-400"></span>
-        <button className="flex items-center gap-2 text-[#ffb386] hover:bg-[#ffb386]/10 px-3 py-1.5 rounded-lg transition-colors">
-          <span className="text-sm">Use Now</span>
-          <FaIcon faIcon={faArrowRight} color="#ffb386" fontsize={12} />
-        </button>
-      </div>
-    </div>
-  );
-};
 
 export const BorrowedSecret = ({
   owner,
