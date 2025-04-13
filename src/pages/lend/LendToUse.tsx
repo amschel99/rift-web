@@ -23,7 +23,8 @@ export default function LendToUse(): JSX.Element {
     queryFn: fetchMyKeys,
   });
 
-  const borrowedKeys = allKeysData?.filter((key) => key?.nonce !== null) || [];
+  const borrowedKeys =
+    allKeysData?.data?.filter((key) => key?.nonce !== null) || [];
 
   const goBack = () => {
     switchtab("home");
