@@ -24,7 +24,7 @@ import { getBtcUsdVal, getEthUsdVal } from "../utils/ethusd";
 import {
   getMantraUsdVal,
   getBerachainUsdVal,
-  getSphrWberaRate,
+  getSphrUsdcRate,
 } from "../utils/api/mantra";
 import { getUnlockedTokens } from "../utils/api/airdrop";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
@@ -96,20 +96,17 @@ export const WalletBalance = (): JSX.Element => {
       queryFn: getUnlockedTokens,
     });
 
-  const { data: sphrWberaRateData, isLoading: sphrWberaRateLoading } = useQuery(
-    {
-      queryKey: ["sphrWberaRate"],
-      queryFn: getSphrWberaRate,
-    }
-  );
+  const { data: sphrUsdcRateData, isLoading: sphrUsdcRateLoading } = useQuery({
+    queryKey: ["sphrUsdcRate"],
+    queryFn: getSphrUsdcRate,
+  });
 
   const sphrAmount = Number(unlockedTokensData?.amount);
   const wberaAmount = Number(unlockedTokensData?.unlocked);
-  const sphrWberaRate = Number(sphrWberaRateData?.data?.currentRate);
+  const sphrUsdcRate = Number(sphrUsdcRateData?.data?.currentRate);
   const wberaUsdPrice = Number(berachainusdval);
-  // alert(`The amount is ${sphrAmount} and ${wberaAmount} and ${sphrWberaRate}`);
 
-  const sphrUsdValue = sphrAmount * sphrWberaRate * wberaUsdPrice;
+  const sphrUsdValue = sphrAmount * sphrUsdcRate * wberaUsdPrice;
   const wberaUsdValue = wberaAmount * wberaUsdPrice;
 
   const walletusdbalance: number =
@@ -172,7 +169,7 @@ export const WalletBalance = (): JSX.Element => {
             mantrausdloading ||
             btcusdloading ||
             ethusdloading ||
-            sphrWberaRateLoading ? (
+            sphrUsdcRateLoading ? (
               <Skeleton
                 variant="text"
                 width={60}
@@ -418,7 +415,7 @@ export const WalletBalance = (): JSX.Element => {
       mantrausdloading ||
       btcusdloading ||
       ethusdloading ||
-      sphrWberaRateLoading ? (
+      sphrUsdcRateLoading ? (
         <div className="">
           <Skeleton
             variant="text"
@@ -461,7 +458,7 @@ export const WalletBalance = (): JSX.Element => {
                 balanceusd={
                   unlockedTokensLoading ||
                   berachainusdloading ||
-                  sphrWberaRateLoading ? (
+                  sphrUsdcRateLoading ? (
                     <Skeleton width={50} />
                   ) : (
                     formatUsd(sphrUsdValue)
