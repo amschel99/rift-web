@@ -557,7 +557,7 @@ const AppActions = ({
       infoButton: true,
       infoType: "web2" as const,
     },
-    { icon: faCoins, text: "Lend", screen: "/lend" },
+    { icon: faCoins, text: "Stake", screen: "/" },
     { icon: faCrown, text: "Premium", screen: "/premiums" },
   ];
 
@@ -568,10 +568,23 @@ const AppActions = ({
         {actionButtons.map((btn, index) => (
           <div
             key={index}
-            className={`rounded-2xl w-28 p-2 min-w-20 h-24 flex flex-col items-center justify-center cursor-pointer hover:scale-95 transition-all duration-300 ${
+            className={`rounded-2xl relative w-28 p-2 min-w-20 h-24 flex flex-col items-center justify-center cursor-pointer hover:scale-95 transition-all duration-300 ${
               btn.text === "Premium" ? "bg-[#ffb386]" : "bg-[#212523]"
-            }`}
+            }
+            ${
+              btn.text === "Stake"
+                ? "border-[#ffb386] border-2 animate-pulse transition-all duration-300"
+                : ""
+            }
+            `}
           >
+            <div className="absolute top-[0.1px] right-0 left-0 bg-[#ffb386] rounded-tr-lg rounded-tl-lg">
+              {btn.text === "Stake" && (
+                <span className="text-[10px] text-[#000] text-center">
+                  Coming Soon
+                </span>
+              )}
+            </div>
             <div
               className="flex flex-col gap-2 items-center justify-center"
               onClick={() => {
