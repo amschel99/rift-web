@@ -109,6 +109,7 @@ export const Rewards = (): JSX.Element => {
   const claimMutation = useMutation<any, Error>({
     // Replace 'any' with a more specific success type if available
     mutationFn: async () => {
+      alert("claimMutation");
       if (!ethAddress) throw new Error("Ethereum address not found");
       const response = await fetch(
         `https://rewardsvault-production.up.railway.app/api/exchange/claim`,
@@ -180,6 +181,7 @@ export const Rewards = (): JSX.Element => {
       showerrorsnack(`Check in again ${timeRemaining}`);
       return;
     }
+    //should call backend endpoint to give users tokens
     const nextdailycheckin = addDays(new Date(), 1);
     localStorage.setItem("nextdailychekin", nextdailycheckin.toISOString());
     setUnlockedAmount(unlockedAmount + 1);
@@ -263,7 +265,7 @@ export const Rewards = (): JSX.Element => {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-gray-400 text-xs mb-1">Withdrawable USDC</p>
+            <p className="text-gray-400 text-xs mb-1">Claimed USDC</p>
             {isTokenDataLoading ? (
               <div className="h-6 w-16 bg-[#34404f] rounded animate-pulse"></div>
             ) : (

@@ -110,7 +110,7 @@ export const WalletBalance = (): JSX.Element => {
   const wberaUsdPrice = Number(berachainusdval);
   // alert(`The amount is ${sphrAmount} and ${wberaAmount} and ${sphrWberaRate}`);
 
-  const sphrUsdValue = sphrAmount * sphrUsdcRate * wberaUsdPrice;
+  const sphrUsdValue = sphrAmount * sphrUsdcRate * 1;
   const wberaUsdBal = Number(wberabalance?.data?.balance) * wberaUsdPrice;
 
   const walletusdbalance: number =
