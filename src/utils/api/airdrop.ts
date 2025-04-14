@@ -38,13 +38,14 @@ export const claimAirdrop = async (airDropid: string, refer_code?: string) => {
     `?id=${airDropid}&refer_code=${refer_code}`;
   const accessToken = localStorage.getItem("spheretoken");
 
-  await fetch(URL, {
+  let res = await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
   });
+  console.log(`The response is ${JSON.stringify(await res.json())}`);
 };
 
 export type unlockTokensType = {
