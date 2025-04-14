@@ -17,6 +17,7 @@ export type draweraction =
   | "consumeawxkey"
   | "stakevault"
   | "unstakevault"
+  | "verifytxwithotp"
   | "unlocktransactions";
 
 interface drawerctxtype {

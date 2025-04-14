@@ -131,19 +131,21 @@ export default function PhoneAuth(): JSX.Element {
 
   // We only need the send OTP mutation
   const { mutate: mutateSendOtp, isPending: sendingOtp } = useMutation({
-    mutationFn: () => sendOtp(phoneNumber),
-    onSuccess: () => {
-      showsuccesssnack("OTP Code sent successfully to your phone");
-      setRequestedOtp(true);
-      setTimeRemaining(120);
-      setCanResend(false);
-    },
-    onError: (error) => {
-      console.error("Failed to send OTP:", error);
-      showerrorsnack(
-        "Failed to send OTP. Please check your phone number and try again."
-      );
-    },
+    mutationFn: () =>
+      sendOtp(phoneNumber).then((res) => {
+        if (res?.status == 500) {
+          showerrorsnack(
+            "Failed to send OTP. Please check your phone number and try again."
+          );
+        } else {
+          showsuccesssnack("OTP Code sent successfully to your phone");
+          setRequestedOtp(true);
+          setTimeRemaining(120);
+          setCanResend(false);
+          setRequestedOtp(true);
+          localStorage.setItem("verifyphone", phoneNumber);
+        }
+      }),
   });
 
   // Combined loading state
@@ -156,9 +158,7 @@ export default function PhoneAuth(): JSX.Element {
     try {
       if (!requestedOtp) {
         // First step: Request OTP
-        await mutateSendOtp();
-        setRequestedOtp(true);
-        showsuccesssnack("OTP sent to your phone");
+        mutateSendOtp();
       } else {
         // Second step: Verify OTP
         if (otpCode.length !== 4) {
@@ -189,13 +189,22 @@ export default function PhoneAuth(): JSX.Element {
               localStorage.setItem("quvaulttoken", quvaultSignInResult.token);
 
               // Proceed with signup
-              await signupUser(
+              const { status } = await signupUser(
                 tgUserId,
                 devicetoken,
                 devicename,
                 otpCode,
                 phoneNumber
               );
+
+              if (status == 400) {
+                setOtpVerified(false);
+                setAccountCreating(false);
+                setAccountCreating(true);
+                showerrorsnack(
+                  "We couldn't verify your account, please try again with the phone number you used initially"
+                );
+              }
             } else {
               // Create QuVault account if sign in fails
               console.log("QuVault login failed, creating new account");
@@ -207,32 +216,49 @@ export default function PhoneAuth(): JSX.Element {
 
               if (quvaultSignUpResult?.token) {
                 localStorage.setItem("quvaulttoken", quvaultSignUpResult.token);
-                await signupUser(
+                const { status } = await signupUser(
                   tgUserId,
                   devicetoken,
                   devicename,
                   otpCode,
                   phoneNumber
                 );
+
+                if (status == 400) {
+                  setOtpVerified(false);
+                  setAccountCreating(false);
+                  setAccountCreating(true);
+                  showerrorsnack(
+                    "We couldn't verify your account, please try again with the phone number you used initially"
+                  );
+                }
               } else {
                 throw new Error("Failed to create QuVault account");
               }
             }
 
             // Create account after successful signup
-            await createAccount(
+            const { status } = await createAccount(
               tgUserId,
               tgUserId,
               devicetoken,
               0,
               phoneNumber
             );
-            console.log(
-              "Wallet creation initiated, waiting for socket confirmation"
-            );
+            if (status == 400) {
+              setOtpVerified(false);
+              setAccountCreating(false);
+              setAccountCreating(true);
+              showerrorsnack(
+                "We couldn't verify your account, please try again with the phone number you used initially"
+              );
+            }
 
             // Socket listener will handle the completion and navigation
           } catch (error) {
+            showerrorsnack(
+              "We couldn't verify your account, please try again with the phone number you used initially"
+            );
             console.error("Account creation process failed:", error);
             setOtpVerified(false);
             setAccountCreating(false);

@@ -99,3 +99,18 @@ export const unlockTokensHistory = async (): Promise<unlockhistorytype[]> => {
   });
   return res.json();
 };
+
+export const performDailyCheckin = async (): Promise<void> => {
+  const URL = BASEURL + ENDPOINTS.dailycheckin;
+  const accessToken = localStorage.getItem("spheretoken");
+
+  const res: Response = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return await res.json();
+};

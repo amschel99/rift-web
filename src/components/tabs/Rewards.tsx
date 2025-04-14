@@ -10,6 +10,7 @@ import { useTabs } from "../../hooks/tabs";
 import {
   claimAirdrop,
   getUnlockedTokens,
+  performDailyCheckin,
   unlockTokensHistory,
 } from "../../utils/api/airdrop";
 import { formatNumber } from "../../utils/formatters";
@@ -168,6 +169,21 @@ export const Rewards = (): JSX.Element => {
     mutationFn: () => createReferralLink(),
   });
 
+  const { mutate: mutateDailyCheckin } = useMutation({
+    mutationFn: () =>
+      performDailyCheckin().then(() => {
+        queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
+        queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
+
+        const nextdailycheckin = addDays(new Date(), 1);
+        localStorage.setItem("nextdailychekin", nextdailycheckin.toISOString());
+        setUnlockedAmount(unlockedAmount);
+        toggleAnimation();
+        setIsCheckInDisabled(true);
+        updateTimeRemaining();
+      }),
+  });
+
   const onTransaction = () => {
     switchtab("sendcrypto");
   };
@@ -180,14 +196,10 @@ export const Rewards = (): JSX.Element => {
     if (isCheckInDisabled) {
       showerrorsnack(`Check in again ${timeRemaining}`);
       return;
+    } else {
+      // should call backend endpoint to give users tokens
+      mutateDailyCheckin();
     }
-    //should call backend endpoint to give users tokens
-    const nextdailycheckin = addDays(new Date(), 1);
-    localStorage.setItem("nextdailychekin", nextdailycheckin.toISOString());
-    setUnlockedAmount(unlockedAmount + 1);
-    toggleAnimation();
-    setIsCheckInDisabled(true);
-    updateTimeRemaining();
   };
 
   const updateTimeRemaining = () => {

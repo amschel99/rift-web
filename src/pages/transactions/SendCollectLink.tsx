@@ -16,6 +16,7 @@ import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import beralogo from "../../assets/images/icons/bera.webp";
 import { colors } from "@/constants";
+import { useAppDrawer } from "@/hooks/drawer";
 
 export default function SendCollectLink(): JSX.Element {
   const { initData } = useLaunchParams();
@@ -23,14 +24,7 @@ export default function SendCollectLink(): JSX.Element {
   const { srccurrency, intent } = useParams();
   const { showerrorsnack } = useSnackbar();
   const { switchtab } = useTabs();
-
-  // --- Robust localStorage Parsing ---
-  // const safeGetNumber = (key: string): number => {
-  //   const value = localStorage.getItem(key);
-  //   const num = Number(value); // Attempt conversion
-
-  //   return isNaN(num) ? 0 : num; // Default to 0 if null, undefined, or NaN
-  // };
+  const { openAppDrawer } = useAppDrawer();
 
   const ethBal = localStorage.getItem("ethbal");
   const ethBalUsd = localStorage.getItem("ethbalUsd");
@@ -40,9 +34,7 @@ export default function SendCollectLink(): JSX.Element {
   const wberaBal = localStorage.getItem("WBERAbal");
   const wberaBalUsd = localStorage.getItem("WBERAbalUsd");
   const wberaUsdValue = localStorage.getItem("WberaUsdVal");
-
-  // --- End Robust Parsing ---
-
+  const txverified = localStorage.getItem("txverified");
   const prev_page = localStorage.getItem("prev_page");
 
   const [depositAsset, setDepositAsset] = useState<string>(
@@ -107,6 +99,8 @@ export default function SendCollectLink(): JSX.Element {
   const onShareWallet = async () => {
     if (accessAmnt == "" || cryptoAmount == "" || errorInUSDVal()) {
       showerrorsnack(`Enter a valid amount`);
+    } else if (txverified == null) {
+      openAppDrawer("verifytxwithotp");
     } else {
       setProcessing(true);
 
@@ -117,9 +111,13 @@ export default function SendCollectLink(): JSX.Element {
       );
 
       if (collectlink) {
+        localStorage.removeItem("txverified");
+
         const shareUrl = collectlink + `%26intent=${intent}`;
         openTelegramLink(
-          `https://t.me/share/url?url=${shareUrl}&text=Click to collect ${accessAmnt} USD from ${initData?.user?.username}`
+          `https://t.me/share/url?url=${shareUrl}&text=Click to collect ${accessAmnt} USD from ${
+            initData?.user?.username || initData?.user?.id
+          }`
         );
       } else {
         showerrorsnack(
@@ -130,8 +128,6 @@ export default function SendCollectLink(): JSX.Element {
       setProcessing(false);
     }
   };
-
-  console.log(depositAsset);
 
   useBackButton(goBack);
 
@@ -341,12 +337,17 @@ export default function SendCollectLink(): JSX.Element {
             ))}
           </div>
         </PopOver>
-      </div>{" "}
-      {/* End Scrollable Content Area */}
-      {/* Bottom Button Container - Not fixed, part of flex layout */}
+      </div>
+
       <div className="shrink-0 p-4 bg-[#212523] border-t border-[#34404f]">
         <SubmitButton
-          text={processing ? "Processing..." : "Generate & Share Link"}
+          text={
+            txverified == null
+              ? "Verify To Send Link"
+              : processing
+              ? "Processing..."
+              : "Generate & Share Link"
+          }
           icon={
             <Telegram
               color={

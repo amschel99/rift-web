@@ -7,10 +7,10 @@ export const signupUser = async (
   deviceName: string,
   otpCode: string,
   phoneNumber: string
-) => {
+): Promise<{ status: number }> => {
   let URL = BASEURL + ENDPOINTS.signup;
 
-  await fetch(URL, {
+  const res = await fetch(URL, {
     method: "POST",
     body: JSON.stringify({
       telegramId: tgUsername,
@@ -22,34 +22,24 @@ export const signupUser = async (
     }),
     headers: { "Content-Type": "application/json" },
   });
+
+  return { status: res?.status };
 };
 
-export const sendOtp = async (phone: string) => {
+export const sendOtp = async (phone: string): Promise<{ status: number }> => {
   const URL = BASEURL + ENDPOINTS.sendotp;
-  try {
-    const response = await fetch(URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        phone,
-      }),
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error("Failed to send OTP:", response.status, errorData);
-      throw new Error(errorData.message || "Failed to send OTP");
-    }
+  const response = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      phone,
+    }),
+  });
 
-    return response;
-  } catch (e) {
-    console.error("Send OTP error:", e);
-    throw Error(
-      "Failed to send OTP. Please check your connection and try again."
-    );
-  }
+  return { status: response?.status };
 };
 
 export const verifyOtp = async (code: string, phone: string) => {

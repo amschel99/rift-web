@@ -10,11 +10,14 @@ import { useAppDialog } from "@/hooks/dialog";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { useAppDrawer } from "../../hooks/drawer";
-import { base64ToString } from "../../utils/base64";
 import { useSocket } from "../../utils/SocketProvider";
 import { useSnackbar } from "../../hooks/snackbar";
 import { numberFormat } from "../../utils/formatters";
-import { doKeyPayment, UseOpenAiKey } from "../../utils/api/keys";
+import {
+  doKeyPayment,
+  UseOpenAiKey,
+  doKeyPaymentSuccess,
+} from "../../utils/api/keys";
 import { TransactionStatusWithoutSocket } from "../../components/TransactionStatus";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
@@ -33,6 +36,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
   const { openAppDrawerWithKey } = useAppDrawer();
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
+  const { openAppDrawer } = useAppDrawer();
 
   const [processing, setProcessing] = useState<boolean>(false);
   const [userGotKey, setUserGotKey] = useState<boolean>(false);
@@ -48,6 +52,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
   const paysecretpurpose = localStorage.getItem("paysecretpurpose");
   const paysecretamount = localStorage.getItem("paysecretamount");
   const paysecretcurrency = localStorage.getItem("paysecretcurrency");
+  const txverified = localStorage.getItem("txverified");
   const prev_page = localStorage.getItem("prev_page");
 
   const { mutate: mutatekeypayment, isPending: keypaymentloading } =
@@ -74,6 +79,15 @@ export default function ClaimLendKeyLink(): JSX.Element {
             showerrorsnack("An error occurred, please try again");
           }),
     });
+
+  const onPayForKeyToUse = () => {
+    if (txverified == null) {
+      openAppDrawer("verifytxwithotp");
+      return;
+    } else {
+      mutatekeypayment();
+    }
+  };
 
   const goBack = () => {
     localStorage.removeItem("paysecretid");
@@ -122,24 +136,36 @@ export default function ClaimLendKeyLink(): JSX.Element {
     }
   };
 
+  const ethUsdValue = localStorage.getItem("ethvalue");
+  const wberaUsdValue = localStorage.getItem("WberaUsdVal");
+
+  const secretAmountInUSD =
+    paysecretcurrency === "WBERA"
+      ? Number(paysecretamount) * Number(wberaUsdValue)
+      : paysecretcurrency === "ETH"
+      ? Number(paysecretamount) * Number(ethUsdValue)
+      : Number(paysecretamount) * 0.99;
+
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("TXConfirmed", () => {
+    socket.on("TXConfirmed", (data) => {
       setTxStatus("PROCESSED");
       setTxMessage("Transaction completed");
       setShowTxStatus(true);
 
+      doKeyPaymentSuccess(
+        paysecretnonce as string,
+        paysecretreceiver as string,
+        data?.transactionHash,
+        secretAmountInUSD
+      ).then(() => {
+        localStorage.removeItem("txverified");
+      });
+
       setTimeout(() => {
         setShowTxStatus(false);
       }, 4500);
-
-      socket.emit("paymentKeySuccess", {
-        email: paysecretreceiver?.includes("==")
-          ? base64ToString(paysecretreceiver)
-          : paysecretreceiver,
-        nonce: paysecretnonce,
-      });
 
       socket.on("KeyUnlocked", () => {
         showsuccesssnack("Key was unlocked successfully");
@@ -241,7 +267,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
         </p>
 
         <SubmitButton
-          text="Get Key"
+          text={txverified == null ? "Verify To Get Key" : "Get Key"}
           icon={
             <FaIcon
               faIcon={faCheckCircle}
@@ -258,7 +284,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
           }}
           isDisabled={processing || userGotKey || keypaymentloading}
           isLoading={processing || keypaymentloading}
-          onclick={mutatekeypayment}
+          onclick={onPayForKeyToUse}
         />
       </div>
 

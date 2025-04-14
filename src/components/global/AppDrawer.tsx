@@ -15,6 +15,7 @@ import { ClaimLendCryptoLink } from "../drawer/ClaimLendCryptoLink";
 import { ConsumeAwxKey } from "../forms/ConsumeAwxKey";
 import { StakeInVault } from "../drawer/StakeInVault";
 import { UnStakeFromVault } from "../drawer/UnStakeFromVault";
+import { VerifyTransaction } from "../drawer/VerifyTransaction";
 import { colors } from "../../constants";
 
 export const AppDrawer = (): JSX.Element => {
@@ -72,6 +73,8 @@ export const AppDrawer = (): JSX.Element => {
         <StakeInVault />
       ) : action == "unstakevault" ? (
         <UnStakeFromVault />
+      ) : action == "verifytxwithotp" ? (
+        <VerifyTransaction />
       ) : (
         <NodeTeeSelector />
       )}

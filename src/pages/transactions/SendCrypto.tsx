@@ -26,6 +26,7 @@ import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import beralogo from "../../assets/images/icons/bera.webp";
 import { colors } from "@/constants";
+import { useAppDrawer } from "@/hooks/drawer";
 
 export default function SendCrypto(): JSX.Element {
   const { srccurrency, intent } = useParams();
@@ -34,6 +35,7 @@ export default function SendCrypto(): JSX.Element {
   const { showerrorsnack } = useSnackbar();
   const { showTxStatusBar, txStatusBarVisible, transactionStatus } =
     useTransactionStatus();
+  const { openAppDrawer } = useAppDrawer();
 
   const [depositAsset, setDepositAsset] = useState<string>(
     srccurrency as string
@@ -48,6 +50,7 @@ export default function SendCrypto(): JSX.Element {
   const wberabalance = localStorage.getItem("WBERAbal");
   const wusdcbalance = localStorage.getItem("wusdcbal");
   const prev_page = localStorage.getItem("prev_page");
+  const txverified = localStorage.getItem("txverified");
 
   const availableBalance =
     depositAsset == "WBERA"
@@ -63,25 +66,29 @@ export default function SendCrypto(): JSX.Element {
   const { mutate: mutateSendEth, isError: ethError } = useMutation({
     mutationFn: () =>
       sendEth(receiverAddress, sendAmnt, intent as string)
-        .then(() => {})
+        .then(() => {
+          localStorage.removeItem("txverified");
+        })
         .catch(() => {
           setProcessing(false);
         }),
   });
-
   const { mutate: mutateSendUsdc, isError: usdcError } = useMutation({
     mutationFn: () =>
       sendUSDC(receiverAddress, sendAmnt, intent as string)
-        .then(() => {})
+        .then(() => {
+          localStorage.removeItem("txverified");
+        })
         .catch(() => {
           setProcessing(false);
         }),
   });
-
   const { mutate: mutateSendWusdc, isError: wusdcError } = useMutation({
     mutationFn: () =>
       sendWUSDC(receiverAddress, sendAmnt, intent as string)
-        .then(() => {})
+        .then(() => {
+          localStorage.removeItem("txverified");
+        })
         .catch(() => {
           setProcessing(false);
         }),
@@ -89,7 +96,9 @@ export default function SendCrypto(): JSX.Element {
   const { mutate: mutateSendWbera, isError: wberaError } = useMutation({
     mutationFn: () =>
       sendWbera(receiverAddress, sendAmnt, intent as string)
-        .then(() => {})
+        .then(() => {
+          localStorage.removeItem("txverified");
+        })
         .catch(() => {
           setProcessing(false);
         }),
@@ -104,6 +113,11 @@ export default function SendCrypto(): JSX.Element {
   const onSendCrypto = async () => {
     if (receiverAddress == "" || sendAmnt == "") {
       showerrorsnack(`Enter a valid ${depositAsset} address & amount`);
+      return;
+    }
+
+    if (txverified == null) {
+      openAppDrawer("verifytxwithotp");
       return;
     }
 
@@ -341,7 +355,7 @@ export default function SendCrypto(): JSX.Element {
 
       <BottomButtonContainer>
         <SubmitButton
-          text="Send"
+          text={txverified == null ? "Verify To Send" : "Send"}
           icon={
             <FaIcon
               faIcon={faCircleArrowUp}

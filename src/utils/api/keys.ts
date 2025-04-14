@@ -121,6 +121,27 @@ export const doKeyPayment = async (
   return { status: res?.status };
 };
 
+export const doKeyPaymentSuccess = async (
+  nonce: string,
+  email: string,
+  transactionHash: string,
+  amountInUSD: number
+): Promise<void> => {
+  const URL = BASEURL + ENDPOINTS.keypaymentsuccess;
+  const accessToken: string | null = localStorage.getItem("spheretoken");
+
+  const res = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ nonce, email, transactionHash, amountInUSD }),
+  });
+
+  return res.json();
+};
+
 export const UseAirWallexKey = async (
   id: string,
   nonce: string

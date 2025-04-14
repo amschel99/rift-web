@@ -82,10 +82,10 @@ export default function CreateLendSecret(): JSX.Element {
 
   const amountInUSD =
     repayAsset == "WBERA"
-      ? Number(secretFee) * Number(wberaUsdValue)
+      ? Number(customFee == "" ? secretFee : customFee) * Number(wberaUsdValue)
       : repayAsset == "ETH"
-      ? Number(secretFee) * Number(ethUsdValue)
-      : Number(secretFee) * 0.99;
+      ? Number(customFee == "" ? secretFee : customFee) * Number(ethUsdValue)
+      : Number(customFee == "" ? secretFee : customFee) * 0.99;
 
   const { mutate: onLendKey, isPending: lendloading } = useMutation({
     mutationFn: () =>
@@ -96,7 +96,7 @@ export default function CreateLendSecret(): JSX.Element {
         selSecretType,
         customFee == "" ? secretFee : customFee,
         repayAsset,
-        noExpiry ? "0" : String(amountInUSD)
+        String(amountInUSD)
       )
         .then((res) => {
           if (res?.data && secretFee == "0") {

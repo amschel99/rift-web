@@ -150,7 +150,7 @@ createRoot(document.getElementById("root")!).render(
                         path="/security/selector/:type"
                         element={<NodesTeeSelector />}
                       />
-                      <Route path="/lend" element={<LendToUse />} />{" "}
+                      <Route path="/lend" element={<LendToUse />} />
                       <Route
                         path="/lend/secret/:type/:secretvalue"
                         element={<CreateLendSecret />}

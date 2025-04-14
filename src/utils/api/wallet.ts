@@ -38,10 +38,10 @@ export const createAccount = async (
   deviceToken: string,
   sphereid_index: number,
   phoneNumber: string
-) => {
+): Promise<{ status: number }> => {
   let URL = BASEURL + ENDPOINTS.createwallet;
 
-  await fetch(URL, {
+  const res = await fetch(URL, {
     method: "POST",
     body: JSON.stringify({
       telegramId: email,
@@ -52,6 +52,8 @@ export const createAccount = async (
     }),
     headers: { "Content-Type": "application/json" },
   });
+
+  return { status: res?.status };
 };
 
 // HTTP - Get eth wallet balance
@@ -152,6 +154,7 @@ export const sendEth = async (
       value: ethValStr,
       intent,
       otpCode: "1580",
+      type: "normal",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -176,6 +179,7 @@ export const sendUSDC = async (
       value: usdtCalStr,
       intent,
       otpCode: "1580",
+      type: "normal",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -200,30 +204,7 @@ export const sendWUSDC = async (
       value: wusdcCalStr,
       intent,
       otpCode: "1580",
-    }),
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-};
-
-export const sendBTC = async (
-  toAddr: string,
-  btcValStr: string,
-  intent: string
-) => {
-  let token: string | null = localStorage.getItem("spheretoken");
-
-  let URL = BASEURL + ENDPOINTS.sendbtc;
-
-  await fetch(URL, {
-    method: "POST",
-    body: JSON.stringify({
-      to: toAddr,
-      value: btcValStr,
-      intent,
-      otpCode: "1580",
+      type: "normal",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -247,6 +228,7 @@ export const sendWbera = async (
       value: wberaValStr,
       intent,
       otpCode: "1580",
+      type: "normal",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
