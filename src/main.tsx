@@ -40,9 +40,7 @@ import AddPin from "./pages/security/AddPin.tsx";
 import AddEmail from "./pages/security/AddEmail.tsx";
 import AddPhone from "./pages/security/AddPhone.tsx";
 import NodesTeeSelector from "./pages/security/NodesTeeSelector.tsx";
-
 import LendToUse from "./pages/lend/LendToUse.tsx";
-
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import Premium from "./pages/Premium.tsx";
 import Business from "./pages/business/Index.tsx";
@@ -85,7 +83,7 @@ createRoot(document.getElementById("root")!).render(
                       <Route path="/auth/phone" element={<PhoneAuth />} />
                       <Route path="/app" element={<App />} />
                       <Route path="/logout" element={<Logout />} />
-                      <Route path="/coin/:coinId" element={<CoinInfo />} />
+                      <Route path="/coininfo" element={<CoinInfo />} />
                       <Route path="/btc-asset" element={<BtcAsset />} />
                       <Route path="/web2" element={<WebAssets />} />
                       <Route
