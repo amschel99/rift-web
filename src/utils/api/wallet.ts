@@ -154,7 +154,7 @@ export const sendEth = async (
       value: ethValStr,
       intent,
       otpCode: "1580",
-      type: "normal",
+      type: "gasless",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -179,7 +179,7 @@ export const sendUSDC = async (
       value: usdtCalStr,
       intent,
       otpCode: "1580",
-      type: "normal",
+      type: "gasless",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -204,7 +204,7 @@ export const sendWUSDC = async (
       value: wusdcCalStr,
       intent,
       otpCode: "1580",
-      type: "normal",
+      type: "gasless",
     }),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -228,7 +228,7 @@ export const sendWbera = async (
       value: wberaValStr,
       intent,
       otpCode: "1580",
-      type: "normal",
+      type: "gasless",
     }),
     headers: {
       Authorization: `Bearer ${token}`,

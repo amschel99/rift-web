@@ -21,13 +21,13 @@ import {
   formatSeconds,
 } from "../../utils/dates";
 import { Copy, Telegram } from "../../assets/icons/actions";
-import { FaIcon } from "../../assets/faicon";
-import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
-import { Confetti } from "../../assets/animations";
+import { Confetti, Loading } from "../../assets/animations";
 import referearn from "../../assets/images/icons/refer.png";
-import mantralogo from "../../assets/images/sphere.jpg";
+import spherelogo from "../../assets/images/sphere.jpg";
 import usdclogo from "../../assets/images/labs/usdc.png";
+import walletout from "../../assets/images/wallet_out.png";
 import transaction from "../../assets/images/obhehalfspend.png";
+import "../../styles/components/tabs/rewards.scss";
 
 // --- API Response Types ---
 interface ClaimInfoData {
@@ -169,20 +169,28 @@ export const Rewards = (): JSX.Element => {
     mutationFn: () => createReferralLink(),
   });
 
-  const { mutate: mutateDailyCheckin } = useMutation({
-    mutationFn: () =>
-      performDailyCheckin().then(() => {
-        queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
-        queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
+  const { mutate: mutateDailyCheckin, isPending: dailycheckingpending } =
+    useMutation({
+      mutationFn: () =>
+        performDailyCheckin()
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
+            queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
 
-        const nextdailycheckin = addDays(new Date(), 1);
-        localStorage.setItem("nextdailychekin", nextdailycheckin.toISOString());
-        setUnlockedAmount(unlockedAmount);
-        toggleAnimation();
-        setIsCheckInDisabled(true);
-        updateTimeRemaining();
-      }),
-  });
+            const nextdailycheckin = addDays(new Date(), 1);
+            localStorage.setItem(
+              "nextdailychekin",
+              nextdailycheckin.toISOString()
+            );
+            setUnlockedAmount(unlockedAmount);
+            toggleAnimation();
+            setIsCheckInDisabled(true);
+            updateTimeRemaining();
+          })
+          .catch(() => {
+            showerrorsnack(`Please check in again ${timeRemaining}`);
+          }),
+    });
 
   const onTransaction = () => {
     switchtab("sendcrypto");
@@ -262,7 +270,10 @@ export const Rewards = (): JSX.Element => {
   const pendingUsdcAmount = Number(claimInfoQuery.data?.pendingWbera || 0); // Use data from claimInfoQuery
 
   return (
-    <section className="flex flex-col bg-[#0e0e0e] text-[#f6f7f9] px-4 py-6 space-y-6 overflow-y-auto pb-20">
+    <section
+      id="rewards"
+      className="flex flex-col bg-[#0e0e0e] text-[#f6f7f9] px-4 py-6 space-y-6 overflow-y-auto pb-20"
+    >
       {/* Locked SPHR Card */}
       <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
         <div className="flex items-start justify-between mb-6">
@@ -276,6 +287,7 @@ export const Rewards = (): JSX.Element => {
               </p>
             </div>
           </div>
+
           <div className="text-right">
             <p className="text-gray-400 text-xs mb-1">Claimed USDC</p>
             {isTokenDataLoading ? (
@@ -307,7 +319,7 @@ export const Rewards = (): JSX.Element => {
                   {formatNumber(sphrBalance)}
                 </span>
                 <img
-                  src={mantralogo}
+                  src={spherelogo}
                   alt="SPHR Token"
                   className="w-8 h-8 rounded-full"
                 />
@@ -320,27 +332,29 @@ export const Rewards = (): JSX.Element => {
         <div className="flex gap-3">
           <button
             onClick={onDailyCheckin}
-            disabled={isCheckInDisabled}
+            disabled={dailycheckingpending}
             className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all flex flex-col items-center justify-center h-16 ${
               isCheckInDisabled
                 ? "bg-[#34404f] text-gray-500 cursor-not-allowed"
                 : "bg-[#ffb386] text-[#212523] hover:opacity-90"
             }`}
           >
-            {!isCheckInDisabled ? (
+            {dailycheckingpending ? (
+              <Loading width="1rem" height="1rem" />
+            ) : isCheckInDisabled ? (
+              <span className="text-xs text-center">Claim {timeRemaining}</span>
+            ) : (
               <>
                 <span className="font-semibold">Daily Check-in</span>
                 <span className="text-xs flex items-center gap-1 justify-center">
                   +1 SPHR
                   <img
-                    src={mantralogo}
+                    src={spherelogo}
                     alt="SPHR"
                     className="w-3 h-3 rounded-full"
                   />
                 </span>
               </>
-            ) : (
-              <span className="text-xs text-center">Claim {timeRemaining}</span>
             )}
           </button>
           <button
@@ -381,14 +395,11 @@ export const Rewards = (): JSX.Element => {
                 <div className="flex items-center gap-1">
                   <span className="text-[#f6f7f9] text-sm">+10</span>
                   <img
-                    src={mantralogo}
+                    src={spherelogo}
                     alt="SPHR"
                     className="w-4 h-4 rounded-full"
                   />
                 </div>
-                <span className="text-xs text-[#ffb386] px-2 py-1 rounded-full bg-[#ffb386]/10">
-                  Locked SPHR
-                </span>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2">
@@ -429,85 +440,30 @@ export const Rewards = (): JSX.Element => {
         </div>
       </div>
 
-      {/* Unlock USDC Tasks Card */}
-      <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
-        <h3 className="text-[#f6f7f9] text-lg font-bold mb-2">Unlock USDC</h3>
-        <p className="text-gray-400 text-sm mb-6 flex items-center gap-1">
-          Complete tasks with sufficient SPHR balance to unlock USDC.
+      <div className="performunlocktasks">
+        <p className="title_desc">
+          Unlock USDC
+          <span>
+            Complete tasks with sufficient SPHR balance to unlock USDC
+          </span>
         </p>
 
-        <div className="space-y-4">
-          <div
-            onClick={onDeposit}
-            className="bg-[#212523] rounded-xl p-4 cursor-pointer hover:bg-[#34404f] transition-all border border-[#34404f]"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#34404f] flex items-center justify-center">
-                  <FaIcon faIcon={faArrowDown} color="#f6f7f9" fontsize={18} />
-                </div>
-                <div>
-                  <div className="text-[#f6f7f9] font-medium">
-                    Deposit Crypto
-                  </div>
-                  <div className="text-gray-400 text-xs">
-                    Deposit assets to unlock upto +15 USDC depending on current
-                    exchange rate (Requires 15 SPHR)
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 items-end">
-                <div className="flex items-center gap-1">
-                  <span className="text-[#f6f7f9] text-sm">+15</span>
-                  <img
-                    src={usdclogo}
-                    alt="USDC"
-                    className="w-4 h-4 rounded-full"
-                  />
-                </div>
-                <span className="text-xs text-[#ffb386] px-2 py-1 rounded-full bg-[#ffb386]/10">
-                  Unlock USDC
-                </span>
-              </div>
-            </div>
-          </div>
+        <div className="tasks">
+          <UnlockTask
+            title="Deposit crypto"
+            description="Click to deposit assets and unlock upto 15 USDC depending on current exchange rate (Requires 15 SPHR)"
+            image={transaction}
+            unlockrewards={15}
+            onclick={onDeposit}
+          />
 
-          <div
-            onClick={onTransaction}
-            className="bg-[#212523] rounded-xl p-4 cursor-pointer hover:bg-[#34404f] transition-all border border-[#34404f]"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-3">
-                <img
-                  src={transaction}
-                  alt="Transaction"
-                  className="w-10 h-10 rounded-lg"
-                />
-                <div>
-                  <div className="text-[#f6f7f9] font-medium">
-                    Make a Transaction
-                  </div>
-                  <div className="text-gray-400 text-xs">
-                    Perform a transaction to unlock upto +9 USDC depending on
-                    current exchange rate (Requires 9 SPHR)
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 items-end">
-                <div className="flex items-center gap-1">
-                  <span className="text-[#f6f7f9] text-sm">+9</span>
-                  <img
-                    src={usdclogo}
-                    alt="USDC"
-                    className="w-4 h-4 rounded-full"
-                  />
-                </div>
-                <span className="text-xs text-[#ffb386] px-2 py-1 rounded-full bg-[#ffb386]/10">
-                  Unlock USDC
-                </span>
-              </div>
-            </div>
-          </div>
+          <UnlockTask
+            title="Make a transaction"
+            description="Click to perform a transaction and unlock upto 9 USDC depending on current exchange rate (Requires 9 SPHR)"
+            image={walletout}
+            unlockrewards={9}
+            onclick={onTransaction}
+          />
         </div>
       </div>
 
@@ -529,7 +485,7 @@ export const Rewards = (): JSX.Element => {
             <div className="flex items-center justify-between p-4 bg-[#212523] rounded-lg border border-[#34404f]">
               <div className="flex items-center gap-3">
                 <img
-                  src={usdclogo}
+                  src={spherelogo}
                   alt="USDC"
                   className="w-8 h-8 rounded-full"
                 />
@@ -627,5 +583,36 @@ export const Rewards = (): JSX.Element => {
         </div>
       )}
     </section>
+  );
+};
+
+const UnlockTask = ({
+  image,
+  title,
+  description,
+  unlockrewards,
+  onclick,
+}: {
+  image: string;
+  title: string;
+  description: string;
+  unlockrewards: number;
+  onclick: () => void;
+}): JSX.Element => {
+  return (
+    <div className="unlocktask" onClick={onclick}>
+      <div className="img_rewards">
+        <img src={image} alt={title} />
+
+        <div className="unlockreward">
+          <span>+{unlockrewards}</span> <img src={usdclogo} alt="USDC" />
+        </div>
+      </div>
+
+      <div className="titledesc">
+        <p>{title}</p>
+        <span>{description}</span>
+      </div>
+    </div>
   );
 };

@@ -43,7 +43,6 @@ export default function SendCrypto(): JSX.Element {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [receiverAddress, setReceiverAddress] = useState<string>("");
   const [sendAmnt, setSendAmnt] = useState<string>("");
-  const [processing, setProcessing] = useState<boolean>(false);
 
   const ethbalance = localStorage.getItem("ethbal");
   const usdcbalance = localStorage.getItem("usdcbal");
@@ -70,7 +69,7 @@ export default function SendCrypto(): JSX.Element {
           localStorage.removeItem("txverified");
         })
         .catch(() => {
-          setProcessing(false);
+          console.error("Unable to send ETH");
         }),
   });
   const { mutate: mutateSendUsdc, isError: usdcError } = useMutation({
@@ -80,7 +79,7 @@ export default function SendCrypto(): JSX.Element {
           localStorage.removeItem("txverified");
         })
         .catch(() => {
-          setProcessing(false);
+          console.error("Unable to send USDC");
         }),
   });
   const { mutate: mutateSendWusdc, isError: wusdcError } = useMutation({
@@ -90,7 +89,7 @@ export default function SendCrypto(): JSX.Element {
           localStorage.removeItem("txverified");
         })
         .catch(() => {
-          setProcessing(false);
+          console.error("Unable to send WUSDC");
         }),
   });
   const { mutate: mutateSendWbera, isError: wberaError } = useMutation({
@@ -100,7 +99,7 @@ export default function SendCrypto(): JSX.Element {
           localStorage.removeItem("txverified");
         })
         .catch(() => {
-          setProcessing(false);
+          console.error("Unable to send WBERA");
         }),
   });
 
@@ -122,13 +121,10 @@ export default function SendCrypto(): JSX.Element {
     }
 
     if (depositAsset == "ETH") {
-      setProcessing(true);
-
       mutateSendEth();
 
       if (ethError) {
         showerrorsnack("An unexpected error occurred");
-        setProcessing(false);
       } else {
         showTxStatusBar(
           "PENDING",
@@ -140,13 +136,10 @@ export default function SendCrypto(): JSX.Element {
     }
 
     if (depositAsset == "WUSDC") {
-      setProcessing(true);
-
       mutateSendWusdc();
 
       if (wusdcError) {
         showerrorsnack("An unexpected error occurred");
-        setProcessing(false);
       } else {
         showTxStatusBar(
           "PENDING",
@@ -158,13 +151,10 @@ export default function SendCrypto(): JSX.Element {
     }
 
     if (depositAsset == "USDC") {
-      setProcessing(true);
-
       mutateSendUsdc();
 
       if (usdcError) {
         showerrorsnack("An unexpected error occurred");
-        setProcessing(false);
       } else {
         showTxStatusBar(
           "PENDING",
@@ -176,13 +166,10 @@ export default function SendCrypto(): JSX.Element {
     }
 
     if (depositAsset == "WBERA") {
-      setProcessing(true);
-
       mutateSendWbera();
 
       if (wberaError) {
         showerrorsnack("An unexpected error occurred");
-        setProcessing(false);
       } else {
         showTxStatusBar(
           "PENDING",
@@ -360,7 +347,6 @@ export default function SendCrypto(): JSX.Element {
             <FaIcon
               faIcon={faCircleArrowUp}
               color={
-                processing ||
                 receiverAddress == "" ||
                 sendAmnt == "" ||
                 Number(sendAmnt) > Number(availableBalance) ||
@@ -371,15 +357,12 @@ export default function SendCrypto(): JSX.Element {
             />
           }
           isDisabled={
-            processing ||
             receiverAddress == "" ||
             sendAmnt == "" ||
             Number(sendAmnt) > Number(availableBalance) ||
             (txStatusBarVisible && transactionStatus == "PENDING")
           }
-          isLoading={
-            processing || (txStatusBarVisible && transactionStatus == "PENDING")
-          }
+          isLoading={txStatusBarVisible && transactionStatus == "PENDING"}
           onclick={onSendCrypto}
           sxstyles={{
             width: "100%",
