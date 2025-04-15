@@ -605,7 +605,7 @@ const UnlockTask = ({
         <img src={image} alt={title} />
 
         <div className="unlockreward">
-          <span>+{unlockrewards}</span> <img src={usdclogo} alt="USDC" />
+          <span>+{unlockrewards}</span> <img src={spherelogo} alt="USDC" />
         </div>
       </div>
 
