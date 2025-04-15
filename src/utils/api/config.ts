@@ -29,7 +29,7 @@ export const ENDPOINTS = {
   sendbtc: "/transaction/spend-btc",
   sendom: "/transaction/spend-om",
   sendbera: "/transaction/spend-wbera",
-  sendwusdc: "/transaction/spend-wusdc",
+  sendwusdc: "/transaction/spend-usdc",
   txhistory: "/transaction/history",
   getfaucet: "/wallet/faucet/",
   promptgpt: "/conversation/ai",

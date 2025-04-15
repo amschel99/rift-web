@@ -16,17 +16,12 @@ import {
 import { useTabs } from "../hooks/tabs";
 import {
   walletBalance,
-  mantraBalance,
   usdtBalance,
   wusdcBalance,
   wberaBalance,
 } from "../utils/api/wallet";
 import { getEthUsdVal } from "../utils/ethusd";
-import {
-  getMantraUsdVal,
-  getBerachainUsdVal,
-  getSphrUsdcRate,
-} from "../utils/api/mantra";
+import { getBerachainUsdVal, getSphrUsdcRate } from "../utils/api/mantra";
 import { getUnlockedTokens } from "../utils/api/airdrop";
 import { formatUsd, formatNumber, numberFormat } from "../utils/formatters";
 import { FaIcon } from "../assets/faicon";
@@ -62,10 +57,6 @@ export const WalletBalance = (): JSX.Element => {
     queryKey: ["btceth"],
     queryFn: walletBalance,
   });
-  const { isLoading: mantraLoading } = useQuery({
-    queryKey: ["mantrabalance"],
-    queryFn: mantraBalance,
-  });
   const { data: usdtbalance, isLoading: usdtballoading } = useQuery({
     queryKey: ["usdcbalance"],
     queryFn: usdtBalance,
@@ -74,17 +65,10 @@ export const WalletBalance = (): JSX.Element => {
     queryKey: ["wBerabalance"],
     queryFn: wberaBalance,
   });
-
   const { data: usdcbalance, isLoading: usdcballoading } = useQuery({
     queryKey: ["wusdcbalance"],
     queryFn: wusdcBalance,
   });
-
-  const { isLoading: mantrausdloading } = useQuery({
-    queryKey: ["mantrausd"],
-    queryFn: getMantraUsdVal,
-  });
-
   const { data: ethusdval, isLoading: ethusdloading } = useQuery({
     queryKey: ["ethusd"],
     queryFn: getEthUsdVal,
@@ -155,8 +139,6 @@ export const WalletBalance = (): JSX.Element => {
             {btcethLoading ||
             berachainusdloading ||
             usdcballoading ||
-            mantraLoading ||
-            mantrausdloading ||
             ethusdloading ||
             sphrUsdcRateLoading ? (
               <Skeleton
@@ -169,7 +151,7 @@ export const WalletBalance = (): JSX.Element => {
               "$" +
               numberFormat(Math.abs(walletusdbalance || 0)).replace(/[()]/g, "")
             ) : (
-              formatUsd(walletusdbalance || 0)
+              `$${walletusdbalance.toFixed(4)}`
             )}
           </p>
 
@@ -397,9 +379,7 @@ export const WalletBalance = (): JSX.Element => {
       </div>
 
       {btcethLoading ||
-      mantraLoading ||
       usdtballoading ||
-      mantrausdloading ||
       ethusdloading ||
       sphrUsdcRateLoading ? (
         <div className="">
@@ -463,13 +443,7 @@ export const WalletBalance = (): JSX.Element => {
                     formatNumber(Number(wberabalance?.data?.balance))
                   )
                 }
-                balanceusd={
-                  wberabaloading || berachainusdloading ? (
-                    <Skeleton width={50} />
-                  ) : (
-                    formatUsd(wberaUsdBal)
-                  )
-                }
+                balanceusd={wberaUsdBal || 0}
               />
               <Asset
                 name="Ethereum"
@@ -640,20 +614,8 @@ export const Asset = ({
       </div>
 
       <p className="text-sm text-[#f6f7f9] flex flex-col gap-1 items-end">
-        {balance && (
-          <span>
-            {typeof balance == "number"
-              ? formatNumber(Number(balance))
-              : balance}
-          </span>
-        )}
-        <span className="text-xs text-[#f6f7f9]">
-          {typeof balanceusd === "string"
-            ? balanceusd
-            : typeof balanceusd == "number"
-            ? formatUsd(balanceusd)
-            : balanceusd}
-        </span>
+        {balance && <span>{balance}</span>}
+        <span className="text-xs text-[#f6f7f9]">${balanceusd}</span>
       </p>
     </div>
   );

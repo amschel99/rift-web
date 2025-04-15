@@ -60,7 +60,7 @@ export const Notifications = (): JSX.Element => {
       </div>
 
       <div
-        className="flex items-center gap-2 mt-4 my-1"
+        className="flex items-center gap-2 my-4"
         style={{
           backgroundColor: claimedstartairdrop == null ? "" : "transparent",
         }}
@@ -82,7 +82,16 @@ export const Notifications = (): JSX.Element => {
       </div>
 
       {transactionshistory?.transactions?.map((_tx) => (
-        <div className="notification">
+        <div
+          className="notification"
+          onClick={() => {
+            _tx?.currency == "USDC"
+              ? openLink(polygonscan + _tx?.transactionHash)
+              : _tx?.currency == "ETH"
+              ? openLink(etherscan + _tx?.transactionHash)
+              : openLink(berascan + _tx?.transactionHash);
+          }}
+        >
           <img
             src={
               _tx?.currency == "ETH"
@@ -100,15 +109,7 @@ export const Notifications = (): JSX.Element => {
             </p>
             <p className="link">
               {_tx?.createdAt}
-              <span
-                onClick={() => {
-                  _tx?.currency == "USDT"
-                    ? openLink(polygonscan + _tx?.transactionHash)
-                    : _tx?.currency == "ETH"
-                    ? etherscan + _tx?.transactionHash
-                    : berascan + _tx?.transactionHash;
-                }}
-              >
+              <span>
                 {_tx?.transactionHash?.substring(0, 8) + "..."}
                 <Stake width={6} height={11} color={colors.accent} />
               </span>
