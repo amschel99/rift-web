@@ -20,7 +20,7 @@ import {
   formatDateToStr,
   formatSeconds,
 } from "../../utils/dates";
-import { Copy, Telegram } from "../../assets/icons/actions";
+import { Copy, Stake, Telegram } from "../../assets/icons/actions";
 import { Confetti, Loading } from "../../assets/animations";
 import referearn from "../../assets/images/icons/refer.png";
 import spherelogo from "../../assets/images/sphere.jpg";
@@ -28,6 +28,7 @@ import usdclogo from "../../assets/images/labs/usdc.png";
 import walletout from "../../assets/images/wallet_out.png";
 import transaction from "../../assets/images/obhehalfspend.png";
 import "../../styles/components/tabs/rewards.scss";
+import { colors } from "@/constants";
 
 // --- API Response Types ---
 interface ClaimInfoData {
@@ -237,6 +238,11 @@ export const Rewards = (): JSX.Element => {
     claimMutation.mutate();
   };
 
+  const onExchangeRate = () => {
+    localStorage.setItem("prev_page", "rewards");
+    navigate("/coininfo");
+  };
+
   useEffect(() => {
     if (airdropId !== null) {
       openAppDialog("loading", "Claiming your Airdrop tokens, please wait...");
@@ -272,7 +278,7 @@ export const Rewards = (): JSX.Element => {
   return (
     <section
       id="rewards"
-      className="flex flex-col bg-[#0e0e0e] text-[#f6f7f9] px-4 py-6 space-y-6 overflow-y-auto pb-20"
+      className="flex flex-col bg-[#0e0e0e] text-[#f6f7f9] px-4 py-6 space-y-3 overflow-y-auto pb-20"
     >
       {/* Locked SPHR Card */}
       <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
@@ -309,7 +315,7 @@ export const Rewards = (): JSX.Element => {
           </div>
         </div>
 
-        <div className="bg-[#212523] rounded-xl p-4 mb-6 border border-[#34404f]">
+        <div className="bg-[#212523] rounded-xl p-4 mb-4 border border-[#34404f]">
           {isTokenDataLoading ? (
             <div className="h-12 w-32 mx-auto bg-[#34404f] rounded animate-pulse"></div>
           ) : (
@@ -365,6 +371,10 @@ export const Rewards = (): JSX.Element => {
           </button>
         </div>
       </div>
+
+      <span className="sphrexchangerate" onClick={onExchangeRate}>
+        SPHR / USDC Exchange Rate <Stake color={colors.accent} />
+      </span>
 
       {/* Earn More SPHR Tasks Card */}
       <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
