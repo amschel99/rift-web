@@ -130,7 +130,7 @@ export default function CreateLendSecret(): JSX.Element {
       {mysecrets || [].length >= 1 ? (
         <div className="secretselector" onClick={openPopOver}>
           {selSecretType === "nil" || selSecretValue === "nil" ? (
-            <p className="text-sm text-[#f6f7f9]">
+            <p className="choose_key">
               Please choose a key to lend.{" "}
               <span className="text-gray-400">
                 You have {mysecrets?.length} key(s)
@@ -138,7 +138,7 @@ export default function CreateLendSecret(): JSX.Element {
             </p>
           ) : (
             <>
-              <div className="flex items-center gap-2 bg-[#212121] border border-[#212121] p-2 rounded-2xl my-2">
+              <div className="flex items-center gap-2">
                 <img
                   src={
                     selSecretType == "POE" || selSecretType == "OPENAI"
