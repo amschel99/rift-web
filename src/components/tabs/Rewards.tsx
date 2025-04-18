@@ -73,6 +73,7 @@ export const Rewards = (): JSX.Element => {
   const [claimCooldownRemaining, setClaimCooldownRemaining] =
     useState<string>(""); // State for formatted cooldown
   const [burnAmount, setBurnAmount] = useState<string>(""); // State for SPHR burn amount input
+  const [isSettingAllowance, setIsSettingAllowance] = useState<boolean>(false); // Loading state for allowance call
 
   const toggleAnimation = () => {
     setshowanimation(true);
@@ -275,7 +276,7 @@ export const Rewards = (): JSX.Element => {
   };
 
   // --- Burn SPHR Handler ---
-  const onBurnSphr = () => {
+  const onBurnSphr = async () => {
     const amountToBurn = parseFloat(burnAmount);
     if (isNaN(amountToBurn) || amountToBurn <= 0) {
       showerrorsnack("Please enter a valid positive amount of SPHR to burn.");
@@ -286,8 +287,55 @@ export const Rewards = (): JSX.Element => {
       return;
     }
 
-    // Pass the amount string to the mutation
-    burnMutation.mutate({ amount: burnAmount });
+    setIsSettingAllowance(true); // Start loading indicator for allowance step
+
+    try {
+      // 1. Set Allowance Step
+      const sphereToken = localStorage.getItem("spheretoken");
+      if (!sphereToken) {
+        throw new Error(
+          "Sphere token not found. Please connect wallet properly."
+        );
+      }
+
+      const allowanceResponse = await fetch(
+        "https://strato-vault.com/set-sphere-allowance",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${sphereToken}`,
+            // Add Content-Type if your endpoint expects it, even for empty body
+            "Content-Type": "application/json",
+          },
+          // Add body: JSON.stringify({}) if required by the endpoint, even if empty
+        }
+      );
+
+      if (!allowanceResponse.ok) {
+        // Try to get error message from allowance endpoint response
+        const errorData = await allowanceResponse.json().catch(() => ({}));
+        console.error(
+          "Failed to set allowance",
+          allowanceResponse.status,
+          errorData
+        );
+        throw new Error(
+          errorData?.message ||
+            "Failed to set token allowance. Please try again."
+        );
+      }
+
+      // If allowance is successful, proceed to burn
+      console.log("Allowance set successfully"); // Optional: for debugging
+      burnMutation.mutate({ amount: burnAmount });
+    } catch (error: any) {
+      // Catch errors from allowance call or missing token
+      showerrorsnack(
+        error.message || "An error occurred during the allowance step."
+      );
+    } finally {
+      setIsSettingAllowance(false); // Stop loading indicator regardless of outcome
+    }
   };
 
   const updateTimeRemaining = () => {
@@ -647,12 +695,14 @@ export const Rewards = (): JSX.Element => {
         <button
           onClick={onBurnSphr}
           disabled={
+            isSettingAllowance ||
             burnMutation.isPending ||
             !burnAmount ||
             parseFloat(burnAmount) <= 0 ||
-            parseFloat(burnAmount) > sphrBalance // Disable if input > balance
+            parseFloat(burnAmount) > sphrBalance
           }
           className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+            isSettingAllowance ||
             burnMutation.isPending ||
             !burnAmount ||
             parseFloat(burnAmount) <= 0 ||
@@ -661,7 +711,11 @@ export const Rewards = (): JSX.Element => {
               : "bg-gradient-to-r from-[#ff8a50] to-[#ffb386] text-[#212523] hover:opacity-90"
           }`}
         >
-          {burnMutation.isPending ? (
+          {isSettingAllowance ? (
+            <div className="flex items-center justify-center gap-2">
+              <Loading width="1rem" height="1rem" /> Setting Allowance...
+            </div>
+          ) : burnMutation.isPending ? (
             <div className="flex items-center justify-center gap-2">
               <Loading width="1rem" height="1rem" /> Burning SPHR...
             </div>
