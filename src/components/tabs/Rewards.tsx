@@ -11,11 +11,9 @@ import {
   claimAirdrop,
   getUnlockedTokens,
   performDailyCheckin,
-  unlockTokensHistory,
 } from "../../utils/api/airdrop";
 import { formatNumber } from "../../utils/formatters";
 import { createReferralLink } from "../../utils/api/refer";
-import { dateDistance, formatDateToStr } from "../../utils/dates";
 import { Copy, Stake, Telegram } from "../../assets/icons/actions";
 import { Confetti, Loading } from "../../assets/animations";
 import referearn from "../../assets/images/icons/refer.png";
@@ -52,11 +50,6 @@ export const Rewards = (): JSX.Element => {
   const { data: tokenData, isLoading: isTokenDataLoading } = useQuery({
     queryKey: ["getunlocked"],
     queryFn: getUnlockedTokens,
-  });
-
-  const { data: unlockhistorydata } = useQuery({
-    queryKey: ["unlockhistory"],
-    queryFn: unlockTokensHistory,
   });
 
   // --- NEW Burn and Reward Mutation ---
@@ -122,7 +115,7 @@ export const Rewards = (): JSX.Element => {
           localStorage.removeItem("airdropId");
           showsuccesssnack("You Successfully claimed Airdrop Tokens (SPHR)");
           toggleAnimation();
-          queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
+          queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
           queryClient
             .invalidateQueries({ queryKey: ["getunlocked"] })
             .then(() => {
@@ -132,7 +125,7 @@ export const Rewards = (): JSX.Element => {
         .catch(() => {
           localStorage.removeItem("airdropId");
           showerrorsnack("Sorry, the Airdrop did not work");
-          queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
+          queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
           queryClient
             .invalidateQueries({ queryKey: ["getunlocked"] })
             .then(() => {
@@ -151,7 +144,6 @@ export const Rewards = (): JSX.Element => {
       mutationFn: () =>
         performDailyCheckin()
           .then(() => {
-            queryClient.invalidateQueries({ queryKey: ["unlockhistory"] });
             queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
 
             const nextdailycheckin = addDays(new Date(), 1);
@@ -535,59 +527,6 @@ export const Rewards = (): JSX.Element => {
         </button>
       </div>
       {/* ---------------------------------------- */}
-
-      {/* History Section */}
-      <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
-        <h3 className="text-[#f6f7f9] text-lg font-bold mb-4">History</h3>
-        <div className="space-y-4">
-          {unlockhistorydata && unlockhistorydata[0]?.message?.length > 0 ? (
-            unlockhistorydata[0]?.message?.map(
-              (message: string, index: number) => {
-                const parts = message.split(" ");
-                const potentialDate = parts[parts.length - 1];
-                let dateStr = "";
-                let description = message;
-                // Basic date check - might need refinement
-                if (
-                  potentialDate &&
-                  potentialDate.includes("-") &&
-                  !isNaN(Date.parse(potentialDate))
-                ) {
-                  dateStr = potentialDate;
-                  description = parts.slice(0, -1).join(" ");
-                } else {
-                  description = message;
-                }
-
-                return (
-                  <div
-                    key={index}
-                    className="border-b border-[#34404f] pb-3 last:border-0 last:pb-0"
-                  >
-                    <div className="text-[#f6f7f9] text-sm mb-1">
-                      {description}
-                    </div>
-                    {dateStr && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-500">
-                          {formatDateToStr(dateStr)}
-                        </span>
-                        <span className="text-[#ffb386]">
-                          {dateDistance(dateStr)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-            )
-          ) : (
-            <div className="text-center text-gray-400 py-8">
-              No history available yet.
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Confetti Animation */}
       {showanimation && (
