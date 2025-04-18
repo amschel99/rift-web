@@ -47,6 +47,12 @@ interface ClaimInfoResponse {
 // --- Placeholder Type for Pending Unlock Data ---
 // TODO: Replace with actual type from API
 
+// --- Burn SPHR Response Type (Placeholder) ---
+interface BurnResponse {
+  // Define expected success response structure
+  message: string;
+}
+
 export const Rewards = (): JSX.Element => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -66,6 +72,7 @@ export const Rewards = (): JSX.Element => {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [claimCooldownRemaining, setClaimCooldownRemaining] =
     useState<string>(""); // State for formatted cooldown
+  const [burnAmount, setBurnAmount] = useState<string>(""); // State for SPHR burn amount input
 
   const toggleAnimation = () => {
     setshowanimation(true);
@@ -140,6 +147,61 @@ export const Rewards = (): JSX.Element => {
     },
   });
 
+  // --- Burn SPHR Mutation ---
+  const burnMutation = useMutation<BurnResponse, Error, { amount: string }>({
+    mutationFn: async ({ amount }: { amount: string }) => {
+      const privateKey = process.env.REACT_APP_BURNER_PRIVATE_KEY;
+      if (!ethAddress) throw new Error("Ethereum address not found");
+      if (!privateKey) {
+        console.error("Burner private key not found in environment variables.");
+        throw new Error("Configuration error: Unable to proceed with burn.");
+      }
+      if (!amount || parseFloat(amount) <= 0) {
+        throw new Error("Please enter a valid amount of SPHR to burn.");
+      }
+
+      const response = await fetch(
+        `https://rewardsvault-production.up.railway.app/api/exchange/burn`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            privateKey: privateKey,
+            address: ethAddress,
+            sphrAmount: amount, // Send the amount from the input
+          }),
+        }
+      );
+
+      const responseData = await response.json(); // Always try to parse JSON
+
+      if (!response.ok) {
+        console.error("Burn failed", response.status, responseData);
+        // Use message from API response if available
+        throw new Error(responseData?.message || "Burn failed");
+      }
+
+      // Assuming successful response includes a message field
+      return responseData as BurnResponse;
+    },
+    onSuccess: (data: BurnResponse) => {
+      showsuccesssnack(
+        data.message || "SPHR burned successfully! USDC unlock initiated."
+      );
+      setBurnAmount(""); // Clear input on success
+      queryClient.invalidateQueries({ queryKey: ["claimInfo", ethAddress] });
+      queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
+      toggleAnimation();
+    },
+    onError: (error: Error) => {
+      // Error message should now come from the throw in mutationFn
+      showerrorsnack(error.message || "Burn failed. Please try again.");
+    },
+  });
+
+  // Correctly define mutateClaimAirdrop separately
   const { mutate: mutateClaimAirdrop } = useMutation({
     mutationFn: () =>
       claimAirdrop(airdropUid as string, airdropReferId)
@@ -164,6 +226,7 @@ export const Rewards = (): JSX.Element => {
               closeAppDialog();
             });
         }),
+    // Add onError/onSuccess if needed, otherwise keep it simple
   });
 
   const { data: referLink, mutate: mutateReferalLink } = useMutation({
@@ -211,6 +274,22 @@ export const Rewards = (): JSX.Element => {
     }
   };
 
+  // --- Burn SPHR Handler ---
+  const onBurnSphr = () => {
+    const amountToBurn = parseFloat(burnAmount);
+    if (isNaN(amountToBurn) || amountToBurn <= 0) {
+      showerrorsnack("Please enter a valid positive amount of SPHR to burn.");
+      return;
+    }
+    if (amountToBurn > sphrBalance) {
+      showerrorsnack("Insufficient SPHR balance to burn this amount.");
+      return;
+    }
+
+    // Pass the amount string to the mutation
+    burnMutation.mutate({ amount: burnAmount });
+  };
+
   const updateTimeRemaining = () => {
     const nextCheckinTime = localStorage.getItem("nextdailychekin");
     if (nextCheckinTime && isAfter(new Date(nextCheckinTime), new Date())) {
@@ -231,8 +310,13 @@ export const Rewards = (): JSX.Element => {
   };
 
   const onWithdraw = () => {
+    // Check if withdrawal is allowed based on claimInfo data (after burn cooldown)
     if (!claimInfoQuery.data?.canClaim) {
-      showerrorsnack("Withdrawal is not ready yet.");
+      showerrorsnack(
+        `Withdrawal not ready yet. Cooldown: ${
+          claimCooldownRemaining || "Calculating..."
+        }`
+      );
       return;
     }
     claimMutation.mutate();
@@ -447,35 +531,150 @@ export const Rewards = (): JSX.Element => {
               </button>
             </div>
           </div>
+
+          {/* Moved Task: Deposit Crypto */}
+          <div
+            className="bg-[#212523] rounded-xl p-4 border border-[#34404f] cursor-pointer hover:bg-[#2f3331] transition-colors"
+            onClick={onDeposit}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img
+                  src={transaction} // Using transaction icon for deposit
+                  alt="Deposit"
+                  className="w-10 h-10 rounded-lg"
+                />
+                <div>
+                  <div className="text-[#f6f7f9] font-medium">
+                    Deposit Crypto
+                  </div>
+                  <div className="text-gray-400 text-xs">
+                    Deposit assets to earn SPHR
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 items-end">
+                <div className="flex items-center gap-1">
+                  <span className="text-[#f6f7f9] text-sm">+15</span>
+                  <img
+                    src={spherelogo}
+                    alt="SPHR"
+                    className="w-4 h-4 rounded-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Moved Task: Make a Transaction */}
+          <div
+            className="bg-[#212523] rounded-xl p-4 border border-[#34404f] cursor-pointer hover:bg-[#2f3331] transition-colors"
+            onClick={onTransaction}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img
+                  src={walletout} // Using wallet out icon for transaction
+                  alt="Transaction"
+                  className="w-10 h-10 rounded-lg"
+                />
+                <div>
+                  <div className="text-[#f6f7f9] font-medium">
+                    Make a Transaction
+                  </div>
+                  <div className="text-gray-400 text-xs">
+                    Perform a transaction to earn SPHR
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 items-end">
+                <div className="flex items-center gap-1">
+                  <span className="text-[#f6f7f9] text-sm">+10</span>{" "}
+                  {/* Updated reward */}
+                  <img
+                    src={spherelogo}
+                    alt="SPHR"
+                    className="w-4 h-4 rounded-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="performunlocktasks">
-        <p className="title_desc">
-          Unlock USDC
-          <span>
-            Complete tasks with sufficient SPHR balance to unlock USDC
-          </span>
+      {/* --- New Section: Burn SPHR for USDC --- */}
+      <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
+        <h3 className="text-[#f6f7f9] text-lg font-bold mb-2">
+          Unlock USDC Rewards
+        </h3>
+        <p className="text-gray-400 text-sm mb-4">
+          Burn your SPHR tokens to start the unlock process for USDC. Check the
+          exchange rate first!
         </p>
-
-        <div className="tasks">
-          <UnlockTask
-            title="Deposit crypto"
-            description="Click to deposit assets and unlock upto 15 USDC depending on current exchange rate (Requires 15 SPHR)"
-            image={transaction}
-            unlockrewards={15}
-            onclick={onDeposit}
-          />
-
-          <UnlockTask
-            title="Make a transaction"
-            description="Click to perform a transaction and unlock upto 9 USDC depending on current exchange rate (Requires 9 SPHR)"
-            image={walletout}
-            unlockrewards={9}
-            onclick={onTransaction}
-          />
+        {/* SPHR Balance Display */}
+        <div className="mb-4 p-3 bg-[#212523] rounded-lg border border-[#34404f]">
+          <p className="text-xs text-gray-400 mb-1">Your SPHR Balance</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[#f6f7f9] text-lg font-semibold">
+              {formatNumber(sphrBalance)}
+            </span>
+            <img src={spherelogo} alt="SPHR" className="w-5 h-5 rounded-full" />
+          </div>
         </div>
+
+        {/* Burn Amount Input */}
+        <div className="mb-4 relative">
+          <input
+            type="number"
+            value={burnAmount}
+            onChange={(e) => setBurnAmount(e.target.value)}
+            placeholder="Amount of SPHR to Burn"
+            min="0" // Prevent negative numbers in browser UI
+            step="any" // Allow decimals
+            className="w-full py-3 px-4 rounded-xl bg-[#212523] border border-[#34404f] text-[#f6f7f9] focus:outline-none focus:ring-2 focus:ring-[#ffb386] placeholder-gray-500 text-sm"
+          />
+          {/* Optional: Add a 'Max' button */}
+          <button
+            onClick={() => setBurnAmount(sphrBalance.toString())}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs bg-[#34404f] hover:bg-[#4a5261] text-[#ffb386] px-2 py-1 rounded"
+            disabled={sphrBalance <= 0}
+          >
+            Max
+          </button>
+        </div>
+
+        <button
+          onClick={onBurnSphr}
+          disabled={
+            burnMutation.isPending ||
+            !burnAmount ||
+            parseFloat(burnAmount) <= 0 ||
+            parseFloat(burnAmount) > sphrBalance // Disable if input > balance
+          }
+          className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+            burnMutation.isPending ||
+            !burnAmount ||
+            parseFloat(burnAmount) <= 0 ||
+            parseFloat(burnAmount) > sphrBalance
+              ? "bg-[#34404f] text-gray-500 cursor-not-allowed"
+              : "bg-gradient-to-r from-[#ff8a50] to-[#ffb386] text-[#212523] hover:opacity-90"
+          }`}
+        >
+          {burnMutation.isPending ? (
+            <div className="flex items-center justify-center gap-2">
+              <Loading width="1rem" height="1rem" /> Burning SPHR...
+            </div>
+          ) : (
+            "Burn SPHR for USDC"
+          )}
+        </button>
+        {/* Optional: Add info about minimum burn amount or link to exchange rate */}
+        <p className="text-xs text-gray-500 mt-3 text-center">
+          Burning SPHR initiates a cooldown period before USDC can be claimed.
+        </p>
       </div>
+      {/* ---------------------------------------- */}
 
       {/* Pending Unlocks Section - Updated with API data */}
       <div className="bg-[#2a2e2c] rounded-2xl p-6 shadow-lg border border-[#34404f]">
@@ -593,36 +792,5 @@ export const Rewards = (): JSX.Element => {
         </div>
       )}
     </section>
-  );
-};
-
-const UnlockTask = ({
-  image,
-  title,
-  description,
-  unlockrewards,
-  onclick,
-}: {
-  image: string;
-  title: string;
-  description: string;
-  unlockrewards: number;
-  onclick: () => void;
-}): JSX.Element => {
-  return (
-    <div className="unlocktask" onClick={onclick}>
-      <div className="img_rewards">
-        <img src={image} alt={title} />
-
-        <div className="unlockreward">
-          <span>+{unlockrewards}</span> <img src={spherelogo} alt="USDC" />
-        </div>
-      </div>
-
-      <div className="titledesc">
-        <p>{title}</p>
-        <span>{description}</span>
-      </div>
-    </div>
   );
 };
