@@ -43,6 +43,22 @@ export const fetchMyKeys = async (): Promise<keyType[]> => {
   return res?.json();
 };
 
+export const getKeyDetails = async (nonce: string): Promise<keyType> => {
+  const token: string | null = localStorage.getItem("spheretoken");
+
+  const URL = BASEURL + ENDPOINTS.fetchkey + `?nonce=${nonce}`;
+
+  const res: Response = await fetch(URL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token as string}`,
+    },
+  });
+
+  return res?.json();
+};
+
 export const importKey = async (
   keyval: string,
   keyUtilType: string
