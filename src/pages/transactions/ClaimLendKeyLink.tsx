@@ -32,6 +32,7 @@ import usdclogo from "../../assets/images/labs/usdc.png";
 import ethlogo from "../../assets/images/eth.png";
 import "../../styles/pages/transactions/claimlendkeylink.scss";
 import { Loading } from "@/assets/animations";
+import { stringToBase64 } from "@/utils/base64";
 
 export default function ClaimLendKeyLink(): JSX.Element {
   const navigate = useNavigate();
@@ -118,7 +119,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
     openAppDialog("loading", "Preparing your chat...");
 
     const { response, accessToken, conversationId } = await UseOpenAiKey(
-      paysecretid as string,
+      stringToBase64(keydetails?.email as string),
       paysecretnonce as string
     );
 
