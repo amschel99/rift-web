@@ -100,6 +100,7 @@ export const WalletBalance = (): JSX.Element => {
   const walletusdbalance: number =
     Number(btcethbalance?.balance) * Number(ethusdval) +
     Number(usdtbalance?.data?.balance) +
+    Number(usdcbalance?.data?.balance) +
     sphrUsdValue +
     wberaUsdBal;
 
@@ -140,6 +141,7 @@ export const WalletBalance = (): JSX.Element => {
             berachainusdloading ||
             usdcballoading ||
             ethusdloading ||
+            usdtballoading ||
             sphrUsdcRateLoading ? (
               <Skeleton
                 variant="text"
@@ -151,7 +153,7 @@ export const WalletBalance = (): JSX.Element => {
               "$" +
               numberFormat(Math.abs(walletusdbalance || 0)).replace(/[()]/g, "")
             ) : (
-              `$${walletusdbalance.toFixed(4)}`
+              `$${walletusdbalance.toFixed(4) || 0}`
             )}
           </p>
 
@@ -427,7 +429,7 @@ export const WalletBalance = (): JSX.Element => {
                   sphrUsdcRateLoading ? (
                     <Skeleton width={50} />
                   ) : (
-                    `${sphrUsdValue}`
+                    `${sphrUsdValue?.toFixed(4)}`
                   )
                 }
               />
@@ -443,7 +445,7 @@ export const WalletBalance = (): JSX.Element => {
                     formatNumber(Number(wberabalance?.data?.balance))
                   )
                 }
-                balanceusd={wberaUsdBal || 0}
+                balanceusd={wberaUsdBal?.toFixed(3) || 0}
               />
               <Asset
                 name="Ethereum"
