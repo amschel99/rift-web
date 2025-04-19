@@ -31,7 +31,10 @@ export const createAirdropCampaign = async (
   return res.json();
 };
 
-export const claimAirdrop = async (airDropid: string, refer_code?: string) => {
+export const claimAirdrop = async (
+  airDropid: string,
+  refer_code?: string
+): Promise<{ status: number }> => {
   const URL =
     BASEURL +
     ENDPOINTS.claimairdrop +
@@ -45,7 +48,8 @@ export const claimAirdrop = async (airDropid: string, refer_code?: string) => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  console.log(`The response is ${JSON.stringify(await res.json())}`);
+
+  return { status: res?.status };
 };
 
 export type unlockTokensType = {

@@ -111,16 +111,22 @@ export const Rewards = (): JSX.Element => {
   const { mutate: mutateClaimAirdrop } = useMutation({
     mutationFn: () =>
       claimAirdrop(airdropUid as string, airdropReferId)
-        .then(() => {
+        .then((res) => {
           localStorage.removeItem("airdropId");
           showsuccesssnack("You Successfully claimed Airdrop Tokens (SPHR)");
           toggleAnimation();
-          queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
-          queryClient
-            .invalidateQueries({ queryKey: ["getunlocked"] })
-            .then(() => {
-              closeAppDialog();
-            });
+
+          if (res?.status == 200) {
+            queryClient.invalidateQueries({ queryKey: ["getunlocked"] });
+            queryClient
+              .invalidateQueries({ queryKey: ["getunlocked"] })
+              .then(() => {
+                closeAppDialog();
+              });
+          } else {
+            localStorage.removeItem("airdropId");
+            showerrorsnack("Sorry, the Airdrop did not work");
+          }
         })
         .catch(() => {
           localStorage.removeItem("airdropId");
