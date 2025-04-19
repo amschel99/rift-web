@@ -6,7 +6,8 @@ export const signupUser = async (
   deviceToken: string,
   deviceName: string,
   otpCode: string,
-  phoneNumber: string
+  phoneNumber: string,
+  referrer?: string
 ): Promise<{ status: number }> => {
   let URL = BASEURL + ENDPOINTS.signup;
 
@@ -19,6 +20,7 @@ export const signupUser = async (
       deviceName,
       otpCode,
       phoneNumber,
+      referrer,
     }),
     headers: { "Content-Type": "application/json" },
   });
