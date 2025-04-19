@@ -1,6 +1,6 @@
 import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   faArrowRight,
   faCheckCircle,
@@ -17,7 +17,10 @@ import {
   doKeyPayment,
   UseOpenAiKey,
   doKeyPaymentSuccess,
+  getKeyDetails,
 } from "../../utils/api/keys";
+import { getBerachainUsdVal } from "@/utils/api/mantra";
+import { getEthUsdVal } from "@/utils/ethusd";
 import { TransactionStatusWithoutSocket } from "../../components/TransactionStatus";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
@@ -28,6 +31,7 @@ import wberalogo from "../../assets/images/icons/bera.webp";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import ethlogo from "../../assets/images/eth.png";
 import "../../styles/pages/transactions/claimlendkeylink.scss";
+import { Loading } from "@/assets/animations";
 
 export default function ClaimLendKeyLink(): JSX.Element {
   const navigate = useNavigate();
@@ -46,12 +50,18 @@ export default function ClaimLendKeyLink(): JSX.Element {
   );
   const [txMessage, setTxMessage] = useState<string>("");
 
-  const paysecretreceiver = localStorage.getItem("paysecretreceiver");
-  const paysecretid = localStorage.getItem("paysecretid");
   const paysecretnonce = localStorage.getItem("paysecretnonce");
-  const paysecretpurpose = localStorage.getItem("paysecretpurpose");
-  const paysecretamount = localStorage.getItem("paysecretamount");
-  const paysecretcurrency = localStorage.getItem("paysecretcurrency");
+
+  const { data: keydetails, isFetching: keydetailsloading } = useQuery({
+    queryKey: ["keydetails"],
+    queryFn: () => getKeyDetails(paysecretnonce as string),
+  });
+
+  const paysecretreceiver = keydetails?.email;
+  const paysecretid = keydetails?.id;
+  const paysecretpurpose = keydetails?.purpose;
+  const paysecretamount = keydetails?.paymentValue;
+  const paysecretcurrency = keydetails?.paymentCurrency;
   const txverified = localStorage.getItem("txverified");
   const prev_page = localStorage.getItem("prev_page");
 
@@ -139,12 +149,21 @@ export default function ClaimLendKeyLink(): JSX.Element {
   const ethUsdValue = localStorage.getItem("ethvalue");
   const wberaUsdValue = localStorage.getItem("WberaUsdVal");
 
+  const { data: ethusdval } = useQuery({
+    queryKey: ["ethusd"],
+    queryFn: getEthUsdVal,
+  });
+  const { data: berausdval } = useQuery({
+    queryKey: ["berachainusd"],
+    queryFn: getBerachainUsdVal,
+  });
+
   const secretAmountInUSD =
     paysecretcurrency === "WBERA"
-      ? Number(paysecretamount) * Number(wberaUsdValue)
+      ? Number(paysecretamount || 0) * Number(wberaUsdValue || berausdval)
       : paysecretcurrency === "ETH"
-      ? Number(paysecretamount) * Number(ethUsdValue)
-      : Number(paysecretamount) * 0.99;
+      ? Number(paysecretamount || 0) * Number(ethUsdValue || ethusdval)
+      : Number(paysecretamount || 0) * 0.99;
 
   useEffect(() => {
     if (!socket) return;
@@ -160,6 +179,8 @@ export default function ClaimLendKeyLink(): JSX.Element {
         data?.transactionHash,
         secretAmountInUSD
       ).then(() => {
+        setProcessing(false);
+        setUserGotKey(true);
         localStorage.removeItem("txverified");
       });
 
@@ -208,7 +229,13 @@ export default function ClaimLendKeyLink(): JSX.Element {
       <div className="received_key">
         <img src={poelogo} alt="received-key" />
         <p className="key_val">
-          {paysecretpurpose} <span>{paysecretid}</span>
+          {keydetailsloading ? (
+            <Loading />
+          ) : (
+            <>
+              {paysecretpurpose} <span>{paysecretid}</span>
+            </>
+          )}
         </p>
         <p className="desc">
           You have received a paid {paysecretpurpose} key. <br /> Click&nbsp;
@@ -219,7 +246,8 @@ export default function ClaimLendKeyLink(): JSX.Element {
         {userGotKey && (
           <>
             <p className="unlocks">
-              You successfully paid for the {paysecretpurpose} key
+              You successfully paid for the{" "}
+              {keydetails ? "---" : paysecretpurpose} key
             </p>
             <SubmitButton
               text="Start Using Key"
@@ -238,8 +266,8 @@ export default function ClaimLendKeyLink(): JSX.Element {
         <p className="title">
           Pay&nbsp;
           <span>
-            {paysecretamount}&nbsp;
-            {paysecretcurrency}
+            {keydetailsloading ? "- - -" : paysecretamount}&nbsp;
+            {!keydetailsloading && paysecretcurrency}
           </span>
           &nbsp;To Use Key
         </p>
@@ -253,11 +281,11 @@ export default function ClaimLendKeyLink(): JSX.Element {
                 ? wberalogo
                 : ethlogo
             }
-            alt="mantra"
+            alt="payment-token"
           />
           <p>
-            {paysecretamount}&nbsp;
-            {paysecretcurrency}
+            {keydetailsloading ? "- - -" : paysecretamount}&nbsp;
+            {!keydetailsloading && paysecretcurrency}
           </p>
         </div>
 
@@ -267,7 +295,13 @@ export default function ClaimLendKeyLink(): JSX.Element {
         </p>
 
         <SubmitButton
-          text={txverified == null ? "Verify To Get Key" : "Get Key"}
+          text={
+            keydetailsloading
+              ? "Please wait..."
+              : txverified == null
+              ? "Verify To Get Key"
+              : "Get Key"
+          }
           icon={
             <FaIcon
               faIcon={faCheckCircle}
@@ -282,7 +316,9 @@ export default function ClaimLendKeyLink(): JSX.Element {
             padding: "0.625rem",
             borderRadius: "0.375rem",
           }}
-          isDisabled={processing || userGotKey || keypaymentloading}
+          isDisabled={
+            keydetailsloading || processing || userGotKey || keypaymentloading
+          }
           isLoading={processing || keypaymentloading}
           onclick={onPayForKeyToUse}
         />
