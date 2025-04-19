@@ -215,13 +215,16 @@ export default function PhoneAuth(): JSX.Element {
               );
 
               if (quvaultSignUpResult?.token) {
+                const referrer = localStorage.getItem("referrer");
                 localStorage.setItem("quvaulttoken", quvaultSignUpResult.token);
+
                 const { status } = await signupUser(
                   tgUserId,
                   devicetoken,
                   devicename,
                   otpCode,
-                  phoneNumber
+                  phoneNumber,
+                  referrer as string
                 );
 
                 if (status == 400) {
@@ -231,6 +234,8 @@ export default function PhoneAuth(): JSX.Element {
                   showerrorsnack(
                     "We couldn't verify your account, please try again with the phone number you used initially"
                   );
+
+                  localStorage.removeItem("referrer");
                 }
               } else {
                 throw new Error("Failed to create QuVault account");
