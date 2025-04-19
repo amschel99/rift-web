@@ -38,11 +38,7 @@ function App(): JSX.Element {
     const starttab = localStorage.getItem("starttab");
     const startpage = localStorage.getItem("startpage");
     // paid key/secret values
-    const paysecretid = localStorage.getItem("paysecretid");
     const paysecretnonce = localStorage.getItem("paysecretnonce");
-    const paysecretpurpose = localStorage.getItem("paysecretpurpose");
-    const paysecretamount = localStorage.getItem("paysecretamount");
-    const paysecretcurrency = localStorage.getItem("paysecretcurrency");
 
     if (address == null || token == null) {
       navigate("/auth/phone");
@@ -64,13 +60,7 @@ function App(): JSX.Element {
       return;
     }
 
-    if (
-      paysecretid !== null &&
-      paysecretnonce !== null &&
-      paysecretpurpose !== null &&
-      paysecretamount !== null &&
-      paysecretcurrency !== null
-    ) {
+    if (paysecretnonce !== null) {
       navigate("/claimlendkey");
       return;
     }
