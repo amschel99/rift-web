@@ -171,10 +171,10 @@ export default function CreateLendSecret(): JSX.Element {
       )}
       <PopOver anchorEl={anchorEl} setAnchorEl={setanchorEl}>
         <div className="select_secrets">
-          {mysecrets?.map((_key) => (
+          {mysecrets?.map((_key, idx) => (
             <div
               className="img_desc"
-              key={_key?.id}
+              key={_key?.id + idx}
               onClick={() => {
                 setSelSecretType(_key?.purpose);
                 setSelSecretValue(_key?.value);
