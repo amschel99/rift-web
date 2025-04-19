@@ -62,24 +62,20 @@ export default function Splash(): JSX.Element {
       }
 
       if (startParam?.includes("payment")) {
-        /**https://t.me/spheredev_bot/spheredev?startapp={Nzg2MDM5NDkwNw==} {_Qy9IhBW01Hzu} {_payment=true} {_amount=30} {_currency=USDT} {_owner=7860394907} {_ownerAddress=0x9FDcEe7216386e9e11EB7aaf94Dc725EF22386C6} {_purpose=OPENAI} */
+        /**https://t.me/spheredev_bot/spheredev?startapp={Nzg2MDM5NDkwNw==} {_Qy9IhBW01Hzu} {_payment=true}*/
         // opened with a paid key link
         const splitparam = startParam?.split("_");
-        const paysecretreceiver = splitparam[0];
-        const paysecretid = splitparam[1];
         const paysecretnonce = splitparam[1];
-        const paysecretpurpose = splitparam[7]?.split("=")[1];
-        const paysecretamount = splitparam[3]?.split("=")[1];
-        const paysecretcurrency = splitparam[4]?.split("=")[1];
 
-        localStorage.setItem("paysecretreceiver", paysecretreceiver);
-        localStorage.setItem("paysecretid", paysecretid);
         localStorage.setItem("paysecretnonce", paysecretnonce);
-        localStorage.setItem("paysecretpurpose", paysecretpurpose);
-        localStorage.setItem("paysecretamount", paysecretamount);
-        localStorage.setItem("paysecretcurrency", paysecretcurrency);
-
         userAuthenticated();
+      }
+
+      if (startParam?.includes("referral")) {
+        // https://t.me/sphere_id_bot/sphere?startapp=referral_ooxcyr74
+        const referalcode = startParam?.split("_");
+
+        localStorage.setItem("referrer", referalcode[0]);
       }
 
       if (startParam?.includes("collect")) {
