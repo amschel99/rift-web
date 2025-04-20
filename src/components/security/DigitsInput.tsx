@@ -92,7 +92,6 @@ export const DigitsInput = ({
           type="text"
           inputMode="numeric"
           placeholder="0"
-          className={val0 !== "" ? "valueinput" : ""}
           value={val0}
           maxLength={1}
           onChange={(ev) => focusOnInputChange(ev, setVal0, val1ref, 0)}
@@ -104,7 +103,6 @@ export const DigitsInput = ({
           type="text"
           inputMode="numeric"
           placeholder="0"
-          className={val1 !== "" ? "valueinput" : ""}
           value={val1}
           maxLength={1}
           onChange={(ev) => focusOnInputChange(ev, setVal1, val2ref, 1)}
@@ -116,7 +114,6 @@ export const DigitsInput = ({
           type="text"
           inputMode="numeric"
           placeholder="0"
-          className={val2 !== "" ? "valueinput" : ""}
           value={val2}
           maxLength={1}
           onChange={(ev) => focusOnInputChange(ev, setVal2, val3ref, 2)}
@@ -128,7 +125,6 @@ export const DigitsInput = ({
           type="text"
           inputMode="numeric"
           placeholder="0"
-          className={val3 !== "" ? "valueinput" : ""}
           value={val3}
           maxLength={1}
           onChange={(ev) => focusOnInputChange(ev, setVal3, null, 3)}
