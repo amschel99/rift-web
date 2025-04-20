@@ -126,6 +126,7 @@ export const Rewards = (): JSX.Element => {
           } else {
             localStorage.removeItem("airdropId");
             showerrorsnack("Sorry, the Airdrop did not work");
+            closeAppDialog();
           }
         })
         .catch(() => {
