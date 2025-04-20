@@ -289,7 +289,10 @@ export const WalletBalance = (): JSX.Element => {
           </div>
         )}
 
-        <div className="flex flex-col gap-2 w-full bg-[#212523] rounded-xl p-2 my-4 mb-4">
+        <div
+          className="flex flex-col gap-2 w-full bg-[#212523] rounded-xl p-2 my-4 mb-4"
+          onClick={() => navigate("/polymarket")}
+        >
           <div className="flex items-center gap-2">
             <img
               src={polymarketlogo}
