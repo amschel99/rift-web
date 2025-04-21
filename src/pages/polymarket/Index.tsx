@@ -1,5 +1,6 @@
 import { CSSProperties, JSX, ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   faAnglesDown,
   faAnglesUp,
@@ -10,12 +11,13 @@ import {
 import { useBackButton } from "@/hooks/backbutton";
 import { useTabs } from "@/hooks/tabs";
 import { formatUsd } from "@/utils/formatters";
+import { fetchMarkets } from "@/utils/polymarket/markets";
 import { SearchInput } from "@/components/global/Inputs";
+import { SubmitButton } from "@/components/global/Buttons";
 import { FaIcon } from "@/assets/faicon";
 import { colors } from "@/constants";
 import marketimg from "@/assets/images/labs/mantracover.jpeg";
 import "@/styles/pages/polymarket/index.scss";
-import { SubmitButton } from "@/components/global/Buttons";
 
 export default function Polymarket(): JSX.Element {
   const navigate = useNavigate();
@@ -23,6 +25,15 @@ export default function Polymarket(): JSX.Element {
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [marketFilter, setMarketFilter] = useState<"all" | "me">("all");
+
+  const { data } = useQuery({
+    queryKey: ["polymarkets"],
+    queryFn: fetchMarkets,
+  });
+  // console.log(isPending);
+  // console.log(error);
+  console.log(data?.status);
+  console.log(data?.markets);
 
   const goBack = () => {
     switchtab("home");
@@ -75,11 +86,13 @@ export default function Polymarket(): JSX.Element {
 
       {marketFilter == "all" ? (
         <div className="markets">
-          <Market />
-          <Market />
-          <Market />
-          <Market />
-          <Market />
+          <Market
+            marketid="1278687rL"
+            marketimage={marketimg}
+            markettitle="Will Meta be forced to sell Instagram or WhatsApp in 2025 ?"
+            marketvolume="$8K"
+            minshares={100}
+          />
         </div>
       ) : (
         <div className="markets">
@@ -114,9 +127,21 @@ const StatsCounter = ({
   );
 };
 
-// {marketid,marketimage,markettitle,marketvolume,minshares}:
-// {marketid:string,marketimage:string,markettitle:string,marketvolume:number|string,minshares:number}
-const Market = (): JSX.Element => {
+const Market = ({
+  marketid,
+  marketimage,
+  markettitle,
+  marketvolume,
+  minshares,
+}: {
+  marketid: string;
+  marketimage: string;
+  markettitle: string;
+  marketvolume: number | string;
+  minshares: number;
+}): JSX.Element => {
+  const navigate = useNavigate();
+
   const buttonstyles: CSSProperties = {
     width: "49%",
     padding: "0.5rem",
@@ -124,19 +149,23 @@ const Market = (): JSX.Element => {
     color: colors.textprimary,
   };
 
+  const goToMarket = () => {
+    navigate(`/market/${marketid}`);
+  };
+
   return (
-    <div className="marketctr">
+    <div className="marketctr" onClick={goToMarket}>
       <div className="img_title">
-        <img src={marketimg} alt="market" />
-        <p>Will Meta be forced to sell Instagram or WhatsApp in 2025 ?</p>
+        <img src={marketimage} alt="market" />
+        <p>{markettitle}</p>
       </div>
 
       <div className="marketconditions">
         <p>
-          $8K <span>Vol</span>
+          {marketvolume} <span>Vol</span>
         </p>
         <p>
-          100 <span>Min Shares</span>
+          {minshares} <span>Min Shares</span>
         </p>
       </div>
 
