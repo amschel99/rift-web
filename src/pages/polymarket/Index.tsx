@@ -1,6 +1,6 @@
-import { CSSProperties, JSX, ReactNode, useState } from "react";
+import { CSSProperties, JSX, MouseEvent, ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+// import { useQuery } from "@tanstack/react-query";
 import {
   faAnglesDown,
   faAnglesUp,
@@ -10,13 +10,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "@/hooks/backbutton";
 import { useTabs } from "@/hooks/tabs";
+import { useAppDrawer } from "@/hooks/drawer";
 import { formatUsd } from "@/utils/formatters";
-import { fetchMarkets } from "@/utils/polymarket/markets";
+// import { fetchMarkets } from "@/utils/polymarket/markets";
 import { SearchInput } from "@/components/global/Inputs";
 import { SubmitButton } from "@/components/global/Buttons";
 import { FaIcon } from "@/assets/faicon";
 import { colors } from "@/constants";
-import marketimg from "@/assets/images/labs/mantracover.jpeg";
+import marketimg from "@/assets/images/labs/mantracover.png";
 import "@/styles/pages/polymarket/index.scss";
 
 export default function Polymarket(): JSX.Element {
@@ -26,14 +27,14 @@ export default function Polymarket(): JSX.Element {
   const [searchValue, setSearchValue] = useState<string>("");
   const [marketFilter, setMarketFilter] = useState<"all" | "me">("all");
 
-  const { data } = useQuery({
-    queryKey: ["polymarkets"],
-    queryFn: fetchMarkets,
-  });
+  // const { data } = useQuery({
+  //   queryKey: ["polymarkets"],
+  //   queryFn: fetchMarkets,
+  // });
   // console.log(isPending);
   // console.log(error);
-  console.log(data?.status);
-  console.log(data?.markets);
+  // console.log(data?.status);
+  // console.log(data?.markets);
 
   const goBack = () => {
     switchtab("home");
@@ -141,12 +142,24 @@ const Market = ({
   minshares: number;
 }): JSX.Element => {
   const navigate = useNavigate();
+  const { openAppDrawerWithKey } = useAppDrawer();
 
   const buttonstyles: CSSProperties = {
     width: "49%",
     padding: "0.5rem",
+    borderRadius: "0.5rem",
     fontWeight: "bold",
     color: colors.textprimary,
+  };
+
+  const onTradeYes = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    openAppDrawerWithKey("tradeyesno", marketid, "yes"); // drawer action : tradeyesno >> keyToShare : market id >> purpose : trade yes
+  };
+
+  const onTradeNo = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    openAppDrawerWithKey("tradeyesno", marketid, "no"); // drawer action : tradeyesno >> keyToShare : market id >> purpose : trade no
   };
 
   const goToMarket = () => {
@@ -179,8 +192,8 @@ const Market = ({
               fontsize={12}
             />
           }
-          sxstyles={{ ...buttonstyles, backgroundColor: colors.accent }}
-          onclick={() => {}}
+          sxstyles={{ ...buttonstyles, backgroundColor: colors.success }}
+          onclick={onTradeYes}
         />
 
         <SubmitButton
@@ -193,7 +206,7 @@ const Market = ({
             />
           }
           sxstyles={{ ...buttonstyles, backgroundColor: colors.danger }}
-          onclick={() => {}}
+          onclick={onTradeNo}
         />
       </div>
     </div>
