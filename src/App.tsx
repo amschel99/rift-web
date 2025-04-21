@@ -10,8 +10,10 @@ import {
   disableVerticalSwipes,
   unmountSwipeBehavior,
 } from "@telegram-apps/sdk-react";
+import { useQuery } from "@tanstack/react-query";
 import { tabsType, useTabs } from "./hooks/tabs";
 import { useAppDrawer } from "./hooks/drawer";
+import { checkServerStatus } from "./utils/api/apistatus";
 import { BottomTabNavigation } from "./components/Bottom";
 import { HomeTab } from "./components/tabs/Home";
 import { SecurityTab } from "./components/tabs/Security";
@@ -70,6 +72,18 @@ function App(): JSX.Element {
       return;
     }
   }, []);
+
+  const { data } = useQuery({
+    queryKey: ["serverstatus"],
+    refetchInterval: 30000,
+    queryFn: checkServerStatus,
+  });
+
+  useEffect(() => {
+    if (data?.status !== 200) {
+      navigate("/server-error");
+    }
+  }, [data?.status]);
 
   useEffect(() => {
     checkAccessUser();
