@@ -1,6 +1,5 @@
 import { CSSProperties, JSX, MouseEvent, ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
-// import { useQuery } from "@tanstack/react-query";
 import {
   faAnglesDown,
   faAnglesUp,
@@ -12,7 +11,6 @@ import { useBackButton } from "@/hooks/backbutton";
 import { useTabs } from "@/hooks/tabs";
 import { useAppDrawer } from "@/hooks/drawer";
 import { formatUsd } from "@/utils/formatters";
-// import { fetchMarkets } from "@/utils/polymarket/markets";
 import { SearchInput } from "@/components/global/Inputs";
 import { SubmitButton } from "@/components/global/Buttons";
 import { FaIcon } from "@/assets/faicon";
@@ -26,15 +24,6 @@ export default function Polymarket(): JSX.Element {
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [marketFilter, setMarketFilter] = useState<"all" | "me">("all");
-
-  // const { data } = useQuery({
-  //   queryKey: ["polymarkets"],
-  //   queryFn: fetchMarkets,
-  // });
-  // console.log(isPending);
-  // console.log(error);
-  // console.log(data?.status);
-  // console.log(data?.markets);
 
   const goBack = () => {
     switchtab("home");

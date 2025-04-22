@@ -116,7 +116,17 @@ export const fetchMarkets = async (): Promise<{
 
   const res = await fetch(URL, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      Connection: "keep-alive",
+      "Upgrade-Insecure-Requests": "1",
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "none",
+      "Sec-Fetch-User": "?1",
+      Priority: "u=0, i",
+    },
   });
 
   const data: markettype[] = await res?.json();
