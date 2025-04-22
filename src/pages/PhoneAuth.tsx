@@ -10,7 +10,7 @@ import {
   signinQuvaultUser,
 } from "../utils/api/quvault/auth";
 import { useSocket } from "../utils/SocketProvider";
-// import { useBackButton } from "@/hooks/backbutton";
+import { useBackButton } from "@/hooks/backbutton";
 import { useSnackbar } from "../hooks/snackbar";
 import { PhoneInput } from "../components/security/PhoneInput";
 import { BottomButtonContainer } from "../components/Bottom";
@@ -80,14 +80,6 @@ export default function PhoneAuth(): JSX.Element {
   const [devicetoken, setDeviceToken] = useState<string>("default-token");
   const devicename = "Samsung-A15";
 
-  useEffect(() => {
-    async function generateToken() {
-      const token = await generatePersistentDeviceToken(tgUserId);
-      setDeviceToken(token);
-    }
-    generateToken();
-  }, [tgUserId]);
-
   // State management
   const [socketLoading, setSocketLoading] = useState<boolean>(false);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -99,44 +91,13 @@ export default function PhoneAuth(): JSX.Element {
   const [timeRemaining, setTimeRemaining] = useState<number>(120); // 2 minutes
   const [canResend, setCanResend] = useState<boolean>(false);
 
-  // Timer effect for OTP countdown
-  useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
-
-    if (requestedOtp && timeRemaining > 0) {
-      timer = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            setCanResend(true);
-            clearInterval(timer as NodeJS.Timeout);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [requestedOtp, timeRemaining]);
-
-  // Format time remaining as MM:SS
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
   // We only need the send OTP mutation
   const { mutate: mutateSendOtp, isPending: sendingOtp } = useMutation({
     mutationFn: () =>
       sendOtp(phoneNumber).then((res) => {
         if (res?.status == 500) {
           showerrorsnack(
-            "Failed to send OTP. Please check your phone number and try again."
+            "We could not send an OTP to your phone, please try again"
           );
         } else {
           showsuccesssnack("OTP Code sent successfully to your phone");
@@ -151,6 +112,19 @@ export default function PhoneAuth(): JSX.Element {
 
   // Combined loading state
   const isLoading = socketLoading || sendingOtp || accountCreating;
+
+  // Format time remaining as MM:SS
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const goBack = () => {
+    navigate(-1);
+  };
 
   // Verify button click handler
   const onSubmitPhoneAuth = async () => {
@@ -173,9 +147,7 @@ export default function PhoneAuth(): JSX.Element {
           // Verify OTP first
           await verifyOtp(otpCode, phoneNumber);
           setOtpVerified(true);
-          showsuccesssnack(
-            "Phone verification successful. Creating your account..."
-          );
+          showsuccesssnack("Your phone was verified successfully");
           setAccountCreating(true);
 
           // Try to sign in with QuVault first
@@ -188,7 +160,6 @@ export default function PhoneAuth(): JSX.Element {
             if (quvaultSignInResult?.token) {
               console.log("QuVault login successful");
               localStorage.setItem("quvaulttoken", quvaultSignInResult.token);
-              const referrer = localStorage.getItem("referrer");
 
               // Proceed with signup
               const { status } = await signupUser(
@@ -196,8 +167,7 @@ export default function PhoneAuth(): JSX.Element {
                 devicetoken,
                 devicename,
                 otpCode,
-                phoneNumber,
-                referrer as string
+                phoneNumber
               );
 
               if (status == 400) {
@@ -220,14 +190,12 @@ export default function PhoneAuth(): JSX.Element {
               if (quvaultSignUpResult?.token) {
                 localStorage.setItem("quvaulttoken", quvaultSignUpResult.token);
 
-                const referrer = localStorage.getItem("referrer");
                 const { status } = await signupUser(
                   tgUserId,
                   devicetoken,
                   devicename,
                   otpCode,
-                  phoneNumber,
-                  referrer as string
+                  phoneNumber
                 );
 
                 if (status == 400) {
@@ -296,29 +264,53 @@ export default function PhoneAuth(): JSX.Element {
     setSocketLoading(false);
   };
 
+  useBackButton(goBack);
+
+  useEffect(() => {
+    async function generateToken() {
+      const token = await generatePersistentDeviceToken(tgUserId);
+      setDeviceToken(token);
+    }
+    generateToken();
+  }, [tgUserId]);
+
+  // Timer effect for OTP countdown
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+
+    if (requestedOtp && timeRemaining > 0) {
+      timer = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            clearInterval(timer as NodeJS.Timeout);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [requestedOtp, timeRemaining]);
+
   // Set up socket listeners for account creation
   useEffect(() => {
     if (socket) {
       // Set up socket event listeners
       const handleAccountCreationSuccess = (data: any) => {
-        // Store necessary data in localStorage
-        if (data?.address) localStorage.setItem("ethaddress", data.address);
-        if (data?.btcAdress) localStorage.setItem("btcaddress", data.btcAdress);
-        if (data?.accessToken)
-          localStorage.setItem("spheretoken", data.accessToken);
-        localStorage.setItem("firsttimeuse", "false");
-
         console.log("Account creation success:", data);
         setSocketLoading(false);
         setAccountCreating(false);
 
         if (data?.user == tgUserId) {
-          showsuccesssnack("Your wallet is ready! Redirecting to app...");
-          localStorage.removeItem("referrer");
+          showsuccesssnack("Your phone number was added successfully");
 
           // Small delay to show the success message
           setTimeout(() => {
-            navigate("/app", { replace: true });
+            goBack();
           }, 1500);
         } else {
           // If the user ID doesn't match, something went wrong
@@ -476,8 +468,8 @@ export default function PhoneAuth(): JSX.Element {
       )}
 
       <p className="note">
-        To get started with Sphere, we need to verify your account with a phone
-        number
+        Your phone number will be used to verify its you performing transactions
+        on your wallet via OTPs
       </p>
 
       <BottomButtonContainer>
