@@ -506,7 +506,7 @@ const AppActions = ({
       infoButton: true,
       infoType: "web2" as const,
     },
-    { icon: faCoins, text: "Stake", screen: "/" },
+    { icon: faCoins, text: "Stake", screen: "/app" },
     { icon: faCrown, text: "Premium", screen: "/premiums" },
   ];
 
