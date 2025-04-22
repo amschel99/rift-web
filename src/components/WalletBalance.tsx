@@ -142,7 +142,8 @@ export const WalletBalance = (): JSX.Element => {
             usdcballoading ||
             ethusdloading ||
             usdtballoading ||
-            sphrUsdcRateLoading ? (
+            sphrUsdcRateLoading ||
+            isNaN(walletusdbalance) ? (
               <Skeleton
                 variant="text"
                 width={60}
