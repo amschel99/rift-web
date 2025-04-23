@@ -84,8 +84,9 @@ export default function Signup(): JSX.Element {
 
       if (quvaultSignInResult?.token) {
         localStorage.setItem("quvaulttoken", quvaultSignInResult.token);
+        console.log("quvault signin success");
 
-        await signupUser(
+        const { status: signupstatus } = await signupUser(
           tgUserId,
           devicetoken,
           devicename,
@@ -93,6 +94,18 @@ export default function Signup(): JSX.Element {
           "0",
           referrer ?? undefined
         );
+
+        const { status: createaccstatus } = await createAccount(
+          tgUserId,
+          tgUserId,
+          devicetoken,
+          0,
+          "0"
+        );
+
+        if (signupstatus == 200 && createaccstatus == 200) {
+          setHttpAuthOk(true);
+        }
       } else {
         // try quvault signup if signin fails
         const quvaultSignUpResult = await signupQuvaultUser(
@@ -102,8 +115,9 @@ export default function Signup(): JSX.Element {
         );
 
         localStorage.setItem("quvaulttoken", quvaultSignUpResult.token);
+        console.log("quvault signup success");
 
-        await signupUser(
+        const { status: signupstatus } = await signupUser(
           tgUserId,
           devicetoken,
           devicename,
@@ -111,19 +125,18 @@ export default function Signup(): JSX.Element {
           "0",
           referrer ?? undefined
         );
-      }
 
-      // create account after signup -> creates wallet
-      const { status } = await createAccount(
-        tgUserId,
-        tgUserId,
-        devicetoken,
-        0,
-        "0"
-      );
+        const { status: createaccstatus } = await createAccount(
+          tgUserId,
+          tgUserId,
+          devicetoken,
+          0,
+          "0"
+        );
 
-      if (status == 200) {
-        setHttpAuthOk(true);
+        if (signupstatus == 200 && createaccstatus == 200) {
+          setHttpAuthOk(true);
+        }
       }
     } catch (error) {
       console.log("there was an issue with account creation & login");
@@ -164,6 +177,8 @@ export default function Signup(): JSX.Element {
   useEffect(() => {
     if (socket && httpAuthOk) {
       const handleAccountCreationSuccess = (data: any) => {
+        console.log("account creation success");
+
         if (data?.address) localStorage.setItem("ethaddress", data.address);
         if (data?.btcAdress) localStorage.setItem("btcaddress", data.btcAdress);
         if (data?.accessToken)
@@ -180,6 +195,7 @@ export default function Signup(): JSX.Element {
           localStorage.removeItem("referrer");
           navigate("/app", { replace: true });
         } else {
+          console.log("retrying authentication");
           for (let i = 0; i < retries; i++) {
             onSignup();
           }
