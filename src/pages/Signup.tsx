@@ -91,7 +91,7 @@ export default function Signup(): JSX.Element {
           devicename,
           "0",
           "0",
-          referrer as string
+          referrer ?? undefined
         );
       } else {
         // try quvault signup if signin fails
@@ -109,7 +109,7 @@ export default function Signup(): JSX.Element {
           devicename,
           "0",
           "0",
-          referrer as string
+          referrer ?? undefined
         );
       }
 
@@ -199,7 +199,7 @@ export default function Signup(): JSX.Element {
         socket.off("AccountCreationFailed", handleAccountCreationFailed);
       };
     }
-  }, [socket]);
+  }, [socket, httpAuthOk]);
 
   return (
     <section id="signup">
