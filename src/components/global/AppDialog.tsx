@@ -25,9 +25,9 @@ export const AppDialog = (): JSX.Element => {
         paper: {
           style: {
             width: "90vw",
-            height: "14rem",
+            height: action == "loading" ? "10rem" : "14rem",
             padding: "0.5rem",
-            borderRadius: "0.625rem",
+            borderRadius: action == "loading" ? "1rem" : "0.625rem",
             backgroundColor: colors.primary,
           },
           elevation: 0,
