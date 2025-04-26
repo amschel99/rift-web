@@ -49,9 +49,7 @@ import StartCampaign from "./pages/business/StartCampaign.tsx";
 import ChatWithBot from "./pages/bot/ChatWithBot.tsx";
 import ChatBotWithKey from "./pages/bot/ChatBotWithKey.tsx";
 import WebAssets from "./pages/WebAssets.tsx";
-import Deposit from "./pages/deposit/Deposit.tsx";
 import DepositToAddress from "./pages/deposit/DepositToAddress.tsx";
-import DepositFromAwx from "./pages/deposit/DepositFromAwx.tsx";
 import SpherePremium from "./pages/premium/SpherePremium.tsx";
 import PstTokenInfo from "./pages/quvault/PstTokenInfo.tsx";
 import LaunchPadInfo from "./pages/quvault/LaunchpadInfo.tsx";
@@ -156,14 +154,9 @@ createRoot(document.getElementById("root")!).render(
                         path="/lend/secret/:type/:secretvalue"
                         element={<CreateLendSecret />}
                       />
-                      <Route path="/deposit" element={<Deposit />} />
                       <Route
                         path="/deposit-address"
                         element={<DepositToAddress />}
-                      />
-                      <Route
-                        path="/deposit-awx/:target"
-                        element={<DepositFromAwx />}
                       />
                       <Route path="/premiums" element={<Premium />} />
                       <Route

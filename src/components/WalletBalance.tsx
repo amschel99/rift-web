@@ -122,7 +122,7 @@ export const WalletBalance = (): JSX.Element => {
   };
 
   const onDeposit = () => {
-    navigate("/deposit");
+    navigate("/deposit-address");
   };
 
   const toggleInfoCard = (type: "web2" | "clicktocollect") => {
