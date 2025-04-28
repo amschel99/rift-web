@@ -179,6 +179,9 @@ createRoot(document.getElementById("root")!).render(
                         path="/vault-details/:vaultId"
                         element={<VaultDetails />}
                       />
+                      <Route path="/polymarket" element={<Polymarket />} />
+                      <Route path="/market/:id" element={<MarketDetails />} />
+                      <Route path="/server-error" element={<ServerFailure />} />
                     </Routes>
 
                     <TransactionStatus />
