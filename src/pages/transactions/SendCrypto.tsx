@@ -239,7 +239,7 @@ export default function SendCrypto(): JSX.Element {
           />
           <div>
             <p className="text-sm font-medium text-[#f6f7f9]">
-              {depositAsset == "WUSDC" ? "USDC.E" : depositAsset}
+              {depositAsset == "WUSDC" ? "USDC.e" : depositAsset}
             </p>
             <span className="text-xs text-gray-400">
               {depositAsset == "WBERA"
@@ -310,7 +310,7 @@ export default function SendCrypto(): JSX.Element {
           >
             <img src={usdclogo} alt="WUSDC" className="w-8 h-8 rounded-full" />
             <div>
-              <p className="text-sm text-[#f6f7f9]">USDC.E</p>
+              <p className="text-sm text-[#f6f7f9]">USDC.e</p>
               <span className="text-xs text-gray-400">USDC (Berachain)</span>
             </div>
           </div>

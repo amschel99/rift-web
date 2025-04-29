@@ -6,7 +6,6 @@ import { UnlockTransactions } from "../drawer/UnlockTransactions";
 import { NodeTeeSelector } from "../tabs/security/NodeTeeSelector";
 import { SendAirdropLink } from "../drawer/SendAirdropLink";
 import { TransactionLimit } from "../drawer/TransactionLimit";
-import { DeleteRecovery } from "../drawer/DeleteRecovery";
 import { RevokeSecretAccess } from "../drawer/RevokeSecretAccess";
 import { CreateKey } from "../drawer/CreateKey";
 import { SwapPst } from "../drawer/SwapPst";
@@ -59,8 +58,6 @@ export const AppDrawer = (): JSX.Element => {
         <SendAirdropLink />
       ) : action == "transactionlimit" ? (
         <TransactionLimit />
-      ) : action == "deleteemail" || action == "deletephone" ? (
-        <DeleteRecovery />
       ) : action == "revokesecretaccess" ? (
         <RevokeSecretAccess />
       ) : action == "createkey" ? (

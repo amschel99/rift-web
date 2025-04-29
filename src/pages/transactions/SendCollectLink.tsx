@@ -180,7 +180,7 @@ export default function SendCollectLink(): JSX.Element {
                   : depositAsset == "USDC"
                   ? "USD Coin (Polygon)"
                   : depositAsset == "WUSDC"
-                  ? "USDC.E"
+                  ? "USDC.e"
                   : "USD Coin"}
               </p>
             </div>
@@ -302,7 +302,7 @@ export default function SendCollectLink(): JSX.Element {
               },
               {
                 id: "WUSDC",
-                symbol: "USDC.E",
+                symbol: "USDC.e",
                 name: "USDC (Berachain)",
                 logo: usdclogo,
               },

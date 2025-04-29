@@ -144,7 +144,7 @@ const SendCryptoPicker = ({
     },
     {
       symbol: "WUSDC",
-      name: "USDC.E",
+      name: "USDC.e",
       icon: usdclogo,
     },
   ];
