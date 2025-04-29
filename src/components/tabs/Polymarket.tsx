@@ -1,4 +1,11 @@
-import { CSSProperties, JSX, MouseEvent, ReactNode, useState } from "react";
+import {
+  CSSProperties,
+  Fragment,
+  JSX,
+  MouseEvent,
+  ReactNode,
+  useState,
+} from "react";
 import {
   faAnglesDown,
   faAnglesUp,
@@ -11,7 +18,11 @@ import { useBackButton } from "@/hooks/backbutton";
 import { useTabs } from "@/hooks/tabs";
 import { useAppDrawer } from "@/hooks/drawer";
 import { formatUsd } from "@/utils/formatters";
-import { fetchMarkets } from "@/utils/polymarket/markets";
+import {
+  fetchMarkets,
+  fetchMarketByConditionId,
+} from "@/utils/polymarket/markets";
+import { getUserOrders } from "@/utils/polymarket/orders";
 import { numberFormat } from "@/utils/formatters";
 import { SubmitButton } from "@/components/global/Buttons";
 import { FaIcon } from "@/assets/faicon";
@@ -38,6 +49,10 @@ export const Polymarket = (): JSX.Element => {
   const { data: cryptomarkets, isPending: cryptomarketspending } = useQuery({
     queryKey: ["cryptomarkets"],
     queryFn: () => fetchMarkets("crypto"),
+  });
+  const { data: userorders, isPending: userorderspending } = useQuery({
+    queryKey: ["userorders"],
+    queryFn: getUserOrders,
   });
 
   useBackButton(goBack);
@@ -91,7 +106,7 @@ export const Polymarket = (): JSX.Element => {
         </button>
       </div>
 
-      {nbamarketspending || cryptomarketspending ? (
+      {nbamarketspending || cryptomarketspending || userorderspending ? (
         <div className="loading">
           <Loading width="1.5rem" height="1.5rem" />
         </div>
@@ -125,9 +140,21 @@ export const Polymarket = (): JSX.Element => {
         </div>
       ) : (
         <div className="markets">
-          <p className="notrades">
-            Your trades will appear here once you start trading
-          </p>
+          {userorders && userorders?.data?.length > 0 ? (
+            userorders?.data?.map((order) => (
+              <TradedMarket
+                key={order?.asset_id + order?.market}
+                orderid={order?.id}
+                marketid={order?.market}
+                outcome={order?.outcome}
+                side={order?.side}
+              />
+            ))
+          ) : (
+            <p className="notrades">
+              Your trades will appear here once you start trading
+            </p>
+          )}
         </div>
       )}
     </section>
@@ -240,60 +267,67 @@ const Market = ({
   );
 };
 
-// const TradedMarket = ({
-//   marketid,
-//   marketimage,
-//   markettitle,
-//   marketvolume,
-//   spread,
-// }: {
-//   marketid: string;
-//   marketimage: string;
-//   markettitle: string;
-//   marketvolume: number | string;
-//   spread: number;
-// }): JSX.Element => {
-//   const { openAppDrawerWithKey } = useAppDrawer();
+const TradedMarket = ({
+  marketid,
+  orderid,
+  outcome,
+  side,
+}: {
+  marketid: string;
+  orderid: string;
+  outcome: string;
+  side: string;
+}): JSX.Element => {
+  const { openAppDrawerWithKey } = useAppDrawer();
 
-//   const buttonstyles: CSSProperties = {
-//     padding: "0.5rem",
-//     fontFamily: "Raleway, serif",
-//     fontWeight: "bold",
-//     color: colors.textprimary,
-//     backgroundColor: colors.danger,
-//   };
+  const { data: marketdata, isFetching } = useQuery({
+    queryKey: ["marketbyconditionid"],
+    queryFn: () => fetchMarketByConditionId(marketid),
+  });
 
-//   const onCancelTrade = () => {
-//     openAppDrawerWithKey(
-//       "canceltradeorder",
-//       marketid,
-//       "Will Meta be forced to sell Instagram or WhatsApp in 2025 ?"
-//     ); // drawer action : tradeyesno >> keyToShare : market id >> purpose : market title
-//   };
+  const buttonstyles: CSSProperties = {
+    padding: "0.5rem",
+    fontFamily: "Raleway, serif",
+    fontWeight: "bold",
+    color: colors.textprimary,
+    backgroundColor: colors.danger,
+  };
 
-//   return (
-//     <div className="marketctr">
-//       <div className="img_title">
-//         <img src={marketimage} alt="market" />
-//         <p>{markettitle}</p>
-//       </div>
+  const onCancelTrade = () => {
+    openAppDrawerWithKey(
+      "canceltradeorder",
+      orderid,
+      marketdata?.data?.description
+    ); // drawer action : tradeyesno >> keyToShare : order-id >> purpose : market-description
+  };
 
-//       <div className="marketconditions">
-//         <p>
-//           {numberFormat(Number(marketvolume || 0))} <span>Vol</span>
-//         </p>
-//         <p>
-//           {spread} <span>Spread</span>
-//         </p>
-//       </div>
+  return (
+    <Fragment>
+      {!isFetching && (
+        <div className="marketctr">
+          <div className="img_title">
+            <img src={marketdata?.data?.image} alt="market" />
+            <p>{marketdata?.data?.description?.substring(0, 20) + "..."}</p>
+          </div>
 
-//       <div className="marketactions">
-//         <SubmitButton
-//           text="Cancel Order"
-//           sxstyles={buttonstyles}
-//           onclick={onCancelTrade}
-//         />
-//       </div>
-//     </div>
-//   );
-// };
+          <div className="marketconditions">
+            <p>
+              <span>Side</span> {side}
+            </p>
+            <p>
+              <span>Outcome</span> {outcome}
+            </p>
+          </div>
+
+          <div className="marketactions">
+            <SubmitButton
+              text="Cancel Order"
+              sxstyles={buttonstyles}
+              onclick={onCancelTrade}
+            />
+          </div>
+        </div>
+      )}
+    </Fragment>
+  );
+};

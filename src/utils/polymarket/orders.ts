@@ -32,7 +32,7 @@ type ordertype = {
   created_at: number;
 };
 
-export const getOrders = async (): Promise<{ data: ordertype[] }> => {
+export const getUserOrders = async (): Promise<{ data: ordertype[] }> => {
   const URL = POLYMARKET_BASE_URL + POLYMARKET_ENDPOINTS.userorders;
   const polymarkettoken = localStorage.getItem("polymarkettoken");
 
@@ -63,10 +63,10 @@ export const createOrder = async (
       Authorization: `Bearer ${polymarkettoken}`,
     },
     body: JSON.stringify({
-      token_id: token_id,
-      price: price,
-      side: side,
-      size: size,
+      token_id,
+      price,
+      side,
+      size,
     }),
   });
 

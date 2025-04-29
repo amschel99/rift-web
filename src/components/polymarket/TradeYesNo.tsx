@@ -13,7 +13,7 @@ import "@/styles/pages/polymarket/tradeyesno.scss";
 type tradetype = "BUY" | "SELL";
 
 export const TradeYesNo = (): JSX.Element => {
-  const { keyToshare, secretPurpose } = useAppDrawer(); // keytoshare : market id >> secretpurpose : indicates buy yes or no
+  const { keyToshare, secretPurpose, closeAppDrawer } = useAppDrawer(); // keytoshare : market id >> secretpurpose : indicates buy yes or no
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
   const defaulttradeoption = secretPurpose as string;
 
@@ -59,11 +59,15 @@ export const TradeYesNo = (): JSX.Element => {
           Number(tradeShares) //size
         )
           .then((res) => {
+            console.log(res);
+
             if (res?.data?.orderID) {
               showsuccesssnack(`You successfully traded ${tradeOption}`);
+              closeAppDrawer();
             }
           })
-          .catch(() => {
+          .catch((err) => {
+            console.log(err);
             showerrorsnack("Sorry, an error occurred, please try again");
           }),
     });
