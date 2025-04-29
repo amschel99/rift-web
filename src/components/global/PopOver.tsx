@@ -115,7 +115,7 @@ export const CurrencyPopOver = <T extends string>({
     },
     {
       id: "WUSDC",
-      name: "USDC.E",
+      name: "USDC.e",
       logo: usdclogo,
       type: "",
     },

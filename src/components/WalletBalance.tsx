@@ -487,16 +487,16 @@ export const WalletBalance = (): JSX.Element => {
                 balanceusd={Number(btcethbalance?.balance) * Number(ethusdval)}
               />
               <Asset
-                name="USDC "
-                symbol="USDC (Polygon)"
+                name="USDC (Polygon)"
+                symbol="USDC"
                 image={usdclogo}
                 navigatelink="/usdc-asset/send"
                 balance={Number(usdtbalance?.data?.balance)}
                 balanceusd={Number(usdtbalance?.data?.balance)}
               />
               <Asset
-                name="USDC "
-                symbol="USDC.E"
+                name="USDC (Berachain)"
+                symbol="USDC.e"
                 image={usdclogo}
                 navigatelink="/wusdc-asset/send"
                 balance={Number(usdcbalance?.data?.balance)}

@@ -45,8 +45,6 @@ export const VerifyTransaction = (): JSX.Element => {
   });
 
   const onAddPhoneNumber = () => {
-    console.log("hello world");
-
     navigate("/auth/phone");
     closeAppDrawer();
   };

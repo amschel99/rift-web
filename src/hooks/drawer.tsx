@@ -6,8 +6,6 @@ export type draweraction =
   | "nodeteeselector"
   | "transactionlimit"
   | "createkey"
-  | "deleteemail"
-  | "deletephone"
   | "paymentlink"
   | "revokesecretaccess"
   | "swappst"
