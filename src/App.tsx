@@ -24,6 +24,7 @@ import { ProfileTab } from "./components/tabs/Profile";
 import LendToUse from "./pages/lend/LendToUse";
 import { Polymarket } from "./components/tabs/Polymarket";
 import "./index.css";
+
 function App(): JSX.Element {
   const navigate = useNavigate();
   const { openAppDrawer } = useAppDrawer();
