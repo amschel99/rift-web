@@ -61,7 +61,7 @@ export default function WUsdcAsset(): JSX.Element {
       <div className="balance flex flex-col items-center mb-6">
         <p className="text-3xl font-bold">{formatUsd(Number(wusdcbal))}</p>
         <span className="text-sm text-gray-400">
-          {formatNumber(Number(wusdcbal))} USDC
+          {formatNumber(Number(wusdcbal))} USDC.e
         </span>
         {/** Ability to create new keys will be added in the future */}
         {/* <CreateNewKey /> */}
