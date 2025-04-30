@@ -125,7 +125,7 @@ export default function DepositToAddress(): JSX.Element {
                       ? "Ethereum"
                       : depositAsset == "USDC"
                       ? "USD Coin (Polygon)"
-                      : "USDC.e" // WUSDC
+                      : "USDC (Berachain)" // WUSDC
                   }
                 </span>
               </div>
@@ -139,10 +139,25 @@ export default function DepositToAddress(): JSX.Element {
         <PopOver anchorEl={anchorEl} setAnchorEl={setAnchorEl}>
           <div className="bg-[#2a2e2c] p-2 rounded-lg shadow-lg border border-[#34404f] w-60">
             {[
-              { id: "WBERA", name: "Berachain", logo: beralogo },
-              { id: "ETH", name: "Ethereum", logo: ethlogo },
-              { id: "USDC", name: "USD Coin (Polygon)", logo: usdclogo },
-              { id: "WUSDC", name: "USDC.e", logo: usdclogo }, // Added WUSDC option
+              {
+                id: "WBERA",
+                symbol: "WBERA",
+                name: "Berachain",
+                logo: beralogo,
+              },
+              { id: "ETH", symbol: "ETH", name: "Ethereum", logo: ethlogo },
+              {
+                id: "USDC",
+                symbol: "USDC",
+                name: "USDC (Polygon)",
+                logo: usdclogo,
+              },
+              {
+                id: "WUSDC",
+                symbol: "USDC.e",
+                name: "USDC (Berachain)",
+                logo: usdclogo,
+              },
             ].map((asset) => (
               <div
                 key={asset.id}
