@@ -155,4 +155,12 @@ export const Component = ():JSX.Element => {
 <button className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">Submit</button>
 ```
 
+- for colors, please prefer to use rgba colors over hex:
+
+```scss
+// colors
+$success: rgba(15, 177, 77, 1);
+```
+
+This branch, uiV2, intends to clean us the codebase while using this guide and any other code style guide that may arise in the process while updating the UI to [the new design](https://www.figma.com/design/KGyRB7lsvBsteLYMFgpyOZ/sphereid?node-id=0-1&t=UckZ8jVjfyjNKKBw-1).
 To learn more about sphere, please checkout [SPHERE.md](./SPHERE.md) and try the miniapp.
