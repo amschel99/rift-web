@@ -14,7 +14,7 @@ account abstraction, manage blockchain assets & Web2 secrets. << A Telegram Mini
 - eruda: mobile debug tool
 - sass: styles (scss transform to css)
 
-*** Please prefer using these dependencies, inclued additional dependencies only where/when necessary ***
+*** Please prefer using these dependencies, include additional dependencies only where/when necessary ***
 
 
 #### Style guide
@@ -158,8 +158,11 @@ export const Component = ():JSX.Element => {
 - for colors, please prefer to use rgba colors over hex:
 
 ```scss
-// colors
+// colors ✅
 $success: rgba(15, 177, 77, 1);
+
+// colors ❌
+$success: #0fb14d;
 ```
 
 This branch, uiV2, intends to clean us the codebase while using this guide and any other code style guide that may arise in the process while updating the UI to [the new design](https://www.figma.com/design/KGyRB7lsvBsteLYMFgpyOZ/sphereid?node-id=0-1&t=UckZ8jVjfyjNKKBw-1).
