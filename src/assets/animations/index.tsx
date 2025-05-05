@@ -1,12 +1,12 @@
 import { JSX } from "react";
 import Lottie from "lottie-react";
-import loadinganim from "./loading.json";
-import loadingaltanim from "./loading-alt.json";
-import successanim from "./success.json";
-import warninganim from "./error.json";
-import notificationanim from "./notification.json";
-import premiumanim from "./premium.json";
-import confettianim from "./confetti.json";
+import loadinganim from "./all/loading.json";
+import loadingaltanim from "./all/loading-alt.json";
+import successanim from "./all/success.json";
+import warninganim from "./all/error.json";
+import notificationanim from "./all/notification.json";
+import premiumanim from "./all/premium.json";
+import confettianim from "./all/confetti.json";
 
 export interface animationProps {
   width?: string;
