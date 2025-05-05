@@ -28,7 +28,7 @@ const Wallet = ({ ethBalance, usdcBalance, wberaBalance }:props):JSX.Element => 
   const ethBalanceUsd:number = ethBalanlce * ethPrice;
   /** **/
 
-  retrun( {/**  **/} )
+  return( {/**  **/} )
 }
 ```
 
@@ -112,6 +112,7 @@ export const Component = ():JSX.Element => {
 ##### Styles
 - please prefer to use scss over css and/or tailwind
 - scss is a powerful tool, it offers mixins(i.e. functions), operations, logic, nested styling, inheritance
+- scss also includes warnings for code that might break in future with a css update
 - tailwind is not prefreed because we want clean html, a good seperation of concerns as well as design freedom
 
 ```scss
