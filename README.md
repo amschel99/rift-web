@@ -82,8 +82,10 @@ export default function Page(){
 - page components should be created as a section, i.e:
 
 ```tsx
-export default function Page(){
-  <section id="id"> {/** **/} </section>
+export default function Page() {
+  return(
+    <section id="section-id"> {/** **/} </section>
+  )
 }
 ```
 
@@ -94,6 +96,16 @@ export default function Page(){
 ```tsx
 export const Component = ():JSX.Element => {
   return ( { /** **/} )
+}
+```
+
+- components should also be created as div-s
+
+```tsx
+export const Component = ():JSX.Element => {
+  return (
+    <div id="div-id"> {/** **/} </div>
+  )
 }
 ```
 
