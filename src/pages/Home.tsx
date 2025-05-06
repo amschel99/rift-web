@@ -11,21 +11,20 @@ import {
   unmountSwipeBehavior,
 } from "@telegram-apps/sdk-react";
 import { useQuery } from "@tanstack/react-query";
-import { tabsType, useTabs } from "./hooks/tabs";
-import { useAppDrawer } from "./hooks/drawer";
-import { checkServerStatus } from "./utils/api/apistatus";
-import { BottomTabNavigation } from "./components/Bottom";
-import { HomeTab } from "./components/tabs/Home";
-import { LabsTab } from "./components/tabs/Lab";
-import { Notifications } from "./components/tabs/Notifications";
-import { Rewards } from "./components/tabs/Rewards";
-import { SendCryptoTab } from "./components/tabs/SendCrypto";
-import { ProfileTab } from "./components/tabs/Profile";
-import LendToUse from "./pages/lend/LendToUse";
-import { Polymarket } from "./components/tabs/Polymarket";
-import "./index.css";
+import { tabsType, useTabs } from "../hooks/tabs";
+import { useAppDrawer } from "../hooks/drawer";
+import { checkServerStatus } from "../utils/api/apistatus";
+import { BottomTabNavigation } from "../components/Bottom";
+import { HomeTab } from "../components/tabs/Home";
+import { LabsTab } from "../components/tabs/Lab";
+import { Notifications } from "../components/tabs/Notifications";
+import { Rewards } from "../components/tabs/Rewards";
+import { SendCryptoTab } from "../components/tabs/SendCrypto";
+import { ProfileTab } from "../components/tabs/Profile";
+import LendToUse from "./lend/LendToUse";
+import { Polymarket } from "../components/tabs/Polymarket";
 
-function App(): JSX.Element {
+export default function Home(): JSX.Element {
   const navigate = useNavigate();
   const { openAppDrawer } = useAppDrawer();
   const { switchtab, currTab } = useTabs();
@@ -144,5 +143,3 @@ function App(): JSX.Element {
     </section>
   );
 }
-
-export default App;
