@@ -6,7 +6,6 @@ import { useSocket } from "../../utils/SocketProvider";
 import { spendOnBehalf } from "../../utils/api/wallet";
 import { getBtcUsdVal, getEthUsdVal } from "../../utils/ethusd";
 import { numberFormat } from "../../utils/formatters";
-import { getMantraUsdVal } from "../../utils/api/mantra";
 import { base64ToString } from "../../utils/base64";
 import { TransactionStatusWithoutSocket } from "../TransactionStatus";
 import { SubmitButton } from "../global/Buttons";
@@ -29,10 +28,6 @@ export const CollectCryptoFromLink = (): JSX.Element => {
     queryKey: ["ethusd"],
     queryFn: getEthUsdVal,
   });
-  const { data: mantrausdval, isFetching: mantrausdloading } = useQuery({
-    queryKey: ["mantrausd"],
-    queryFn: getMantraUsdVal,
-  });
   const { data: btcusdval, isFetching: btcusdloading } = useQuery({
     queryKey: ["btcusd"],
     queryFn: getBtcUsdVal,
@@ -48,8 +43,6 @@ export const CollectCryptoFromLink = (): JSX.Element => {
   const multiplier: number =
     utxoCurrency === "ETH"
       ? Number(ethusdval)
-      : utxoCurrency === "OM"
-      ? Number(mantrausdval)
       : utxoCurrency === "BTC"
       ? Number(btcusdval)
       : 0.99;
@@ -164,9 +157,7 @@ export const CollectCryptoFromLink = (): JSX.Element => {
 
       <p>
         Click <span>'Receive'</span> to collect&nbsp;
-        {ethusdloading || btcusdloading || mantrausdloading
-          ? "- - -"
-          : `${collectValue} USD`}
+        {ethusdloading || btcusdloading ? "- - -" : `${collectValue} USD`}
       </p>
 
       <SubmitButton

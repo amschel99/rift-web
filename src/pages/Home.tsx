@@ -6,7 +6,7 @@ import { useAppDrawer } from "../hooks/drawer";
 import { checkServerStatus } from "../utils/api/apistatus";
 import { BottomTabNavigation } from "../components/Bottom";
 import { HomeTab } from "../components/tabs/HomeTab";
-import { KeysTab } from "@/components/tabs/KeysTab";
+import { KeysTab } from "../components/tabs/KeysTab";
 import { Rewards } from "../components/tabs/Rewards";
 import { SendCryptoTab } from "../components/tabs/SendCrypto";
 import { Polymarket } from "../components/tabs/Polymarket";

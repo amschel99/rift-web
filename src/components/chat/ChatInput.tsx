@@ -1,5 +1,5 @@
 import { JSX, useState } from "react";
-import { ArrowUpCircle } from "@/assets/icons";
+import { ArrowUpCircle } from "../../assets/icons";
 import { colors } from "../../constants";
 import "../../styles/components/chat/chatinput.scss";
 

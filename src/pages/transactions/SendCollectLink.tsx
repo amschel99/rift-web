@@ -1,22 +1,21 @@
 import { JSX, MouseEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
+import { useLaunchParams, openTelegramLink } from "@telegram-apps/sdk-react";
+import { Slider } from "@mui/material";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useTabs } from "../../hooks/tabs";
 import { useBackButton } from "../../hooks/backbutton";
 import { formatUsd } from "../../utils/formatters";
 import { shareWalletAccess } from "../../utils/api/wallet";
-import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { PopOver } from "../../components/global/PopOver";
 import { OutlinedTextInput } from "../../components/global/Inputs";
-import { Slider } from "@mui/material";
-import { Telegram } from "../../assets/icons";
 import { SubmitButton } from "../../components/global/Buttons";
+import { Telegram } from "../../assets/icons";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import beralogo from "../../assets/images/icons/bera.webp";
-import { colors } from "@/constants";
-import { useAppDrawer } from "@/hooks/drawer";
+import { colors } from "../../constants";
+import { useAppDrawer } from "../../hooks/drawer";
 
 export default function SendCollectLink(): JSX.Element {
   const { initData } = useLaunchParams();

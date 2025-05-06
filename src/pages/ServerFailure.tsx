@@ -1,10 +1,10 @@
 import { JSX } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { useTabs } from "@/hooks/tabs";
-import { checkServerStatus } from "@/utils/api/apistatus";
-import { SubmitButton } from "@/components/global/Buttons";
-import "@/styles/pages/serverfailure.scss";
+import { useTabs } from "../hooks/tabs";
+import { checkServerStatus } from "../utils/api/apistatus";
+import { SubmitButton } from "../components/global/Buttons";
+import "../styles/pages/serverfailure.scss";
 
 export default function ServerFailure(): JSX.Element {
   const navigate = useNavigate();

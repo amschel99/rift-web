@@ -1,7 +1,7 @@
 import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useAppDialog } from "@/hooks/dialog";
+import { useAppDialog } from "../../hooks/dialog";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
 import { useAppDrawer } from "../../hooks/drawer";
@@ -14,8 +14,8 @@ import {
   doKeyPaymentSuccess,
   getKeyDetails,
 } from "../../utils/api/keys";
-import { getBerachainUsdVal } from "@/utils/api/mantra";
-import { getEthUsdVal } from "@/utils/ethusd";
+import { getBerachainUsdVal } from "../../utils/api/sphere";
+import { getEthUsdVal } from "../../utils/ethusd";
 import { TransactionStatusWithoutSocket } from "../../components/TransactionStatus";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
@@ -25,8 +25,8 @@ import wberalogo from "../../assets/images/icons/bera.webp";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import ethlogo from "../../assets/images/eth.png";
 import "../../styles/pages/transactions/claimlendkeylink.scss";
-import { Loading } from "@/assets/animations";
-import { stringToBase64 } from "@/utils/base64";
+import { Loading } from "../../assets/animations";
+import { stringToBase64 } from "../../utils/base64";
 
 export default function ClaimLendKeyLink(): JSX.Element {
   const navigate = useNavigate();

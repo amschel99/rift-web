@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { SubmitButton } from "@/components/global/Buttons";
-import { colors } from "@/constants";
+import { SubmitButton } from "../components/global/Buttons";
+import { colors } from "../constants";
 
 export default function Logout() {
   const navigate = useNavigate();

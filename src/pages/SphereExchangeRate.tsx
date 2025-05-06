@@ -1,11 +1,11 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
-import { useTabs } from "@/hooks/tabs";
-import { useBackButton } from "@/hooks/backbutton";
-import { CoinPriceChart } from "@/components/PriceChart";
-import { coinPriceType } from "@/types/earn";
+import { useTabs } from "../hooks/tabs";
+import { useBackButton } from "../hooks/backbutton";
+import { CoinPriceChart } from "../components/PriceChart";
+import { coinPriceType } from "../utils/coingecko/markets";
 import { useQuery } from "@tanstack/react-query";
-import { getSphrUsdcRate } from "@/utils/api/mantra";
+import { getSphrUsdcRate } from "../utils/api/sphere";
 import "../styles/pages/coininfo.scss";
 
 export default function SphereExchangeRate(): JSX.Element {

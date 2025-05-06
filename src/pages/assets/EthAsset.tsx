@@ -6,7 +6,7 @@ import { useTabs } from "../../hooks/tabs";
 import { formatUsd, formatNumber } from "../../utils/formatters";
 import { SubmitButton } from "../../components/global/Buttons";
 import { Copy, Telegram, ArrowUpCircle } from "../../assets/icons";
-import { colors } from "@/constants";
+import { colors } from "../../constants";
 import ethlogo from "../../assets/images/logos/eth.png";
 import "../../styles/pages/assets/assets.scss";
 

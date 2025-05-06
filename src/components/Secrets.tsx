@@ -3,11 +3,11 @@ import { useNavigate } from "react-router";
 import { useAppDialog } from "../hooks/dialog";
 import { useSnackbar } from "../hooks/snackbar";
 import { keyType, UseOpenAiKey } from "../utils/api/keys";
+import { stringToBase64 } from "../utils/base64";
 import poelogo from "../assets/images/icons/poe.png";
 import awxlogo from "../assets/images/awx.png";
 import polymarketlogo from "../assets/images/icons/polymarket.png";
 import "../styles/components/secrets.scss";
-import { stringToBase64 } from "@/utils/base64";
 
 export const MySecrets = ({
   secretsLs,

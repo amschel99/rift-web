@@ -1,14 +1,14 @@
 import { CSSProperties, JSX, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useAppDrawer } from "@/hooks/drawer";
-import { useSnackbar } from "@/hooks/snackbar";
-import { fetchMarketByConditionId } from "@/utils/polymarket/markets";
-import { createOrder } from "@/utils/polymarket/orders";
+import { useAppDrawer } from "../../hooks/drawer";
+import { useSnackbar } from "../../hooks/snackbar";
+import { fetchMarketByConditionId } from "../../utils/polymarket/markets";
+import { createOrder } from "../../utils/polymarket/orders";
 import { BottomButtonContainer } from "../Bottom";
 import { SubmitButton } from "../global/Buttons";
-import { colors } from "@/constants";
+import { colors } from "../../constants";
 import { HorizontalDivider } from "../global/Divider";
-import "@/styles/pages/polymarket/tradeyesno.scss";
+import "../../styles/pages/polymarket/tradeyesno.scss";
 
 type tradetype = "BUY" | "SELL";
 

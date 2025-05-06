@@ -1,11 +1,11 @@
 import { JSX, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { sendOtp, verifyOtp } from "@/utils/api/signup";
+import { useSnackbar } from "../../hooks/snackbar";
+import { useAppDrawer } from "../../hooks/drawer";
 import { DigitsInput } from "../security/DigitsInput";
 import { SubmitButton } from "../global/Buttons";
-import { useSnackbar } from "@/hooks/snackbar";
-import { useAppDrawer } from "@/hooks/drawer";
+import { sendOtp, verifyOtp } from "../../utils/api/signup";
 import "../../styles/components/drawer/verifytx.scss";
 
 export const VerifyTransaction = (): JSX.Element => {

@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { revokeKeyAccess } from "@/utils/api/keys";
+import { revokeKeyAccess } from "../../utils/api/keys";
 import { useAppDrawer } from "../../hooks/drawer";
 import { useSnackbar } from "../../hooks/snackbar";
 import { SubmitButton } from "../global/Buttons";
