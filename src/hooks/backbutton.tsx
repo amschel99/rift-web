@@ -2,7 +2,6 @@ import { useEffect, useCallback } from "react";
 import { backButton } from "@telegram-apps/sdk-react";
 
 export const useBackButton = (goBack: () => void) => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedGoBack = useCallback(goBack, []);
 
   const clearDeepLinkParams = () => {
