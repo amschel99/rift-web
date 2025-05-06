@@ -1,9 +1,8 @@
 import { JSX } from "react";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
-import "../../styles/components/tabs/rewards.scss";
 
-export const Rewards = (): JSX.Element => {
+export const KeysTab = (): JSX.Element => {
   const { switchtab } = useTabs();
 
   const goBack = () => {
@@ -12,5 +11,5 @@ export const Rewards = (): JSX.Element => {
 
   useBackButton(goBack);
 
-  return <section id="rewards">just rewards page here</section>;
+  return <div id="keystab">Keys tab here</div>;
 };

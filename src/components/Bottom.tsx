@@ -60,7 +60,7 @@ export const BottomTabNavigation = (): JSX.Element => {
       title: "Keys",
       icon: (
         <Shield
-          color={currTab == "home" ? colors.textprimary : colors.textsecondary}
+          color={currTab == "keys" ? colors.textprimary : colors.textsecondary}
         />
       ),
     },
