@@ -16,9 +16,9 @@ html {
 }
 
 body {
+  @include mixins.useBaseFont();
   background-color: colors.$primary;
   color: colors.$textprimary;
-  @include mixins.useBaseFont();
 }
 
 ::-webkit-scrollbar {
