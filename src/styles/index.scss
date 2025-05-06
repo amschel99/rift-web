@@ -1,54 +1,26 @@
-@use "./constants/colors.scss" as colors;
+@use "./constants/colors" as colors;
 @use "./constants/mixins" as mixins;
-@use "tailwindcss";
 
-@layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html,
-  body {
-    height: 100%;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    overscroll-behavior: none;
-  }
-
-  body {
-    @include mixins.useBaseFont();
-    background-color: colors.$primary;
-    color: colors.$textprimary;
-  }
-
-  #root {
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .overflow-y-auto {
-    -webkit-overflow-scrolling: touch;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -ms-overflow-style: none;
+  scrollbar-width: 0;
 }
 
-@layer utilities {
-  .blur-transition {
-    transition: filter 0.2s ease-in-out;
-  }
+html {
+  scroll-behavior: smooth;
+}
 
-  .backdrop-blur-transition {
-    transition: backdrop-filter 0.2s ease-in-out;
-  }
+body {
+  background-color: colors.$primary;
+  color: colors.$textprimary;
+  @include mixins.useBaseFont();
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
