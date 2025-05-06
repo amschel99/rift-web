@@ -34,6 +34,7 @@ import Home from "./pages/Home.tsx";
 // import GetPremium from "./pages/premium/GetPremium.tsx";
 // import ServerFailure from "./pages/ServerFailure.tsx";
 // import Logout from "./pages/Logout.tsx";
+import "./styles/index.scss";
 
 init();
 const queryclient = new QueryClient();
