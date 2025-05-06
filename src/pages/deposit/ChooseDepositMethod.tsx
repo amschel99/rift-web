@@ -15,7 +15,7 @@ function ChooseDepositMethod() {
       </p>
       <div className="flex flex-col gap-4 h-screen items-center justify-center">
         <div
-          className="bg-[#212121] border border-[#313131] rounded-xl p-4 w-full flex gap-4"
+          className="bg-[#212121] border border-[#313131] rounded-xl p-4 w-full flex gap-4 cursor-pointer"
           onClick={() => navigate("/deposit")}
         >
           <img src={wallet} alt="wallet" className="w-24 h-24" />
@@ -27,7 +27,7 @@ function ChooseDepositMethod() {
           </div>
         </div>
         <div
-          className="bg-[#212121] border border-[#ffb386] rounded-xl p-4 w-full flex gap-4"
+          className="bg-[#212121] border border-[#ffb386] rounded-xl p-4 w-full flex gap-4 cursor-pointer"
           onClick={() => navigate("/deposit/mpesa")}
         >
           <img src={mpesa} alt="mpesa" className="w-24 h-24 rounded-2xl" />
