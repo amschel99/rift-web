@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useTabs, tabsType } from "../hooks/tabs";
 import { useAppDialog } from "../hooks/dialog";
 import { useSnackbar } from "../hooks/snackbar";
-import { signinWithIdentifier } from "@/utils/polymarket/auth";
+import { signinWithIdentifier } from "../utils/polymarket/auth";
 import { Home, Exchange, Shield, Gift } from "../assets/icons";
 import { colors } from "../constants";
 import "../styles/components/tabs/bottomtab.scss";
