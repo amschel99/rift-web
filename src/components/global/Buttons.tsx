@@ -78,7 +78,7 @@ export const MantraButton = ({
         fontSize: "0.875rem",
         fontWeight: "bold",
         color: isLoading || isDisabled ? colors.textsecondary : colors.primary,
-        backgroundImage: colors.omgradient,
+        backgroundImage: colors.accent,
         ...sxstyles,
       }}
       disabled={isDisabled}

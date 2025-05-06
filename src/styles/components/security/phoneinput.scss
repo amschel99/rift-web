@@ -54,20 +54,22 @@
 
   .phone-input {
     @include mixins.useButton();
-    @include mixins.useBaseFont();
-    flex: 1;
-    height: 100%;
-    padding: 0 1rem;
-    font-size: 1rem;
-    font-weight: 500;
-    color: rgba(248, 250, 252, 1);
-    border: none;
-    outline: none;
-    background-color: transparent;
-    width: 100%;
 
-    &::placeholder {
-      color: rgba(127, 127, 127, 1);
+    & {
+      flex: 1;
+      height: 100%;
+      padding: 0 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: rgba(248, 250, 252, 1);
+      border: none;
+      outline: none;
+      background-color: transparent;
+      width: 100%;
+
+      &::placeholder {
+        color: rgba(127, 127, 127, 1);
+      }
     }
   }
 }

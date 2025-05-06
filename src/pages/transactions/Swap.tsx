@@ -1,11 +1,10 @@
 import { JSX, useState } from "react";
 import { useNavigate } from "react-router";
-import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { formatNumber } from "../../utils/formatters";
 import { SubmitButton } from "../../components/global/Buttons";
 import { CryptoPopOver } from "../../components/global/PopOver";
-import { FaIcon } from "../../assets/faicon";
+import { Rotate } from "../../assets/icons";
 import { colors } from "../../constants";
 import btclogo from "../../assets/images/btc.png";
 import ethlogo from "../../assets/images/eth.png";
@@ -180,7 +179,7 @@ export default function SwapCrypto(): JSX.Element {
 
       <div key={sellCurrency} className="switch_currenncy">
         <button onClick={onSwitchCurency}>
-          <FaIcon faIcon={faArrowsRotate} color={colors.primary} />
+          <Rotate color={colors.primary} />
         </button>
       </div>
 
@@ -230,8 +229,7 @@ export default function SwapCrypto(): JSX.Element {
       <SubmitButton
         text="Swap"
         icon={
-          <FaIcon
-            faIcon={faArrowsRotate}
+          <Rotate
             color={
               sellCurrencyValue == "" || receiveCurrencyValue == 0
                 ? colors.textsecondary

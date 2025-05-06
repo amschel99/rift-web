@@ -9,7 +9,7 @@ import {
 import { UserMessage, BotMessage } from "../../components/chat/Messages";
 import { ChatInput } from "../../components/chat/ChatInput";
 import { LoadingAlt } from "../../assets/animations";
-import gptlogo from "../../assets/images/gpt.png";
+import gptlogo from "../../assets/images/logos/openai.png";
 import "../../styles/pages/chatbot.scss";
 
 export default function ChatBotWithKey(): JSX.Element {

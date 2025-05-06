@@ -1,16 +1,8 @@
 import { JSX } from "react";
 import { useNavigate } from "react-router";
-import {
-  faLock,
-  faLockOpen,
-  faPlay,
-  faKey,
-} from "@fortawesome/free-solid-svg-icons";
 import { useAppDialog } from "../hooks/dialog";
 import { useSnackbar } from "../hooks/snackbar";
 import { keyType, UseOpenAiKey } from "../utils/api/keys";
-import { FaIcon } from "../assets/faicon";
-import { colors } from "../constants";
 import poelogo from "../assets/images/icons/poe.png";
 import awxlogo from "../assets/images/awx.png";
 import polymarketlogo from "../assets/images/icons/polymarket.png";
@@ -169,11 +161,6 @@ export const SharedSecrets = ({
             />
 
             <div className="sharedfrom">
-              <FaIcon
-                faIcon={secret?.locked ? faLock : faLockOpen}
-                color={secret?.locked ? colors.danger : colors.success}
-                fontsize={14}
-              />
               <span>
                 {secret?.purpose === "OPENAI" || secret?.purpose === "POE"
                   ? "OpenAI Key"
@@ -199,11 +186,6 @@ export const SharedSecrets = ({
                   )
             }
           >
-            <FaIcon
-              faIcon={secret?.locked ? faKey : faPlay}
-              color="#ffffff"
-              fontsize={12}
-            />
             <span>{secret?.locked ? "Get Key" : "Use"}</span>
           </button>
         </div>

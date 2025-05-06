@@ -50,7 +50,6 @@
         font-weight: 400;
 
         span {
-          @include mixins.useAltFont();
           font-size: 1rem;
           font-weight: bold;
         }
@@ -63,20 +62,22 @@
 
       input {
         @include mixins.useButton();
-        @include mixins.useAltFont();
-        font-size: 1.5rem;
-        font-weight: bold;
-        text-align: center;
-        color: colors.$textprimary;
 
-        &::placeholder {
-          color: colors.$textsecondary;
-        }
+        & {
+          font-size: 1.5rem;
+          font-weight: bold;
+          text-align: center;
+          color: colors.$textprimary;
 
-        &::-webkit-outer-spin-button,
-        &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
+          &::placeholder {
+            color: colors.$textsecondary;
+          }
+
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
         }
       }
 
@@ -88,13 +89,16 @@
 
       .max_out {
         @include mixins.useButton();
-        margin-top: 0.5rem;
-        padding: 0.125rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: colors.$primary;
-        background-color: colors.$textprimary;
+
+        & {
+          margin-top: 0.5rem;
+          padding: 0.125rem 0.75rem;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: colors.$primary;
+          background-color: colors.$textprimary;
+        }
       }
     }
   }
@@ -104,15 +108,17 @@
     width: 100%;
 
     button {
-      @include mixins.useFlex(row, nowrap, center, center, 0);
       @include mixins.useButton();
-      width: 1.75rem;
-      margin-top: -0.5rem;
-      height: 1.75rem;
-      border-radius: 50%;
-      background-color: colors.$textprimary;
-      z-index: 10;
-      animation: animateswicth 0.25s ease-in-out;
+
+      & {
+        width: 1.75rem;
+        margin-top: -0.5rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        background-color: colors.$textprimary;
+        z-index: 10;
+        animation: animateswicth 0.25s ease-in-out;
+      }
     }
 
     @keyframes animateswicth {
@@ -166,7 +172,6 @@
 
     .receive_qty {
       .qty {
-        @include mixins.useAltFont();
         font-size: 1.5rem;
         font-weight: bold;
         text-align: center;

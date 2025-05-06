@@ -1,6 +1,6 @@
-import { JSX, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { JSX, useEffect, useCallback } from "react";
 import { useLaunchParams } from "@telegram-apps/sdk-react";
+import { useNavigate } from "react-router";
 import { useAppDialog } from "@/hooks/dialog";
 import "../styles/pages/signup.scss";
 
@@ -9,7 +9,7 @@ export default function Splash(): JSX.Element {
   const navigate = useNavigate();
   const { openAppDialog, closeAppDialog } = useAppDialog();
 
-  const userAuthenticated = () => {
+  const userAuthenticated = useCallback(() => {
     const ethaddress: string | null = localStorage.getItem("ethaddress");
     const token: string | null = localStorage.getItem("spheretoken");
     const quvaulttoken: string | null = localStorage.getItem("quvaulttoken");
@@ -34,9 +34,9 @@ export default function Splash(): JSX.Element {
       navigate("/app");
       return;
     }
-  };
+  }, []);
 
-  const checkStartParams = () => {
+  const checkStartParams = useCallback(() => {
     if (startParam) {
       if (startParam?.includes("starttab")) {
         localStorage.setItem("starttab", startParam?.split("-")[1]);
@@ -99,12 +99,11 @@ export default function Splash(): JSX.Element {
     } else {
       userAuthenticated();
     }
-  };
+  }, []);
 
   useEffect(() => {
     openAppDialog("loading", "Loading, please wait...");
     checkStartParams();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <section id="signup" />;

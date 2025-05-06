@@ -10,7 +10,7 @@ import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { PopOver } from "../../components/global/PopOver";
 import { OutlinedTextInput } from "../../components/global/Inputs";
 import { Slider } from "@mui/material";
-import { Telegram } from "../../assets/icons/actions";
+import { Telegram } from "../../assets/icons";
 import { SubmitButton } from "../../components/global/Buttons";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";

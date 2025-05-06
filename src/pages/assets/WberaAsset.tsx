@@ -1,15 +1,14 @@
 import { JSX } from "react";
 import { useNavigate, useParams } from "react-router";
-import { faCircleArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useTabs } from "../../hooks/tabs";
 import { formatUsd, formatNumber } from "../../utils/formatters";
 import { SubmitButton } from "../../components/global/Buttons";
-import { FaIcon } from "../../assets/faicon";
-import { Copy, Telegram } from "../../assets/icons/actions";
-import beralogo from "../../assets/images/icons/bera.webp";
+import { ArrowUpCircle, Copy, Telegram } from "../../assets/icons";
 import { colors } from "@/constants";
+import beralogo from "../../assets/images/logos/bera.jpg";
+import "../../styles/pages/assets/assets.scss";
 
 export default function WberaAsset(): JSX.Element {
   const navigate = useNavigate();
@@ -88,7 +87,7 @@ export default function WberaAsset(): JSX.Element {
           />
           <SubmitButton
             text="Send WBERA"
-            icon={<FaIcon faIcon={faCircleArrowUp} color={colors.primary} />}
+            icon={<ArrowUpCircle color={colors.primary} />}
             sxstyles={{
               flexGrow: 1.5,
               padding: "0.75rem",

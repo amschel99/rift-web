@@ -1,14 +1,11 @@
 import { CSSProperties, JSX, ReactNode } from "react";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
-import { faHouse, faDiceFive, faGift } from "@fortawesome/free-solid-svg-icons";
 import { useMutation } from "@tanstack/react-query";
 import { useTabs, tabsType } from "../hooks/tabs";
-import { useAppDrawer } from "../hooks/drawer";
 import { useAppDialog } from "../hooks/dialog";
+import { useSnackbar } from "../hooks/snackbar";
 import { signinWithIdentifier } from "@/utils/polymarket/auth";
-import { FaIcon } from "../assets/faicon";
+import { Home, Exchange, Shield, Gift } from "../assets/icons";
 import { colors } from "../constants";
-import { Polymarket } from "../assets/icons/actions";
 import "../styles/components/tabs/bottomtab.scss";
 
 type tabMenus = {
@@ -18,29 +15,28 @@ type tabMenus = {
 };
 
 export const BottomTabNavigation = (): JSX.Element => {
-  const { initData } = useLaunchParams();
-
   const { currTab, switchtab } = useTabs();
-  const { openAppDrawer } = useAppDrawer();
   const { openAppDialog, closeAppDialog } = useAppDialog();
+  const { showerrorsnack } = useSnackbar();
 
-  const tgUserId: string = String(initData?.user?.id as number);
   const { mutate: polymarketSignIn } = useMutation({
     mutationFn: () =>
-      signinWithIdentifier(tgUserId)
+      signinWithIdentifier()
         .then((res) => {
           if (res?.token) {
             localStorage.setItem("polymarkettoken", res?.token);
             closeAppDialog();
             switchtab("polymarket");
           } else {
-            openAppDrawer("polymarketauth");
-            closeAppDialog();
+            showerrorsnack(
+              "Sorry, we couldn't setup polymarket for you, please try again"
+            );
           }
         })
         .catch(() => {
-          closeAppDialog();
-          openAppDrawer("polymarketauth");
+          showerrorsnack(
+            "Sorry, we couldn't setup polymarket for you, please try again"
+          );
         }),
   });
 
@@ -54,34 +50,28 @@ export const BottomTabNavigation = (): JSX.Element => {
       menu: "home",
       title: "Home",
       icon: (
-        <FaIcon
-          faIcon={faHouse}
-          color={currTab == "home" ? "#ffb386" : colors.textprimary}
-          fontsize={20}
+        <Home
+          color={currTab == "home" ? colors.textprimary : colors.textsecondary}
         />
       ),
     },
     {
-      menu: "lend",
-      title: "Lend Assets",
+      menu: "keys",
+      title: "Keys",
       icon: (
-        <div className="fa-icon-container">
-          <FaIcon
-            faIcon={faDiceFive}
-            color={currTab == "lend" ? "#ffb386" : colors.textprimary}
-            fontsize={20}
-          />
-        </div>
+        <Shield
+          color={currTab == "home" ? colors.textprimary : colors.textsecondary}
+        />
       ),
     },
     {
       menu: "rewards",
       title: "Rewards",
       icon: (
-        <FaIcon
-          faIcon={faGift}
-          color={currTab == "rewards" ? "#ffb386" : colors.textprimary}
-          fontsize={20}
+        <Gift
+          color={
+            currTab == "rewards" ? colors.textprimary : colors.textsecondary
+          }
         />
       ),
     },
@@ -89,15 +79,17 @@ export const BottomTabNavigation = (): JSX.Element => {
       menu: "polymarket",
       title: "Polymarktet",
       icon: (
-        <Polymarket
-          color={currTab == "polymarket" ? "#ffb386" : colors.textprimary}
+        <Exchange
+          color={
+            currTab == "polymarket" ? colors.textprimary : colors.textsecondary
+          }
         />
       ),
     },
   ];
 
   return (
-    <div className="bg-[#212121]/80 backdrop-blur-xl flex justify-between items-center fixed bottom-0 w-full z-10 py-2 px-4 border-t border-white/10">
+    <div id="bottomtab">
       {bottomtabMenus?.map((bottomtab, index) => (
         <button
           key={index + bottomtab?.title}
@@ -106,12 +98,10 @@ export const BottomTabNavigation = (): JSX.Element => {
               ? () => onPolymarket()
               : () => switchtab(bottomtab.menu)
           }
-          className={`bottom-nav-button ${
-            currTab === bottomtab.menu ? "active" : ""
-          }`}
+          className={currTab === bottomtab.menu ? "active" : ""}
         >
-          <div className="icon-wrapper">{bottomtab?.icon}</div>
-          <span className="button-text">{bottomtab?.title}</span>
+          {bottomtab?.icon}
+          {bottomtab?.title}
         </button>
       ))}
     </div>

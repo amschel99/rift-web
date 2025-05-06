@@ -28,13 +28,10 @@ export const PhoneInput = ({ setPhoneVal, sxstyles }: props): JSX.Element => {
     useState<countrycode[]>(countryCodes);
 
   useEffect(() => {
-    // Format phone number with country code for Twilio
-    // This ensures the phone number is in E.164 format (+[country code][number])
     const value = `${selectCallCode?.code}${localPhoneval}`;
     setPhoneVal(value);
   }, [localPhoneval, selectCallCode, setPhoneVal]);
 
-  // Filter countries based on search term
   useEffect(() => {
     if (!searchValue.trim()) {
       setFilteredCountries(countryCodes);
@@ -50,15 +47,13 @@ export const PhoneInput = ({ setPhoneVal, sxstyles }: props): JSX.Element => {
     setFilteredCountries(filtered);
   }, [searchValue]);
 
-  // Handle phone number input and ensure only digits are entered
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
-    // Only allow digits
     const digitsOnly = input.replace(/\D/g, "");
+
     setlocaPhonelVal(digitsOnly);
   };
 
-  // Handle search input
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
@@ -134,7 +129,6 @@ export const PhoneInput = ({ setPhoneVal, sxstyles }: props): JSX.Element => {
   );
 };
 
-// Expanded list of country codes - adding more countries including Uganda
 const countryCodes: countrycode[] = [
   { countryname: "United States", flag: "🇺🇸", code: "+1" },
   { countryname: "Kenya", flag: "🇰🇪", code: "+254" },

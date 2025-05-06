@@ -1,7 +1,7 @@
 import { JSX, SyntheticEvent } from "react";
 import { Dialog } from "@mui/material";
 import { useAppDialog } from "../../hooks/dialog";
-import { LoadingOutput, ErrorOutput, ImportKeyOutput } from "../dialog/Outputs";
+import { LoadingOutput, ErrorOutput } from "../dialog/Outputs";
 import { colors } from "../../constants";
 
 export const AppDialog = (): JSX.Element => {
@@ -29,6 +29,7 @@ export const AppDialog = (): JSX.Element => {
             padding: "0.5rem",
             borderRadius: action == "loading" ? "1rem" : "0.625rem",
             backgroundColor: colors.primary,
+            boxShadow: colors.innershadow,
           },
           elevation: 0,
         },
@@ -38,8 +39,6 @@ export const AppDialog = (): JSX.Element => {
     >
       {action == "loading" || action == "referearn" ? (
         <LoadingOutput />
-      ) : action == "awxkeyimport" ? (
-        <ImportKeyOutput />
       ) : (
         <ErrorOutput />
       )}

@@ -15,13 +15,10 @@ import { tabsType, useTabs } from "../hooks/tabs";
 import { useAppDrawer } from "../hooks/drawer";
 import { checkServerStatus } from "../utils/api/apistatus";
 import { BottomTabNavigation } from "../components/Bottom";
-import { HomeTab } from "../components/tabs/Home";
-import { LabsTab } from "../components/tabs/Lab";
+import { HomeTab } from "../components/tabs/HomeTab";
 import { Notifications } from "../components/tabs/Notifications";
 import { Rewards } from "../components/tabs/Rewards";
 import { SendCryptoTab } from "../components/tabs/SendCrypto";
-import { ProfileTab } from "../components/tabs/Profile";
-import LendToUse from "./lend/LendToUse";
 import { Polymarket } from "../components/tabs/Polymarket";
 
 export default function Home(): JSX.Element {
@@ -120,19 +117,15 @@ export default function Home(): JSX.Element {
   }, []);
 
   return (
-    <section className="bg-[#0e0e0e] h-screen overflow-y-scroll">
+    <section>
       {currTab == "home" ? (
         <HomeTab />
-      ) : currTab == "lend" ? (
-        <LendToUse />
-      ) : currTab == "labs" ? (
-        <LabsTab />
+      ) : currTab == "keys" ? (
+        <>Your Keys Here</>
       ) : currTab == "rewards" ? (
         <Rewards />
       ) : currTab == "sendcrypto" ? (
         <SendCryptoTab />
-      ) : currTab == "profile" ? (
-        <ProfileTab />
       ) : currTab == "polymarket" ? (
         <Polymarket />
       ) : (

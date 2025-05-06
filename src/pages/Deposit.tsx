@@ -4,10 +4,10 @@ import { useTabs } from "../hooks/tabs";
 import { useSnackbar } from "../hooks/snackbar";
 import { PopOver } from "../components/global/PopOver";
 import { useBackButton } from "../hooks/backbutton";
-import { Copy } from "../../assets/icons/actions";
-import ethlogo from "../../assets/images/eth.png";
-import usdclogo from "../../assets/images/labs/usdc.png";
-import beralogo from "../../assets/images/icons/bera.webp";
+import { Copy } from "../assets/icons";
+import ethlogo from "../assets/images/logos/eth.png";
+import usdclogo from "../assets/images/logos/usdc.png";
+import beralogo from "../assets/images/logos/bera.jpg";
 
 // Define network info type
 type NetworkInfo = {

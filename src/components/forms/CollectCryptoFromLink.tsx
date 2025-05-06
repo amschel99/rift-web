@@ -1,6 +1,5 @@
 import { JSX, useEffect, useState } from "react";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { faCircleArrowDown } from "@fortawesome/free-solid-svg-icons";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDrawer } from "../../hooks/drawer";
 import { useSocket } from "../../utils/SocketProvider";
@@ -11,12 +10,9 @@ import { getMantraUsdVal } from "../../utils/api/mantra";
 import { base64ToString } from "../../utils/base64";
 import { TransactionStatusWithoutSocket } from "../TransactionStatus";
 import { SubmitButton } from "../global/Buttons";
-import { FaIcon } from "../../assets/faicon";
-import { colors } from "../../constants";
-import foreignspend from "../../assets/images/obhehalfspend.png";
-import "../../styles/components/forms.scss";
+import foreignspend from "../../assets/images/icons/wallet.png";
+import "../../styles/components/drawer/collectcryptofromlink.scss";
 
-// collect crypto to my address from a shared (collect) link
 export const CollectCryptoFromLink = (): JSX.Element => {
   const queryclient = useQueryClient();
   const { socket } = useSocket();
@@ -163,7 +159,7 @@ export const CollectCryptoFromLink = (): JSX.Element => {
   ]);
 
   return (
-    <div id="sendethfromtoken">
+    <div id="collectcryptofromlink">
       <img src={foreignspend} alt="Foreign spend" />
 
       <p>
@@ -175,7 +171,6 @@ export const CollectCryptoFromLink = (): JSX.Element => {
 
       <SubmitButton
         text="Receive"
-        icon={<FaIcon faIcon={faCircleArrowDown} color={colors.textprimary} />}
         isLoading={isPending}
         isDisabled={isPending}
         sxstyles={{

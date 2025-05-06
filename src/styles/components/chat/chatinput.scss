@@ -20,26 +20,30 @@
   .promptinput {
     @include mixins.useBaseFont();
     @include mixins.useButton();
-    width: 88%;
-    height: 100%;
-    border: 0;
 
-    resize: none;
-    font-family: "Open Sans", sans-serif;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: colors.$textprimary;
+    & {
+      width: 88%;
+      height: 100%;
+      border: 0;
+      resize: none;
+      font-family: "Open Sans", sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: colors.$textprimary;
 
-    &::placeholder {
-      color: colors.$textsecondary;
+      &::placeholder {
+        color: colors.$textsecondary;
+      }
     }
   }
 
   .submitprompt {
     @include mixins.useButton();
-    @include mixins.useFlex(row, nowrap, center, center, 0);
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 0.5rem;
+
+    & {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 0.5rem;
+    }
   }
 }

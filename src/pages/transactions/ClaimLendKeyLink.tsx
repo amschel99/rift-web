@@ -1,11 +1,6 @@
 import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  faArrowRight,
-  faCheckCircle,
-  faInfoCircle,
-} from "@fortawesome/free-solid-svg-icons";
 import { useAppDialog } from "@/hooks/dialog";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
@@ -24,8 +19,7 @@ import { getEthUsdVal } from "@/utils/ethusd";
 import { TransactionStatusWithoutSocket } from "../../components/TransactionStatus";
 import { SubmitButton } from "../../components/global/Buttons";
 import { colors } from "../../constants";
-import { Import } from "../../assets/icons/actions";
-import { FaIcon } from "../../assets/faicon";
+import { PlusSolid } from "../../assets/icons";
 import poelogo from "../../assets/images/openai-alt.png";
 import wberalogo from "../../assets/images/icons/bera.webp";
 import usdclogo from "../../assets/images/labs/usdc.png";
@@ -38,7 +32,6 @@ export default function ClaimLendKeyLink(): JSX.Element {
   const navigate = useNavigate();
   const { socket } = useSocket();
   const { switchtab } = useTabs();
-  const { openAppDrawerWithKey } = useAppDrawer();
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const { openAppDrawer } = useAppDrawer();
@@ -136,15 +129,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
   };
 
   const onStartUseKey = () => {
-    if (paysecretpurpose === "OPENAI") {
-      decodeOpenAiKey();
-    } else {
-      openAppDrawerWithKey(
-        "consumeawxkey",
-        paysecretid as string,
-        paysecretnonce as string
-      ); //keyToshare: secretid, purpose: secretnonce
-    }
+    decodeOpenAiKey();
   };
 
   const ethUsdValue = localStorage.getItem("ethvalue");
@@ -223,10 +208,6 @@ export default function ClaimLendKeyLink(): JSX.Element {
 
   return (
     <section id="claimlendkeylink">
-      <span className="icon_ctr">
-        <Import color={colors.textprimary} />
-      </span>
-
       <div className="received_key">
         <img src={poelogo} alt="received-key" />
         <p className="key_val">
@@ -252,7 +233,6 @@ export default function ClaimLendKeyLink(): JSX.Element {
             </p>
             <SubmitButton
               text="Start Using Key"
-              icon={<FaIcon faIcon={faArrowRight} color={colors.primary} />}
               sxstyles={{
                 padding: "0.625rem",
                 borderRadius: "0.375rem",
@@ -292,10 +272,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
           </p>
         </div>
 
-        <p className="deducts">
-          <FaIcon faIcon={faInfoCircle} fontsize={12} color={colors.danger} />
-          Amount will be deducted from your balance
-        </p>
+        <p className="deducts">Amount will be deducted from your balance</p>
 
         <SubmitButton
           text={
@@ -306,8 +283,7 @@ export default function ClaimLendKeyLink(): JSX.Element {
               : "Get Key"
           }
           icon={
-            <FaIcon
-              faIcon={faCheckCircle}
+            <PlusSolid
               color={
                 processing || userGotKey || keypaymentloading
                   ? colors.textsecondary

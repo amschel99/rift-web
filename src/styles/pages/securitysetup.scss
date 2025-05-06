@@ -50,17 +50,18 @@
   }
 
   .seeall {
-    @include mixins.useFlex(row, nowrap, center, flex-end, 0.375rem);
     @include mixins.useButton();
-    @include mixins.useBaseFont();
-    width: 100%;
-    margin-top: 1rem;
-    padding: 0.25rem;
-    border: 0;
-    background-color: transparent;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: colors.$textsecondary;
+
+    & {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.25rem;
+      border: 0;
+      background-color: transparent;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: colors.$textsecondary;
+    }
 
     span {
       @include mixins.useFlex(row, nowrap, center, center, 0);
@@ -75,16 +76,18 @@
 
   .learnmore {
     @include mixins.useButton();
-    @include mixins.useBaseFont();
-    margin-top: 0.5rem;
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.75rem;
-    font-size: 0.75rem;
-    color: colors.$textsecondary;
-    background-color: colors.$divider;
 
-    .icon {
-      margin-left: 0.25rem;
+    & {
+      margin-top: 0.5rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      color: colors.$textsecondary;
+      background-color: colors.$divider;
+
+      .icon {
+        margin-left: 0.25rem;
+      }
     }
   }
 }

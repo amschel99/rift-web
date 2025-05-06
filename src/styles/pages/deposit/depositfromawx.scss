@@ -156,13 +156,16 @@
 
     .currencyamount {
       @include mixins.useButton();
-      width: calc(100% - 4rem);
-      height: 100%;
-      padding-left: 0.5rem;
-      color: colors.$textprimary;
 
-      &::placeholder {
-        color: colors.$textsecondary;
+      & {
+        width: calc(100% - 4rem);
+        height: 100%;
+        padding-left: 0.5rem;
+        color: colors.$textprimary;
+
+        &::placeholder {
+          color: colors.$textsecondary;
+        }
       }
     }
 

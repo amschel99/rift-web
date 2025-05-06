@@ -1,16 +1,14 @@
 import { JSX } from "react";
 import { useNavigate, useParams } from "react-router";
-import { faCircleArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useTabs } from "../../hooks/tabs";
 import { formatUsd, formatNumber } from "../../utils/formatters";
 import { SubmitButton } from "../../components/global/Buttons";
-// import { CreateNewKey } from "./BtcAsset";
-import { Copy, Telegram } from "../../assets/icons/actions";
-import { FaIcon } from "../../assets/faicon";
-import usdclogo from "../../assets/images/labs/usdc.png";
+import { ArrowUpCircle, Copy, Telegram } from "../../assets/icons";
 import { colors } from "@/constants";
+import usdclogo from "../../assets/images/logos/usdc.png";
+import "../../styles/pages/assets/assets.scss";
 
 export default function BeraUsdcAsset(): JSX.Element {
   const navigate = useNavigate();
@@ -90,7 +88,7 @@ export default function BeraUsdcAsset(): JSX.Element {
           />
           <SubmitButton
             text="Send USDC.e"
-            icon={<FaIcon faIcon={faCircleArrowUp} color={colors.primary} />}
+            icon={<ArrowUpCircle color={colors.primary} />}
             sxstyles={{
               flexGrow: 1.5,
               padding: "0.75rem",

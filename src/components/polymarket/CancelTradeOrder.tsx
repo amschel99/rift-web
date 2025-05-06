@@ -1,12 +1,12 @@
 import { JSX } from "react";
-import { useAppDrawer } from "@/hooks/drawer";
-import { useSnackbar } from "@/hooks/snackbar";
-import { cancelOrder } from "@/utils/polymarket/orders";
+import { useMutation } from "@tanstack/react-query";
+import { useAppDrawer } from "../../hooks/drawer";
+import { useSnackbar } from "../../hooks/snackbar";
+import { cancelOrder } from "../../utils/polymarket/orders";
 import { BottomButtonContainer } from "../Bottom";
 import { SubmitButton } from "../global/Buttons";
-import { colors } from "@/constants";
+import { colors } from "../../constants";
 import "../../styles/pages/polymarket/cancelorder.scss";
-import { useMutation } from "@tanstack/react-query";
 
 export const CancelTradeOrder = (): JSX.Element => {
   const { closeAppDrawer, keyToshare, secretPurpose } = useAppDrawer();

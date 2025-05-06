@@ -2,17 +2,16 @@ import { JSX, useState, useEffect } from "react";
 import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { faCheckCircle, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { signupUser, sendOtp, verifyOtp } from "../utils/api/signup";
 import { createAccount } from "../utils/api/wallet";
 import { useSocket } from "../utils/SocketProvider";
-import { useBackButton } from "@/hooks/backbutton";
+import { useBackButton } from "../hooks/backbutton";
 import { useSnackbar } from "../hooks/snackbar";
 import { PhoneInput } from "../components/security/PhoneInput";
 import { DigitsInput } from "../components/security/DigitsInput";
 import { BottomButtonContainer } from "../components/Bottom";
 import { SubmitButton } from "../components/global/Buttons";
-import { FaIcon } from "../assets/faicon";
+import { Check } from "../assets/icons";
 import { colors } from "../constants";
 import "../styles/pages/phoneauth.scss";
 
@@ -347,12 +346,7 @@ export default function PhoneAuth(): JSX.Element {
       <BottomButtonContainer>
         <SubmitButton
           text={requestedOtp ? "Verify Phone Number" : "Get OTP"}
-          icon={
-            <FaIcon
-              faIcon={requestedOtp ? faCheckCircle : faPhone}
-              color={colors.primary}
-            />
-          }
+          icon={<Check color={colors.primary} />}
           sxstyles={{
             gap: "0.5rem",
             padding: "0.75rem 1.5rem",

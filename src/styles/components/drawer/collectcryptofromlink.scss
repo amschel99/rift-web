@@ -1,0 +1,22 @@
+@use "../../constants/colors" as colors;
+@use "../../constants/mixins" as mixins;
+
+#collectcryptofromlink {
+  @include mixins.useFlex(column, nowrap, center, center, 0);
+  width: 100%;
+  padding: 1rem;
+
+  img {
+    margin-top: 1rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  p {
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0 3rem;
+    font-size: 0.875rem;
+    color: colors.$textprimary;
+  }
+}

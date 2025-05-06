@@ -1,3 +1,5 @@
+export { default as AnglesDown } from "./all/AnglesDown";
+export { default as AnglesUp } from "./all/AnglesUp";
 export { default as ArrowDownCircle } from "./all/ArrowDownCircle";
 export { default as ArrowRight } from "./all/ArrowRight";
 export { default as ArrowRightUp } from "./all/ArrowRightUp";
@@ -32,3 +34,4 @@ export { default as Shuffle } from "./all/Shuffle";
 export { default as Telegram } from "./all/Telegram";
 export { default as User } from "./all/User";
 export { default as Wallet } from "./all/Wallet";
+export { default as Warning } from "./all/Warning";

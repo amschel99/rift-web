@@ -1,6 +1,5 @@
 import { JSX, useState } from "react";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { FaIcon } from "../../assets/faicon";
+import { ArrowUpCircle } from "@/assets/icons";
 import { colors } from "../../constants";
 import "../../styles/components/chat/chatinput.scss";
 
@@ -34,12 +33,10 @@ export const ChatInput = ({
           onSubmitPrompt(propmtValue);
         }}
       >
-        <FaIcon
-          faIcon={faPaperPlane}
+        <ArrowUpCircle
           color={
             propmtValue == "" || promptLoading ? colors.divider : colors.accent
           }
-          fontsize={18}
         />
       </button>
     </div>

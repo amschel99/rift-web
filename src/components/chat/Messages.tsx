@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { Avatar } from "@mui/material";
-import gptlogo from "../../assets/images/gpt.png";
+import gptlogo from "../../assets/images/logos/openai.png";
 import "../../styles/components/chat/messages.scss";
 
 interface messageprops {

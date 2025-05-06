@@ -12,12 +12,15 @@
 
   #searchinput {
     @include mixins.useButton();
-    width: calc(100% - 1rem);
-    height: 100%;
-    color: colors.$textprimary;
 
-    &::placeholder {
-      color: colors.$textsecondary;
+    & {
+      width: calc(100% - 1rem);
+      height: 100%;
+      color: colors.$textprimary;
+
+      &::placeholder {
+        color: colors.$textsecondary;
+      }
     }
   }
 }

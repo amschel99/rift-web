@@ -4,7 +4,7 @@ import { useAppDrawer } from "../../hooks/drawer";
 import { useSnackbar } from "../../hooks/snackbar";
 import { SubmitButton } from "../global/Buttons";
 import { colors } from "../../constants";
-import { Copy, Telegram } from "../../assets/icons/actions";
+import { Copy, Telegram } from "../../assets/icons";
 import "../../styles/components/drawer/sendlendlink.scss";
 
 export const SendLendLink = (): JSX.Element => {

@@ -17,12 +17,14 @@
   }
 
   .address {
-    @include mixins.useFlex(row, nowrap, center, center, 0.25rem);
     @include mixins.useButton();
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 0.75rem;
-    color: colors.$textsecondary;
+
+    & {
+      text-transform: uppercase;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: colors.$textsecondary;
+    }
   }
 
   .balance {
@@ -30,7 +32,6 @@
     width: 100%;
 
     p {
-      @include mixins.useAltFont();
       font-size: 2.25rem;
       font-weight: 600;
     }
@@ -67,28 +68,6 @@
     .buttons {
       @include mixins.useFlex(row, nowrap, center, space-between, 0);
       width: 100%;
-
-      // button {
-      // @include mixins.useFlex(row, nowrap, center, center, 0.5rem);
-      // @include mixins.useButton();
-      // @include mixins.useBaseFont();
-      // width: 85%;
-      // padding: 0.5rem;
-      // border-radius: 2rem;
-      // font-size: 0.75rem;
-      // font-weight: 500;
-      // color: colors.$textprimary;
-      // }
-
-      // .send {
-      //   width: 62%;
-      //   background-color: colors.$accent;
-      // }
-
-      // .receive {
-      //   width: 35%;
-      //   background-color: colors.$divider;
-      // }
     }
   }
 }

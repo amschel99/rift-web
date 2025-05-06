@@ -76,7 +76,6 @@
       font-weight: 600;
 
       .fiatbal {
-        @include mixins.useAltFont();
         font-size: 0.875rem;
         font-weight: 600;
       }
@@ -105,15 +104,17 @@
 
       button {
         @include mixins.useButton();
-        @include mixins.useBaseFont();
-        padding: 0.25rem 1.25rem;
-        border: 1px solid colors.$divider;
-        border-radius: 1rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-align: center;
-        color: colors.$textprimary;
-        background-color: colors.$divider;
+
+        & {
+          padding: 0.25rem 1.25rem;
+          border: 1px solid colors.$divider;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-align: center;
+          color: colors.$textprimary;
+          background-color: colors.$divider;
+        }
       }
     }
   }
@@ -149,14 +150,16 @@
 
       button {
         @include mixins.useButton();
-        @include mixins.useAltFont();
-        width: 31%;
-        padding: 0.5rem;
-        border: 1px solid colors.$divider;
-        border-radius: 0.25rem;
-        font-weight: 600;
-        color: colors.$textprimary;
-        background-color: colors.$divider;
+
+        & {
+          width: 31%;
+          padding: 0.5rem;
+          border: 1px solid colors.$divider;
+          border-radius: 0.25rem;
+          font-weight: 600;
+          color: colors.$textprimary;
+          background-color: colors.$divider;
+        }
       }
     }
   }

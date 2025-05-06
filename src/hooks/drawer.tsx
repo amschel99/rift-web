@@ -2,23 +2,12 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 export type draweraction =
   | "collectfromwallet"
-  | "sendairdroplink"
-  | "nodeteeselector"
-  | "transactionlimit"
-  | "createkey"
   | "paymentlink"
   | "revokesecretaccess"
-  | "swappst"
   | "sendlendlink"
-  | "claimlendcryptolink"
-  | "consumeawxkey"
-  | "stakevault"
-  | "unstakevault"
   | "verifytxwithotp"
   | "tradeyesno"
-  | "canceltradeorder"
-  | "polymarketauth"
-  | "unlocktransactions";
+  | "canceltradeorder";
 
 interface drawerctxtype {
   action: draweraction;

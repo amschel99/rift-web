@@ -1,18 +1,18 @@
 import { JSX } from "react";
 import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
+import { openLink } from "@telegram-apps/sdk-react";
 import { useQuery } from "@tanstack/react-query";
 import { useBackButton } from "../../hooks/backbutton";
 import { useTabs } from "../../hooks/tabs";
-import { getTransactionHistory } from "@/utils/api/wallet";
-import { openLink } from "@telegram-apps/sdk-react";
+import { getTransactionHistory } from "../../utils/api/wallet";
+import { ArrowRightUp } from "../../assets/icons";
+import { colors } from "../../constants";
 import notification from "../../assets/images/icons/notification.png";
 import aidrop from "../../assets/images/icons/campaing.png";
 import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import wberalogo from "../../assets/images/icons/bera.webp";
-import { Stake } from "@/assets/icons/actions";
-import { colors } from "@/constants";
 import "../../styles/components/tabs/notifications.scss";
 
 export const Notifications = (): JSX.Element => {
@@ -112,7 +112,7 @@ export const Notifications = (): JSX.Element => {
               {_tx?.createdAt}
               <span>
                 {_tx?.transactionHash?.substring(0, 8) + "..."}
-                <Stake width={6} height={11} color={colors.accent} />
+                <ArrowRightUp color={colors.accent} />
               </span>
             </p>
           </div>

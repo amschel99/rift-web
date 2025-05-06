@@ -1,34 +1,19 @@
-import {
-  CSSProperties,
-  Fragment,
-  JSX,
-  MouseEvent,
-  ReactNode,
-  useState,
-} from "react";
-import {
-  faAnglesDown,
-  faAnglesUp,
-  faChartPie,
-  faChartSimple,
-  faWaveSquare,
-} from "@fortawesome/free-solid-svg-icons";
+import { CSSProperties, Fragment, JSX, MouseEvent, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useBackButton } from "@/hooks/backbutton";
-import { useTabs } from "@/hooks/tabs";
-import { useAppDrawer } from "@/hooks/drawer";
-import { formatUsd } from "@/utils/formatters";
+import { useBackButton } from "../../hooks/backbutton";
+import { useTabs } from "../../hooks/tabs";
+import { useAppDrawer } from "../../hooks/drawer";
 import {
   fetchMarkets,
   fetchMarketByConditionId,
-} from "@/utils/polymarket/markets";
-import { getUserOrders } from "@/utils/polymarket/orders";
-import { numberFormat } from "@/utils/formatters";
-import { SubmitButton } from "@/components/global/Buttons";
-import { FaIcon } from "@/assets/faicon";
-import { colors } from "@/constants";
-import { Loading } from "@/assets/animations";
-import "@/styles/pages/polymarket/index.scss";
+} from "../../utils/polymarket/markets";
+import { getUserOrders } from "../../utils/polymarket/orders";
+import { numberFormat } from "../../utils/formatters";
+import { SubmitButton } from "../../components/global/Buttons";
+import { Loading } from "../../assets/animations";
+import { AnglesUp, AnglesDown } from "../../assets/icons";
+import { colors } from "../../constants";
+import "../../styles/pages/polymarket/index.scss";
 
 export const Polymarket = (): JSX.Element => {
   const queryclient = useQueryClient();
@@ -59,24 +44,6 @@ export const Polymarket = (): JSX.Element => {
 
   return (
     <section id="polymarket">
-      <div className="mystats">
-        <StatsCounter
-          icon={<FaIcon faIcon={faChartSimple} color={colors.textprimary} />}
-          title="Markets Traded"
-          value={0}
-        />
-        <StatsCounter
-          icon={<FaIcon faIcon={faChartPie} color={colors.textprimary} />}
-          title="Volume Traded"
-          value={formatUsd(0)}
-        />
-        <StatsCounter
-          icon={<FaIcon faIcon={faWaveSquare} color={colors.textprimary} />}
-          title="Profit/Loss"
-          value={formatUsd(0)}
-        />
-      </div>
-
       <div className="marketfilters">
         <button
           className={marketFilter == "nba" ? "active" : ""}
@@ -169,28 +136,6 @@ export const Polymarket = (): JSX.Element => {
   );
 };
 
-const StatsCounter = ({
-  icon,
-  title,
-  value,
-  onclick,
-}: {
-  icon: ReactNode;
-  title: string;
-  value: string | number;
-  onclick?: () => void;
-}): JSX.Element => {
-  return (
-    <div className="stat_ctr" onClick={onclick}>
-      <div className="icon">{icon}</div>
-
-      <p>
-        <span>{title}</span> {value}
-      </p>
-    </div>
-  );
-};
-
 const Market = ({
   conditionid,
   marketimage,
@@ -247,26 +192,14 @@ const Market = ({
       <div className="marketactions">
         <SubmitButton
           text={`Buy ${outcomearr[0]}`}
-          icon={
-            <FaIcon
-              faIcon={faAnglesUp}
-              color={colors.textprimary}
-              fontsize={12}
-            />
-          }
+          icon={<AnglesUp color={colors.textprimary} />}
           sxstyles={{ ...buttonstyles, backgroundColor: colors.success }}
           onclick={onTradeYes}
         />
 
         <SubmitButton
           text={`Buy ${outcomearr[1]}`}
-          icon={
-            <FaIcon
-              faIcon={faAnglesDown}
-              color={colors.textprimary}
-              fontsize={12}
-            />
-          }
+          icon={<AnglesDown color={colors.textprimary} />}
           sxstyles={{ ...buttonstyles, backgroundColor: colors.danger }}
           onclick={onTradeNo}
         />

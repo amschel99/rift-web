@@ -37,7 +37,6 @@
       font-weight: bold;
 
       span {
-        @include mixins.useAltFont();
         font-size: 0.875rem;
         font-weight: 300;
         color: colors.$textsecondary;
@@ -74,7 +73,6 @@
       font-size: 0.875rem;
 
       span {
-        @include mixins.useAltFont();
         font-weight: bold;
       }
     }
@@ -96,7 +94,6 @@
 
       p {
         @include mixins.useFlex(column, nowrap, flex-start, flex-start, 0);
-        @include mixins.useAltFont();
         font-weight: bold;
 
         span {
