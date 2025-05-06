@@ -219,6 +219,11 @@ $success: rgba(15, 177, 77, 1);
 $success: #0fb14d;
 ```
 
+#### Comments
+
+- please use comments sparingly, where necessary
+- do not leave comments in markup, markup should be self describing
+
 #### Commits
 
 - please try and use meaningfull commit messages that indicate what change(s) the commit is about
