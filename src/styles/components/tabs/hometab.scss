@@ -1,0 +1,17 @@
+@use "../../constants/colors" as colors;
+@use "../../constants/mixins" as mixins;
+
+#hometab {
+  @include mixins.useTabsHeight();
+
+  & {
+    margin-top: 2.75rem;
+    padding-top: 0.5rem;
+  }
+
+  .actions {
+    @include mixins.useFlex(row, nowrap, center, flex-start, 1.5rem);
+    margin: 1rem 0;
+    width: 100%;
+  }
+}
