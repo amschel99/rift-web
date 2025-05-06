@@ -22,6 +22,27 @@ account abstraction, manage blockchain assets & Web2 secrets. << A Telegram Mini
 
 the idea for this guide is to enable us to write self describing code that anyone can instantly be onboarded into and easily know what they are working with.
 
+#### Imports
+
+please prefer to organize imports this order:
+
+1. react imports
+2. external/3rd party dependencies (non-react)
+3. hooks (if any)
+4. utils/helpers
+5. assets (icons/colors/images)
+6. styles (prioritize external scss styles over inline styles. use inline styles when necessary)
+
+```tsx
+import {} from "react";
+import {} from "@mui/material";
+import {} from "@tanstack-react-query";
+import {} from "@/hooks";
+import {} from "@/utils";
+import {} from "@/assets";
+import styles from "@/styles";
+```
+
 #### Naming
 
 ** please prefer self-describing names for everything: variables, folders, files, functions, props, types, interfaces, classnames, ids e.t.c **
