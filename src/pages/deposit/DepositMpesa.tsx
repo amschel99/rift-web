@@ -1,6 +1,6 @@
 import mpesa from "../../assets/images/mpesa1.png";
 import { PopOver } from "../../components/global/PopOver";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useTabs } from "../../hooks/tabs";
 import { useBackButton } from "../../hooks/backbutton";
@@ -10,16 +10,19 @@ import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import beralogo from "../../assets/images/icons/bera.webp";
 import Lottie from "lottie-react";
-import kenya from "../../assets/images/ke.webp";
 import { toast } from "react-toastify";
-import { FaIcon } from "@/assets/faicon";
-import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { getEthUsdVal } from "../../utils/ethusd";
+import { getBerachainUsdVal } from "../../utils/api/mantra";
+import { useLaunchParams } from "@telegram-apps/sdk-react";
 
-const baseUrl = import.meta.env.VITE_API_URL;
+const baseUrl = "https://mpesa-offramping-onramping-production.up.railway.app";
+const KESUSDT = 125;
 
 function DepositMpesa() {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
+  const { initData } = useLaunchParams();
+  const tgUserId: string = String(initData?.user?.id as number);
 
   // Updated state type to include WUSDC
   const [depositAsset, setDepositAsset] = useState<
@@ -28,15 +31,29 @@ function DepositMpesa() {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDepositSuccess, setIsDepositSuccess] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const ethaddress = localStorage.getItem("ethaddress") as string;
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState<"KES" | "ASSET">("KES");
+  const [kesValue, setKesValue] = useState<number | null>(null);
+  const [assetValue, setAssetValue] = useState<number | null>(null);
 
   const goBack = () => {
     switchtab("home");
     navigate("/app");
   };
+
+  useEffect(() => {
+    const trxref = localStorage.getItem("trxref");
+    const reference = localStorage.getItem("reference");
+    if (trxref && reference) {
+      // user has been redirected from paystack,
+      setIsLoading(true);
+      // check if txn was successful, if so setIsLoading to false, setIsDepositSuccess to true
+      // get the txn hash, amount in kes & deposit asset and set them in state
+      // clear txn reference from local storage
+    }
+  }, []);
 
   const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -54,16 +71,6 @@ function DepositMpesa() {
       });
       return;
     }
-    if (phoneNumber == "") {
-      toast.error("Please enter a phone number", {
-        style: {
-          backgroundColor: "#212121",
-          color: "#f6f7f9",
-          borderRadius: "10px",
-        },
-      });
-      return;
-    }
     if (email == "") {
       toast.error("Please enter an email", {
         style: {
@@ -75,62 +82,93 @@ function DepositMpesa() {
       return;
     }
     setIsLoading(true);
-    //   {
-    //     "email": "ayiendaglen@gmail.com",
-    //     "amount": 5000,
-    //     "currency": "KES",//NGN,GHS,KES
-    //     "paymentMethod": "mobile_money", //'card' | 'mobile_money' | 'bank_transfer';
-    //     "mobileProvider": "mpesa", //optional if mobile payment is provided // mpesa, airtel, mtn, etc.
-    //     "cryptoAsset": "BERA-USDC",//BERA-USDC POL-USDC, ETH, WBERA
-    //     "cryptoWalletAddress": "0x1234567890abcdef1234567890abcdef12345678"
-    // }
     try {
-      const response = await axios.post(`${baseUrl}/deposit/mpesa`, {
-        email,
-        amount,
-        currency: "KES",
-        paymentMethod: "mobile_money",
-        mobileProvider: "mpesa",
-        cryptoAsset:
-          depositAsset === "USDC"
-            ? "POL-USDC"
-            : depositAsset === "WUSDC"
-            ? "BERA-USDC"
-            : depositAsset,
+      const response = await fetch(`${baseUrl}/api/onramp/payments`, {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          amount,
+          currency: "KES",
+          paymentMethod: "mobile_money",
+          mobileProvider: "mpesa",
+          cryptoAsset:
+            depositAsset === "USDC"
+              ? "POL-USDC"
+              : depositAsset === "WUSDC"
+              ? "BERA-USDC"
+              : depositAsset,
+          cryptoWalletAddress: ethaddress,
+          externalReference: tgUserId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-      console.log(response);
+      const data = await response.json();
+      console.log(data);
+      const url = data.data.paymentUrl;
+      console.log(url);
+      window.open(url, "_blank");
     } catch (error) {
-      console.log(error);
+      setIsLoading(false);
+      toast.error("Error depositing funds", {
+        style: {
+          backgroundColor: "#212121",
+          color: "#f6f7f9",
+          borderRadius: "10px",
+        },
+      });
+      console.error(error);
     }
   };
-  const convertToKES = (amount: number, asset: string) => {
+  const convertToKES = async (amount: number, asset: string) => {
     const lowerCaseAsset = asset.toLowerCase();
     switch (lowerCaseAsset) {
       case "eth":
-        return amount * 238425.52;
+        return amount * (await getEthUsdVal()) * KESUSDT;
       case "usdc":
-        return amount * 129;
+        return amount * KESUSDT;
       case "wusdc":
-        return amount * 129;
+        return amount * KESUSDT;
       case "wbera":
-        return amount * 455.46;
+        return amount * (await getBerachainUsdVal()) * KESUSDT;
       default:
         return amount;
     }
   };
-  const convertToAsset = (amount: number, asset: string) => {
+  const convertToAsset = async (amount: number, asset: string) => {
     const lowerCaseAsset = asset.toLowerCase();
     switch (lowerCaseAsset) {
       case "eth":
-        return amount / 238425.52;
+        return amount / (await getEthUsdVal()) / KESUSDT;
       case "usdc":
-        return amount / 129;
+        return amount / KESUSDT;
       case "wusdc":
-        return amount / 129;
+        return amount / KESUSDT;
       case "wbera":
-        return amount / 455.46;
+        return amount / (await getBerachainUsdVal()) / KESUSDT;
     }
   };
+
+  useEffect(() => {
+    if (amount && amountType === "ASSET") {
+      convertToKES(Number(amount), depositAsset).then((val) =>
+        setKesValue(val)
+      );
+    } else {
+      setKesValue(null);
+    }
+  }, [amount, depositAsset, amountType]);
+
+  useEffect(() => {
+    if (amount && amountType === "KES") {
+      convertToAsset(Number(amount), depositAsset).then((val) =>
+        setAssetValue(val !== undefined ? val : null)
+      );
+    } else {
+      setAssetValue(null);
+    }
+  }, [amount, depositAsset, amountType]);
 
   useBackButton(goBack);
   return (
@@ -272,7 +310,7 @@ function DepositMpesa() {
               onChange={(e) => setAmount(e.target.value)}
             />
             <p className="text-gray-400 text-xs mt-2 text-center font-bold">
-              {convertToAsset(Number(amount), depositAsset)?.toLocaleString()}{" "}
+              {assetValue !== null ? assetValue.toLocaleString() : ""}{" "}
               {depositAsset}
             </p>
           </div>
@@ -291,36 +329,11 @@ function DepositMpesa() {
               onChange={(e) => setAmount(e.target.value)}
             />
             <p className="text-gray-400 text-xs mt-2 text-center font-bold">
-              {convertToKES(Number(amount), depositAsset).toLocaleString()} KES
+              {kesValue !== null ? kesValue.toLocaleString() : ""} KES
             </p>
           </div>
         </div>
         {/* Deposit Address Section */}
-        <div className="my-4 mt-8 mx-2">
-          <p className="text-[#f6f7f9] font-medium mb-1">Phone Number</p>
-          <p className="text-gray-400 text-xs mb-4">
-            Enter your phone number to receive a payment notification.
-          </p>
-          <div className="items-center gap-2">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-20 h-12 rounded-md border border-[#34404f] bg-[#2a2e2c]">
-                <img
-                  src={kenya}
-                  alt="kenya"
-                  className="w-[90%] rounded-md h-[90%]"
-                />
-              </div>
-              <input
-                type="text"
-                className="w-full p-2 py-4 rounded-xl border border-[#34404f] bg-[#2a2e2c] text-sm text-[#f6f7f9] focus:outline-none focus:ring-2 focus:ring-[#ffb386] focus:border-[#ffb386]"
-                placeholder="701838690"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-
         <div className="my-4 mt-8 mx-2">
           <p className="text-[#f6f7f9] font-medium mb-1">Email</p>
           <p className="text-gray-400 text-xs mb-4">
@@ -358,10 +371,16 @@ function DepositMpesa() {
               style={{ width: "60vw", maxWidth: 400 }}
             />
             <h1 className="font-bold text-white text-md">
-              Sending STK push to +254 {phoneNumber}
+              Processing transaction
             </h1>
             <p className="text-gray-400 text-xs">
-              Buying {depositAsset} with {amount} KES
+              Buying {depositAsset} with{" "}
+              {amountType == "KES"
+                ? amount
+                : kesValue !== null
+                ? kesValue.toLocaleString()
+                : ""}{" "}
+              KES
             </p>
           </div>
         )}
@@ -370,23 +389,45 @@ function DepositMpesa() {
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm"
             style={{ minHeight: "100vh" }}
           >
-            <div className="flex items-center justify-between w-full mx-4">
-              <p></p>
-              <FaIcon faIcon={faClose} color="#f6f7f9" fontsize={20} />
-            </div>
             <Lottie
               animationData={success}
               autoPlay
-              loop
+              loop={false}
               className="animation"
               style={{ width: "60vw", maxWidth: 400 }}
             />
-            <h1 className="font-bold text-white text-md">
-              Sending STK push to +254 {phoneNumber}
+            <h1 className="font-bold text-white text-md mt-2">
+              {depositAsset} is on its way!
             </h1>
-            <p className="text-gray-400 text-xs">
-              Buying {depositAsset} with {amount} KES
+            <p className="text-gray-400 text-xs mt-2">
+              Successfully deposited {depositAsset} with{" "}
+              {amountType == "KES"
+                ? amount
+                : kesValue !== null
+                ? kesValue.toLocaleString()
+                : ""}{" "}
+              KES
             </p>
+            <div className="flex w-full items-center justify-center mt-8">
+              <button
+                className="w-1/2 p-2 py-3 mx-2 rounded-xl border border-[#34404f] bg-[#ffb386] text-sm text-[#0e0e0e] font-semibold"
+                onClick={() => {
+                  setIsDepositSuccess(false);
+                  setIsLoading(false);
+                }}
+              >
+                View in Wallet
+              </button>
+              <button
+                className="w-1/2 p-2 py-3 mx-2 rounded-xl border border-[#ffb386] bg-transparent text-sm text-[#f0f7f9] font-semibold"
+                onClick={() => {
+                  setIsDepositSuccess(false);
+                  setIsLoading(false);
+                }}
+              >
+                Transaction Details
+              </button>
+            </div>
           </div>
         )}
       </div>

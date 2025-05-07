@@ -83,6 +83,16 @@ export default function Splash(): JSX.Element {
         userAuthenticated();
       }
 
+      // https://t.me/sphere_id_bot/sphere?startapp=mpesa?trxref=9qy6xr27hu&reference=9qy6xr27hu
+      if (startParam?.includes("mpesa")) {
+        const trxref = startParam?.split("&")[0];
+        const reference = startParam?.split("&")[1];
+
+        localStorage.setItem("trxref", trxref);
+        localStorage.setItem("reference", reference);
+        navigate("/deposit/mpesa");
+      }
+
       if (startParam?.includes("collect")) {
         // opened with collect link
         // https://t.me/spheredev_bot/spheredev?startapp= {hyp5tQRDFSeA} {-MC4wMTI1Mw==} {-ETH} {-collect}
