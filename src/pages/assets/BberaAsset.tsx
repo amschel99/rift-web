@@ -10,7 +10,7 @@ import { colors } from "../../constants";
 import beralogo from "../../assets/images/logos/bera.jpg";
 import "../../styles/pages/assets/assets.scss";
 
-export default function WberaAsset(): JSX.Element {
+export default function BeraAsset(): JSX.Element {
   const navigate = useNavigate();
   const { intent } = useParams();
   const { showsuccesssnack } = useSnackbar();
