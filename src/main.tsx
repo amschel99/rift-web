@@ -17,14 +17,14 @@ import Splash from "./pages/Splash.tsx";
 import Auth from "./pages/Auth.tsx";
 import Home from "./pages/Home.tsx";
 // import PhoneAuth from "./pages/PhoneAuth.tsx";
-// import EthAsset from "./pages/assets/EthAsset.tsx";
+import EthAsset from "./pages/assets/EthAsset.tsx";
 // import WberaAsset from "./pages/assets/WberaAsset.tsx";
 // import PolygonUsdcAsset from "./pages/assets/PolygonUsdcAsset.tsx";
 // import BeraUsdcAsset from "./pages/assets/BeraUsdcAsset.tsx";
 // import SendCrypto from "./pages/transactions/SendCrypto.tsx";
 // import SendCollectLink from "./pages/transactions/SendCollectLink.tsx";
 // import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
-// import Deposit from "./pages/Deposit.tsx";
+import Deposit from "./pages/Deposit.tsx";
 // import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 // import WebAssets from "./pages/WebAssets.tsx";
 // import ChatBotWithKey from "./pages/bot/ChatBotWithKey.tsx";
@@ -52,7 +52,7 @@ let routes = createBrowserRouter([
   // { path: "/auth/phone", element: <PhoneAuth /> },
   { path: "/app", element: <Home /> },
   // { path: "/claimlendkey", element: <ClaimLendKeyLink /> },
-  // { path: "/eth-asset/:intent", element: <EthAsset /> },
+  { path: "/eth-asset/:intent", element: <EthAsset /> },
   // { path: "/wbera-asset/:intent", element: <WberaAsset /> },
   // { path: "/polygon-usdc-asset/:intent", element: <PolygonUsdcAsset /> },
   // { path: "/bera-usdc-asset/:intent", element: <BeraUsdcAsset /> },
@@ -71,7 +71,7 @@ let routes = createBrowserRouter([
   // { path: "/swap", element: <SwapCrypto /> },
   // { path: "/premium", element: <Premium /> },
   // { path: "/get-premium", element: <GetPremium /> },
-  // { path: "/deposit", element: <Deposit /> },
+  { path: "/deposit/:srccurrency", element: <Deposit /> },
   // { path: "/logout", element: <Logout /> },
   // { path: "/server-error", element: <ServerFailure /> },
 ]);
