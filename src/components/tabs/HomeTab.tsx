@@ -1,6 +1,7 @@
 import { Fragment, JSX, useEffect } from "react";
 import { backButton } from "@telegram-apps/sdk-react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 import { AppBar } from "../AppBar";
 import { AssetBalance, WalletAction, WalletBalance } from "../WalletBalance";
 import { ArrowDownCircle, ArrowUpCircle, PlusSolid } from "../../assets/icons";
@@ -17,6 +18,8 @@ import { colors } from "../../constants";
 import "../../styles/components/tabs/hometab.scss";
 
 export const HomeTab = (): JSX.Element => {
+  const navigate = useNavigate();
+
   const { data: ethbalance, isFetching: ethbalfetching } = useQuery({
     queryKey: ["ethbalance"],
     queryFn: getEthBalance,
@@ -93,6 +96,16 @@ export const HomeTab = (): JSX.Element => {
     "usdcusdprice",
     String(usdcInfo?.market_data?.current_price?.usd)
   );
+
+  const goToEthAsset = () => {
+    navigate("/eth-asset/send");
+  };
+
+  const goToBeraAsset = () => {};
+
+  const goToPolygonUsdcAsset = () => {};
+
+  const goToBeraUsdcAsset = () => {};
 
   useEffect(() => {
     if (backButton.isSupported()) {
@@ -188,6 +201,7 @@ export const HomeTab = (): JSX.Element => {
           )}
           balance={Number(ethbalance?.balance)}
           priceUsd={Number(ethereumInfo?.market_data?.current_price?.usd)}
+          onClickHandler={goToEthAsset}
         />
 
         <AssetBalance
@@ -210,6 +224,7 @@ export const HomeTab = (): JSX.Element => {
           )}
           balance={Number(berabalance?.data?.balance)}
           priceUsd={Number(beraInfo?.market_data?.current_price?.usd)}
+          onClickHandler={goToBeraAsset}
         />
 
         <AssetBalance
@@ -232,6 +247,7 @@ export const HomeTab = (): JSX.Element => {
           )}
           balance={Number(polygonusdcbalance?.data?.balance)}
           priceUsd={Number(usdcInfo?.market_data?.current_price?.usd)}
+          onClickHandler={goToPolygonUsdcAsset}
         />
 
         <AssetBalance
@@ -254,6 +270,7 @@ export const HomeTab = (): JSX.Element => {
           )}
           balance={Number(berausdcbalance?.data?.balance)}
           priceUsd={Number(usdcInfo?.market_data?.current_price?.usd)}
+          onClickHandler={goToBeraUsdcAsset}
         />
       </div>
     </Fragment>
