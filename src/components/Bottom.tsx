@@ -31,12 +31,14 @@ export const BottomTabNavigation = (): JSX.Element => {
             showerrorsnack(
               "Sorry, we couldn't setup polymarket for you, please try again"
             );
+            closeAppDialog();
           }
         })
         .catch(() => {
           showerrorsnack(
             "Sorry, we couldn't setup polymarket for you, please try again"
           );
+          closeAppDialog();
         }),
   });
 
