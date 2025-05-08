@@ -8,6 +8,7 @@ export { default as Cancel } from "./all/Cancel";
 export { default as Check } from "./all/Check";
 export { default as ChevronDown } from "./all/ChevronDown";
 export { default as Clipboard } from "./all/Clipboard";
+export { default as Clock } from "./all/Clock";
 export { default as Copy } from "./all/Copy";
 export { default as Diamond } from "./all/Diamond";
 export { default as Email } from "./all/Email";
