@@ -22,10 +22,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-
-    /* Path Aliases */
-    "baseUrl": "."
+    "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
 }
