@@ -35,7 +35,8 @@ export const SnackBar = (): JSX.Element => {
       sx={{
         zIndex: 4000,
         "& .MuiSnackbarContent-root": {
-          backgroundColor: colors.primary,
+          borderRadius: "0.5rem",
+          backgroundColor: colors.secondary,
         },
       }}
     />
