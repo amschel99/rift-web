@@ -54,7 +54,7 @@ const drawerstyles: CSSProperties = {
   borderTopLeftRadius: "0.5rem",
   borderTopRightRadius: "0.5rem",
   zIndex: 4000,
-  backgroundColor: colors.primary,
+  backgroundColor: colors.secondary,
 };
 
 const barstyles: CSSProperties = {
