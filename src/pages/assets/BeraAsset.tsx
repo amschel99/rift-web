@@ -35,12 +35,12 @@ export default function BeraAsset(): JSX.Element {
   const berabalUsd = localStorage.getItem("berabalusd");
 
   const onSendBera = () => {
-    // localStorage.setItem("prev_page", `/eth-asset/${intent}`);
-    // navigate(`/send-crypto/ETH/${intent}`);
+    // localStorage.setItem("prev_page", `/bera-asset/${intent}`);
+    // navigate(`/send-crypto/WBERA/${intent}`);
   };
 
   const onDepositBera = () => {
-    localStorage.setItem("prev_page", `/eth-asset/${intent}`);
+    localStorage.setItem("prev_page", `/bera-asset/${intent}`);
     navigate("/deposit/WBERA");
   };
 
@@ -66,6 +66,10 @@ export default function BeraAsset(): JSX.Element {
                 : "negative"
             }
           >
+            {(Number(beraInfo?.market_data?.price_change_percentage_24h) > 1 ||
+              Number(beraInfo?.market_data?.price_change_percentage_24h) ==
+                0) &&
+              "+"}
             {beraInfo?.market_data?.price_change_percentage_24h}%
           </span>
         </p>

@@ -68,6 +68,11 @@ export default function EthAsset(): JSX.Element {
                 : "negative"
             }
           >
+            {(Number(ethereumInfo?.market_data?.price_change_percentage_24h) >
+              1 ||
+              Number(ethereumInfo?.market_data?.price_change_percentage_24h) ==
+                0) &&
+              "+"}
             {ethereumInfo?.market_data?.price_change_percentage_24h}%
           </span>
         </p>

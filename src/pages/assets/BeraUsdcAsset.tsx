@@ -1,104 +1,137 @@
 import { JSX } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
-import { useSnackbar } from "../../hooks/snackbar";
 import { useTabs } from "../../hooks/tabs";
-import { formatUsd, formatNumber } from "../../utils/formatters";
-import { SubmitButton } from "../../components/global/Buttons";
-import { ArrowUpCircle, Copy, Telegram } from "../../assets/icons";
+import { fetchCoinInfo, fetchCoinPrices } from "../../utils/coingecko/markets";
+import { numberFormat } from "../../utils/formatters";
+import { YourAssetBalance } from "../../components/WalletBalance";
+import { CoinPriceChart } from "../../components/PriceChart";
+import { Question, ArrowUpCircle, ArrowDownCircle } from "../../assets/icons";
 import { colors } from "../../constants";
-import usdclogo from "../../assets/images/logos/usdc.png";
 import "../../styles/pages/assets/assets.scss";
 
 export default function BeraUsdcAsset(): JSX.Element {
   const navigate = useNavigate();
   const { intent } = useParams();
-  const { showsuccesssnack } = useSnackbar();
   const { switchtab } = useTabs();
+
+  const { data: usdcInfo } = useQuery({
+    queryKey: ["usdcinfo"],
+    queryFn: () => fetchCoinInfo("usd-coin"),
+  });
+
+  const { data: usdcprices, isPending: pricesfetching } = useQuery({
+    queryKey: ["usdcprices"],
+    queryFn: () => fetchCoinPrices("usd-coin", 30),
+  });
 
   const goBack = () => {
     switchtab("home");
     navigate("/app");
   };
 
-  const walletAddress = localStorage.getItem("ethaddress");
-  const wusdcbal = localStorage.getItem("wusdcbal");
+  const beraUsdcbal = localStorage.getItem("berausdcbal");
+  const beraUsdcUsdbal =
+    Number(beraUsdcbal) * Number(usdcInfo?.market_data?.current_price?.usd);
 
-  const onCopyAddr = () => {
-    if (walletAddress !== null) {
-      navigator.clipboard.writeText(walletAddress as string);
-      showsuccesssnack("Address copied to clipboard");
-    }
+  const onSendBera = () => {
+    // localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
+    // navigate(`/send-crypto/WUSDC/${intent}`);
   };
 
-  const onSendUSDC = () => {
-    localStorage.setItem("prev_page", `/usdc-asset/${intent}`);
-    navigate(`/send-crypto/WUSDC/${intent}`);
-  };
-
-  const onSendUSDCLink = () => {
-    localStorage.setItem("prev_page", `/usdc-asset/${intent}`);
-    navigate(`/sendcollectlink/WUSDC/${intent}`);
+  const onDepositBera = () => {
+    localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
+    navigate("/deposit/WUSDC");
   };
 
   useBackButton(goBack);
 
   return (
-    <section className="flex flex-col items-center p-4 bg-[#0e0e0e] text-[#f6f7f9] h-full">
-      <img src={usdclogo} alt="usdc" className="w-16 h-16 rounded-full mb-4" />
+    <section id="assetdetails">
+      <div className="token">
+        <div className="img_name_symbol">
+          <img src={usdcInfo?.image?.large} alt="ETH" />
+          <p>
+            USDC (Berachain) <span className="bera-usdc-symbol">USDC.e</span>
+          </p>
+        </div>
 
-      <button
-        className="address flex items-center gap-2 bg-[#34404f] text-[#f6f7f9] px-3 py-1 rounded-full text-sm mb-4"
-        onClick={onCopyAddr}
-      >
-        {walletAddress?.substring(0, 3)}...
-        {walletAddress?.substring(walletAddress.length - 4)}
-        <Copy width={14} height={16} color="#f6f7f9" />
-      </button>
-
-      <div className="balance flex flex-col items-center mb-6">
-        <p className="text-3xl font-bold">{formatUsd(Number(wusdcbal))}</p>
-        <span className="text-sm text-gray-400">
-          {formatNumber(Number(wusdcbal))} USDC.e
-        </span>
-        {/** Ability to create new keys will be added in the future */}
-        {/* <CreateNewKey /> */}
+        <p className="price_change">
+          ${usdcInfo?.market_data?.current_price?.usd}
+          <span
+            className={
+              Number(usdcInfo?.market_data?.price_change_percentage_24h) > 1 ||
+              Number(usdcInfo?.market_data?.price_change_percentage_24h) == 0
+                ? "positive"
+                : "negative"
+            }
+          >
+            {(Number(usdcInfo?.market_data?.price_change_percentage_24h) > 1 ||
+              Number(usdcInfo?.market_data?.price_change_percentage_24h) ==
+                0) &&
+              "+"}
+            {usdcInfo?.market_data?.price_change_percentage_24h}%
+          </span>
+        </p>
       </div>
 
-      <div className="actions w-full max-w-md flex flex-col items-center gap-4 bg-[#2a2e2c] p-4 rounded-xl border border-[#34404f]">
-        <p className="text-center text-sm text-gray-400">
-          You can Send USDC.e (USDC Berachain) directly to an address or create
-          a payment link for others to collect usdc from your wallet.
+      <YourAssetBalance
+        balance={Number(beraUsdcbal)}
+        balanceUsd={Number(beraUsdcUsdbal)}
+      />
+
+      {usdcprices && <CoinPriceChart data={usdcprices} />}
+      {!pricesfetching && (
+        <p className="pice-desc">
+          <Question width={12} height={12} color={colors.textsecondary} />
+          Prices for the last 30 days
         </p>
+      )}
 
-        <span className="divider w-full h-[1px] bg-[#34404f]" />
+      <p className="tokendesc">{usdcInfo?.description?.en}</p>
 
-        <div className="buttons flex justify-between w-full gap-3">
-          <SubmitButton
-            text="Create Link"
-            icon={<Telegram width={18} height={18} color={colors.primary} />}
-            sxstyles={{
-              flexGrow: 1,
-              padding: "0.75rem",
-              borderRadius: "2rem",
-              fontSize: "0.875rem",
-              fontWeight: "normal",
-            }}
-            onclick={onSendUSDCLink}
-          />
-          <SubmitButton
-            text="Send USDC.e"
-            icon={<ArrowUpCircle color={colors.primary} />}
-            sxstyles={{
-              flexGrow: 1.5,
-              padding: "0.75rem",
-              borderRadius: "2rem",
-              fontSize: "0.875rem",
-              fontWeight: "bold",
-            }}
-            onclick={onSendUSDC}
-          />
-        </div>
+      <div className="token_stats">
+        <p>
+          Market cap Rank <span>#{usdcInfo?.market_cap_rank}</span>
+        </p>
+        <p>
+          Market Cap{" "}
+          <span>
+            ${numberFormat(Number(usdcInfo?.market_data?.market_cap?.usd))}
+          </span>
+        </p>
+        <p>
+          Circulating Supply
+          <span>
+            {numberFormat(Number(usdcInfo?.market_data?.circulating_supply))}
+          </span>
+        </p>
+        <p>
+          Total Supply
+          <span>
+            {usdcInfo?.market_data?.total_supply
+              ? numberFormat(Number(usdcInfo?.market_data?.total_supply))
+              : "- - -"}
+          </span>
+        </p>
+        <p>
+          Max Supply
+          <span>
+            {usdcInfo?.market_data?.max_supply
+              ? numberFormat(Number(usdcInfo?.market_data?.max_supply))
+              : "- - -"}
+          </span>
+        </p>
+      </div>
+
+      <div className="assetactions">
+        <button onClick={onSendBera}>
+          Send <ArrowUpCircle color={colors.textprimary} />
+        </button>
+        <button onClick={onDepositBera}>
+          Deposit <ArrowDownCircle color={colors.textprimary} />
+        </button>
       </div>
     </section>
   );
