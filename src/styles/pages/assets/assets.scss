@@ -89,6 +89,7 @@
     padding: 0.5rem;
     border-top: 1px solid colors.$divider;
     background-color: colors.$primary;
+    z-index: 1000;
 
     button {
       @include mixins.useFlex(row, nowrap, center, center, 0.375rem);
