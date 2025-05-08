@@ -2,81 +2,27 @@ import { JSX, useState, useEffect } from "react";
 import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useBackButton } from "../hooks/backbutton";
+import { useSnackbar } from "../hooks/snackbar";
 import { signupUser, sendOtp, verifyOtp } from "../utils/api/signup";
 import { createAccount } from "../utils/api/wallet";
 import { useSocket } from "../utils/SocketProvider";
-import { useBackButton } from "../hooks/backbutton";
-import { useSnackbar } from "../hooks/snackbar";
 import { PhoneInput } from "../components/security/PhoneInput";
 import { DigitsInput } from "../components/security/DigitsInput";
-import { BottomButtonContainer } from "../components/Bottom";
-import { SubmitButton } from "../components/global/Buttons";
 import { Check } from "../assets/icons";
 import { colors } from "../constants";
 import "../styles/pages/phoneauth.scss";
 
-const getPersistentDeviceInfo = async (): Promise<string> => {
-  const deviceAttributes = [];
-
-  deviceAttributes.push(navigator.hardwareConcurrency?.toString() || "");
-
-  deviceAttributes.push(
-    `${screen.width}x${screen.height}x${screen.colorDepth}`
-  );
-
-  try {
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl");
-
-    if (gl) {
-      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-
-      if (debugInfo) {
-        const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-        deviceAttributes.push(`${vendor}|${renderer}`);
-      }
-    }
-  } catch (e) {
-    console.log(e);
-  }
-
-  return deviceAttributes.filter(Boolean).join("|");
-};
-
-const generatePersistentDeviceToken = async (
-  tgUserId: string
-): Promise<string> => {
-  const deviceInfo = await getPersistentDeviceInfo();
-
-  const combinedString = `${tgUserId}-${deviceInfo}`;
-
-  const hashBuffer = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(combinedString)
-  );
-
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const deviceToken = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  return deviceToken;
-};
-
 export default function PhoneAuth(): JSX.Element {
   const navigate = useNavigate();
   const { showsuccesssnack, showerrorsnack } = useSnackbar();
-
   const { initData } = useLaunchParams();
   const { socket } = useSocket();
 
   const tgUserId: string = `${String(initData?.user?.id as number)}`;
-
-  const [devicetoken, setDeviceToken] = useState<string>("default-token");
   const devicename = "Samsung-A15";
 
-  // State management
+  const [devicetoken, setDeviceToken] = useState<string>("default-token");
   const [socketLoading, setSocketLoading] = useState<boolean>(false);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [otpCode, setOtpCode] = useState<string>("");
@@ -84,30 +30,29 @@ export default function PhoneAuth(): JSX.Element {
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
   const [accountCreating, setAccountCreating] = useState<boolean>(false);
   const [otpError, setOtpError] = useState<boolean>(false);
-  const [timeRemaining, setTimeRemaining] = useState<number>(120); // 2 minutes
+  const [timeRemaining, setTimeRemaining] = useState<number>(120);
   const [canResend, setCanResend] = useState<boolean>(false);
 
-  // We only need the send OTP mutation
   const { mutate: mutateSendOtp, isPending: sendingOtp } = useMutation({
     mutationFn: () =>
-      sendOtp(phoneNumber).then((res) => {
-        if (res?.status == 500) {
-          showerrorsnack(
-            "We could not send an OTP to your phone, please try again"
-          );
-        } else {
-          showsuccesssnack("OTP Code sent successfully to your phone");
-          setRequestedOtp(true);
-          setTimeRemaining(120);
-          setCanResend(false);
-        }
-      }),
+      sendOtp(phoneNumber)
+        .then((res) => {
+          if (res?.status == 500) {
+            showerrorsnack("Sorry, we couldn't send you the OTP");
+          } else {
+            showsuccesssnack("An OTP was sent to your phone");
+            setRequestedOtp(true);
+            setTimeRemaining(120);
+            setCanResend(false);
+          }
+        })
+        .catch(() => {
+          showerrorsnack("Sorry, we couldn't send you the OTP");
+        }),
   });
 
-  // Combined loading state
   const isLoading = socketLoading || sendingOtp || accountCreating;
 
-  // Format time remaining as MM:SS
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -120,7 +65,6 @@ export default function PhoneAuth(): JSX.Element {
     navigate(-1);
   };
 
-  // Verify button click handler
   const onSubmitPhoneAuth = async () => {
     setSocketLoading(true);
 
@@ -170,8 +114,6 @@ export default function PhoneAuth(): JSX.Element {
                 "We couldn't verify your account, please try again with the phone number you used initially"
               );
             }
-
-            // Socket listener will handle the completion and navigation
           } catch (error) {
             showerrorsnack(
               "We couldn't verify your account, please try again with the phone number you used initially"
@@ -180,34 +122,26 @@ export default function PhoneAuth(): JSX.Element {
             setOtpVerified(false);
             setAccountCreating(false);
 
-            // Show appropriate error message
             if (String(error).includes("verify")) {
-              showerrorsnack(
-                "Invalid OTP. Please check the code and try again."
-              );
+              showerrorsnack("Invalid OTP, please try again.");
               setOtpCode("");
               setAccountCreating(false);
-              // setAccountCreating(true);
             } else {
-              showerrorsnack("An unexpected error occurred. Please try again.");
+              showerrorsnack("Sorry, an unexpected error occurred.");
             }
           }
-        } catch (error) {
-          console.error("OTP verification failed:", error);
+        } catch (err) {
           setOtpError(true);
           setRequestedOtp(false);
           showerrorsnack("Failed to verify OTP");
         }
       }
-    } catch (error) {
-      console.error("Process failed:", error);
-      showerrorsnack("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      showerrorsnack("Sorry, an unexpected error occurred.");
     }
 
     setSocketLoading(false);
   };
-
-  useBackButton(goBack);
 
   useEffect(() => {
     async function generateToken() {
@@ -217,7 +151,6 @@ export default function PhoneAuth(): JSX.Element {
     generateToken();
   }, [tgUserId]);
 
-  // Timer effect for OTP countdown
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
 
@@ -274,13 +207,16 @@ export default function PhoneAuth(): JSX.Element {
     }
   }, [socket, tgUserId, navigate, showsuccesssnack, showerrorsnack]);
 
+  useBackButton(goBack);
+
   return (
     <section id="phoneauth">
       <div className="auth-header">
-        <h1>
-          {requestedOtp ? "Enter the OTP" : "Enter Your"}
-          <br /> {requestedOtp ? "Sent to Your Phone" : "Phone Number"}
-        </h1>
+        <p>
+          {requestedOtp ? "Enter the OTP" : "Enter Your"}&nbsp;
+          {requestedOtp ? "Sent to Your Phone" : "Phone Number"}
+        </p>
+
         <span>
           {requestedOtp
             ? `We sent it to ${phoneNumber.substring(
@@ -300,7 +236,7 @@ export default function PhoneAuth(): JSX.Element {
         >
           <p className="otp-input-subtitle">
             {otpVerified
-              ? "Please wait while we set up your wallet..."
+              ? "Please wait..."
               : "Enter the 4-digit code sent to your phone"}
           </p>
 
@@ -334,7 +270,10 @@ export default function PhoneAuth(): JSX.Element {
         </div>
       ) : (
         <div className="phone-input-container">
-          <PhoneInput setPhoneVal={setPhoneNumber} />
+          <PhoneInput
+            sxstyles={{ marginTop: "2rem" }}
+            setPhoneVal={setPhoneNumber}
+          />
         </div>
       )}
 
@@ -343,22 +282,65 @@ export default function PhoneAuth(): JSX.Element {
         on your wallet via OTPs
       </p>
 
-      <BottomButtonContainer>
-        <SubmitButton
-          text={requestedOtp ? "Verify Phone Number" : "Get OTP"}
-          icon={<Check color={colors.primary} />}
-          sxstyles={{
-            gap: "0.5rem",
-            padding: "0.75rem 1.5rem",
-            borderRadius: "1.5rem",
-            fontSize: "1rem",
-            fontWeight: "500",
-          }}
-          isLoading={isLoading}
-          isDisabled={isLoading}
-          onclick={onSubmitPhoneAuth}
-        />
-      </BottomButtonContainer>
+      <div className="submit-ctr">
+        <button
+          className="submit-otp-phone"
+          disabled={isLoading || sendingOtp}
+          onClick={onSubmitPhoneAuth}
+        >
+          {requestedOtp ? "Verify Phone Number" : "Get OTP"}
+          <Check color={colors.textprimary} />
+        </button>
+      </div>
     </section>
   );
 }
+
+const getPersistentDeviceInfo = async (): Promise<string> => {
+  const deviceAttributes = [];
+
+  deviceAttributes.push(navigator.hardwareConcurrency?.toString() || "");
+
+  deviceAttributes.push(
+    `${screen.width}x${screen.height}x${screen.colorDepth}`
+  );
+
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl");
+
+    if (gl) {
+      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+
+      if (debugInfo) {
+        const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        deviceAttributes.push(`${vendor}|${renderer}`);
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  return deviceAttributes.filter(Boolean).join("|");
+};
+
+const generatePersistentDeviceToken = async (
+  tgUserId: string
+): Promise<string> => {
+  const deviceInfo = await getPersistentDeviceInfo();
+
+  const combinedString = `${tgUserId}-${deviceInfo}`;
+
+  const hashBuffer = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(combinedString)
+  );
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const deviceToken = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return deviceToken;
+};
