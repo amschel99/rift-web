@@ -99,6 +99,7 @@ export const AssetBalance = ({
                       : "negative"
                   }
                 >
+                  {(dayPriceChange > 1 || dayPriceChange == 0) && "+"}
                   {dayPriceChange}%
                 </span>
               </p>
