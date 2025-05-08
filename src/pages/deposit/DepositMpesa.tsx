@@ -186,7 +186,14 @@ export default function DepositMpesa() {
   useBackButton(goBack);
 
   return (
-    <div>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        overflowY: "auto",
+        marginBottom: "4rem",
+      }}
+    >
       <h1 className="text-2xl font-bold text-center mt-4">
         Deposit Crypto using M-PESA
       </h1>
@@ -338,7 +345,7 @@ export default function DepositMpesa() {
             </p>
           </div>
         </div>
-        <div className="my-4 mt-8 mx-2">
+        <div className="pb-8 mt-8 mx-2">
           <p className="text-[#f6f7f9] font-medium mb-1">Email</p>
           <p className="text-gray-400 text-xs mb-4">
             Enter your email to receive a payment notification.
