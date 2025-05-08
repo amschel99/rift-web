@@ -6,12 +6,15 @@ import Lottie from "lottie-react";
 import { PopOver } from "../../components/global/PopOver";
 import { useTabs } from "../../hooks/tabs";
 import { useBackButton } from "../../hooks/backbutton";
+import { useSnackbar } from "../../hooks/snackbar";
 import { OFFRAMP_BASEURL } from "../../utils/api/config";
-import { getEthUsdVal } from "../../utils/ethusd";
-import { getBerachainUsdVal } from "../../utils/api/mantra";
+import {
+  checkBeraBalance,
+  checkBeraUsdcBalance,
+  checkPolUsdcBalance,
+} from "../../utils/ether";
 import loading from "../../assets/animations/loading-deposit.json";
 import success from "../../assets/animations/success.json";
-import ethlogo from "../../assets/images/eth.png";
 import usdclogo from "../../assets/images/labs/usdc.png";
 import beralogo from "../../assets/images/icons/bera.webp";
 import mpesa from "../../assets/images/mpesa1.png";
@@ -22,12 +25,13 @@ export default function DepositMpesa() {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
   const { initData } = useLaunchParams();
+  const { showerrorsnack } = useSnackbar();
   const tgUserId: string = String(initData?.user?.id as number);
 
   // Updated state type to include WUSDC
-  const [depositAsset, setDepositAsset] = useState<
-    "WBERA" | "ETH" | "USDC" | "WUSDC"
-  >("ETH");
+  const [depositAsset, setDepositAsset] = useState<"WBERA" | "USDC" | "WUSDC">(
+    "WUSDC"
+  );
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDepositSuccess, setIsDepositSuccess] = useState(false);
@@ -35,8 +39,14 @@ export default function DepositMpesa() {
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState<"KES" | "ASSET">("KES");
-  const [kesValue, setKesValue] = useState<number | null>(null);
-  const [assetValue, setAssetValue] = useState<number | null>(null);
+  const [kesValue, setKesValue] = useState<number>(0);
+  const [assetValue, setAssetValue] = useState<number>(0);
+  const [reserveBeraBalance, setReserveBeraBalance] = useState<number>(0);
+  const [reserveBeraUsdcBalance, setReserveBeraUsdcBalance] =
+    useState<number>(0);
+  const [reservePolUscBalance, setReservePolUsdcBalance] = useState<number>(0);
+
+  const beraUsdValue = localStorage.getItem("WberaUsdVal");
 
   const goBack = () => {
     switchtab("home");
@@ -49,123 +59,141 @@ export default function DepositMpesa() {
 
   const handleMpesaDeposit = async () => {
     if (amount == "") {
-      toast.error("Please enter an amount", {
-        style: {
-          backgroundColor: "#212121",
-          color: "#f6f7f9",
-          borderRadius: "10px",
-          padding: "10px",
-          textAlign: "center",
-        },
-      });
-      return;
-    }
-    if (email == "") {
-      toast.error("Please enter an email", {
-        style: {
-          backgroundColor: "#212121",
-          color: "#f6f7f9",
-          borderRadius: "10px",
-        },
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${OFFRAMP_BASEURL}/api/onramp/payments`, {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          amount: Number(amount),
-          currency: "KES",
-          paymentMethod: "mobile_money",
-          mobileProvider: "mpesa",
-          cryptoAsset:
-            depositAsset === "USDC"
-              ? "POL-USDC"
-              : depositAsset === "WUSDC"
-              ? "BERA-USDC"
-              : depositAsset,
-          cryptoWalletAddress: ethaddress,
-          externalReference: tgUserId,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      showerrorsnack("Please enter an amount");
+    } else if (email == "") {
+      showerrorsnack("Please enter a valid email address");
+    } else if (
+      depositAsset == "WBERA" &&
+      convertToAsset(kesValue) >= reserveBeraBalance
+    ) {
+      showerrorsnack(
+        "We are unable to process that amount, please try a lower amount"
+      );
+    } else if (
+      depositAsset == "WUSDC" &&
+      convertToAsset(kesValue) >= reserveBeraUsdcBalance
+    ) {
+      showerrorsnack(
+        "We are unable to process that amount, please try a lower amount"
+      );
+    } else if (
+      depositAsset == "USDC" &&
+      convertToAsset(kesValue) >= reservePolUscBalance
+    ) {
+      showerrorsnack(
+        "We are unable to process that amount, please try a lower amount"
+      );
+    } else {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${OFFRAMP_BASEURL}/api/onramp/payments`, {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            amount: Number(amount),
+            currency: "KES",
+            paymentMethod: "mobile_money",
+            mobileProvider: "mpesa",
+            cryptoAsset:
+              depositAsset === "USDC"
+                ? "POL-USDC"
+                : depositAsset === "WUSDC"
+                ? "BERA-USDC"
+                : depositAsset,
+            cryptoWalletAddress: ethaddress,
+            externalReference: tgUserId,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      const data = await response.json();
-      const url = data?.data?.paymentUrl;
+        const data = await response.json();
+        const url = data?.data?.paymentUrl;
 
-      openLink(url);
-    } catch (error) {
-      setIsLoading(false);
+        openLink(url);
+      } catch (error) {
+        setIsLoading(false);
 
-      toast.error("Error depositing funds", {
-        style: {
-          backgroundColor: "#212121",
-          color: "#f6f7f9",
-          borderRadius: "10px",
-        },
-      });
-      console.error(error);
+        toast.error("Error depositing funds", {
+          style: {
+            backgroundColor: "#212121",
+            color: "#f6f7f9",
+            borderRadius: "10px",
+          },
+        });
+        console.error(error);
+      }
     }
   };
 
-  const convertToKES = async (amount: number, asset: string) => {
-    const lowerCaseAsset = asset.toLowerCase();
-    switch (lowerCaseAsset) {
-      case "eth":
-        return amount * (await getEthUsdVal()) * KESUSDT;
-      case "usdc":
+  const convertToKES = (amount: number) => {
+    switch (depositAsset) {
+      case "USDC":
         return amount * KESUSDT;
-      case "wusdc":
+      case "WUSDC":
         return amount * KESUSDT;
-      case "wbera":
-        return amount * (await getBerachainUsdVal()) * KESUSDT;
+      case "WBERA":
+        return amount * Number(beraUsdValue) * KESUSDT;
       default:
         return amount;
     }
   };
 
-  const convertToAsset = async (amount: number, asset: string) => {
-    const lowerCaseAsset = asset.toLowerCase();
-    switch (lowerCaseAsset) {
-      case "eth":
-        return amount / (await getEthUsdVal()) / KESUSDT;
-      case "usdc":
+  const convertToAsset = (amount: number): number => {
+    switch (depositAsset) {
+      case "USDC":
         return amount / KESUSDT;
-      case "wusdc":
+      case "WUSDC":
         return amount / KESUSDT;
-      case "wbera":
-        return amount / (await getBerachainUsdVal()) / KESUSDT;
+      case "WBERA":
+        return amount / Number(beraUsdValue) / KESUSDT;
+      default:
+        return 0;
     }
+  };
+
+  const getReserveBalances = async () => {
+    const berabalance = await checkBeraBalance();
+    const beraUsdcBalance = await checkBeraUsdcBalance();
+    const polUsdcBalance = await checkPolUsdcBalance();
+
+    setReserveBeraBalance(Number(berabalance));
+    setReserveBeraUsdcBalance(Number(beraUsdcBalance));
+    setReservePolUsdcBalance(Number(polUsdcBalance));
+
+    console.log("bera", berabalance);
+    console.log("bera/usdc", beraUsdcBalance);
+    console.log("pol/usdc", polUsdcBalance);
   };
 
   useEffect(() => {
     if (amount && amountType === "ASSET") {
-      convertToKES(Number(amount), depositAsset).then((val) =>
-        setKesValue(val)
-      );
-    } else {
-      setKesValue(null);
+      setKesValue(convertToKES(Number(amount)));
     }
   }, [amount, depositAsset, amountType]);
 
   useEffect(() => {
     if (amount && amountType === "KES") {
-      convertToAsset(Number(amount), depositAsset).then((val) =>
-        setAssetValue(val !== undefined ? val : null)
-      );
-    } else {
-      setAssetValue(null);
+      setAssetValue(convertToAsset(Number(amount)));
     }
   }, [amount, depositAsset, amountType]);
+
+  useEffect(() => {
+    getReserveBalances();
+  }, []);
 
   useBackButton(goBack);
 
   return (
-    <div>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        overflowY: "auto",
+        marginBottom: "4rem",
+      }}
+    >
       <h1 className="text-2xl font-bold text-center mt-4">
         Deposit Crypto using M-PESA
       </h1>
@@ -184,13 +212,7 @@ export default function DepositMpesa() {
         >
           <div className="flex items-center gap-3">
             <img
-              src={
-                depositAsset == "WBERA"
-                  ? beralogo
-                  : depositAsset == "ETH"
-                  ? ethlogo
-                  : usdclogo // Covers USDC and WUSDC
-              }
+              src={depositAsset == "WBERA" ? beralogo : usdclogo}
               className="w-8 h-8 rounded-full"
               alt={depositAsset}
             />
@@ -202,8 +224,6 @@ export default function DepositMpesa() {
                 {
                   depositAsset == "WBERA"
                     ? "Berachain"
-                    : depositAsset == "ETH"
-                    ? "Ethereum"
                     : depositAsset == "USDC"
                     ? "USD Coin (Polygon)"
                     : "USDC (Berachain)" // WUSDC
@@ -224,7 +244,6 @@ export default function DepositMpesa() {
               name: "Berachain",
               logo: beralogo,
             },
-            { id: "ETH", symbol: "ETH", name: "Ethereum", logo: ethlogo },
             {
               id: "USDC",
               symbol: "USDC",
@@ -326,8 +345,7 @@ export default function DepositMpesa() {
             </p>
           </div>
         </div>
-        {/* Deposit Address Section */}
-        <div className="my-4 mt-8 mx-2">
+        <div className="pb-8 mt-8 mx-2">
           <p className="text-[#f6f7f9] font-medium mb-1">Email</p>
           <p className="text-gray-400 text-xs mb-4">
             Enter your email to receive a payment notification.
