@@ -21,8 +21,9 @@ import EthAsset from "./pages/assets/EthAsset.tsx";
 import BeraAsset from "./pages/assets/BeraAsset.tsx";
 import PolygonUsdcAsset from "./pages/assets/PolygonUsdcAsset.tsx";
 import BeraUsdcAsset from "./pages/assets/BeraUsdcAsset.tsx";
-// import SendCrypto from "./pages/transactions/SendCrypto.tsx";
-// import SendCollectLink from "./pages/transactions/SendCollectLink.tsx";
+import SendCryptoMethods from "./pages/transactions/SendCryptoMethods.tsx";
+import SendCrypto from "./pages/transactions/SendCrypto.tsx";
+import SendCryptoCollectLink from "./pages/transactions/SendCryptoCollectLink.tsx";
 // import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
 import Deposit from "./pages/Deposit.tsx";
 // import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
@@ -56,11 +57,13 @@ let routes = createBrowserRouter([
   { path: "/bera-asset/:intent", element: <BeraAsset /> },
   { path: "/polygon-usdc-asset/:intent", element: <PolygonUsdcAsset /> },
   { path: "/bera-usdc-asset/:intent", element: <BeraUsdcAsset /> },
-  // { path: "/send-crypto/:srccurrency/:intent", element: <SendCrypto /> },
-  // {
-  //   path: "/sendcollectlink/:srccurrency/:intent",
-  //   element: <SendCollectLink />,
-  // },
+  { path: "/send-crypto-methods/:intent", element: <SendCryptoMethods /> },
+  { path: "/send-crypto/:srccurrency/:intent", element: <SendCrypto /> },
+  {
+    path: "/sendcollectlink/:srccurrency/:intent",
+    element: <SendCryptoCollectLink />,
+  },
+  { path: "/deposit/:srccurrency", element: <Deposit /> },
   // { path: "/web-assets", element: <WebAssets /> },
   // { path: "/chatbot/:openaikey", element: <ChatBotWithKey /> },
   // {
@@ -71,7 +74,6 @@ let routes = createBrowserRouter([
   // { path: "/swap", element: <SwapCrypto /> },
   // { path: "/premium", element: <Premium /> },
   // { path: "/get-premium", element: <GetPremium /> },
-  { path: "/deposit/:srccurrency", element: <Deposit /> },
   // { path: "/logout", element: <Logout /> },
   // { path: "/server-error", element: <ServerFailure /> },
 ]);
