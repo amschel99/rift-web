@@ -18,9 +18,9 @@ import Auth from "./pages/Auth.tsx";
 import Home from "./pages/Home.tsx";
 // import PhoneAuth from "./pages/PhoneAuth.tsx";
 import EthAsset from "./pages/assets/EthAsset.tsx";
-// import WberaAsset from "./pages/assets/WberaAsset.tsx";
-// import PolygonUsdcAsset from "./pages/assets/PolygonUsdcAsset.tsx";
-// import BeraUsdcAsset from "./pages/assets/BeraUsdcAsset.tsx";
+import BeraAsset from "./pages/assets/BeraAsset.tsx";
+import PolygonUsdcAsset from "./pages/assets/PolygonUsdcAsset.tsx";
+import BeraUsdcAsset from "./pages/assets/BeraUsdcAsset.tsx";
 // import SendCrypto from "./pages/transactions/SendCrypto.tsx";
 // import SendCollectLink from "./pages/transactions/SendCollectLink.tsx";
 // import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
@@ -53,9 +53,9 @@ let routes = createBrowserRouter([
   { path: "/app", element: <Home /> },
   // { path: "/claimlendkey", element: <ClaimLendKeyLink /> },
   { path: "/eth-asset/:intent", element: <EthAsset /> },
-  // { path: "/wbera-asset/:intent", element: <WberaAsset /> },
-  // { path: "/polygon-usdc-asset/:intent", element: <PolygonUsdcAsset /> },
-  // { path: "/bera-usdc-asset/:intent", element: <BeraUsdcAsset /> },
+  { path: "/bera-asset/:intent", element: <BeraAsset /> },
+  { path: "/polygon-usdc-asset/:intent", element: <PolygonUsdcAsset /> },
+  { path: "/bera-usdc-asset/:intent", element: <BeraUsdcAsset /> },
   // { path: "/send-crypto/:srccurrency/:intent", element: <SendCrypto /> },
   // {
   //   path: "/sendcollectlink/:srccurrency/:intent",
