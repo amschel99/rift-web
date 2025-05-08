@@ -9,13 +9,16 @@ import "../styles/components/appbar.scss";
 export const AppBar = (): JSX.Element => {
   const { initData } = useLaunchParams();
 
+  const ethaddress = localStorage.getItem("ethaddress");
+
   return (
     <div id="appbar">
       <div className="accounswitch">
         <img src={spherelogo} alt="SPHERE" />
 
         <span>
-          8BM0169rC8 <ChevronDown color={colors.textsecondary} />
+          {ethaddress?.substring(3, 11)}
+          <ChevronDown color={colors.textsecondary} />
         </span>
       </div>
 
