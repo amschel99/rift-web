@@ -3,14 +3,9 @@ import { useNavigate } from "react-router";
 import { useBackButton } from "../../hooks/backbutton";
 import { formatNumber } from "../../utils/formatters";
 import { SubmitButton } from "../../components/global/Buttons";
-import { CryptoPopOver } from "../../components/global/PopOver";
 import { Rotate } from "../../assets/icons";
 import { colors } from "../../constants";
-import btclogo from "../../assets/images/btc.png";
-import ethlogo from "../../assets/images/eth.png";
-import usdclogo from "../../assets/images/labs/usdc.png";
-import wusdlogo from "../../assets/images/wusd.png";
-import mantralogo from "../../assets/images/labs/mantralogo.jpeg";
+import ethlogo from "../../assets/images/logos/eth.png";
 import "../../styles/pages/transactions/swapcrypto.scss";
 
 // Define allowed swap types directly
@@ -23,10 +18,6 @@ export default function SwapCrypto(): JSX.Element {
   const [receiveCurrency, setReceiveCurrency] = useState<SwapAssetType>("USDC");
   const [sellCurrencyValue, setSellCurrencyValue] = useState<string>("");
   const [receiveCurrencyValue, setReceiveCurrencyValue] = useState<number>(0);
-  const [sellCurrencyAnchorEl, setSellCurrencyAnchorEl] =
-    useState<HTMLDivElement | null>(null);
-  const [receiveCurrencyAnchorEl, setReceiveCurrencyAnchorEl] =
-    useState<HTMLDivElement | null>(null);
 
   // my balances
   const hkda_balance = 0;
@@ -122,37 +113,16 @@ export default function SwapCrypto(): JSX.Element {
     <section id="swapcrypto" className="bg-[#0e0e0e] h-screen">
       <div className="sellcurr_ctr">
         <div className="curr_balance">
-          <div
-            className="curr"
-            onClick={(e) => setSellCurrencyAnchorEl(e.currentTarget)}
-          >
+          <div className="curr">
             {sellCurrency == "HKDA" ? (
               <span className="currency_icon">🇭🇰</span>
             ) : (
-              <img
-                src={
-                  sellCurrency == "OM"
-                    ? mantralogo
-                    : sellCurrency == "WUSD"
-                    ? wusdlogo
-                    : sellCurrency == "USDC"
-                    ? usdclogo
-                    : sellCurrency == "ETH"
-                    ? ethlogo
-                    : btclogo
-                }
-                alt={sellCurrency}
-              />
+              <img src={ethlogo} alt={sellCurrency} />
             )}
             <span className="font-bold text-sm text-gray-400">
               {sellCurrency}
             </span>
           </div>
-          <CryptoPopOver
-            anchorEl={sellCurrencyAnchorEl}
-            setAnchorEl={setSellCurrencyAnchorEl}
-            setCurrency={setSellCurrency}
-          />
 
           <p className="font-bold text-sm text-gray-400 flex gap-1">
             <span>{formatNumber(display_balance)}</span>&nbsp;
@@ -184,37 +154,16 @@ export default function SwapCrypto(): JSX.Element {
       </div>
 
       <div className="receivecurr_ctr">
-        <div
-          className="curr"
-          onClick={(e) => setReceiveCurrencyAnchorEl(e.currentTarget)}
-        >
+        <div className="curr">
           {receiveCurrency == "HKDA" ? (
             <span className="currency_icon">🇭🇰</span>
           ) : (
-            <img
-              src={
-                receiveCurrency == "OM"
-                  ? mantralogo
-                  : receiveCurrency == "WUSD"
-                  ? wusdlogo
-                  : receiveCurrency == "USDC"
-                  ? usdclogo
-                  : receiveCurrency == "ETH"
-                  ? ethlogo
-                  : btclogo
-              }
-              alt={receiveCurrency}
-            />
+            <img src={ethlogo} alt={receiveCurrency} />
           )}
           <span className="font-bold text-sm text-gray-400">
             {receiveCurrency}
           </span>
         </div>
-        <CryptoPopOver
-          anchorEl={receiveCurrencyAnchorEl}
-          setAnchorEl={setReceiveCurrencyAnchorEl}
-          setCurrency={setReceiveCurrency}
-        />
 
         <div className="receive_qty">
           <p className="qty">
