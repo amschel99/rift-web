@@ -16,12 +16,13 @@ import "@/styles/pages/deposit/paystackhadler.scss";
 export default function PaystackHandler(): JSX.Element {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
-  const txreference = localStorage.getItem("paystackreference");
+  // const txreference = localStorage.getItem("paystackreference");
+  const txreference = "2j5fm03pqd";
 
   const [socketTransactionStatus, setSocketTransactionStatus] =
     useState<string>("");
 
-  const { data: paystackStatusResponse } = useQuery({
+  const { data: paystackStatusResponse, isPending } = useQuery({
     queryKey: ["txstatus"],
     queryFn: () => checkTransactionStatus(txreference as string),
     refetchInterval: 5000,
@@ -57,30 +58,36 @@ export default function PaystackHandler(): JSX.Element {
 
   return (
     <section id="paystackhandler">
-      <div className="fiatstatus">
-        <div className="img">
-          <img
-            src={
-              paystackStatusResponse?.paystackVerificationData?.channel ===
-              "mobile_money"
-                ? mpesa
-                : creditcard
-            }
-            alt="payment-methods"
-          />
-          <p>
-            {paystackStatusResponse?.status === "success"
-              ? "Success"
-              : "Processing"}
-          </p>
+      {isPending ? (
+        <div className="animation-ctr">
+          <Loading width="2rem" height="2rem" />
         </div>
+      ) : (
+        <div className="fiatstatus">
+          <div className="img">
+            <img
+              src={
+                paystackStatusResponse?.paystackVerificationData?.channel ===
+                "mobile_money"
+                  ? mpesa
+                  : creditcard
+              }
+              alt="payment-methods"
+            />
+            <p>
+              {paystackStatusResponse?.status === "success"
+                ? "Success"
+                : "Processing"}
+            </p>
+          </div>
 
-        {paystackStatusResponse?.status === "success" ? (
-          <CheckAlt color={colors.success} />
-        ) : (
-          <Loading />
-        )}
-      </div>
+          {paystackStatusResponse?.status === "success" ? (
+            <CheckAlt color={colors.success} />
+          ) : (
+            <Loading />
+          )}
+        </div>
+      )}
 
       {paystackStatusResponse?.status === "success" && (
         <div className="fiatstatus cryptostatus">
@@ -98,14 +105,14 @@ export default function PaystackHandler(): JSX.Element {
       )}
 
       {paystackStatusResponse?.status === "success" &&
-        socketTransactionStatus === "success" && (
-          <>
-            <p className="complete">
-              The transaction was completed successfully
-            </p>
-            <button onClick={goBack}>Check my balance</button>
-          </>
-        )}
+      socketTransactionStatus === "success" ? (
+        <>
+          <p className="complete">The transaction was completed successfully</p>
+          <button onClick={goBack}>Check my balance</button>
+        </>
+      ) : (
+        <p className="complete">Please wait as we process the transaction...</p>
+      )}
     </section>
   );
 }

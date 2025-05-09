@@ -118,7 +118,8 @@ export const WalletBalance = (): JSX.Element => {
   };
 
   const onDeposit = () => {
-    navigate("/deposit-method");
+    // navigate("/deposit-method");
+    navigate("/paystack-handler");
   };
 
   const toggleInfoCard = (type: "web2" | "clicktocollect") => {
