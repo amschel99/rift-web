@@ -219,6 +219,8 @@ $success: rgba(15, 177, 77, 1);
 $success: #0fb14d;
 ```
 
+- please don't use tailwind
+
 #### Comments
 
 - please use comments sparingly, where necessary
@@ -235,5 +237,6 @@ To learn more about sphere, please checkout [SPHERE.md](./SPHERE.md), [PAPER.md]
 
 #### TODO
 
-- send to address
+- buy
+- profile
 - move notifications to its own page
