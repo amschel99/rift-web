@@ -35,13 +35,13 @@ export default function PolygonUsdcAsset(): JSX.Element {
   const polygonUsdcUsdbal =
     Number(polygonUsdcbal) * Number(usdcInfo?.market_data?.current_price?.usd);
 
-  const onSendBera = () => {
-    // localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
-    // navigate(`/send-crypto/USDC/${intent}`);
+  const onPolUsdc = () => {
+    localStorage.setItem("prev_page", `/polygon-usdc-asset/${intent}`);
+    navigate(`/send-crypto-methods/USDC/${intent}`);
   };
 
-  const onDepositBera = () => {
-    localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
+  const onDepositPolUsdc = () => {
+    localStorage.setItem("prev_page", `/polygon-usdc-asset/${intent}`);
     navigate("/deposit/WUSDC");
   };
 
@@ -126,10 +126,10 @@ export default function PolygonUsdcAsset(): JSX.Element {
       </div>
 
       <div className="assetactions">
-        <button onClick={onSendBera}>
+        <button onClick={onPolUsdc}>
           Send <ArrowUpCircle color={colors.textprimary} />
         </button>
-        <button onClick={onDepositBera}>
+        <button onClick={onDepositPolUsdc}>
           Deposit <ArrowDownCircle color={colors.textprimary} />
         </button>
       </div>

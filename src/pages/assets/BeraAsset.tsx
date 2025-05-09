@@ -35,8 +35,8 @@ export default function BeraAsset(): JSX.Element {
   const berabalUsd = localStorage.getItem("berabalusd");
 
   const onSendBera = () => {
-    // localStorage.setItem("prev_page", `/bera-asset/${intent}`);
-    // navigate(`/send-crypto/WBERA/${intent}`);
+    localStorage.setItem("prev_page", `/bera-asset/${intent}`);
+    navigate(`/send-crypto-methods/WBERA/${intent}`);
   };
 
   const onDepositBera = () => {

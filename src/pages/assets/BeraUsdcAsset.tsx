@@ -35,12 +35,12 @@ export default function BeraUsdcAsset(): JSX.Element {
   const beraUsdcUsdbal =
     Number(beraUsdcbal) * Number(usdcInfo?.market_data?.current_price?.usd);
 
-  const onSendBera = () => {
-    // localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
-    // navigate(`/send-crypto/WUSDC/${intent}`);
+  const onSendBeraUsdc = () => {
+    localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
+    navigate(`/send-crypto-methods/WUSDC/${intent}`);
   };
 
-  const onDepositBera = () => {
+  const onDepositBeraUsdc = () => {
     localStorage.setItem("prev_page", `/bera-usdc-asset/${intent}`);
     navigate("/deposit/WUSDC");
   };
@@ -126,10 +126,10 @@ export default function BeraUsdcAsset(): JSX.Element {
       </div>
 
       <div className="assetactions">
-        <button onClick={onSendBera}>
+        <button onClick={onSendBeraUsdc}>
           Send <ArrowUpCircle color={colors.textprimary} />
         </button>
-        <button onClick={onDepositBera}>
+        <button onClick={onDepositBeraUsdc}>
           Deposit <ArrowDownCircle color={colors.textprimary} />
         </button>
       </div>
