@@ -8,9 +8,7 @@ import { BottomTabNavigation } from "../components/Bottom";
 import { HomeTab } from "../components/tabs/HomeTab";
 import { KeysTab } from "../components/tabs/KeysTab";
 import { Rewards } from "../components/tabs/Rewards";
-import { SendCryptoTab } from "../components/tabs/SendCrypto";
 import { Polymarket } from "../components/tabs/Polymarket";
-import { Notifications } from "../components/tabs/Notifications";
 
 export default function Home(): JSX.Element {
   const navigate = useNavigate();
@@ -100,12 +98,8 @@ export default function Home(): JSX.Element {
         <KeysTab />
       ) : currTab == "rewards" ? (
         <Rewards />
-      ) : currTab == "sendcrypto" ? (
-        <SendCryptoTab />
-      ) : currTab == "polymarket" ? (
-        <Polymarket />
       ) : (
-        <Notifications />
+        <Polymarket />
       )}
 
       <BottomTabNavigation />
