@@ -27,7 +27,6 @@ export default function DepositWithCard() {
   const { showerrorsnack } = useSnackbar();
   const tgUserId: string = String(initData?.user?.id as number);
 
-  // Updated state type to include WUSDC
   const [depositAsset, setDepositAsset] = useState<"WBERA" | "USDC" | "WUSDC">(
     "WUSDC"
   );
@@ -36,10 +35,10 @@ export default function DepositWithCard() {
   const [isDepositSuccess, setIsDepositSuccess] = useState(false);
   const ethaddress = localStorage.getItem("ethaddress") as string;
   const [email, setEmail] = useState("");
-  const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState<"KES" | "ASSET">("KES");
-  const [kesValue, setKesValue] = useState<number>(0);
-  const [assetValue, setAssetValue] = useState<number>(0);
+  const [kesAmount, setKesAmount] = useState<number>(0);
+  const [usdAmount, setUsdAmount] = useState<number>(0);
+  const [assetQty, setAssetQty] = useState<number>(0);
   const [reserveBeraBalance, setReserveBeraBalance] = useState<number>(0);
   const [reserveBeraUsdcBalance, setReserveBeraUsdcBalance] =
     useState<number>(0);
@@ -47,23 +46,16 @@ export default function DepositWithCard() {
   const [reserveBalancesLoaded, setreserveBalancesLoaded] =
     useState<boolean>(false);
 
-  const beraUsdValue = localStorage.getItem("WberaUsdVal");
-
-  const goBack = () => {
-    switchtab("home");
-    navigate("/app");
-  };
-
-  const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const wberaUsdValue = localStorage.getItem("WberaUsdVal");
+  const assetUsdValue =
+    depositAsset == "WBERA" ? Number(wberaUsdValue || 0) : 0.99;
 
   const handleMpesaDeposit = async () => {
     if (!reserveBalancesLoaded) {
       return;
     }
 
-    if (amount == "") {
+    if (kesAmount == 0) {
       showerrorsnack("Please enter an amount");
       return;
     }
@@ -75,21 +67,21 @@ export default function DepositWithCard() {
       return;
     }
 
-    if (depositAsset == "WBERA" && assetValue >= reserveBeraBalance) {
+    if (depositAsset == "WBERA" && assetQty >= reserveBeraBalance) {
       showerrorsnack(
         "We are unable to process that amount, please try a lower amount"
       );
       return;
     }
 
-    if (depositAsset == "WUSDC" && assetValue >= reserveBeraUsdcBalance) {
+    if (depositAsset == "WUSDC" && assetQty >= reserveBeraUsdcBalance) {
       showerrorsnack(
         "We are unable to process that amount, please try a lower amount"
       );
       return;
     }
 
-    if (depositAsset == "USDC" && assetValue >= reservePolUscBalance) {
+    if (depositAsset == "USDC" && assetQty >= reservePolUscBalance) {
       showerrorsnack(
         "We are unable to process that amount, please try a lower amount"
       );
@@ -102,7 +94,7 @@ export default function DepositWithCard() {
         method: "POST",
         body: JSON.stringify({
           email,
-          amount: kesValue,
+          amount: kesAmount,
           currency: "KES",
           paymentMethod: "card",
           cryptoAsset:
@@ -128,32 +120,6 @@ export default function DepositWithCard() {
     }
   };
 
-  const convertToKES = (amount: number) => {
-    switch (depositAsset) {
-      case "USDC":
-        return amount * KESUSDT;
-      case "WUSDC":
-        return amount * KESUSDT;
-      case "WBERA":
-        return amount * Number(beraUsdValue) * KESUSDT;
-      default:
-        return amount;
-    }
-  };
-
-  const convertToAsset = (amount: number): number => {
-    switch (depositAsset) {
-      case "USDC":
-        return amount / KESUSDT;
-      case "WUSDC":
-        return amount / KESUSDT;
-      case "WBERA":
-        return amount / Number(beraUsdValue) / KESUSDT;
-      default:
-        return 0;
-    }
-  };
-
   const getReserveBalances = async () => {
     const berabalance = await checkBeraBalance();
     const beraUsdcBalance = await checkBeraUsdcBalance();
@@ -166,11 +132,14 @@ export default function DepositWithCard() {
     });
   };
 
-  useEffect(() => {
-    if (amount && amountType === "ASSET") {
-      setKesValue(convertToKES(Number(amount)));
-    }
-  }, [amount, depositAsset, amountType]);
+  const goBack = () => {
+    switchtab("home");
+    navigate("/app");
+  };
+
+  const openAssetPopOver = (event: MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   useEffect(() => {
     getReserveBalances();
@@ -188,14 +157,17 @@ export default function DepositWithCard() {
       }}
     >
       <h1 className="text-2xl font-bold text-center mt-4">
-        Deposit Crypto using M-PESA
+        Deposit Crypto Card
       </h1>
+
       <p className="text-center text-gray-400 text-sm">
-        Deposit crypto to your Sphere wallet using M-PESA
+        Deposit crypto to your Sphere wallet with your card
       </p>
+
       <div className="flex w-full items-center justify-center my-12">
         <img src={creditcard} alt="card" className="w-24 h-24 rounded-full" />
       </div>
+
       {/* Asset Selector Section */}
       <div className="mx-2">
         <p className="text-[#f6f7f9] font-medium mb-2">Choose Asset</p>
@@ -284,7 +256,7 @@ export default function DepositWithCard() {
             } p-2 rounded-xl w-1/2`}
             onClick={() => setAmountType("KES")}
           >
-            <p className="text-sm font-medium text-center">KES</p>
+            <p className="text-sm font-medium text-center">USD</p>
           </div>
           <div
             className={`${
@@ -311,24 +283,24 @@ export default function DepositWithCard() {
           >
             <p className="text-[#f6f7f9] font-medium mb-1">Amount</p>
             <p className="text-gray-400 text-xs mb-4">
-              The amount in KES you want to deposit.
+              The amount in USD you want to deposit.
             </p>
             <input
               type="text"
               className="w-full p-2 py-4 rounded-xl border border-[#34404f] bg-[#2a2e2c] text-sm text-[#f6f7f9] focus:outline-none focus:ring-2 focus:ring-[#ffb386] focus:border-[#ffb386]"
-              placeholder="Enter amount in KES"
+              placeholder="Enter amount in USD"
               inputMode="numeric"
-              value={amount}
+              value={usdAmount == 0 ? "" : usdAmount}
               onChange={(e) => {
-                setAmount(e.target.value);
-                setKesValue(Number(e.target.value));
+                setUsdAmount(Number(e.target.value));
+                setAssetQty(Number(e.target.value) / assetUsdValue);
+                setKesAmount(
+                  (Number(e.target.value) * KESUSDT) / assetUsdValue
+                );
               }}
-              onKeyUp={(e) =>
-                setAssetValue(convertToAsset(Number(e?.currentTarget?.value)))
-              }
             />
             <p className="text-gray-400 text-xs mt-2 text-center font-bold">
-              {assetValue !== null ? assetValue.toLocaleString() : ""}{" "}
+              {assetQty.toFixed(4)}&nbsp;
               {depositAsset == "WUSDC"
                 ? "USDC.e"
                 : depositAsset == "WBERA"
@@ -336,6 +308,7 @@ export default function DepositWithCard() {
                 : depositAsset}
             </p>
           </div>
+
           <div
             className={`${amountType == "ASSET" ? "flex flex-col" : "hidden"}`}
           >
@@ -349,6 +322,7 @@ export default function DepositWithCard() {
                 : depositAsset}{" "}
               you want to deposit.
             </p>
+
             <input
               type="text"
               className="w-full p-2 py-4 rounded-xl border border-[#34404f] bg-[#2a2e2c] text-sm text-[#f6f7f9] focus:outline-none focus:ring-2 focus:ring-[#ffb386] focus:border-[#ffb386]"
@@ -360,15 +334,19 @@ export default function DepositWithCard() {
                   : depositAsset
               }`}
               inputMode="numeric"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              onKeyUp={(e) => setAssetValue(Number(e?.currentTarget?.value))}
+              value={assetQty == 0 ? "" : assetQty}
+              onChange={(e) => {
+                setAssetQty(Number(e.target.value));
+                setUsdAmount(Number(e.target.value) * assetUsdValue);
+                setKesAmount(Number(e.target.value) * assetUsdValue * KESUSDT);
+              }}
             />
             <p className="text-gray-400 text-xs mt-2 text-center font-bold">
-              {kesValue !== null ? kesValue.toLocaleString() : ""} KES
+              {usdAmount} USD
             </p>
           </div>
         </div>
+
         <div className="pb-8 mt-8 mx-2">
           <p className="text-[#f6f7f9] font-medium mb-1">Email</p>
           <p className="text-gray-400 text-xs mb-4">
@@ -416,16 +394,11 @@ export default function DepositWithCard() {
                 : depositAsset == "WBERA"
                 ? "BERA"
                 : depositAsset}{" "}
-              with{" "}
-              {amountType == "KES"
-                ? amount
-                : kesValue !== null
-                ? kesValue.toLocaleString()
-                : ""}{" "}
-              KES
+              with {usdAmount} USD
             </p>
           </div>
         )}
+
         {isDepositSuccess && (
           <div
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm"
@@ -446,21 +419,7 @@ export default function DepositWithCard() {
                 : depositAsset}{" "}
               is on its way!
             </h1>
-            <p className="text-gray-400 text-xs mt-2">
-              Successfully deposited{" "}
-              {depositAsset == "WUSDC"
-                ? "USDC.e"
-                : depositAsset == "WBERA"
-                ? "BERA"
-                : depositAsset}{" "}
-              with{" "}
-              {amountType == "KES"
-                ? amount
-                : kesValue !== null
-                ? kesValue.toLocaleString()
-                : ""}{" "}
-              KES
-            </p>
+
             <div className="flex w-full items-center justify-center mt-8">
               <button
                 className="w-1/2 p-2 py-3 mx-2 rounded-xl border border-[#34404f] bg-[#ffb386] text-sm text-[#0e0e0e] font-semibold"
