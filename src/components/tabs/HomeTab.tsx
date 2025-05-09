@@ -99,7 +99,11 @@ export const HomeTab = (): JSX.Element => {
   );
 
   const goToSendCryptoMethods = () => {
-    navigate("/send-crypto-methods/send");
+    navigate("/send-crypto-methods/ETH/send");
+  };
+
+  const goToDepositCrypto = () => {
+    navigate("/deposit/ETH");
   };
 
   const goToEthAsset = () => {
@@ -188,7 +192,7 @@ export const HomeTab = (): JSX.Element => {
           <WalletAction
             icon={<ArrowDownCircle color={colors.textprimary} />}
             text="Deposit"
-            onclick={() => {}}
+            onclick={goToDepositCrypto}
           />
         </div>
 
