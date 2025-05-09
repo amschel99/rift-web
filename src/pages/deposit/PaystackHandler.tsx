@@ -9,6 +9,7 @@ import { CheckAlt } from "@/assets/icons/actions";
 import { Loading } from "@/assets/animations";
 import { colors } from "@/constants";
 import mpesa from "../../assets/images/mpesa1.png";
+import creditcard from "../../assets/images/credit-card.png";
 import usdc from "../../assets/images/labs/usdc.png";
 import "@/styles/pages/deposit/paystackhadler.scss";
 
@@ -17,21 +18,12 @@ export default function PaystackHandler(): JSX.Element {
   const { switchtab } = useTabs();
   const txreference = localStorage.getItem("paystackreference");
 
-  const [httpTransactionStatus, setHttpTransactionStatus] =
-    useState<string>("");
   const [socketTransactionStatus, setSocketTransactionStatus] =
     useState<string>("");
 
-  useQuery({
+  const { data: paystackStatusResponse } = useQuery({
     queryKey: ["txstatus"],
-    queryFn: () =>
-      checkTransactionStatus(txreference as string)
-        .then((res) => {
-          setHttpTransactionStatus(res?.status);
-        })
-        .catch(() => {
-          setHttpTransactionStatus("failed");
-        }),
+    queryFn: () => checkTransactionStatus(txreference as string),
     refetchInterval: 5000,
   });
 
@@ -44,7 +36,7 @@ export default function PaystackHandler(): JSX.Element {
   useBackButton(goBack);
 
   useEffect(() => {
-    if (httpTransactionStatus === "success") {
+    if (paystackStatusResponse?.status === "success") {
       OFFRAMP_SOCKET.on("connect", () => {
         console.log("connected to socket server...");
       });
@@ -61,26 +53,36 @@ export default function PaystackHandler(): JSX.Element {
         OFFRAMP_SOCKET.off("OnRampDeposit");
       };
     }
-  }, [httpTransactionStatus]);
+  }, [paystackStatusResponse]);
 
   return (
     <section id="paystackhandler">
       <div className="fiatstatus">
         <div className="img">
-          <img src={mpesa} alt="mpesa" />
+          <img
+            src={
+              paystackStatusResponse?.paystackVerificationData?.channel ===
+              "mobile_money"
+                ? mpesa
+                : creditcard
+            }
+            alt="payment-methods"
+          />
           <p>
-            {httpTransactionStatus === "success" ? "Success" : "Processing"}
+            {paystackStatusResponse?.status === "success"
+              ? "Success"
+              : "Processing"}
           </p>
         </div>
 
-        {httpTransactionStatus === "success" ? (
+        {paystackStatusResponse?.status === "success" ? (
           <CheckAlt color={colors.success} />
         ) : (
           <Loading />
         )}
       </div>
 
-      {httpTransactionStatus === "success" && (
+      {paystackStatusResponse?.status === "success" && (
         <div className="fiatstatus cryptostatus">
           <div className="img">
             <img src={usdc} alt="usdc" />
@@ -95,7 +97,7 @@ export default function PaystackHandler(): JSX.Element {
         </div>
       )}
 
-      {httpTransactionStatus === "success" &&
+      {paystackStatusResponse?.status === "success" &&
         socketTransactionStatus === "success" && (
           <>
             <p className="complete">
