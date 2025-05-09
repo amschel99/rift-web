@@ -10,6 +10,7 @@ import { useSocket } from "../utils/SocketProvider";
 import { PhoneInput } from "../components/security/PhoneInput";
 import { DigitsInput } from "../components/security/DigitsInput";
 import { Check, Rotate } from "../assets/icons";
+import { Loading } from "../assets/animations";
 import { colors } from "../constants";
 import "../styles/pages/phoneauth.scss";
 
@@ -29,7 +30,6 @@ export default function PhoneAuth(): JSX.Element {
   const [requestedOtp, setRequestedOtp] = useState<boolean>(false);
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
   const [accountCreating, setAccountCreating] = useState<boolean>(false);
-  const [otpError, setOtpError] = useState<boolean>(false);
   const [timeRemaining, setTimeRemaining] = useState<number>(120);
   const [canResend, setCanResend] = useState<boolean>(false);
 
@@ -73,7 +73,6 @@ export default function PhoneAuth(): JSX.Element {
         mutateSendOtp();
       } else {
         if (otpCode.length !== 4) {
-          setOtpError(true);
           showerrorsnack("Please enter all 4 digits of the OTP");
           setSocketLoading(false);
           return;
@@ -131,7 +130,6 @@ export default function PhoneAuth(): JSX.Element {
             }
           }
         } catch (err) {
-          setOtpError(true);
           setRequestedOtp(false);
           showerrorsnack("Failed to verify OTP");
         }
@@ -179,8 +177,6 @@ export default function PhoneAuth(): JSX.Element {
         setAccountCreating(false);
 
         if (data?.user == tgUserId) {
-          showsuccesssnack("Your phone number was added successfully");
-
           setTimeout(() => {
             goBack();
           }, 1500);
@@ -240,43 +236,32 @@ export default function PhoneAuth(): JSX.Element {
               : "Enter the 4-digit code sent to your phone"}
           </p>
 
-          {!otpVerified && (
-            <>
-              <DigitsInput setDigitVals={setOtpCode} />
+          <DigitsInput setDigitVals={setOtpCode} />
 
-              <div className="otp-timer">
-                {canResend ? (
-                  <button
-                    className="resend"
-                    onClick={() => {
-                      if (!sendingOtp && canResend) {
-                        setOtpCode("");
-                        mutateSendOtp();
-                        showsuccesssnack("Sending new OTP code...");
-                      }
-                    }}
-                    disabled={sendingOtp || !canResend}
-                  >
-                    Resend
-                    <Rotate
-                      color={
-                        canResend ? colors.textprimary : colors.textsecondary
-                      }
-                    />
-                  </button>
-                ) : (
-                  <span className="timer-value">
-                    Resend OTP in {formatTime(timeRemaining)}
-                  </span>
-                )}
-              </div>
-              {otpError && (
-                <p className="error-message">
-                  Invalid verification code. Please try again.
-                </p>
-              )}
-            </>
-          )}
+          <div className="otp-timer">
+            {canResend ? (
+              <button
+                className="resend"
+                onClick={() => {
+                  if (!sendingOtp && canResend) {
+                    setOtpCode("");
+                    mutateSendOtp();
+                    showsuccesssnack("Sending new OTP code...");
+                  }
+                }}
+                disabled={sendingOtp || !canResend}
+              >
+                Resend
+                <Rotate
+                  color={canResend ? colors.textprimary : colors.textsecondary}
+                />
+              </button>
+            ) : (
+              <span className="timer-value">
+                Resend OTP in {formatTime(timeRemaining)}
+              </span>
+            )}
+          </div>
         </div>
       ) : (
         <div className="phone-input-container">
@@ -295,8 +280,14 @@ export default function PhoneAuth(): JSX.Element {
           disabled={isLoading || sendingOtp}
           onClick={onSubmitPhoneAuth}
         >
-          {requestedOtp ? "Verify Phone Number" : "Get OTP"}
-          <Check color={colors.textprimary} />
+          {isLoading || sendingOtp ? (
+            <Loading />
+          ) : (
+            <>
+              {requestedOtp ? "Verify Phone Number" : "Get OTP"}
+              <Check color={colors.textprimary} />
+            </>
+          )}
         </button>
       </div>
     </section>
