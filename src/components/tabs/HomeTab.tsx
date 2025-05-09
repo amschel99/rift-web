@@ -21,50 +21,49 @@ import "../../styles/components/tabs/hometab.scss";
 export const HomeTab = (): JSX.Element => {
   const navigate = useNavigate();
 
-  const { data: ethbalance, isFetching: ethbalfetching } = useQuery({
+  const { data: ethbalance, isPending: ethbalfetching } = useQuery({
     queryKey: ["ethbalance"],
     queryFn: getEthBalance,
   });
 
-  const { data: berabalance, isFetching: berabalfetching } = useQuery({
+  const { data: berabalance, isPending: berabalfetching } = useQuery({
     queryKey: ["berabalance"],
     queryFn: getBeraBalance,
   });
 
-  const { data: polygonusdcbalance, isFetching: polygonusdcfetching } =
-    useQuery({
+  const { data: polygonusdcbalance, isPending: polygonusdcfetching } = useQuery(
+    {
       queryKey: ["polygonusdcbalance"],
       queryFn: getPolygonUsdBalance,
-    });
+    }
+  );
 
-  const { data: berausdcbalance, isFetching: berausdcbalfetching } = useQuery({
+  const { data: berausdcbalance, isPending: berausdcbalfetching } = useQuery({
     queryKey: ["berausdcbalance"],
     queryFn: getBeraUsdcBalance,
   });
 
-  const { data: unlockedtokens, isFetching: unlockedtokensfetching } = useQuery(
-    {
-      queryKey: ["unlockedTokens"],
-      queryFn: getUnlockedTokens,
-    }
-  );
+  const { data: unlockedtokens, isPending: unlockedtokensfetching } = useQuery({
+    queryKey: ["unlockedTokens"],
+    queryFn: getUnlockedTokens,
+  });
   //
-  const { data: ethereumInfo, isFetching: ethinfofetching } = useQuery({
+  const { data: ethereumInfo, isPending: ethinfofetching } = useQuery({
     queryKey: ["ethinfo"],
     queryFn: () => fetchCoinInfo("ethereum"),
   });
 
-  const { data: usdcInfo, isFetching: usdcinfofetching } = useQuery({
+  const { data: usdcInfo, isPending: usdcinfofetching } = useQuery({
     queryKey: ["usdcinfo"],
     queryFn: () => fetchCoinInfo("usd-coin"),
   });
 
-  const { data: beraInfo, isFetching: berainfofetching } = useQuery({
+  const { data: beraInfo, isPending: berainfofetching } = useQuery({
     queryKey: ["berachainbera"],
     queryFn: () => fetchCoinInfo("berachain-bera"),
   });
   //
-  const { data: sphereusdcrate, isFetching: sphereusdcfetching } = useQuery({
+  const { data: sphereusdcrate, isPending: sphereusdcfetching } = useQuery({
     queryKey: ["sphereusdcrate"],
     queryFn: getSphrUsdcRate,
   });
@@ -104,6 +103,10 @@ export const HomeTab = (): JSX.Element => {
 
   const goToDepositCrypto = () => {
     navigate("/deposit/ETH");
+  };
+
+  const goToBuyOptions = () => {
+    navigate("/buy/options");
   };
 
   const goToEthAsset = () => {
@@ -186,7 +189,7 @@ export const HomeTab = (): JSX.Element => {
           <WalletAction
             icon={<PlusSolid color={colors.textprimary} />}
             text="Buy"
-            onclick={() => {}}
+            onclick={goToBuyOptions}
           />
 
           <WalletAction
