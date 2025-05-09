@@ -5,7 +5,6 @@ export type tabsType =
   | "keys"
   | "polymarket"
   | "rewards"
-  | "sendcrypto"
   | "notifications";
 
 interface tabsctxtype {
