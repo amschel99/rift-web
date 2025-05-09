@@ -5,14 +5,7 @@ import { Avatar } from "@mui/material";
 import { useTabs } from "../hooks/tabs";
 import { useBackButton } from "../hooks/backbutton";
 import { useSnackbar } from "../hooks/snackbar";
-import {
-  Telegram,
-  ArrowRight,
-  Rotate,
-  LogOut,
-  Lock,
-  Check,
-} from "../assets/icons";
+import { Telegram, ArrowRight, Wallet, LogOut, Lock } from "../assets/icons";
 import { colors } from "../constants";
 import "../styles/pages/profile.scss";
 
@@ -68,7 +61,7 @@ export default function Profile(): JSX.Element {
 
       <p className="action-title">Transactions</p>
       <ProfileAction
-        icon={<Rotate width={20} height={20} color={colors.textprimary} />}
+        icon={<Wallet width={22} height={20} color={colors.textprimary} />}
         title="Transaction History"
         description="View your transaction history"
         onclick={goToNotifications}
@@ -76,13 +69,7 @@ export default function Profile(): JSX.Element {
 
       <p className="action-title">Security</p>
       <ProfileAction
-        icon={
-          verifyphone == null ? (
-            <Lock width={22} height={22} color={colors.textprimary} />
-          ) : (
-            <Check color={colors.success} />
-          )
-        }
+        icon={<Lock width={22} height={22} color={colors.textprimary} />}
         title="Phone"
         description={
           verifyphone == null
