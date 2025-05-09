@@ -39,13 +39,12 @@
 
       & {
         font-weight: 500;
+        border: 0;
+        outline: none;
+        outline-color: transparent;
+        background-color: transparent;
+        color: colors.$textsecondary;
       }
-
-      border: 0;
-      outline: none;
-      outline-color: transparent;
-      background-color: transparent;
-      color: colors.$textsecondary;
     }
   }
 
@@ -79,14 +78,13 @@
 
       & {
         font-weight: 500;
+        margin-top: 0.5rem;
+        border: 0;
+        outline: none;
+        outline-color: transparent;
+        background-color: transparent;
+        color: colors.$textsecondary;
       }
-
-      margin-top: 0.5rem;
-      border: 0;
-      outline: none;
-      outline-color: transparent;
-      background-color: transparent;
-      color: colors.$textsecondary;
     }
   }
 }
