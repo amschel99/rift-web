@@ -24,6 +24,7 @@ import BeraUsdcAsset from "./pages/assets/BeraUsdcAsset.tsx";
 import SendCryptoMethods from "./pages/transactions/SendCryptoMethods.tsx";
 import SendCryptoToAddress from "./pages/transactions/SendCryptoToAddress.tsx";
 import SendCryptoCollectLink from "./pages/transactions/SendCryptoCollectLink.tsx";
+import BuyCryptoOptions from "./pages/transactions/buy/BuyCryptoOptions.tsx";
 // import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
 import Deposit from "./pages/Deposit.tsx";
 // import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
@@ -33,7 +34,7 @@ import Deposit from "./pages/Deposit.tsx";
 // import SwapCrypto from "./pages/transactions/Swap.tsx";
 // import Premium from "./pages/premium/index.tsx";
 // import GetPremium from "./pages/premium/GetPremium.tsx";
-// import ServerFailure from "./pages/ServerFailure.tsx";
+import ServerFailure from "./pages/ServerFailure.tsx";
 // import Logout from "./pages/Logout.tsx";
 import "./styles/index.scss";
 
@@ -48,22 +49,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 }
 
 // createBrowserRouter([
-// { path: "", index: true, element: <Splash /> },
-// { path: "/auth", element: <Auth /> },
-// { path: "/auth/phone", element: <PhoneAuth /> },
-// { path: "/app", element: <Home /> },
 // { path: "/claimlendkey", element: <ClaimLendKeyLink /> },
-// { path: "/eth-asset/:intent", element: <EthAsset /> },
-// { path: "/bera-asset/:intent", element: <BeraAsset /> },
-// { path: "/polygon-usdc-asset/:intent", element: <PolygonUsdcAsset /> },
-// { path: "/bera-usdc-asset/:intent", element: <BeraUsdcAsset /> },
-// { path: "/send-crypto-methods/:intent", element: <SendCryptoMethods /> },
-// { path: "/send-crypto/:srccurrency/:intent", element: <SendCrypto /> },
-// {
-//   path: "/sendcollectlink/:srccurrency/:intent",
-//   element: <SendCryptoCollectLink />,
-// },
-// { path: "/deposit/:srccurrency", element: <Deposit /> },
 // { path: "/web-assets", element: <WebAssets /> },
 // { path: "/chatbot/:openaikey", element: <ChatBotWithKey /> },
 // {
@@ -75,7 +61,6 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 // { path: "/premium", element: <Premium /> },
 // { path: "/get-premium", element: <GetPremium /> },
 // { path: "/logout", element: <Logout /> },
-// { path: "/server-error", element: <ServerFailure /> },
 // ]);
 
 createRoot(document.getElementById("root")!).render(
@@ -122,6 +107,11 @@ createRoot(document.getElementById("root")!).render(
                         path="/deposit/:srccurrency"
                         element={<Deposit />}
                       />
+                      <Route
+                        path="/buy/options"
+                        element={<BuyCryptoOptions />}
+                      />
+                      <Route path="/server-error" element={<ServerFailure />} />
                     </Routes>
 
                     <AppDrawer />
