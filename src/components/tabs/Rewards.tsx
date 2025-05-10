@@ -7,6 +7,7 @@ import { useBackButton } from "../../hooks/backbutton";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useAppDialog } from "../../hooks/dialog";
 import { useTabs } from "../../hooks/tabs";
+import { useAppDrawer } from "@/hooks/drawer";
 import {
   claimAirdrop,
   getUnlockedTokens,
@@ -16,13 +17,12 @@ import { formatNumber } from "../../utils/formatters";
 import { createReferralLink } from "../../utils/api/refer";
 import { Copy, Stake, Telegram } from "../../assets/icons/actions";
 import { Confetti, Loading } from "../../assets/animations";
+import { colors } from "@/constants";
 import referearn from "../../assets/images/icons/refer.png";
 import spherelogo from "../../assets/images/sphere.jpg";
-
 import walletout from "../../assets/images/wallet_out.png";
 import transaction from "../../assets/images/obhehalfspend.png";
 import "../../styles/components/tabs/rewards.scss";
-import { colors } from "@/constants";
 
 export const Rewards = (): JSX.Element => {
   const queryClient = useQueryClient();
@@ -30,6 +30,7 @@ export const Rewards = (): JSX.Element => {
   const { showerrorsnack, showsuccesssnack } = useSnackbar();
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const { switchtab } = useTabs();
+  const { openAppDrawer } = useAppDrawer();
 
   const airdropId = localStorage.getItem("airdropId");
   const airdropUid = airdropId?.split("-")[1];
@@ -83,6 +84,7 @@ export const Rewards = (): JSX.Element => {
       );
 
       const responseData = await response.json();
+      localStorage.removeItem("txverified");
 
       if (!response.ok) {
         console.error("Burn and Reward failed", response.status, responseData);
@@ -183,6 +185,8 @@ export const Rewards = (): JSX.Element => {
 
   // --- Burn SPHR Handler (Simplified) ---
   const onBurnSphr = async () => {
+    const txverified = localStorage.getItem("txverified");
+
     // Still async for potential future awaits, but simpler now
     const amountToBurn = parseFloat(burnAmount);
     if (isNaN(amountToBurn) || amountToBurn <= 0) {
@@ -191,6 +195,10 @@ export const Rewards = (): JSX.Element => {
     }
     if (amountToBurn > sphrBalance) {
       showerrorsnack("Insufficient SPHR balance to burn this amount.");
+      return;
+    }
+    if (txverified == null) {
+      openAppDrawer("verifytxwithotp");
       return;
     }
 
