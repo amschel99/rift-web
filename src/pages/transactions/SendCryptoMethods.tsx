@@ -71,7 +71,7 @@ export default function SendCryptoMethods(): JSX.Element {
         <RadioButton
           image={beralogo}
           title="Berachain"
-          description="BERA"
+          description="WBERA"
           ischecked={selectedtAsset == "WBERA"}
           onclick={() => setSelectedAsset("WBERA")}
         />
