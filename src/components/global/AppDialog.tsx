@@ -37,11 +37,7 @@ export const AppDialog = (): JSX.Element => {
       open={dialogOpen}
       onClose={handleClose}
     >
-      {action == "loading" || action == "referearn" ? (
-        <LoadingOutput />
-      ) : (
-        <ErrorOutput />
-      )}
+      <LoadingOutput />
     </Dialog>
   );
 };
