@@ -25,15 +25,11 @@ import SendCryptoMethods from "./pages/transactions/SendCryptoMethods.tsx";
 import SendCryptoToAddress from "./pages/transactions/SendCryptoToAddress.tsx";
 import SendCryptoCollectLink from "./pages/transactions/SendCryptoCollectLink.tsx";
 import BuyCryptoOptions from "./pages/transactions/buy/BuyCryptoOptions.tsx";
-// import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
+import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
 import Deposit from "./pages/Deposit.tsx";
-// import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
-// import WebAssets from "./pages/WebAssets.tsx";
-// import ChatBotWithKey from "./pages/bot/ChatBotWithKey.tsx";
-// import ChatBotWithSharedSecret from "./pages/bot/ChatBotWithSharedSecret.tsx";
-// import SwapCrypto from "./pages/transactions/Swap.tsx";
-// import Premium from "./pages/premium/index.tsx";
-// import GetPremium from "./pages/premium/GetPremium.tsx";
+import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
+import ChatBotWithKey from "./pages/bot/ChatBotWithKey.tsx";
+import ChatBotWithSharedSecret from "./pages/bot/ChatBotWithSharedSecret.tsx";
 import SphereExchangeRate from "./pages/SphereExchangeRate.tsx";
 import Profile from "./pages/Profile.tsx";
 import Notifications from "./pages/Notifications.tsx";
@@ -49,21 +45,6 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     eruda.init();
   });
 }
-
-// createBrowserRouter([
-// { path: "/claimlendkey", element: <ClaimLendKeyLink /> },
-// { path: "/web-assets", element: <WebAssets /> },
-// { path: "/chatbot/:openaikey", element: <ChatBotWithKey /> },
-// {
-//   path: "/chat/:conversationId/:chatAccessToken/:nonce",
-//   element: <ChatBotWithSharedSecret />,
-// },
-// { path: "/lend/secret", element: <CreateLendSecret /> },
-// { path: "/swap", element: <SwapCrypto /> },
-// { path: "/premium", element: <Premium /> },
-// { path: "/get-premium", element: <GetPremium /> },
-// { path: "/logout", element: <Logout /> },
-// ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -112,6 +93,22 @@ createRoot(document.getElementById("root")!).render(
                       <Route
                         path="/buy/options"
                         element={<BuyCryptoOptions />}
+                      />
+                      <Route
+                        path="/claimlendkey"
+                        element={<ClaimLendKeyLink />}
+                      />
+                      <Route
+                        path="/chatbot/:openaikey"
+                        element={<ChatBotWithKey />}
+                      />
+                      <Route
+                        path="/chat/:conversationId/:chatAccessToken/:nonce"
+                        element={<ChatBotWithSharedSecret />}
+                      />
+                      <Route
+                        path="/lend/secret/:purpose/:value"
+                        element={<CreateLendSecret />}
                       />
                       <Route
                         path="/sphere-rate"
