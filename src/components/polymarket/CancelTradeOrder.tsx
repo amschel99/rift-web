@@ -4,8 +4,6 @@ import { useAppDrawer } from "../../hooks/drawer";
 import { useSnackbar } from "../../hooks/snackbar";
 import { cancelOrder } from "../../utils/polymarket/orders";
 import { BottomButtonContainer } from "../Bottom";
-import { SubmitButton } from "../global/Buttons";
-import { colors } from "../../constants";
 import "../../styles/pages/polymarket/cancelorder.scss";
 
 export const CancelTradeOrder = (): JSX.Element => {
@@ -41,19 +39,9 @@ export const CancelTradeOrder = (): JSX.Element => {
       <p className="span">{secretPurpose}</p>
 
       <BottomButtonContainer>
-        <SubmitButton
-          text="Yes Cancel Order"
-          sxstyles={{
-            padding: "0.625rem",
-            borderRadius: "0.5rem",
-            color: colors.textprimary,
-            textTransform: "capitalize",
-            backgroundColor: colors.danger,
-          }}
-          isLoading={isPending}
-          isDisabled={isPending}
-          onclick={() => onCancelOrder()}
-        />
+        <button disabled={isPending} onClick={() => onCancelOrder()}>
+          Yes Cancel Order
+        </button>
       </BottomButtonContainer>
     </div>
   );
