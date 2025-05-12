@@ -1,12 +1,10 @@
-import { CSSProperties, JSX, useState } from "react";
+import { JSX, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAppDrawer } from "../../hooks/drawer";
 import { useSnackbar } from "../../hooks/snackbar";
 import { fetchMarketByConditionId } from "../../utils/polymarket/markets";
 import { createOrder } from "../../utils/polymarket/orders";
 import { BottomButtonContainer } from "../Bottom";
-import { SubmitButton } from "../global/Buttons";
-import { colors } from "../../constants";
 import { HorizontalDivider } from "../global/Divider";
 import "../../styles/pages/polymarket/tradeyesno.scss";
 
@@ -90,37 +88,25 @@ export const TradeYesNo = (): JSX.Element => {
       </div>
 
       <div className="tradeoptions">
-        <SubmitButton
-          text={`${conditiondata?.data?.tokens[0]?.outcome} ${conditiondata?.data?.tokens[0]?.price} ¢`}
-          sxstyles={{
-            ...buttonstyles,
-            backgroundColor:
-              tradeOption == conditiondata?.data?.tokens[0]?.outcome
-                ? colors.success
-                : colors.divider,
-          }}
-          isDisabled={marketdatapending}
-          isLoading={marketdatapending}
-          onclick={() =>
+        <button
+          disabled={marketdatapending}
+          onClick={() =>
             setTradeOption(conditiondata?.data?.tokens[0]?.outcome as string)
           }
-        />
+        >
+          {conditiondata?.data?.tokens[0]?.outcome} $
+          {conditiondata?.data?.tokens[0]?.price} ¢
+        </button>
 
-        <SubmitButton
-          text={`${conditiondata?.data?.tokens[1]?.outcome} ${conditiondata?.data?.tokens[1]?.price} ¢`}
-          sxstyles={{
-            ...buttonstyles,
-            backgroundColor:
-              tradeOption == conditiondata?.data?.tokens[1]?.outcome
-                ? colors.danger
-                : colors.divider,
-          }}
-          isDisabled={marketdatapending}
-          isLoading={marketdatapending}
-          onclick={() =>
+        <button
+          disabled={marketdatapending}
+          onClick={() =>
             setTradeOption(conditiondata?.data?.tokens[1]?.outcome as string)
           }
-        />
+        >
+          {conditiondata?.data?.tokens[1]?.outcome} $
+          {conditiondata?.data?.tokens[1]?.price} ¢
+        </button>
       </div>
 
       <div className="tradeform">
@@ -196,29 +182,13 @@ export const TradeYesNo = (): JSX.Element => {
       </p>
 
       <BottomButtonContainer>
-        <SubmitButton
-          text={`${tradeType} ${tradeOption}`}
-          sxstyles={{
-            padding: "0.625rem",
-            borderRadius: "0.5rem",
-            fontWeight: "600",
-            textTransform: "capitalize",
-            color: colors.textprimary,
-            backgroundColor: colors.accent,
-          }}
-          isLoading={marketdatapending || buysharespending}
-          isDisabled={marketdatapending || buysharespending}
-          onclick={() => onTradeMarketShares()}
-        />
+        <button
+          disabled={marketdatapending || buysharespending}
+          onClick={() => onTradeMarketShares()}
+        >
+          {tradeType} ${tradeOption}
+        </button>
       </BottomButtonContainer>
     </div>
   );
-};
-
-const buttonstyles: CSSProperties = {
-  width: "49%",
-  borderRadius: "0.5rem",
-  fontFamily: "Raleway, serif",
-  textTransform: "capitalize",
-  color: colors.textprimary,
 };
