@@ -7,7 +7,6 @@ import {
 } from "react";
 import { TextField } from "@mui/material";
 import { colors } from "../../constants";
-import "../../styles/components/global/inputs.scss";
 
 type inputProps = {
   inputType: HTMLInputTypeAttribute;
