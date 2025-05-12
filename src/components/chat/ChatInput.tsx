@@ -33,11 +33,7 @@ export const ChatInput = ({
           onSubmitPrompt(propmtValue);
         }}
       >
-        <ArrowUpCircle
-          color={
-            propmtValue == "" || promptLoading ? colors.divider : colors.accent
-          }
-        />
+        <ArrowUpCircle width={20} height={20} color={colors.textprimary} />
       </button>
     </div>
   );
