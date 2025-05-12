@@ -50,6 +50,7 @@ export const ENDPOINTS = {
   stakebalance: "/staking/user/",
   stakelst: "/staking/stake",
   unstakelst: "/staking/initiate-unstake",
+  burnsphere: "/burnAndReward",
 };
 
 export const QUVAULT_ENDPOINTS = {

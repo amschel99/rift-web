@@ -34,6 +34,7 @@ import Deposit from "./pages/Deposit.tsx";
 // import SwapCrypto from "./pages/transactions/Swap.tsx";
 // import Premium from "./pages/premium/index.tsx";
 // import GetPremium from "./pages/premium/GetPremium.tsx";
+import SphereExchangeRate from "./pages/SphereExchangeRate.tsx";
 import Profile from "./pages/Profile.tsx";
 import Notifications from "./pages/Notifications.tsx";
 import ServerFailure from "./pages/ServerFailure.tsx";
@@ -111,6 +112,10 @@ createRoot(document.getElementById("root")!).render(
                       <Route
                         path="/buy/options"
                         element={<BuyCryptoOptions />}
+                      />
+                      <Route
+                        path="/sphere-rate"
+                        element={<SphereExchangeRate />}
                       />
                       <Route path="/profile" element={<Profile />} />
                       <Route

@@ -6,6 +6,15 @@ export type unlockhistorytype = {
   message: string[];
 };
 
+export type unlockTokensType = {
+  id: string;
+  amount: string;
+  createdAt: string;
+  updatedAt: string;
+  username: string;
+  unlocked: string;
+};
+
 export const createAirdropCampaign = async (
   campaignname: string,
   maxsupply: number,
@@ -50,15 +59,6 @@ export const claimAirdrop = async (
   });
 
   return { status: res?.status };
-};
-
-export type unlockTokensType = {
-  id: string;
-  amount: string;
-  createdAt: string;
-  updatedAt: string;
-  username: string;
-  unlocked: string;
 };
 
 export const getUnlockedTokens = async (): Promise<unlockTokensType> => {
@@ -117,4 +117,24 @@ export const performDailyCheckin = async (): Promise<void> => {
   });
 
   return await res.json();
+};
+
+export const burnSphereAndReward = async (
+  amount: string
+): Promise<{ status: number }> => {
+  const URL = BASEURL + ENDPOINTS.burnsphere;
+  const accessToken = localStorage.getItem("spheretoken");
+
+  const res = await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      amountToBurn: amount,
+    }),
+  });
+
+  return { status: res?.status };
 };

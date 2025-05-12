@@ -221,6 +221,17 @@ $success: #0fb14d;
 
 - please don't use tailwind
 
+#### Queries & Mutations
+
+- queries always come before mutations
+
+```tsx
+import { useQuery, useMutation } from "@tanstack-react-query";
+
+const { data } = useQuery();
+const { mutate, data } = useMutation();
+```
+
 #### Comments
 
 - please use comments sparingly, where necessary

@@ -6,13 +6,11 @@ import { CoinPriceChart } from "../components/PriceChart";
 import { coinPriceType } from "../utils/coingecko/markets";
 import { useQuery } from "@tanstack/react-query";
 import { getSphrUsdcRate } from "../utils/api/sphere";
-import "../styles/pages/coininfo.scss";
+import "../styles/pages/sphererate.scss";
 
 export default function SphereExchangeRate(): JSX.Element {
   const navigate = useNavigate();
   const { switchtab } = useTabs();
-
-  const prevpage = localStorage.getItem("prev_page");
 
   const { data: sphrUsdcRateData, isLoading: sphrUsdcRateLoading } = useQuery({
     queryKey: ["sphrUsdcRate"],
@@ -20,13 +18,7 @@ export default function SphereExchangeRate(): JSX.Element {
   });
 
   const goBack = () => {
-    if (prevpage == null) {
-      switchtab("home");
-    } else {
-      switchtab("rewards");
-    }
-
-    localStorage.removeItem("prev_page");
+    switchtab("rewards");
     navigate("/app");
   };
 
