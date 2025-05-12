@@ -3,8 +3,10 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { revokeKeyAccess } from "../../utils/api/keys";
 import { useAppDrawer } from "../../hooks/drawer";
 import { useSnackbar } from "../../hooks/snackbar";
-import { SubmitButton } from "../global/Buttons";
+import { Trash } from "../../assets/icons";
+import { colors } from "../../constants";
 import "../../styles/components/drawer/revokesecret.scss";
+import { Loading } from "../../assets/animations";
 
 export const RevokeSecretAccess = (): JSX.Element => {
   const queryclient = useQueryClient();
@@ -15,10 +17,11 @@ export const RevokeSecretAccess = (): JSX.Element => {
     mutationFn: () =>
       revokeKeyAccess(keyToshare as string)
         .then(() => {
+          showsuccesssnack("Access revoked successfully");
+
           queryclient
-            .invalidateQueries({ queryKey: ["mylendkeys"] })
+            .invalidateQueries({ queryKey: ["mylentkeys"] })
             .then(() => {
-              showsuccesssnack("Access revoked successfully");
               closeAppDrawer();
             });
         })
@@ -32,16 +35,18 @@ export const RevokeSecretAccess = (): JSX.Element => {
     <div className="revokesecretaccess">
       <p>
         Are you sure you want to revoke access to your {secretPurpose} key ?
-        <span>The receipient will not be able to use it again !</span>
+        <span>The receipient will not be able to use it again</span>
       </p>
 
-      <SubmitButton
-        text="Yes, Revoke Access"
-        sxstyles={{ padding: "0.625rem" }}
-        isLoading={isPending}
-        isDisabled={isPending}
-        onclick={() => onRevoke()}
-      />
+      <button disabled={isPending} onClick={() => onRevoke()}>
+        {isPending ? (
+          <Loading width="1.25rem" height="1.25rem" />
+        ) : (
+          <>
+            Yes, Revoke Access <Trash color={colors.textprimary} />
+          </>
+        )}
+      </button>
     </div>
   );
 };
