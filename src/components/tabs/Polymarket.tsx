@@ -12,7 +12,7 @@ import { numberFormat } from "../../utils/formatters";
 import { Loading } from "../../assets/animations";
 import { AnglesUp, AnglesDown } from "../../assets/icons";
 import { colors } from "../../constants";
-import "../../styles/pages/polymarket/index.scss";
+import "../../styles/pages/polymarket/polymarkettab.scss";
 
 export const Polymarket = (): JSX.Element => {
   const queryclient = useQueryClient();
@@ -180,10 +180,10 @@ const Market = ({
       </div>
 
       <div className="marketactions">
-        <button onClick={onTradeYes}>
+        <button onClick={onTradeYes} className="tx-yes">
           Buy {outcomearr[0]} <AnglesUp color={colors.textprimary} />
         </button>
-        <button onClick={onTradeNo}>
+        <button onClick={onTradeNo} className="tx-no">
           Buy {outcomearr[1]} <AnglesDown color={colors.textprimary} />
         </button>
       </div>
