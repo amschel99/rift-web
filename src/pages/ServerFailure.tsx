@@ -11,7 +11,7 @@ export default function ServerFailure(): JSX.Element {
 
   const { data, isFetching } = useQuery({
     queryKey: ["serverstatus"],
-    refetchInterval: 30000,
+    refetchInterval: 5000,
     queryFn: checkServerStatus,
   });
 
