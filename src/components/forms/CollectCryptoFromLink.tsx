@@ -100,31 +100,30 @@ export const CollectCryptoFromLink = (): JSX.Element => {
       setTxMessage("Transaction completed");
       setShowTxStatus(true);
 
-      Promise.all([
-        queryclient.invalidateQueries({ queryKey: ["ethusd"] }),
-        queryclient.invalidateQueries({ queryKey: ["mantrausd"] }),
-        queryclient.invalidateQueries({ queryKey: ["btcusd"] }),
-        queryclient.invalidateQueries({ queryKey: ["btceth"] }),
-        queryclient.invalidateQueries({ queryKey: ["mantrabalance"] }),
-        queryclient.invalidateQueries({ queryKey: ["usdcbalance"] }),
-      ])
+      queryclient
+        .invalidateQueries({
+          queryKey: [
+            "ethbalance",
+            "berabalance",
+            "polygonusdcbalance",
+            "berausdcbalance",
+            "unlockedTokens",
+          ],
+        })
         .then(() => {
           showsuccesssnack(
             `Successfully collected ${base64ToString(utxoVal)} ${utxoCurrency}`
           );
-
           setTimeout(() => {
             setShowTxStatus(false);
             closeAppDrawer();
           }, 4500);
         })
-        .catch((error) => {
-          console.error("Failed to refresh balances:", error);
+        .catch(() => {
           showsuccesssnack(
-            `Successfully collected ${base64ToString(
-              utxoVal
-            )} ${utxoCurrency}. Please refresh for updated balances.`
+            `Successfully collected ${base64ToString(utxoVal)} ${utxoCurrency}`
           );
+
           setTimeout(() => {
             setShowTxStatus(false);
             closeAppDrawer();
@@ -181,7 +180,7 @@ export const CollectCryptoFromLink = (): JSX.Element => {
         />
 
         <p className="balance">
-          {utxoVal}
+          {base64ToString(utxoVal)}
           <span>${collectValue}</span>
         </p>
       </div>
