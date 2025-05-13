@@ -30,6 +30,7 @@
     }
 
     &:disabled {
+      color: colors.$textsecondary;
       background-color: colors.$divider;
     }
   }
