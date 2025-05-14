@@ -4,13 +4,21 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { AppBar } from "../AppBar";
 import { AssetBalance, WalletAction, WalletBalance } from "../WalletBalance";
-import { ArrowDownCircle, ArrowUpCircle } from "../../assets/icons";
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Search,
+  Rotate,
+} from "../../assets/icons";
 import {
   getEthBalance,
   getBeraBalance,
   getPolygonUsdBalance,
   getBeraUsdcBalance,
-} from "../../utils/api/wallet";
+  getBnbBalances,
+  getLiskBalances,
+  getArbitrumBalances,
+} from "../../utils/api/balances";
 import { getUnlockedTokens } from "../../utils/api/airdrop";
 import { fetchCoinInfo } from "../../utils/coingecko/markets";
 import { getSphrUsdcRate } from "../../utils/api/sphere";
@@ -43,6 +51,21 @@ export const HomeTab = (): JSX.Element => {
     queryFn: getBeraUsdcBalance,
   });
 
+  const { data: bnbbalance, isPending: bnbbalfetching } = useQuery({
+    queryKey: ["bnbbalances"],
+    queryFn: getBnbBalances,
+  });
+
+  const { data: liskbalances, isPending: liskbalfetching } = useQuery({
+    queryKey: ["liskbalancess"],
+    queryFn: getLiskBalances,
+  });
+
+  const { data: arbibalances, isPending: arbibalfetching } = useQuery({
+    queryKey: ["arbibalancess"],
+    queryFn: getArbitrumBalances,
+  });
+
   const { data: unlockedtokens, isPending: unlockedtokensfetching } = useQuery({
     queryKey: ["unlockedTokens"],
     queryFn: getUnlockedTokens,
@@ -58,9 +81,24 @@ export const HomeTab = (): JSX.Element => {
     queryFn: () => fetchCoinInfo("usd-coin"),
   });
 
+  const { data: tetherInfo, isPending: tetherinfofetching } = useQuery({
+    queryKey: ["tetherinfo"],
+    queryFn: () => fetchCoinInfo("tether"),
+  });
+
   const { data: beraInfo, isPending: berainfofetching } = useQuery({
     queryKey: ["berachainbera"],
     queryFn: () => fetchCoinInfo("berachain-bera"),
+  });
+
+  const { data: liskInfo, isPending: liskinfofetching } = useQuery({
+    queryKey: ["liskinfo"],
+    queryFn: () => fetchCoinInfo("lisk"),
+  });
+
+  const { data: bnbInfo, isPending: bnbinfofetching } = useQuery({
+    queryKey: ["bnbinfo"],
+    queryFn: () => fetchCoinInfo("binancecoin"),
   });
   //
   const { data: sphereusdcrate, isPending: sphereusdcfetching } = useQuery({
@@ -68,12 +106,29 @@ export const HomeTab = (): JSX.Element => {
     queryFn: getSphrUsdcRate,
   });
 
-  const berabalUsd =
-    Number(berabalance?.data?.balance) *
-    Number(beraInfo?.market_data?.current_price?.usd);
+  const isLoadingAggr: boolean =
+    ethbalfetching ||
+    berabalfetching ||
+    polygonusdcfetching ||
+    berausdcbalfetching ||
+    unlockedtokensfetching ||
+    ethinfofetching ||
+    usdcinfofetching ||
+    berainfofetching ||
+    sphereusdcfetching ||
+    liskinfofetching ||
+    bnbinfofetching ||
+    bnbbalfetching ||
+    tetherinfofetching ||
+    liskbalfetching ||
+    arbibalfetching;
+
   const ethbalUsd =
     Number(ethbalance?.balance) *
     Number(ethereumInfo?.market_data?.current_price?.usd);
+  const berabalUsd =
+    Number(berabalance?.data?.balance) *
+    Number(beraInfo?.market_data?.current_price?.usd);
 
   localStorage.setItem("berabal", String(berabalance?.data?.balance));
   localStorage.setItem("berabalusd", String(berabalUsd));
@@ -103,6 +158,10 @@ export const HomeTab = (): JSX.Element => {
 
   const goToDepositCrypto = () => {
     navigate("/deposit/ETH");
+  };
+
+  const goToSearch = () => {
+    navigate("/search");
   };
 
   const goToEthAsset = () => {
@@ -141,17 +200,7 @@ export const HomeTab = (): JSX.Element => {
 
       <div id="hometab">
         <WalletBalance
-          balancesLoading={
-            ethbalfetching ||
-            berabalfetching ||
-            polygonusdcfetching ||
-            berausdcbalfetching ||
-            unlockedtokensfetching ||
-            ethinfofetching ||
-            usdcinfofetching ||
-            berainfofetching ||
-            sphereusdcfetching
-          }
+          balancesLoading={isLoadingAggr}
           ethBalanceUsd={
             Number(ethbalance?.balance) *
               Number(ethereumInfo?.market_data?.current_price?.usd) || 0
@@ -187,20 +236,21 @@ export const HomeTab = (): JSX.Element => {
             text="Deposit"
             onclick={goToDepositCrypto}
           />
+
+          <WalletAction
+            icon={<Rotate color={colors.textprimary} />}
+            text="Swap"
+            onclick={() => {}}
+          />
+        </div>
+
+        <div className="search-assets" onClick={goToSearch}>
+          <Search width={18} height={18} color={colors.textsecondary} />
+          <span className="placeholder">ETH, WBERA, USDC</span>
         </div>
 
         <AssetBalance
-          tokenLoading={
-            ethbalfetching ||
-            berabalfetching ||
-            polygonusdcfetching ||
-            berausdcbalfetching ||
-            unlockedtokensfetching ||
-            ethinfofetching ||
-            usdcinfofetching ||
-            berainfofetching ||
-            sphereusdcfetching
-          }
+          tokenLoading={isLoadingAggr}
           tokenImage={ethereumInfo?.image?.large as string}
           tokenName={ethereumInfo?.name as string}
           tokenSymbol={ethereumInfo?.symbol as string}
@@ -213,20 +263,10 @@ export const HomeTab = (): JSX.Element => {
         />
 
         <AssetBalance
-          tokenLoading={
-            ethbalfetching ||
-            berabalfetching ||
-            polygonusdcfetching ||
-            berausdcbalfetching ||
-            unlockedtokensfetching ||
-            ethinfofetching ||
-            usdcinfofetching ||
-            berainfofetching ||
-            sphereusdcfetching
-          }
+          tokenLoading={isLoadingAggr}
           tokenImage={beraInfo?.image?.large as string}
-          tokenName="WBERA"
-          tokenSymbol={beraInfo?.symbol as string}
+          tokenName="Berachain"
+          tokenSymbol="WBERA"
           dayPriceChange={Number(
             beraInfo?.market_data?.price_change_percentage_24h
           )}
@@ -236,17 +276,7 @@ export const HomeTab = (): JSX.Element => {
         />
 
         <AssetBalance
-          tokenLoading={
-            ethbalfetching ||
-            berabalfetching ||
-            polygonusdcfetching ||
-            berausdcbalfetching ||
-            unlockedtokensfetching ||
-            ethinfofetching ||
-            usdcinfofetching ||
-            berainfofetching ||
-            sphereusdcfetching
-          }
+          tokenLoading={isLoadingAggr}
           tokenImage={usdcInfo?.image?.large as string}
           tokenName="USDC (Polygon)"
           tokenSymbol={usdcInfo?.symbol as string}
@@ -259,17 +289,7 @@ export const HomeTab = (): JSX.Element => {
         />
 
         <AssetBalance
-          tokenLoading={
-            ethbalfetching ||
-            berabalfetching ||
-            polygonusdcfetching ||
-            berausdcbalfetching ||
-            unlockedtokensfetching ||
-            ethinfofetching ||
-            usdcinfofetching ||
-            berainfofetching ||
-            sphereusdcfetching
-          }
+          tokenLoading={isLoadingAggr}
           tokenImage={usdcInfo?.image?.large as string}
           tokenName="USDC (Berachain)"
           tokenSymbol="USDC.e"
@@ -282,17 +302,124 @@ export const HomeTab = (): JSX.Element => {
         />
 
         <AssetBalance
-          tokenLoading={
-            ethbalfetching ||
-            berabalfetching ||
-            polygonusdcfetching ||
-            berausdcbalfetching ||
-            unlockedtokensfetching ||
-            ethinfofetching ||
-            usdcinfofetching ||
-            berainfofetching ||
-            sphereusdcfetching
-          }
+          tokenLoading={isLoadingAggr}
+          tokenImage={bnbInfo?.image?.large as string}
+          tokenName={bnbInfo?.name as string}
+          tokenSymbol={bnbInfo?.symbol as string}
+          dayPriceChange={Number(
+            bnbInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(bnbbalance?.balances?.BNB)}
+          priceUsd={Number(bnbInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={usdcInfo?.image?.large as string}
+          tokenName="USDC (BNB)"
+          tokenSymbol={usdcInfo?.symbol as string}
+          dayPriceChange={Number(
+            usdcInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(bnbbalance?.balances?.USDC)}
+          priceUsd={Number(usdcInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={tetherInfo?.image?.large as string}
+          tokenName="USDT (BNB)"
+          tokenSymbol={tetherInfo?.symbol as string}
+          dayPriceChange={Number(
+            tetherInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(bnbbalance?.balances?.USDT)}
+          priceUsd={Number(tetherInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={liskInfo?.image?.large as string}
+          tokenName={liskInfo?.name as string}
+          tokenSymbol={liskInfo?.symbol as string}
+          dayPriceChange={Number(
+            liskInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(liskbalances?.balances?.LSK)}
+          priceUsd={Number(liskInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={usdcInfo?.image?.large as string}
+          tokenName="USDC (Lisk)"
+          tokenSymbol={usdcInfo?.symbol as string}
+          dayPriceChange={Number(
+            usdcInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(liskbalances?.balances?.USDC)}
+          priceUsd={Number(usdcInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={tetherInfo?.image?.large as string}
+          tokenName="USDT (Lisk)"
+          tokenSymbol={tetherInfo?.symbol as string}
+          dayPriceChange={Number(
+            tetherInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(liskbalances?.balances?.USDT)}
+          priceUsd={Number(tetherInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={ethereumInfo?.image?.large as string}
+          tokenName="ETH (Arbitrum)"
+          tokenSymbol={ethereumInfo?.symbol as string}
+          dayPriceChange={Number(
+            ethereumInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(arbibalances?.balances?.ETH)}
+          priceUsd={Number(ethereumInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={usdcInfo?.image?.large as string}
+          tokenName="USDC (Arbitrum)"
+          tokenSymbol={usdcInfo?.symbol as string}
+          dayPriceChange={Number(
+            usdcInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(arbibalances?.balances?.USDC)}
+          priceUsd={Number(usdcInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
+          tokenImage={tetherInfo?.image?.large as string}
+          tokenName="USDT (Arbitrum)"
+          tokenSymbol={tetherInfo?.symbol as string}
+          dayPriceChange={Number(
+            tetherInfo?.market_data?.price_change_percentage_24h
+          )}
+          balance={Number(arbibalances?.balances?.USDT)}
+          priceUsd={Number(tetherInfo?.market_data?.current_price?.usd)}
+          onClickHandler={() => {}}
+        />
+
+        <AssetBalance
+          tokenLoading={isLoadingAggr}
           tokenImage={spherelogo}
           tokenName="Sphere (Non-Transferable)"
           tokenSymbol="SPHR"
