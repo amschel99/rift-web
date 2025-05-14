@@ -16,6 +16,7 @@ import { AppDrawer } from "./components/global/AppDrawer.tsx";
 import Splash from "./pages/Splash.tsx";
 import Auth from "./pages/Auth.tsx";
 import Home from "./pages/Home.tsx";
+import Search from "./pages/Search.tsx";
 import PhoneAuth from "./pages/PhoneAuth.tsx";
 import EthAsset from "./pages/assets/EthAsset.tsx";
 import BeraAsset from "./pages/assets/BeraAsset.tsx";
@@ -25,6 +26,7 @@ import SendCryptoMethods from "./pages/transactions/SendCryptoMethods.tsx";
 import SendCryptoToAddress from "./pages/transactions/SendCryptoToAddress.tsx";
 import SendCryptoCollectLink from "./pages/transactions/SendCryptoCollectLink.tsx";
 import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
+import SwapCrypto from "./pages/transactions/SwapCrypto.tsx";
 import Deposit from "./pages/Deposit.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import ChatBotWithKey from "./pages/bot/ChatBotWithKey.tsx";
@@ -60,6 +62,7 @@ createRoot(document.getElementById("root")!).render(
                       <Route path="/auth" index element={<Auth />} />
                       <Route path="/auth/phone" element={<PhoneAuth />} />
                       <Route path="/app" element={<Home />} />
+                      <Route path="/search" element={<Search />} />
                       <Route path="/eth-asset/:intent" element={<EthAsset />} />
                       <Route
                         path="/bera-asset/:intent"
@@ -89,6 +92,7 @@ createRoot(document.getElementById("root")!).render(
                         path="/deposit/:srccurrency"
                         element={<Deposit />}
                       />
+                      <Route path="/swap" element={<SwapCrypto />} />
                       <Route
                         path="/claimlendkey"
                         element={<ClaimLendKeyLink />}
