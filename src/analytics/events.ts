@@ -1,9 +1,9 @@
-import posthog from "posthog-js";
-import { POSTHOG_HOST, POSTHOG_KEY } from "../constants";
-posthog.init(POSTHOG_KEY, {
-  api_host: POSTHOG_HOST,
-  person_profiles: "identified_only",
-});
+// import posthog from "posthog-js";
+// import { POSTHOG_HOST, POSTHOG_KEY } from "../constants";
+// posthog.init(POSTHOG_KEY, {
+//   api_host: POSTHOG_HOST,
+//     person_profiles: "always",
+// });
 export type ANALYTIC_EVENT_TYPES =
   | "SIGN_UP"
   | "SIGN_IN"
@@ -19,8 +19,8 @@ type BASE_EVENT_DETAILS = {
 };
 
 export const analyticsLog = (
-  event: ANALYTIC_EVENT_TYPES,
-  data: BASE_EVENT_DETAILS
+    _event: ANALYTIC_EVENT_TYPES,
+    _data: BASE_EVENT_DETAILS
 ) => {
-  posthog.capture(event, data);
+    //   posthog.capture(event, data);
 };
