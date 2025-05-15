@@ -1,5 +1,5 @@
-import posthog from "posthog-js";
-import { POSTHOG_HOST, POSTHOG_KEY } from "../constants";
+// import posthog from "posthog-js";
+// import { POSTHOG_HOST, POSTHOG_KEY } from "../constants";
 // posthog.init(POSTHOG_KEY, {
 //   api_host: POSTHOG_HOST,
 //     person_profiles: "always",
@@ -19,8 +19,8 @@ type BASE_EVENT_DETAILS = {
 };
 
 export const analyticsLog = (
-  event: ANALYTIC_EVENT_TYPES,
-  data: BASE_EVENT_DETAILS
+    _event: ANALYTIC_EVENT_TYPES,
+    _data: BASE_EVENT_DETAILS
 ) => {
     //   posthog.capture(event, data);
 };
