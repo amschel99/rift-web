@@ -16,7 +16,6 @@ import { AppDrawer } from "./components/global/AppDrawer.tsx";
 import Splash from "./pages/Splash.tsx";
 import Auth from "./pages/Auth.tsx";
 import Home from "./pages/Home.tsx";
-import Search from "./pages/Search.tsx";
 import PhoneAuth from "./pages/PhoneAuth.tsx";
 import EthAsset from "./pages/assets/EthAsset.tsx";
 import BeraAsset from "./pages/assets/BeraAsset.tsx";
@@ -62,7 +61,6 @@ createRoot(document.getElementById("root")!).render(
                       <Route path="/auth" index element={<Auth />} />
                       <Route path="/auth/phone" element={<PhoneAuth />} />
                       <Route path="/app" element={<Home />} />
-                      <Route path="/search" element={<Search />} />
                       <Route path="/eth-asset/:intent" element={<EthAsset />} />
                       <Route
                         path="/bera-asset/:intent"
