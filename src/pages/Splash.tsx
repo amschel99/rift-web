@@ -19,7 +19,7 @@ export default function Splash(): JSX.Element {
   const { startParam, initData } = useLaunchParams();
   const navigate = useNavigate();
   const { openAppDialog, closeAppDialog } = useAppDialog();
-
+  console.log("Init Data::", initData)
   const userAuthenticated = useCallback(() => {
     const user = initData?.user ?? null
     authenticateUser(user?.id?.toString(), user?.username)
