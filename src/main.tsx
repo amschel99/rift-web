@@ -35,11 +35,17 @@ import Notifications from "./pages/Notifications.tsx";
 import ServerFailure from "./pages/ServerFailure.tsx";
 import "./styles/index.scss";
 import { AnalyticsListener } from "./hocs/posthog-provider.tsx";
+import { enableTelegramMock } from "./development/mock.ts";
+import { DevelopmentTools } from "./development/development-tools.tsx";
+
+if (import.meta.env.MODE == "development") {
+  enableTelegramMock()
+}
 
 init();
 const queryclient = new QueryClient();
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+if (import.meta.env.VITE_APP_ENV === "preview") {
   import("eruda").then((erudadev) => {
     const eruda = erudadev.default;
     eruda.init();
@@ -130,6 +136,7 @@ createRoot(document.getElementById("root")!).render(
         </SnackBarProvider>
       </SocketProvider>
       <AnalyticsListener />
+      <DevelopmentTools />
     </QueryClientProvider>
   </StrictMode>
 );
