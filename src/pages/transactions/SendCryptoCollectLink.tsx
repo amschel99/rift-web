@@ -27,30 +27,13 @@ export default function SendCryptoCollectLink(): JSX.Element {
 
   const [selectedCurrency, setSelectedCurrency] =
     useState<cryptoassets>(initialCurrency);
-  const [accessAmnt, setAccessAmnt] = useState<string>("");
   const [cryptoAmount, setCryptoAmount] = useState<string>("");
   const [expiryTime, setExpiryTime] = useState<"30m" | "2h" | "24h" | "8700h">(
     "30m"
   );
 
-  const ethBal = localStorage.getItem("ethbal");
-  const ethBalUsd = localStorage.getItem("ethbalusd");
-  const ethUsdValue = localStorage.getItem("ethvalue");
-  const polygonUsdcBal = localStorage.getItem("polygonusdcbal");
-  const beraUsdcBal = localStorage.getItem("berausdcbal");
-  const beraBal = localStorage.getItem("berabal");
-  const wberaBalUsd = localStorage.getItem("berabalusd");
-  const wberaUsdValue = localStorage.getItem("berapriceusd");
-  const usdcUsdValue = localStorage.getItem("usdcusdprice");
   const txverified = localStorage.getItem("txverified");
   const prev_page = localStorage.getItem("prev_page");
-
-  const assetUsdValue =
-    selectedCurrency == "ETH"
-      ? Number(ethUsdValue || 0)
-      : selectedCurrency == "WBERA"
-      ? Number(wberaUsdValue || 0)
-      : Number(usdcUsdValue);
 
   const goBack = () => {
     if (prev_page == null) {
@@ -61,22 +44,6 @@ export default function SendCryptoCollectLink(): JSX.Element {
     } else {
       navigate(prev_page);
     }
-  };
-
-  const errorInUSDVal = (): boolean => {
-    const usdBalance =
-      selectedCurrency === "WBERA"
-        ? Number(wberaBalUsd || 0)
-        : selectedCurrency === "ETH"
-        ? Number(ethBalUsd || 0)
-        : selectedCurrency === "USDC"
-        ? Number(polygonUsdcBal || 0)
-        : selectedCurrency === "WUSDC"
-        ? Number(beraUsdcBal || 0)
-        : 0;
-
-    const accessAmntNum = Number(accessAmnt);
-    return accessAmntNum > usdBalance;
   };
 
   const { mutate, isPending } = useMutation({
@@ -98,7 +65,7 @@ export default function SendCryptoCollectLink(): JSX.Element {
   });
 
   const onCreateLink = () => {
-    if (accessAmnt == "" || cryptoAmount == "" || errorInUSDVal()) {
+    if (cryptoAmount == "") {
       showerrorsnack("Please enter a valid amount");
     } else if (txverified == null) {
       openAppDrawer("verifytxwithotp");
@@ -120,7 +87,7 @@ export default function SendCryptoCollectLink(): JSX.Element {
         <CurrencyPicker
           image={ethlogo}
           title="Ethereum"
-          description={`ETH (${ethBal})`}
+          description={"ETH"}
           ischecked={selectedCurrency == "ETH"}
           onclick={() => setSelectedCurrency("ETH")}
         />
@@ -128,7 +95,7 @@ export default function SendCryptoCollectLink(): JSX.Element {
         <CurrencyPicker
           image={beralogo}
           title="Berachain"
-          description={`WBERA (${beraBal})`}
+          description={"WBERA"}
           ischecked={selectedCurrency == "WBERA"}
           onclick={() => setSelectedCurrency("WBERA")}
         />
@@ -136,7 +103,7 @@ export default function SendCryptoCollectLink(): JSX.Element {
         <CurrencyPicker
           image={usdclogo}
           title="USDC (Polygon)"
-          description={`USDC (${polygonUsdcBal})`}
+          description={"USDC"}
           ischecked={selectedCurrency == "USDC"}
           onclick={() => setSelectedCurrency("USDC")}
         />
@@ -144,7 +111,7 @@ export default function SendCryptoCollectLink(): JSX.Element {
         <CurrencyPicker
           image={usdclogo}
           title="USDC (Berachain)"
-          description={`USDC.e (${beraUsdcBal})`}
+          description={"USDC.e"}
           ischecked={selectedCurrency == "WUSDC"}
           onclick={() => setSelectedCurrency("WUSDC")}
         />
@@ -157,27 +124,8 @@ export default function SendCryptoCollectLink(): JSX.Element {
           inputlabalel={`Quantity (${
             selectedCurrency == "WUSDC" ? "USDC.e" : selectedCurrency
           })`}
-          inputState={accessAmnt == "" ? "" : cryptoAmount}
+          inputState={cryptoAmount}
           setInputState={setCryptoAmount}
-          onkeyup={() => {
-            const usdValue = Number(cryptoAmount) * assetUsdValue;
-            setAccessAmnt(isNaN(usdValue) ? "" : usdValue.toFixed(2));
-          }}
-          hasError={errorInUSDVal()}
-        />
-
-        <OutlinedTextInput
-          inputType="number"
-          placeholder="0.00"
-          inputlabalel="Amount (USD)"
-          inputState={cryptoAmount == "" ? "" : accessAmnt}
-          setInputState={setAccessAmnt}
-          onkeyup={() => {
-            const cryptoVal =
-              assetUsdValue > 0 ? Number(accessAmnt) / assetUsdValue : 0;
-            setCryptoAmount(isNaN(cryptoVal) ? "" : cryptoVal.toFixed(5));
-          }}
-          hasError={errorInUSDVal()}
         />
       </div>
 

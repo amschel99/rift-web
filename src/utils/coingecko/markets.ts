@@ -98,3 +98,45 @@ export const fetchCoinPrices = async (
 
   return chartData;
 };
+
+type tokens = {
+  arbitrum: {
+    usd: number;
+  };
+  binancecoin: {
+    usd: number;
+  };
+  dai: {
+    usd: 1;
+  };
+  ethereum: {
+    usd: number;
+  };
+  lisk: {
+    usd: number;
+  };
+  optimism: {
+    usd: number;
+  };
+  tether: {
+    usd: number;
+  };
+  [key: string]: {
+    usd: number;
+  };
+};
+
+export const fetchSupprtedTokensPrices = async (): Promise<tokens> => {
+  const url =
+    "https://pro-api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum%2Carbitrum%2Cberachain-bera%2Cdai%2Cusd-coin%2Ctether%2Coptimism%2Cmatic-network%2Clisk%2Cbinancecoin%2Cwrapped-bitcoin";
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      "x-cg-pro-api-key": "CG-Whw1meTdSTTT7CSpGZbaB3Yi",
+    },
+  });
+
+  return res.json();
+};

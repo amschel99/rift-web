@@ -53,6 +53,7 @@ export const ENDPOINTS = {
   stakelst: "/staking/stake",
   unstakelst: "/staking/initiate-unstake",
   burnsphere: "/burnAndReward",
+  swap: "/defi/swap",
 };
 
 export const QUVAULT_ENDPOINTS = {

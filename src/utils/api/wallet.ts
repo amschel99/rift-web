@@ -39,13 +39,15 @@ export type transactionType = {
  * @param deviceToken
  * @param sphereid_index
  * @param phoneNumber
+ * @param otpCode
  */
 export const createAccount = async (
   email: string,
   password: string,
   deviceToken: string,
   sphereid_index: number,
-  phoneNumber: string
+  phoneNumber: string,
+  otpCode: string
 ): Promise<{ status: number }> => {
   let URL = BASEURL + ENDPOINTS.createwallet;
 
@@ -57,6 +59,7 @@ export const createAccount = async (
       deviceToken,
       sphereid_index,
       phoneNumber,
+      otpCode,
     }),
     headers: { "Content-Type": "application/json" },
   });

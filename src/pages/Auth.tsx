@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { useBackButton } from "../hooks/backbutton";
 import { useSnackbar } from "../hooks/snackbar";
-import { signupUser, sendOtp, verifyOtp } from "../utils/api/signup";
+import { signupUser, sendOtp } from "../utils/api/signup";
 import { createAccount } from "../utils/api/wallet";
 import {
   signinQuvaultUser,
@@ -86,7 +86,6 @@ export default function Auth(): JSX.Element {
         }
 
         try {
-          await verifyOtp(otpCode, phoneNumber);
           setOtpVerified(true);
           setAccountCreating(true);
 
@@ -114,7 +113,8 @@ export default function Auth(): JSX.Element {
                 tgUserId,
                 devicetoken,
                 0,
-                "0"
+                phoneNumber,
+                otpCode
               );
 
               if (signupstatus == 200 && createaccstatus == 200) {
@@ -145,7 +145,8 @@ export default function Auth(): JSX.Element {
                 tgUserId,
                 devicetoken,
                 0,
-                "0"
+                phoneNumber,
+                otpCode
               );
 
               if (signupstatus == 200 && createaccstatus == 200) {

@@ -1,30 +1,42 @@
 import { JSX, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useBackButton } from "../../../hooks/backbutton";
+import { useSnackbar } from "../../../hooks/snackbar";
+import { getAllBalances } from "../../../utils/api/balances";
 import { formatNumber } from "../../../utils/formatters";
+import { fetchSupprtedTokensPrices } from "../../../utils/coingecko/markets";
+import { swapTokensNormal, swapTokensGassless } from "../../../utils/api/swap";
 import { PopOver } from "../../../components/global/PopOver";
 import { RadioButtonWithIcons } from "../../../components/global/Radios";
 import { networks, token } from "./NetworkPicker";
 import { Gas, GasOff, Rotate } from "../../../assets/icons";
 import { colors } from "../../../constants";
+import { Loading } from "../../../assets/animations";
 import btclogo from "../../../assets/images/logos/btc.png";
-import ethlogo from "../../../assets/images/logos/eth.png";
 import arbitrumlogo from "../../../assets/images/logos/arbitrum.png";
-import optimismlogo from "../../../assets/images/logos/optimism.png";
 import baselogo from "../../../assets/images/logos/base.png";
-import usdclogo from "../../../assets/images/logos/usdc.png";
 import tetherlogo from "../../../assets/images/logos/usdt.png";
-import dailogo from "../../../assets/images/logos/dai.png";
 import avaxlogo from "../../../assets/images/logos/avalanche-avax.png";
+import ethlogo from "../../../assets/images/logos/eth.png";
+import usdclogo from "../../../assets/images/logos/usdc.png";
+import usdtlogo from "../../../assets/images/logos/usdt.png";
+import arblogo from "../../../assets/images/logos/arbitrum.png";
+import dailogo from "../../../assets/images/logos/dai.png";
+import beralogo from "../../../assets/images/logos/bera.png";
 import maticlogo from "../../../assets/images/logos/matic.png";
+import lisklogo from "../../../assets/images/logos/lisk.png";
+import bnblogo from "../../../assets/images/logos/bnb.png";
+import optimismlogo from "../../../assets/images/logos/optimism.png";
 import "../../../styles/pages/transactions/swap/swapcrypto.scss";
 
 export default function SwapCrypto(): JSX.Element {
   const navigate = useNavigate();
   const { network } = useParams();
+  const { showsuccesssnack, showerrorsnack } = useSnackbar();
 
   const selectedNetwork = network as string as networks;
-  const ethereumTokens: token[] = [
+  const ethereumTokens: Partial<token>[] = [
     { symbol: "ETH", logo: ethlogo },
     { symbol: "USDC", logo: usdclogo },
     { symbol: "USDT", logo: tetherlogo },
@@ -34,7 +46,7 @@ export default function SwapCrypto(): JSX.Element {
     { symbol: "WSTETH", logo: ethlogo },
     { symbol: "RETH", logo: ethlogo },
   ];
-  const arbitrumTokens: token[] = [
+  const arbitrumTokens: Partial<token>[] = [
     { symbol: "ARB", logo: arbitrumlogo },
     { symbol: "ETH", logo: ethlogo },
     { symbol: "USDC", logo: usdclogo },
@@ -47,7 +59,7 @@ export default function SwapCrypto(): JSX.Element {
     { symbol: "WAVAX", logo: avaxlogo },
     { symbol: "WMATIC", logo: maticlogo },
   ];
-  const optimisimToken: token[] = [
+  const optimisimToken: Partial<token>[] = [
     { symbol: "ETH", logo: ethlogo },
     { symbol: "WETH", logo: ethlogo },
     { symbol: "OP", logo: optimismlogo },
@@ -57,7 +69,7 @@ export default function SwapCrypto(): JSX.Element {
     { symbol: "DAI", logo: dailogo },
     { symbol: "WSTETH", logo: ethlogo },
   ];
-  const baseTokes: token[] = [
+  const baseTokes: Partial<token>[] = [
     { symbol: "ETH", logo: ethlogo },
     { symbol: "WETH", logo: ethlogo },
     { symbol: "CBBTC", logo: btclogo },
@@ -69,7 +81,7 @@ export default function SwapCrypto(): JSX.Element {
     { symbol: "WSTETH", logo: ethlogo },
   ];
 
-  const selectedTokens: token[] =
+  const selectedTokens: Partial<token>[] =
     selectedNetwork == "ETHEREUM"
       ? ethereumTokens
       : selectedNetwork == "ARBITRUM"
@@ -80,9 +92,15 @@ export default function SwapCrypto(): JSX.Element {
   const initialSellToken = selectedTokens[0];
   const initialReceiveToken = selectedTokens[0];
 
-  const [sellCurrency, setSellCurrency] = useState<token>(initialSellToken);
+  const { data: allbalances, isPending: balancesloading } = useQuery({
+    queryKey: ["allbalances"],
+    queryFn: getAllBalances,
+  });
+
+  const [sellCurrency, setSellCurrency] =
+    useState<Partial<token>>(initialSellToken);
   const [receiveCurrency, setReceiveCurrency] =
-    useState<token>(initialReceiveToken);
+    useState<Partial<token>>(initialReceiveToken);
   const [sellCurrencyValue, setSellCurrencyValue] = useState<string>("");
   const [receiveCurrencyValue, setReceiveCurrencyValue] = useState<number>(0);
   const [swapType, setSwapType] = useState<"NORMAL" | "GASLESS">("NORMAL");
@@ -91,13 +109,225 @@ export default function SwapCrypto(): JSX.Element {
   const [receiveCurrAnchorEl, setReceiveCurrAnchorEl] =
     useState<HTMLDivElement | null>(null);
 
+  const sellcurrencyId =
+    sellCurrency?.symbol == "ETH" ||
+    sellCurrency?.symbol == "WETH" ||
+    sellCurrency?.symbol == "WSTETH" ||
+    sellCurrency?.symbol == "RETH" ||
+    sellCurrency?.symbol == "CBETH"
+      ? "ethereum"
+      : sellCurrency?.symbol == "WBTC" ||
+        sellCurrency?.symbol == "CBBTC" ||
+        sellCurrency?.symbol == "TBTC"
+      ? "wrapped-bitcoin"
+      : sellCurrency?.symbol == "ARB"
+      ? "arbitrum"
+      : sellCurrency?.symbol == "BERA" || sellCurrency?.symbol == "WBERA"
+      ? "berachain-bera"
+      : sellCurrency?.symbol == "DAI"
+      ? "dai"
+      : sellCurrency?.symbol == "USDC" || sellCurrency?.symbol == "USDC.e"
+      ? "usd-coin"
+      : sellCurrency?.symbol == "USDT"
+      ? "tether"
+      : sellCurrency?.symbol == "OP"
+      ? "optimism"
+      : sellCurrency?.symbol == "MATIC"
+      ? "matic-network"
+      : sellCurrency?.symbol == "LSK"
+      ? "lisk"
+      : "binancecoin";
+  const receivecurrencyId =
+    receiveCurrency?.symbol == "ETH" ||
+    receiveCurrency?.symbol == "WETH" ||
+    receiveCurrency?.symbol == "WSTETH" ||
+    receiveCurrency?.symbol == "RETH" ||
+    receiveCurrency?.symbol == "CBETH"
+      ? "ethereum"
+      : receiveCurrency?.symbol == "WBTC" ||
+        receiveCurrency?.symbol == "CBBTC" ||
+        receiveCurrency?.symbol == "TBTC"
+      ? "wrapped-bitcoin"
+      : receiveCurrency?.symbol == "ARB"
+      ? "arbitrum"
+      : receiveCurrency?.symbol == "BERA" || receiveCurrency?.symbol == "WBERA"
+      ? "berachain-bera"
+      : receiveCurrency?.symbol == "DAI"
+      ? "dai"
+      : receiveCurrency?.symbol == "USDC" || receiveCurrency?.symbol == "USDC.e"
+      ? "usd-coin"
+      : receiveCurrency?.symbol == "USDT"
+      ? "tether"
+      : receiveCurrency?.symbol == "OP"
+      ? "optimism"
+      : receiveCurrency?.symbol == "MATIC"
+      ? "matic-network"
+      : receiveCurrency?.symbol == "LSK"
+      ? "lisk"
+      : "binancecoin";
+
+  const { data: tokenprices, isPending: tokenpricesPending } = useQuery({
+    queryKey: ["tokenprices"],
+    queryFn: fetchSupprtedTokensPrices,
+  });
+
+  const { mutate: mutateSwapNormal, isPending: normalSwapPending } =
+    useMutation({
+      mutationFn: () =>
+        swapTokensNormal(
+          sellCurrency?.symbol as string,
+          receiveCurrency?.symbol as string,
+          sellCurrency?.symbol == "ETH" ||
+            sellCurrency?.symbol == "WETH" ||
+            sellCurrency?.symbol == "WSTETH" ||
+            sellCurrency?.symbol == "RETH" ||
+            sellCurrency?.symbol == "CBETH"
+            ? sellCurrencyValue
+            : "0",
+          sellCurrency?.symbol == "ETH" ||
+            sellCurrency?.symbol == "WETH" ||
+            sellCurrency?.symbol == "WSTETH" ||
+            sellCurrency?.symbol == "RETH" ||
+            sellCurrency?.symbol == "CBETH"
+            ? true
+            : false
+        )
+          .then(() => {
+            setSellCurrencyValue("");
+            setReceiveCurrencyValue(0);
+            showsuccesssnack("The swap was completed successfully");
+          })
+          .catch(() => {
+            showerrorsnack("Sorry, we could not complete the swap");
+          }),
+    });
+
+  const { mutate: mutateSwapGassless, isPending: gasslessSwapPending } =
+    useMutation({
+      mutationFn: () =>
+        swapTokensGassless(
+          sellCurrency?.symbol == "ETH"
+            ? "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+            : (sellCurrency?.address as string),
+          receiveCurrency?.symbol == "ETH"
+            ? "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+            : (receiveCurrency?.address as string),
+          sellCurrencyValue,
+          String(receiveCurrencyValue),
+          sellCurrency?.symbol == "ETH" ||
+            sellCurrency?.symbol == "WETH" ||
+            sellCurrency?.symbol == "WSTETH" ||
+            sellCurrency?.symbol == "RETH" ||
+            sellCurrency?.symbol == "CBETH"
+            ? true
+            : false,
+          receiveCurrency?.symbol == "ETH" ||
+            receiveCurrency?.symbol == "WETH" ||
+            receiveCurrency?.symbol == "WSTETH" ||
+            receiveCurrency?.symbol == "RETH" ||
+            receiveCurrency?.symbol == "CBETH"
+            ? true
+            : false
+        )
+          .then(() => {
+            setSellCurrencyValue("");
+            setReceiveCurrencyValue(0);
+            showsuccesssnack("The swap was completed successfully");
+          })
+          .catch(() => {
+            showerrorsnack("Sorry, we could not complete the swap");
+          }),
+    });
+
+  const onGetTokenEstimates = () => {
+    const sellmultipllier: number =
+      sellCurrency?.symbol == "ETH" ||
+      sellCurrency?.symbol == "WETH" ||
+      sellCurrency?.symbol == "WSTETH" ||
+      sellCurrency?.symbol == "RETH" ||
+      sellCurrency?.symbol == "CBETH"
+        ? Number(tokenprices?.ethereum?.usd)
+        : sellCurrency?.symbol == "WBTC" ||
+          sellCurrency?.symbol == "CBBTC" ||
+          sellCurrency?.symbol == "TBTC"
+        ? Number(tokenprices && tokenprices["wrapped-bitcoin"]?.usd)
+        : sellCurrency?.symbol == "ARB"
+        ? Number(tokenprices?.arbitrum?.usd)
+        : sellCurrency?.symbol == "BERA" || sellCurrency?.symbol == "WBERA"
+        ? Number(tokenprices && tokenprices["berachain-bera"]?.usd)
+        : sellCurrency?.symbol == "DAI"
+        ? Number(tokenprices?.dai?.usd)
+        : sellCurrency?.symbol == "USDC" || sellCurrency?.symbol == "USDC.e"
+        ? Number(tokenprices && tokenprices["usd-coin"]?.usd)
+        : sellCurrency?.symbol == "USDT"
+        ? Number(tokenprices?.tether?.usd)
+        : sellCurrency?.symbol == "OP"
+        ? Number(tokenprices?.optimism?.usd)
+        : sellCurrency?.symbol == "MATIC"
+        ? Number(tokenprices && tokenprices["matic-network"]?.usd)
+        : sellCurrency?.symbol == "LSK"
+        ? Number(tokenprices?.lisk?.usd)
+        : Number(tokenprices?.binancecoin?.usd);
+
+    const receivemultipllier: number =
+      receiveCurrency?.symbol == "ETH" ||
+      receiveCurrency?.symbol == "WETH" ||
+      receiveCurrency?.symbol == "WSTETH" ||
+      receiveCurrency?.symbol == "RETH" ||
+      receiveCurrency?.symbol == "CBETH"
+        ? Number(tokenprices?.ethereum?.usd)
+        : receiveCurrency?.symbol == "WBTC" ||
+          receiveCurrency?.symbol == "CBBTC" ||
+          receiveCurrency?.symbol == "TBTC"
+        ? Number(tokenprices && tokenprices["wrapped-bitcoin"]?.usd)
+        : receiveCurrency?.symbol == "ARB"
+        ? Number(tokenprices?.arbitrum?.usd)
+        : receiveCurrency?.symbol == "BERA" ||
+          receiveCurrency?.symbol == "WBERA"
+        ? Number(tokenprices && tokenprices["berachain-bera"]?.usd)
+        : receiveCurrency?.symbol == "DAI"
+        ? Number(tokenprices?.dai?.usd)
+        : receiveCurrency?.symbol == "USDC" ||
+          receiveCurrency?.symbol == "USDC.e"
+        ? Number(tokenprices && tokenprices["usd-coin"]?.usd)
+        : receiveCurrency?.symbol == "USDT"
+        ? Number(tokenprices?.tether?.usd)
+        : receiveCurrency?.symbol == "OP"
+        ? Number(tokenprices?.optimism?.usd)
+        : receiveCurrency?.symbol == "MATIC"
+        ? Number(tokenprices && tokenprices["matic-network"]?.usd)
+        : receiveCurrency?.symbol == "LSK"
+        ? Number(tokenprices?.lisk?.usd)
+        : Number(tokenprices?.binancecoin?.usd);
+
+    const receiveQty =
+      (Number(sellCurrencyValue) * sellmultipllier) / receivemultipllier;
+
+    setReceiveCurrencyValue(receiveQty);
+  };
+
   const onSwitchCurency = () => {
     setSellCurrency(receiveCurrency);
     setReceiveCurrency(sellCurrency);
+
+    onGetTokenEstimates();
   };
 
   const goBack = () => {
     navigate("/swap-network");
+  };
+
+  const onSubmitSwapIntent = () => {
+    if (sellCurrencyValue == "" || receiveCurrencyValue == 0) {
+      showerrorsnack("Please enter a valid amount to swap");
+      return;
+    }
+
+    if (swapType == "GASLESS") {
+      mutateSwapGassless();
+    } else {
+      mutateSwapNormal();
+    }
   };
 
   useBackButton(goBack);
@@ -134,7 +364,40 @@ export default function SwapCrypto(): JSX.Element {
             className="curr"
             onClick={(e) => setSellCurrAnchorEl(e.currentTarget)}
           >
-            <img src={sellCurrency.logo} alt={sellCurrency.symbol} />
+            <img
+              src={
+                sellCurrency?.symbol == "ETH" ||
+                sellCurrency?.symbol == "WETH" ||
+                sellCurrency?.symbol == "WSTETH" ||
+                sellCurrency?.symbol == "RETH" ||
+                sellCurrency?.symbol == "CBETH"
+                  ? ethlogo
+                  : sellCurrency?.symbol == "WBTC" ||
+                    sellCurrency?.symbol == "CBBTC" ||
+                    sellCurrency?.symbol == "TBTC"
+                  ? btclogo
+                  : sellCurrency?.symbol == "ARB"
+                  ? arblogo
+                  : sellCurrency?.symbol == "BERA" ||
+                    sellCurrency?.symbol == "WBERA"
+                  ? beralogo
+                  : sellCurrency?.symbol == "DAI"
+                  ? dailogo
+                  : sellCurrency?.symbol == "USDC" ||
+                    sellCurrency?.symbol == "USDC.e"
+                  ? usdclogo
+                  : sellCurrency?.symbol == "USDT"
+                  ? usdtlogo
+                  : sellCurrency?.symbol == "OP"
+                  ? optimismlogo
+                  : sellCurrency?.symbol == "MATIC"
+                  ? maticlogo
+                  : sellCurrency?.symbol == "LSK"
+                  ? lisklogo
+                  : bnblogo
+              }
+              alt={sellCurrency.symbol}
+            />
 
             <span className="currency_name">{sellCurrency.symbol}</span>
           </div>
@@ -143,15 +406,50 @@ export default function SwapCrypto(): JSX.Element {
             setAnchorEl={setSellCurrAnchorEl}
           >
             <div className="sell-receive-tokens-ctr">
-              {selectedTokens?.map((_token) => (
+              {allbalances?.data?.arbitrum?.map((_token) => (
                 <div
                   onClick={() => {
-                    setSellCurrency(_token);
+                    setSellCurrency({
+                      symbol: _token?.symbol,
+                      address: _token?.address as string,
+                    });
+
+                    onGetTokenEstimates();
                     setSellCurrAnchorEl(null);
                   }}
                 >
-                  <img src={_token?.logo} alt={_token?.symbol} />
-
+                  <img
+                    src={
+                      _token?.symbol == "ETH" ||
+                      _token?.symbol == "WETH" ||
+                      _token?.symbol == "WSTETH" ||
+                      _token?.symbol == "RETH" ||
+                      _token?.symbol == "CBETH"
+                        ? ethlogo
+                        : _token?.symbol == "WBTC" ||
+                          _token?.symbol == "CBBTC" ||
+                          _token?.symbol == "TBTC"
+                        ? btclogo
+                        : _token?.symbol == "ARB"
+                        ? arblogo
+                        : _token?.symbol == "BERA" || _token?.symbol == "WBERA"
+                        ? beralogo
+                        : _token?.symbol == "DAI"
+                        ? dailogo
+                        : _token?.symbol == "USDC" || _token?.symbol == "USDC.e"
+                        ? usdclogo
+                        : _token?.symbol == "USDT"
+                        ? usdtlogo
+                        : _token?.symbol == "OP"
+                        ? optimismlogo
+                        : _token?.symbol == "MATIC"
+                        ? maticlogo
+                        : _token?.symbol == "LSK"
+                        ? lisklogo
+                        : bnblogo
+                    }
+                    alt={_token?.symbol}
+                  />
                   <span>{_token?.symbol}</span>
                 </div>
               ))}
@@ -167,6 +465,7 @@ export default function SwapCrypto(): JSX.Element {
             autoFocus
             value={sellCurrencyValue}
             onChange={(e) => setSellCurrencyValue(e.target.value)}
+            onKeyUp={() => onGetTokenEstimates()}
           />
           <span className="sell_title">Sell</span>
         </div>
@@ -181,9 +480,44 @@ export default function SwapCrypto(): JSX.Element {
       <div className="receivecurr_ctr">
         <div
           className="curr"
-          onClick={(e) => setReceiveCurrAnchorEl(e.currentTarget)}
+          onClick={(e) => {
+            setReceiveCurrAnchorEl(e.currentTarget);
+          }}
         >
-          <img src={receiveCurrency.logo} alt={receiveCurrency.symbol} />
+          <img
+            src={
+              receiveCurrency?.symbol == "ETH" ||
+              receiveCurrency?.symbol == "WETH" ||
+              receiveCurrency?.symbol == "WSTETH" ||
+              receiveCurrency?.symbol == "RETH" ||
+              receiveCurrency?.symbol == "CBETH"
+                ? ethlogo
+                : receiveCurrency?.symbol == "WBTC" ||
+                  receiveCurrency?.symbol == "CBBTC" ||
+                  receiveCurrency?.symbol == "TBTC"
+                ? btclogo
+                : receiveCurrency?.symbol == "ARB"
+                ? arblogo
+                : receiveCurrency?.symbol == "BERA" ||
+                  receiveCurrency?.symbol == "WBERA"
+                ? beralogo
+                : receiveCurrency?.symbol == "DAI"
+                ? dailogo
+                : receiveCurrency?.symbol == "USDC" ||
+                  receiveCurrency?.symbol == "USDC.e"
+                ? usdclogo
+                : receiveCurrency?.symbol == "USDT"
+                ? usdtlogo
+                : receiveCurrency?.symbol == "OP"
+                ? optimismlogo
+                : receiveCurrency?.symbol == "MATIC"
+                ? maticlogo
+                : receiveCurrency?.symbol == "LSK"
+                ? lisklogo
+                : bnblogo
+            }
+            alt={receiveCurrency.symbol}
+          />
 
           <span className="currency_name">{receiveCurrency.symbol}</span>
         </div>
@@ -192,14 +526,49 @@ export default function SwapCrypto(): JSX.Element {
           setAnchorEl={setReceiveCurrAnchorEl}
         >
           <div className="sell-receive-tokens-ctr">
-            {selectedTokens?.map((_token) => (
+            {allbalances?.data?.arbitrum?.map((_token) => (
               <div
                 onClick={() => {
-                  setReceiveCurrency(_token);
+                  setReceiveCurrency({
+                    symbol: _token?.symbol,
+                    address: _token?.address as string,
+                  });
+                  onGetTokenEstimates();
                   setReceiveCurrAnchorEl(null);
                 }}
               >
-                <img src={_token?.logo} alt={_token?.symbol} />
+                <img
+                  src={
+                    _token?.symbol == "ETH" ||
+                    _token?.symbol == "WETH" ||
+                    _token?.symbol == "WSTETH" ||
+                    _token?.symbol == "RETH" ||
+                    _token?.symbol == "CBETH"
+                      ? ethlogo
+                      : _token?.symbol == "WBTC" ||
+                        _token?.symbol == "CBBTC" ||
+                        _token?.symbol == "TBTC"
+                      ? btclogo
+                      : _token?.symbol == "ARB"
+                      ? arblogo
+                      : _token?.symbol == "BERA" || _token?.symbol == "WBERA"
+                      ? beralogo
+                      : _token?.symbol == "DAI"
+                      ? dailogo
+                      : _token?.symbol == "USDC" || _token?.symbol == "USDC.e"
+                      ? usdclogo
+                      : _token?.symbol == "USDT"
+                      ? usdtlogo
+                      : _token?.symbol == "OP"
+                      ? optimismlogo
+                      : _token?.symbol == "MATIC"
+                      ? maticlogo
+                      : _token?.symbol == "LSK"
+                      ? lisklogo
+                      : bnblogo
+                  }
+                  alt={_token?.symbol}
+                />
 
                 <span>{_token?.symbol}</span>
               </div>
@@ -209,7 +578,7 @@ export default function SwapCrypto(): JSX.Element {
 
         <div className="receive_qty">
           <p className="qty">
-            {formatNumber(receiveCurrencyValue)}{" "}
+            {formatNumber(receiveCurrencyValue)}&nbsp;
             <span>{receiveCurrency.symbol}</span>
           </p>
           <p className="receive_title">Receive</p>
@@ -236,11 +605,14 @@ export default function SwapCrypto(): JSX.Element {
         />
       </div>
 
-      <button
-        className="submit-swap"
-        disabled={sellCurrencyValue == "" || receiveCurrencyValue == 0}
-      >
-        Swap <Rotate color={colors.textprimary} />
+      <button className="submit-swap" onClick={onSubmitSwapIntent}>
+        {normalSwapPending || gasslessSwapPending ? (
+          <Loading width="1.25rem" height="1.25rem" />
+        ) : (
+          <>
+            Swap <Rotate color={colors.textprimary} />
+          </>
+        )}
       </button>
     </section>
   );

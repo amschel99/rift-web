@@ -139,6 +139,18 @@
         transform: scale(1) rotate(0deg);
       }
     }
+
+    #rotate {
+      @keyframes animateswicth {
+        from {
+          transform: scale(1.25) rotate(360deg);
+        }
+
+        to {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+    }
   }
 
   .receivecurr_ctr {

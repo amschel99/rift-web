@@ -69,7 +69,7 @@ export default function Home(): JSX.Element {
     }
   }, []);
 
-  useQuery({
+  const { data: _server_status } = useQuery({
     queryKey: ["serverstatus"],
     refetchInterval: 5000,
     queryFn: () =>

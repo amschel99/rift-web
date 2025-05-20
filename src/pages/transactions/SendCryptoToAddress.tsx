@@ -40,24 +40,8 @@ export default function SendCryptoToAddress(): JSX.Element {
   const [accessAmnt, setAccessAmnt] = useState<string>("");
   const [cryptoAmount, setCryptoAmount] = useState<string>("");
 
-  const ethBal = localStorage.getItem("ethbal");
-  const ethBalUsd = localStorage.getItem("ethbalusd");
-  const ethUsdValue = localStorage.getItem("ethvalue");
-  const polygonUsdcBal = localStorage.getItem("polygonusdcbal");
-  const beraUsdcBal = localStorage.getItem("berausdcbal");
-  const beraBal = localStorage.getItem("berabal");
-  const wberaBalUsd = localStorage.getItem("berabalusd");
-  const wberaUsdValue = localStorage.getItem("berapriceusd");
-  const usdcUsdValue = localStorage.getItem("usdcusdprice");
   const txverified = localStorage.getItem("txverified");
   const prev_page = localStorage.getItem("prev_page");
-
-  const assetUsdValue =
-    selectedCurrency == "ETH"
-      ? Number(ethUsdValue || 0)
-      : selectedCurrency == "WBERA"
-      ? Number(wberaUsdValue || 0)
-      : Number(usdcUsdValue);
 
   const { mutate: _mutateSendEth } = useMutation({
     mutationFn: () =>
@@ -73,6 +57,7 @@ export default function SendCryptoToAddress(): JSX.Element {
           showerrorsnack("Sorry, we couldn't process the transaction");
         }),
   });
+
   const { mutate: _mutateSendUsdc } = useMutation({
     mutationFn: () =>
       sendPolygonUSDC(receiverAddress, cryptoAmount, intent as string)
@@ -87,6 +72,7 @@ export default function SendCryptoToAddress(): JSX.Element {
           showerrorsnack("Sorry, we couldn't process the transaction");
         }),
   });
+
   const { mutate: _mutateSendWusdc } = useMutation({
     mutationFn: () =>
       sendBerachainUsdc(receiverAddress, cryptoAmount, intent as string)
@@ -101,6 +87,7 @@ export default function SendCryptoToAddress(): JSX.Element {
           showerrorsnack("Sorry, we couldn't process the transaction");
         }),
   });
+
   const { mutate: _mutateSendWbera } = useMutation({
     mutationFn: () =>
       sendWbera(receiverAddress, cryptoAmount, intent as string)
@@ -127,30 +114,9 @@ export default function SendCryptoToAddress(): JSX.Element {
     }
   };
 
-  const errorInUSDVal = (): boolean => {
-    const usdBalance =
-      selectedCurrency === "WBERA"
-        ? Number(wberaBalUsd || 0)
-        : selectedCurrency === "ETH"
-        ? Number(ethBalUsd || 0)
-        : selectedCurrency === "USDC"
-        ? Number(polygonUsdcBal || 0)
-        : selectedCurrency === "WUSDC"
-        ? Number(beraUsdcBal || 0)
-        : 0;
-
-    const accessAmntNum = Number(accessAmnt);
-    return accessAmntNum > usdBalance;
-  };
-
   const onSendToAddress = () => {
     if (receiverAddress == "" || cryptoAmount == "") {
       showerrorsnack("Please enter a valid address & amount");
-      return;
-    }
-
-    if (errorInUSDVal()) {
-      showerrorsnack("Please try a lower amount");
       return;
     }
 
@@ -199,7 +165,7 @@ export default function SendCryptoToAddress(): JSX.Element {
         <CurrencyPicker
           image={ethlogo}
           title="Ethereum"
-          description={`ETH (${ethBal})`}
+          description={"ETH"}
           ischecked={selectedCurrency == "ETH"}
           onclick={() => setSelectedCurrency("ETH")}
         />
@@ -207,7 +173,7 @@ export default function SendCryptoToAddress(): JSX.Element {
         <CurrencyPicker
           image={beralogo}
           title="Berachain"
-          description={`WBERA (${beraBal})`}
+          description={"WBERA"}
           ischecked={selectedCurrency == "WBERA"}
           onclick={() => setSelectedCurrency("WBERA")}
         />
@@ -215,7 +181,7 @@ export default function SendCryptoToAddress(): JSX.Element {
         <CurrencyPicker
           image={usdclogo}
           title="USDC (Polygon)"
-          description={`USDC (${polygonUsdcBal})`}
+          description={"USDC"}
           ischecked={selectedCurrency == "USDC"}
           onclick={() => setSelectedCurrency("USDC")}
         />
@@ -223,7 +189,7 @@ export default function SendCryptoToAddress(): JSX.Element {
         <CurrencyPicker
           image={usdclogo}
           title="USDC (Berachain)"
-          description={`USDC.e (${beraUsdcBal})`}
+          description={"USDC.e"}
           ischecked={selectedCurrency == "WUSDC"}
           onclick={() => setSelectedCurrency("WUSDC")}
         />
@@ -256,27 +222,8 @@ export default function SendCryptoToAddress(): JSX.Element {
               ? "USDC.e"
               : selectedCurrency
           })`}
-          inputState={accessAmnt == "" ? "" : cryptoAmount}
+          inputState={cryptoAmount}
           setInputState={setCryptoAmount}
-          onkeyup={() => {
-            const usdValue = Number(cryptoAmount) * assetUsdValue;
-            setAccessAmnt(isNaN(usdValue) ? "" : usdValue.toFixed(2));
-          }}
-          hasError={errorInUSDVal()}
-        />
-
-        <OutlinedTextInput
-          inputType="number"
-          placeholder="0.00"
-          inputlabalel="Amount (USD)"
-          inputState={cryptoAmount == "" ? "" : accessAmnt}
-          setInputState={setAccessAmnt}
-          onkeyup={() => {
-            const cryptoVal =
-              assetUsdValue > 0 ? Number(accessAmnt) / assetUsdValue : 0;
-            setCryptoAmount(isNaN(cryptoVal) ? "" : cryptoVal.toFixed(5));
-          }}
-          hasError={errorInUSDVal()}
         />
       </div>
 

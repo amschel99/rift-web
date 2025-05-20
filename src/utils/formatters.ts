@@ -41,7 +41,7 @@ export const formatNumber = (num: number): number => {
   if (Number.isInteger(num)) {
     return num;
   } else if (typeof num === "number" && !isNaN(num)) {
-    return parseFloat(num.toFixed(2));
+    return parseFloat(num.toFixed(4));
   } else {
     return 0;
   }

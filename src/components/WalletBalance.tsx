@@ -6,26 +6,11 @@ import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = ({
   balancesLoading,
-  ethBalanceUsd,
-  beraBalanceUsd,
-  polygonUsdcBalanceUsd,
-  beraUsdcbalanceUsd,
-  sphereBalanceUsd,
+  totalBalanceUsd,
 }: {
   balancesLoading: boolean;
-  ethBalanceUsd: number;
-  beraBalanceUsd: number;
-  polygonUsdcBalanceUsd: number;
-  beraUsdcbalanceUsd: number;
-  sphereBalanceUsd: number;
+  totalBalanceUsd: number;
 }): JSX.Element => {
-  const totalBalanceUsd =
-    ethBalanceUsd +
-    beraBalanceUsd +
-    polygonUsdcBalanceUsd +
-    beraUsdcbalanceUsd +
-    sphereBalanceUsd;
-
   return (
     <div id="walletbalance">
       <p className="title">Your Total Wallet Balance</p>
@@ -56,6 +41,7 @@ export const AssetBalance = ({
   tokenName,
   tokenSymbol,
   balance,
+  priceUsd,
   network,
   onClickHandler,
 }: {
@@ -64,10 +50,12 @@ export const AssetBalance = ({
   tokenName: string;
   tokenSymbol: string;
   balance: number;
+  priceUsd: number;
   network: string;
-
   onClickHandler: () => void;
 }): JSX.Element => {
+  const totalbalUsd = balance * priceUsd;
+
   return (
     <Fragment>
       {tokenLoading ? (
@@ -99,12 +87,12 @@ export const AssetBalance = ({
                 ? balance.toFixed(4)
                 : balance}
             </p>
-            {/* <span>
+            <span>
               $
               {String(totalbalUsd).split(".")[0]?.length - 1 >= 5
                 ? numberFormat(totalbalUsd)
                 : totalbalUsd.toFixed(4)}
-            </span> */}
+            </span>
           </div>
         </div>
       )}
