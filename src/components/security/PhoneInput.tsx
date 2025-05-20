@@ -177,6 +177,8 @@ const countryCodes: countrycode[] = [
   { countryname: "Spain", flag: "🇪🇸", code: "+34" },
   { countryname: "Italy", flag: "🇮🇹", code: "+39" },
   { countryname: "Russia", flag: "🇷🇺", code: "+7" },
+  { countryname: "Macau", flag: "🇲🇴", code: "+853" },
+  { countryname: "Taiwan", flag: "🇹🇼", code: "+886" },
   { countryname: "Indonesia", flag: "🇮🇩", code: "+62" },
   { countryname: "Pakistan", flag: "🇵🇰", code: "+92" },
   { countryname: "Bangladesh", flag: "🇧🇩", code: "+880" },

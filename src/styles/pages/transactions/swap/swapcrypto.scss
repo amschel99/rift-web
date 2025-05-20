@@ -1,8 +1,26 @@
-@use "../../constants/colors" as colors;
-@use "../../constants/mixins" as mixins;
+@use "../../../constants/colors" as colors;
+@use "../../../constants/mixins" as mixins;
 
 #swapcrypto {
   padding: 1rem;
+
+  .network {
+    @include mixins.useFlex(row, nowrap, center, flex-start, 0.5rem);
+    margin-bottom: 0.875rem;
+
+    img {
+      width: 2rem;
+      height: 2rem;
+      object-fit: cover;
+    }
+
+    p {
+      span {
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+    }
+  }
 
   .sellcurr_ctr {
     width: 100%;
@@ -21,14 +39,14 @@
         padding: 0.25rem 0.375rem;
         border: 1px solid colors.$divider;
         border-radius: 0.5rem;
-        background-color: colors.$primary;
+        background-color: colors.$divider;
 
         .currency_icon {
           @include mixins.useFlex(row, nowrap, center, center, 0);
           width: 1.5rem;
           height: 1.5rem;
           border-radius: 50%;
-          font-size: 0.75rem;
+          font-size: 0.875rem;
           background-color: colors.$textprimary;
         }
 
@@ -40,17 +58,7 @@
         }
 
         .currency_name {
-          font-size: 0.625rem;
-          font-weight: bold;
-        }
-      }
-
-      .balance {
-        font-size: 0.625rem;
-        font-weight: 400;
-
-        span {
-          font-size: 1rem;
+          font-size: 0.875rem;
           font-weight: bold;
         }
       }
@@ -188,6 +196,11 @@
     }
   }
 
+  .tx-type {
+    @include mixins.useFlex(column, nowrap, flex-start, flex-start, 0.5rem);
+    margin-top: 1rem;
+  }
+
   .submit-swap {
     @include mixins.useFlex(row, nowrap, center, center, 0.375rem);
     @include mixins.useButton();
@@ -197,6 +210,29 @@
       bottom: 1rem;
       left: 1rem;
       right: 1rem;
+    }
+  }
+}
+
+.sell-receive-tokens-ctr {
+  width: 44vw;
+  height: 40vh;
+  max-height: 48vh;
+  color: colors.$textprimary;
+
+  div {
+    @include mixins.useFlex(row, nowrap, center, flex-start, 0.375rem);
+    padding: 0.5rem 0.375rem;
+    border-bottom: 1px solid colors.$divider;
+
+    img {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    span {
+      font-size: 0.875rem;
+      font-weight: 600;
     }
   }
 }

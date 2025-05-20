@@ -30,17 +30,6 @@ export type transactionType = {
   createdAt: string;
 };
 
-export type supportedassetType = {
-  chain: string;
-  chainId: number;
-  symbol: string;
-  address: string | null;
-  decimals: number;
-  type: string;
-  category: string;
-  isNative: boolean;
-};
-
 /**
  *
  * Create wallet
@@ -292,27 +281,4 @@ export const getTransactionHistory = async (): Promise<{
   });
 
   return res?.json();
-};
-
-/**
- *
- * Retreive assets supported by sphere
- */
-export const getSupportedAssets = async (): Promise<{
-  assets: supportedassetType[];
-}> => {
-  const URL = BASEURL + ENDPOINTS.supportedassets;
-  let token: string | null = localStorage.getItem("spheretoken");
-
-  const res = await fetch(URL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await res?.json();
-
-  return { assets: data?.assets };
 };

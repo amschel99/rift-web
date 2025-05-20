@@ -18,9 +18,6 @@ export default function Home(): JSX.Element {
   const checkAccessUser = useCallback(async () => {
     const ethaddress: string | null = localStorage.getItem("ethaddress");
     const authtoken: string | null = localStorage.getItem("spheretoken");
-    const authsessionversion: string | null = localStorage.getItem(
-      "auth_session_version"
-    );
 
     // airdrop id
     const airdropId = localStorage.getItem("airdropId");
@@ -40,9 +37,7 @@ export default function Home(): JSX.Element {
       ethaddress == null ||
       typeof ethaddress == undefined ||
       authtoken == null ||
-      typeof authtoken == undefined ||
-      authsessionversion == null ||
-      typeof authsessionversion == undefined
+      typeof authtoken == undefined
     ) {
       navigate("/auth");
       return;

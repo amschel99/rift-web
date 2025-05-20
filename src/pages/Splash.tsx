@@ -20,8 +20,8 @@ export default function Splash(): JSX.Element {
   const navigate = useNavigate();
   const { openAppDialog, closeAppDialog } = useAppDialog();
   const userAuthenticated = useCallback(() => {
-    const user = initData?.user ?? null
-    authenticateUser(user?.id?.toString(), user?.username)
+    const user = initData?.user ?? null;
+    authenticateUser(user?.id?.toString(), user?.username);
     const ethaddress: string | null = localStorage.getItem("ethaddress");
     const token: string | null = localStorage.getItem("spheretoken");
     const quvaulttoken: string | null = localStorage.getItem("quvaulttoken");

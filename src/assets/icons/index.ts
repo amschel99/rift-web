@@ -14,6 +14,7 @@ export { default as Diamond } from "./all/Diamond";
 export { default as Email } from "./all/Email";
 export { default as Exchange } from "./all/Exchange";
 export { default as Gas } from "./all/Gas";
+export { default as GasOff } from "./all/GasOff";
 export { default as Gift } from "./all/Gift";
 export { default as Home } from "./all/Home";
 export { default as Link } from "./all/Link";

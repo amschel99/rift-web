@@ -25,7 +25,8 @@ import SendCryptoMethods from "./pages/transactions/SendCryptoMethods.tsx";
 import SendCryptoToAddress from "./pages/transactions/SendCryptoToAddress.tsx";
 import SendCryptoCollectLink from "./pages/transactions/SendCryptoCollectLink.tsx";
 import ClaimLendKeyLink from "./pages/transactions/ClaimLendKeyLink.tsx";
-import SwapCrypto from "./pages/transactions/SwapCrypto.tsx";
+import SwapCrypto from "./pages/transactions/swap/SwapCrypto.tsx";
+import NetworkPicker from "./pages/transactions/swap/NetworkPicker.tsx";
 import Deposit from "./pages/Deposit.tsx";
 import CreateLendSecret from "./pages/lend/CreateLendSecret.tsx";
 import ChatBotWithKey from "./pages/bot/ChatBotWithKey.tsx";
@@ -38,11 +39,11 @@ import "./styles/index.scss";
 import { AnalyticsListener } from "./hocs/posthog-provider.tsx";
 import { enableTelegramMock } from "./development/mock.ts";
 import { DevelopmentTools } from "./development/development-tools.tsx";
-import "./styles/tailwind.css"
+import "./styles/tailwind.css";
 import { Toaster } from "./components/ui/sonner.tsx";
 
 if (import.meta.env.MODE == "development") {
-  enableTelegramMock()
+  enableTelegramMock();
 }
 
 init();
@@ -99,7 +100,8 @@ createRoot(document.getElementById("root")!).render(
                         path="/deposit/:srccurrency"
                         element={<Deposit />}
                       />
-                      <Route path="/swap" element={<SwapCrypto />} />
+                      <Route path="/swap-network" element={<NetworkPicker />} />
+                      <Route path="/swap/:network" element={<SwapCrypto />} />
                       <Route
                         path="/claimlendkey"
                         element={<ClaimLendKeyLink />}
