@@ -43,6 +43,7 @@ export default function Splash(): JSX.Element {
       authsessionversion == null ||
       typeof authsessionversion == undefined
     ) {
+      closeAppDialog();
       navigate("/auth");
       return;
     } else {

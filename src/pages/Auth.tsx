@@ -121,6 +121,12 @@ export default function Auth(): JSX.Element {
                 setHttpAuthOk(true);
                 showsuccesssnack("Your phone was verified successfully");
                 analyticsLog("SIGN_UP", { telegram_id: tgUserId });
+              } else {
+                setOtpVerified(false);
+                setAccountCreating(false);
+                setRequestedOtp(false);
+                setOtpCode("");
+                showerrorsnack("Sorry, we couldn't verify your account");
               }
             } else {
               const quvaultSignUpResult = await signupQuvaultUser(
