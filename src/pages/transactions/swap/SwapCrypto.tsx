@@ -123,13 +123,8 @@ export default function SwapCrypto(): JSX.Element {
 
           receiveCurrency?.symbol as string,
 
-          sellCurrency?.symbol == "ETH" ||
-            sellCurrency?.symbol == "WETH" ||
-            sellCurrency?.symbol == "WSTETH" ||
-            sellCurrency?.symbol == "RETH" ||
-            sellCurrency?.symbol == "CBETH"
-            ? sellCurrencyValue
-            : "0",
+          sellCurrencyValue,
+
           sellCurrency?.symbol == "ETH" ||
             sellCurrency?.symbol == "WETH" ||
             sellCurrency?.symbol == "WSTETH" ||
@@ -162,13 +157,8 @@ export default function SwapCrypto(): JSX.Element {
           receiveCurrency?.symbol == "ETH"
             ? "eth"
             : (receiveCurrency?.address as string),
-          sellCurrency?.symbol == "ETH" ||
-            sellCurrency?.symbol == "WETH" ||
-            sellCurrency?.symbol == "WSTETH" ||
-            sellCurrency?.symbol == "RETH" ||
-            sellCurrency?.symbol == "CBETH"
-            ? sellCurrencyValue
-            : "0",
+          sellCurrencyValue,
+
           String(receiveCurrencyValue),
           sellCurrency?.symbol == "ETH" ||
             sellCurrency?.symbol == "WETH" ||
