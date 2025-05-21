@@ -54,6 +54,76 @@ export type arbitrumbalType = {
   };
 };
 
+export type balanceType = {
+  chain:
+    | "ARBITRUM"
+    | "BASE"
+    | "OPTIMISM"
+    | "ETHEREUM"
+    | "LISK"
+    | "BNB"
+    | "BERACHAIN"
+    | "POLYGON";
+  chainId: number;
+  symbol:
+    | "ETH"
+    | "WETH"
+    | "USDC"
+    | "USDT"
+    | "DAI"
+    | "WSTETH"
+    | "RETH"
+    | "WBTC"
+    | "ARB"
+    | "CBETH"
+    | "CBBTC"
+    | "TBTC"
+    | "OP"
+    | "LSK"
+    | "BNB"
+    | "BERA"
+    | "WBERA"
+    | "USDC.e"
+    | "MATIC";
+  address: string | null;
+  decimals: number;
+  type: string;
+  category:
+    | "stablecoin"
+    | "native"
+    | "native-wrapped"
+    | "btc-derivative"
+    | "staked-eth"
+    | "governance";
+  balance: string;
+};
+
+export const getAllBalances = async (): Promise<{
+  data: {
+    arbitrum: balanceType[];
+    base: balanceType[];
+    optimism: balanceType[];
+    ethereum: balanceType[];
+    lisk: balanceType[];
+    bnb: balanceType[];
+    berachain: balanceType[];
+    polygon: balanceType[];
+  };
+}> => {
+  const URL = BASEURL + ENDPOINTS.allbalances;
+  let token: string | null = localStorage.getItem("spheretoken");
+
+  const res = await fetch(URL, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return res?.json();
+};
+
 export const getEthBalance = async (): Promise<walletBalTtype> => {
   let token: string | null = localStorage.getItem("spheretoken");
 

@@ -6,26 +6,11 @@ import "../styles/components/walletbalance.scss";
 
 export const WalletBalance = ({
   balancesLoading,
-  ethBalanceUsd,
-  beraBalanceUsd,
-  polygonUsdcBalanceUsd,
-  beraUsdcbalanceUsd,
-  sphereBalanceUsd,
+  totalBalanceUsd,
 }: {
   balancesLoading: boolean;
-  ethBalanceUsd: number;
-  beraBalanceUsd: number;
-  polygonUsdcBalanceUsd: number;
-  beraUsdcbalanceUsd: number;
-  sphereBalanceUsd: number;
+  totalBalanceUsd: number;
 }): JSX.Element => {
-  const totalBalanceUsd =
-    ethBalanceUsd +
-    beraBalanceUsd +
-    polygonUsdcBalanceUsd +
-    beraUsdcbalanceUsd +
-    sphereBalanceUsd;
-
   return (
     <div id="walletbalance">
       <p className="title">Your Total Wallet Balance</p>
@@ -57,7 +42,7 @@ export const AssetBalance = ({
   tokenSymbol,
   balance,
   priceUsd,
-  dayPriceChange,
+  network,
   onClickHandler,
 }: {
   tokenLoading: boolean;
@@ -66,7 +51,7 @@ export const AssetBalance = ({
   tokenSymbol: string;
   balance: number;
   priceUsd: number;
-  dayPriceChange: number;
+  network: string;
   onClickHandler: () => void;
 }): JSX.Element => {
   const totalbalUsd = balance * priceUsd;
@@ -88,21 +73,9 @@ export const AssetBalance = ({
 
             <span className="symbol_price">
               <p className="symbol">
-                {tokenName}, <span>{tokenSymbol}</span>
+                <span>{tokenSymbol}</span>
               </p>
-              <p className="price">
-                ${priceUsd?.toFixed(2)}
-                <span
-                  className={
-                    dayPriceChange > 1 || dayPriceChange == 0
-                      ? "positive"
-                      : "negative"
-                  }
-                >
-                  {(dayPriceChange > 1 || dayPriceChange == 0) && "+"}
-                  {dayPriceChange}%
-                </span>
-              </p>
+              <p className="price">{network}</p>
             </span>
           </div>
 

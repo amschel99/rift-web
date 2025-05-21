@@ -98,7 +98,8 @@ export default function PhoneAuth(): JSX.Element {
               tgUserId,
               devicetoken,
               0,
-              phoneNumber
+              phoneNumber,
+              otpCode
             );
 
             if (signupstatus == 200 && createaccstatus == 200) {
@@ -109,14 +110,10 @@ export default function PhoneAuth(): JSX.Element {
               setAccountCreating(false);
               setRequestedOtp(false);
               setOtpCode("");
-              showerrorsnack(
-                "We couldn't verify your account, please try again with the phone number you used initially"
-              );
+              showerrorsnack("Sorry, we couldn't verify your account");
             }
           } catch (error) {
-            showerrorsnack(
-              "We couldn't verify your account, please try again with the phone number you used initially"
-            );
+            showerrorsnack("Sorry, we couldn't verify your account");
             console.error("Account creation process failed:", error);
             setOtpVerified(false);
             setAccountCreating(false);

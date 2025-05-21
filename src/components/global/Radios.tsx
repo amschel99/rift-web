@@ -1,15 +1,17 @@
-import { CSSProperties, JSX } from "react";
-import { Check, Clock } from "../../assets/icons";
+import { CSSProperties, JSX, ReactNode } from "react";
+import { Check, Clock, ArrowRight } from "../../assets/icons";
 import { colors } from "../../constants";
 import "../../styles/components/global/radios.scss";
 
 interface radioProps {
   image: string;
+  icon?: ReactNode;
   title: string;
   description: string;
   ischecked: boolean;
   sxstyles?: CSSProperties;
   disabled?: boolean;
+  isRadio?: boolean;
   onclick: () => void;
 }
 
@@ -20,8 +22,9 @@ export const RadioButton = ({
   ischecked,
   sxstyles,
   disabled,
+  isRadio,
   onclick,
-}: radioProps): JSX.Element => {
+}: Partial<radioProps>): JSX.Element => {
   return (
     <div
       id="radio_btn_ctr"
@@ -37,7 +40,47 @@ export const RadioButton = ({
         </p>
       </div>
 
-      <Check color={ischecked ? colors.success : colors.divider} />
+      {isRadio ? (
+        <Check color={ischecked ? colors.success : colors.divider} />
+      ) : (
+        <ArrowRight
+          color={disabled ? colors.textsecondary : colors.textprimary}
+        />
+      )}
+    </div>
+  );
+};
+
+export const RadioButtonWithIcons = ({
+  icon,
+  title,
+  description,
+  ischecked,
+  sxstyles,
+  disabled,
+  isRadio,
+  onclick,
+}: Partial<radioProps>): JSX.Element => {
+  return (
+    <div
+      id="radio_btn_ctr"
+      className={ischecked ? "checked" : disabled ? "disabled" : ""}
+      style={sxstyles}
+      onClick={onclick}
+    >
+      <div className="img_title_desc">
+        <span className="icons">{icon}</span>
+
+        <p>
+          {title} <span>{description}</span>
+        </p>
+      </div>
+
+      {isRadio ? (
+        <Check color={ischecked ? colors.success : colors.divider} />
+      ) : (
+        <ArrowRight color={colors.textprimary} />
+      )}
     </div>
   );
 };

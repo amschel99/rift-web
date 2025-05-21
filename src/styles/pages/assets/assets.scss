@@ -18,8 +18,10 @@
 
       p {
         @include mixins.useFlex(column, nowrap, flex-start, flex-start, 0);
+        font-size: 0.875rem;
 
         span {
+          font-size: 1rem;
           font-weight: 600;
           text-transform: uppercase;
 
@@ -65,7 +67,6 @@
 
   .token_stats {
     margin-top: 1rem;
-    padding-bottom: 3.5rem;
 
     p {
       @include mixins.useFlex(row, nowrap, center, space-between, 0);

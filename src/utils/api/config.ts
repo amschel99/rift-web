@@ -15,6 +15,7 @@ export const ENDPOINTS = {
   liskbalances: "/wallet/lisk-balances",
   basebalances: "/wallet/base-balances",
   bnbbalances: "/wallet/bnb-balances",
+  allbalances: "/balances/all",
   arbitrumbalances: "/wallet/arbitrum-balances",
   sharewallet: "/authorization/authorize-unchecked-spend",
   spendwithtoken: "/authorization/foreign-unchecked-spend",
@@ -23,15 +24,12 @@ export const ENDPOINTS = {
   fetchkey: "/key/single-key",
   sharekey: "/key/share",
   usekey: "/key/use",
-  keyearnings: "/key/earnings",
   keypayment: "/key/do-key-payment",
   keypaymentsuccess: "/key/payment-success",
   keysbyowner: "/key/fetch-by-owner",
   revokekeyaccess: "/key/revoke-key",
   sendeth: "/transaction/spend-eth",
   sendusdc: "/transaction/spend-usdt",
-  sendbtc: "/transaction/spend-btc",
-  sendom: "/transaction/spend-om",
   sendbera: "/transaction/spend-wbera",
   sendwusdc: "/transaction/spend-usdc",
   txhistory: "/transaction/history",
@@ -55,6 +53,7 @@ export const ENDPOINTS = {
   stakelst: "/staking/stake",
   unstakelst: "/staking/initiate-unstake",
   burnsphere: "/burnAndReward",
+  swap: "/defi/swap",
 };
 
 export const QUVAULT_ENDPOINTS = {
