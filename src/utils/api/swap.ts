@@ -2,6 +2,7 @@ import { BASEURL, ENDPOINTS } from "./config";
 
 export const swapTokensNormal = async (
   token_to_sell: string,
+  token_to_sell_address: string,
   token_to_buy: string,
   value: string,
   isEth: boolean
@@ -19,6 +20,7 @@ export const swapTokensNormal = async (
       chain: "arbitrum",
       flow: "normal",
       token_to_sell,
+      token_to_sell_address,
       token_to_buy,
       value,
       isEth,
@@ -29,12 +31,11 @@ export const swapTokensNormal = async (
 };
 
 export const swapTokensGassless = async (
+  token_to_sell: string,
   token_to_sell_address: string,
-  token_to_buy_address: string,
+  token_to_buy: string,
   value: string,
-  amountOut: string,
-  isEth: boolean,
-  isBuyingEth: boolean
+  isEth: boolean
 ): Promise<{ status: number }> => {
   let URL = BASEURL + ENDPOINTS.swap;
   let token: string | null = localStorage.getItem("spheretoken");
@@ -48,12 +49,11 @@ export const swapTokensGassless = async (
     body: JSON.stringify({
       chain: "arbitrum",
       flow: "gasless",
+      token_to_sell,
       token_to_sell_address,
-      token_to_buy_address,
+      token_to_buy,
       value,
-      amountOut,
       isEth,
-      isBuyingEth,
     }),
   });
 

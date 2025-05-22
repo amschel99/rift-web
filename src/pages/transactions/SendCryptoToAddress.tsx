@@ -17,7 +17,8 @@ import { getAllBalances } from "../../utils/api/balances";
 import { numberFormat, formatNumber } from "../../utils/formatters";
 import { CurrencyPicker } from "../../components/global/Radios";
 import { OutlinedTextInput } from "../../components/global/Inputs";
-import { Check, Link } from "../../assets/icons";
+import { ArrowUpCircle, Check } from "../../assets/icons";
+import { Loading } from "../../assets/animations";
 import { colors } from "../../constants";
 import ethlogo from "../../assets/images/logos/eth.png";
 import beralogo from "../../assets/images/logos/bera.png";
@@ -61,7 +62,7 @@ export default function SendCryptoToAddress(): JSX.Element {
     Number(allbalances?.data?.berachain[2]?.balance) || 0
   );
 
-  const { mutate: _mutateSendEth } = useMutation({
+  const { mutate: _mutateSendEth, isPending: sendethPending } = useMutation({
     mutationFn: () =>
       sendEth(receiverAddress, cryptoAmount, intent as string)
         .then(() => {
@@ -76,7 +77,7 @@ export default function SendCryptoToAddress(): JSX.Element {
         }),
   });
 
-  const { mutate: _mutateSendUsdc } = useMutation({
+  const { mutate: _mutateSendUsdc, isPending: sendusdcPending } = useMutation({
     mutationFn: () =>
       sendPolygonUSDC(receiverAddress, cryptoAmount, intent as string)
         .then(() => {
@@ -91,35 +92,38 @@ export default function SendCryptoToAddress(): JSX.Element {
         }),
   });
 
-  const { mutate: _mutateSendWusdc } = useMutation({
-    mutationFn: () =>
-      sendBerachainUsdc(receiverAddress, cryptoAmount, intent as string)
-        .then(() => {
-          localStorage.removeItem("txverified");
-          showTxStatusBar(
-            "PENDING",
-            `Send ${numberFormat(Number(cryptoAmount))} ${selectedCurrency}`
-          );
-        })
-        .catch(() => {
-          showerrorsnack("Sorry, we couldn't process the transaction");
-        }),
-  });
+  const { mutate: _mutateSendWusdc, isPending: sendberausdcPending } =
+    useMutation({
+      mutationFn: () =>
+        sendBerachainUsdc(receiverAddress, cryptoAmount, intent as string)
+          .then(() => {
+            localStorage.removeItem("txverified");
+            showTxStatusBar(
+              "PENDING",
+              `Send ${numberFormat(Number(cryptoAmount))} ${selectedCurrency}`
+            );
+          })
+          .catch(() => {
+            showerrorsnack("Sorry, we couldn't process the transaction");
+          }),
+    });
 
-  const { mutate: _mutateSendWbera } = useMutation({
-    mutationFn: () =>
-      sendWbera(receiverAddress, cryptoAmount, intent as string)
-        .then(() => {
-          localStorage.removeItem("txverified");
-          showTxStatusBar(
-            "PENDING",
-            `Send ${numberFormat(Number(cryptoAmount))} ${selectedCurrency}`
-          );
-        })
-        .catch(() => {
-          showerrorsnack("Sorry, we couldn't process the transaction");
-        }),
-  });
+  const { mutate: _mutateSendWbera, isPending: sendwberaPending } = useMutation(
+    {
+      mutationFn: () =>
+        sendWbera(receiverAddress, cryptoAmount, intent as string)
+          .then(() => {
+            localStorage.removeItem("txverified");
+            showTxStatusBar(
+              "PENDING",
+              `Send ${numberFormat(Number(cryptoAmount))} ${selectedCurrency}`
+            );
+          })
+          .catch(() => {
+            showerrorsnack("Sorry, we couldn't process the transaction");
+          }),
+    }
+  );
 
   const goBack = () => {
     if (prev_page == null) {
@@ -248,13 +252,28 @@ export default function SendCryptoToAddress(): JSX.Element {
       <div className="actions">
         <button
           onClick={onSendToAddress}
-          disabled={txStatusBarVisible && transactionStatus == "PENDING"}
+          disabled={
+            sendethPending ||
+            sendusdcPending ||
+            sendberausdcPending ||
+            sendwberaPending ||
+            (txStatusBarVisible && transactionStatus == "PENDING")
+          }
         >
-          {txverified == null ? "Verify To Send" : "Send"}
-          {txverified == null ? (
-            <Check color={colors.textprimary} />
+          {sendethPending ||
+          sendusdcPending ||
+          sendberausdcPending ||
+          sendwberaPending ? (
+            <Loading width="1.25rem" height="1.25rem" />
+          ) : txverified == null ? (
+            <>
+              Verify To Send <Check color={colors.textprimary} />
+            </>
           ) : (
-            <Link color={colors.textprimary} />
+            <>
+              Send
+              <ArrowUpCircle color={colors.textprimary} />
+            </>
           )}
         </button>
       </div>
