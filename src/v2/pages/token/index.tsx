@@ -1,4 +1,3 @@
-import React from "react";
 import TokenHeader from "./features/TokenHeader";
 import BalanceContainer from "./features/BalanceContainer";
 import { PriceChart } from "./features/PriceChart";
@@ -9,17 +8,21 @@ import dummyTokenLogo from "@/assets/images/logos/bera.png";
 import TokenDetails from "./features/TokenDetails";
 import TokenPerformance from "./features/TokenPerformance";
 import TokenActivity from "./features/TokenActivity";
+import { useParams } from "react-router-dom";
+import { useTokenDetails } from "@/hooks/useTokenDetails";
 
 function Token() {
+  const { id } = useParams();
+  const { historicalPrice, userBalance, tokenDetails, performanceData } =
+    useTokenDetails(id);
+  if (!userBalance || !historicalPrice || !tokenDetails || !performanceData) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="">
       <TokenHeader title="Sphere" />
-      <BalanceContainer
-        balance="7.69"
-        usdPriceChange={-7.23}
-        percentPriceChange={-4.07}
-      />
-      <PriceChart />
+      <BalanceContainer userBalance={userBalance} />
+      <PriceChart historicalPrice={historicalPrice} />
       <TokenActions />
       <Title title="Your Balance" />
       <TokenContainer
@@ -31,20 +34,9 @@ function Token() {
         tokenSymbol="SPHERE"
       />
       <Title title="Token Details" />
-      <TokenDetails
-        symbol="SPHERE"
-        name="Sphere"
-        decimals={18}
-        totalSupply={1000000000}
-        circulatingSupply={1000000000}
-        maxSupply={1000000000}
-      />
+      <TokenDetails tokenDetails={tokenDetails} />
       <Title title="24h Performance" />
-      <TokenPerformance
-        volume={1000000000}
-        trades={1000000000}
-        traders={1000000000}
-      />
+      <TokenPerformance performanceData={performanceData} />
       <Title title="Activity" />
       <TokenActivity />
     </div>

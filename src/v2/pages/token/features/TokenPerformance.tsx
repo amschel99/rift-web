@@ -1,11 +1,8 @@
-import React from "react";
-import { colors } from "@/constants";
 import TokenRow from "../components/TokenRow";
+import { IPerformanceData } from "@/hooks/useTokenDetails";
 
 interface TokenPerformanceProps {
-  volume: number;
-  trades: number;
-  traders: number;
+  performanceData: IPerformanceData;
 }
 
 interface TokenRowItem {
@@ -14,29 +11,29 @@ interface TokenRowItem {
   extras?: string;
 }
 
-function TokenPerformance({ volume, trades, traders }: TokenPerformanceProps) {
+function TokenPerformance({ performanceData }: TokenPerformanceProps) {
   const performanceDetails: TokenRowItem[] = [
     {
       title: "Volume",
-      value: volume.toLocaleString(),
+      value: performanceData.volume.toLocaleString(),
     },
     {
       title: "Trades",
-      value: trades.toLocaleString(),
+      value: performanceData.trades.toLocaleString(),
     },
     {
       title: "Traders",
-      value: traders.toLocaleString(),
+      value: performanceData.traders.toLocaleString(),
     },
   ];
   return (
     <div className="flex flex-col gap-1 bg-accent rounded-md p-2 mx-2">
       {performanceDetails.map((detail, index) => (
         <div
-          className="border-b border-primary"
+          className="border-b border-gray-600"
           style={{
-            borderBottomWidth: performanceDetails.length - 1 === index ? 0 : 1,
-            borderColor: colors.divider,
+            borderBottomWidth:
+              performanceDetails.length - 1 === index ? 0 : "0.5px",
           }}
         >
           <TokenRow key={index} title={detail.title} value={detail.value} />

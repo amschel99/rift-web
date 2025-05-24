@@ -33,7 +33,7 @@ export default function PageContainer() {
       <Route path="/oo" element={<OnRamp />} />
       <Route path="/history" element={<History />} />
       <Route path="/explore" element={<Explore />} />
-      <Route path="/token" element={<Token />} />
+      <Route path="/token/:id" element={<Token />} />
     </Routes>
   );
 }

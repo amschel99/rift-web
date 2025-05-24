@@ -1,5 +1,3 @@
-import React from "react";
-import { colors } from "@/constants";
 interface TokenContainerProps {
   tokenName: string;
   tokenImage: string;
@@ -36,10 +34,7 @@ function TokenContainer({
         />
         <div className="flex flex-col">
           <p className="text-lg font-bold">{tokenName}</p>
-          <p
-            className="text-xs font-medium"
-            style={{ color: colors.textsecondary }}
-          >
+          <p className="text-xs font-medium text-gray-400">
             {tokenBalance} {tokenSymbol}
           </p>
         </div>
@@ -47,8 +42,9 @@ function TokenContainer({
       <div className="flex items-center gap-2 flex-col">
         <p className="text-xl font-bold">${tokenUsdBalance}</p>
         <p
-          className="text-sm font-medium"
-          style={{ color: isPositive ? colors.success : colors.danger }}
+          className={`text-sm font-medium ${
+            isPositive ? "text-success" : "text-danger"
+          }`}
         >
           {displayPriceChange}
         </p>

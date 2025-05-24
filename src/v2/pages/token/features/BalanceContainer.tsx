@@ -1,53 +1,48 @@
-import { colors } from "@/constants";
+import React, { useMemo } from "react";
+import { type IUserBalance } from "@/hooks/useTokenDetails";
 
 interface BalanceContainerProps {
-  balance: string;
-  usdPriceChange: number;
-  percentPriceChange: number;
+  userBalance: IUserBalance;
 }
 
-function BalanceContainer({
-  balance,
-  usdPriceChange,
-  percentPriceChange,
-}: BalanceContainerProps) {
-  const isPositive = usdPriceChange > 0;
-  let usdPriceChangeDisplay;
-  let percentPriceChangeDisplay;
-  if (!isPositive) {
-    const usdPrice = usdPriceChange.toString().replace("-", "");
-    const percentPrice = percentPriceChange.toString().replace("-", "");
-    usdPriceChangeDisplay = `-$${usdPrice}`;
-    percentPriceChangeDisplay = `-${percentPrice}%`;
-  } else {
-    usdPriceChangeDisplay = `$${usdPriceChange}`;
-    percentPriceChangeDisplay = `${percentPriceChange}%`;
-  }
+function BalanceContainer({ userBalance }: BalanceContainerProps) {
+  const isPositive = userBalance.usdPriceChange > 0;
+
+  const { usdPriceChangeDisplay, percentPriceChangeDisplay } = useMemo(() => {
+    if (!isPositive) {
+      const usdPrice = userBalance.usdPriceChange.toString().replace("-", "");
+      const percentPrice = userBalance.percentPriceChange
+        .toString()
+        .replace("-", "");
+      return {
+        usdPriceChangeDisplay: `-$${usdPrice}`,
+        percentPriceChangeDisplay: `-${percentPrice}%`,
+      };
+    } else {
+      return {
+        usdPriceChangeDisplay: `$${userBalance.usdPriceChange}`,
+        percentPriceChangeDisplay: `${userBalance.percentPriceChange}%`,
+      };
+    }
+  }, [userBalance.usdPriceChange, userBalance.percentPriceChange, isPositive]);
+
   return (
     <div className="w-full flex flex-col items-center justify center mt-16">
-      <p
-        className={`text-5xl font-bold`}
-        style={{
-          color: colors.textprimary,
-        }}
-      >
-        ${balance}
+      <p className={`text-5xl font-bold text-primary`}>
+        ${userBalance.balance}
       </p>
       <div className="flex flex-row items-center justify-center my-2">
         <p
-          className={`text-xl font-semibold text-center `}
-          style={{
-            color: isPositive ? colors.success : colors.danger,
-          }}
+          className={`text-xl font-semibold text-center ${
+            isPositive ? "text-success" : "text-danger"
+          }`}
         >
           {usdPriceChangeDisplay}
         </p>
         <p
-          className={`text-sm font-semibold mx-1 rounded-sm py.5 px-1`}
-          style={{
-            color: colors.primary,
-            backgroundColor: isPositive ? colors.success : colors.danger,
-          }}
+          className={`text-sm font-semibold mx-1 rounded-sm py.5 px-1 text-primary ${
+            isPositive ? "bg-success" : "bg-danger"
+          }`}
         >
           {percentPriceChangeDisplay}
         </p>

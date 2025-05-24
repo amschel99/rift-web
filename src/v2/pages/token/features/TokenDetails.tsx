@@ -1,14 +1,8 @@
-import React from "react";
 import TokenRow from "../components/TokenRow";
-import { colors } from "@/constants";
+import { ITokenDetails } from "@/hooks/useTokenDetails";
 
 interface TokenDetailsProps {
-  symbol: string;
-  name: string;
-  decimals: number;
-  totalSupply: number;
-  circulatingSupply: number;
-  maxSupply?: number;
+  tokenDetails: ITokenDetails;
 }
 
 interface TokenRowItem {
@@ -16,43 +10,36 @@ interface TokenRowItem {
   value: string | number;
 }
 
-function TokenDetails({
-  symbol,
-  name,
-  decimals,
-  totalSupply,
-  circulatingSupply,
-}: TokenDetailsProps) {
+function TokenDetails({ tokenDetails }: TokenDetailsProps) {
   const itemDetails: TokenRowItem[] = [
     {
       title: "Symbol",
-      value: symbol,
+      value: tokenDetails.symbol,
     },
     {
       title: "Name",
-      value: name,
+      value: tokenDetails.name,
     },
     {
       title: "Decimals",
-      value: decimals,
+      value: tokenDetails.decimals,
     },
     {
       title: "Total Supply",
-      value: totalSupply.toLocaleString(),
+      value: tokenDetails.totalSupply.toLocaleString(),
     },
     {
       title: "Circulating Supply",
-      value: circulatingSupply.toLocaleString(),
+      value: tokenDetails.circulatingSupply.toLocaleString(),
     },
   ];
   return (
     <div className="flex flex-col gap-1 bg-accent rounded-md p-2 mx-2">
       {itemDetails.map((detail, index) => (
         <div
-          className="border-b border-primary"
+          className="border-b border-gray-600"
           style={{
-            borderBottomWidth: itemDetails.length - 1 === index ? 0 : 1,
-            borderColor: colors.divider,
+            borderBottomWidth: itemDetails.length - 1 === index ? 0 : "0.5px",
           }}
         >
           <TokenRow key={index} title={detail.title} value={detail.value} />

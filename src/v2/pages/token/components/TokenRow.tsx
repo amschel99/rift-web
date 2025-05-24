@@ -1,6 +1,3 @@
-import { colors } from "@/constants";
-import React from "react";
-
 interface TokenRowProps {
   title: string;
   value: string | number;
@@ -9,15 +6,8 @@ interface TokenRowProps {
 function TokenRow({ title, value, extras }: TokenRowProps) {
   return (
     <div className="flex items-center justify-between py-4">
-      <p
-        className="text-sm font-medium"
-        style={{
-          color: colors.textsecondary,
-        }}
-      >
-        {title}
-      </p>
-      <p className="text-sm font-medium">{value}</p>
+      <p className="text-sm font-medium text-secondary-foreground">{title}</p>
+      <p className="text-sm font-medium text-gray-400">{value}</p>
       {extras && <p className="text-sm font-medium">{extras}</p>}
     </div>
   );
