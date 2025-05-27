@@ -7,6 +7,7 @@ import { CgSpinner } from "react-icons/cg";
 import { z } from "zod"
 import TokenRenderer from "./token-renderer"
 import { useFlow } from "../known/flow-context"
+import { WalletToken } from "@/lib/entities"
 
 const choice = z.object({
     id: z.string()
@@ -32,8 +33,9 @@ export default function ChooseToken(props: Props){
         return filtered ?? []
     }, [searchFilter, ownedTokensQuery?.isLoading, ownedTokensQuery?.data?.length, searchFilter?.length])
 
-    function handleSelect(token: string){
-        flowControl.state?.setValue('token', token)
+    function handleSelect(token: WalletToken) {
+        flowControl.state?.setValue('token', token.name)
+        flowControl.state?.setValue('chain', token.chain_id)
         flowControl.goToNext()
     }
 

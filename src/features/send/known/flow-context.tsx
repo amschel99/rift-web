@@ -8,6 +8,7 @@ const stateSchema = z.object({
     chain: z.string().optional(),
     amount: z.string().optional(),
     hash: z.string().optional(),
+    recipient: z.string().optional(),
     active: z.enum(['select-token', 'address-search', 'amount-input', 'confirm', 'success', 'error']),
 }) 
 

@@ -4,7 +4,7 @@ import { WalletToken } from "@/lib/entities"
 
 interface TokenRendererProps {
     token: WalletToken
-    onClick?: (token: string) => void
+    onClick?: (token: WalletToken) => void
 }
 
 export default function TokenRenderer(props: TokenRendererProps) {
@@ -21,7 +21,7 @@ export default function TokenRenderer(props: TokenRendererProps) {
 
     return (
         <div onClick={()=> {
-            onClick?.(token.id)
+            onClick?.(token)
         }} className="flex flex-row items-center justify-between px-4 py-3 rounded-md cursor-pointer active:scale-95 bg-surface-alt w-full" > 
             <div className="flex flex-row items-center gap-x-2" >
                 {/* Token Icon */}

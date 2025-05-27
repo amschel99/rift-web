@@ -30,3 +30,14 @@ export interface Balance {
     token: string
     balances?: Array<Balance>
 }
+
+export interface WalletSocialProfile {
+    username?: string
+}
+
+export interface WalletAddress {
+    address: string
+    chain?: string
+    type: 'address' | 'telegram-username' | 'name-service'
+    social_profile?: WalletSocialProfile
+}

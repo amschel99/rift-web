@@ -4,59 +4,71 @@ import { Slot } from "@radix-ui/react-slot"
 import { ReactNode, useCallback, useState } from "react"
 import FlowContextProvider, { useFlow } from "./flow-context"
 import { SelectToken } from "./select-token"
+import AddressSearch from "./address-search"
 
 interface Props {
-    renderTrigger: ()=> ReactNode
+    renderTrigger: () => ReactNode
 }
 
-const snapPoints: (string | number)[] = [1, '800px', '300px']
-
-export default function SendToKnown(props: Props){
-    const { renderTrigger } = props
-    const { isOpen, onOpen, onClose, toggle } = useDisclosure()
-    const [activeSnapPoint, setActiveSnapPoint] = useState(snapPoints[0])
+export default function SendToKnown(props: Props) {
 
     return (
-        <FlowContextProvider onClose={onClose} >
-            <Drawer modal open={isOpen} onClose={onClose} onOpenChange={(open)=>{
-                if(open){
-                    onOpen()
-                }else{
-                    onClose()
-                }
-            }}  >
-                <DrawerTrigger>
-                    <div>
-                    {renderTrigger()}
-                    </div>
-                </DrawerTrigger>
-                <DrawerContent className="h-[95vh]" >
-                    <DrawerHeader>
-                        <div className="flex flex-row items-center justify-between" >
-                            <DrawerTitle>
-                                <p>
-                                    Send
-                                </p>
-                            </DrawerTitle>
-                        </div>
-                    </DrawerHeader>
-                    <div className="flex flex-col w-full h-full items-center " >
-                        <SendToKnownLayout/>
-                    </div>
-                </DrawerContent>
-            </Drawer>
+        <FlowContextProvider>
+            <_SendToKnown {...props} />
         </FlowContextProvider>
     )
 }
 
+function _SendToKnown(props: Props) {
+    const { state } = useFlow()
+    const { renderTrigger } = props
+    const { isOpen, onOpen, onClose, toggle } = useDisclosure()
 
-function SendToKnownLayout(){
+    return (
+        <Drawer modal open={isOpen} onClose={() => {
+            onClose()
+            state?.reset()
+        }} onOpenChange={(open) => {
+            if (open) {
+                onOpen()
+            } else {
+                    onClose()
+                }
+            }}  >
+            <DrawerTrigger>
+                <div>
+                    {renderTrigger()}
+                </div>
+            </DrawerTrigger>
+            <DrawerContent className="h-[95vh]" >
+                <DrawerHeader>
+                    <div className="flex flex-row items-center justify-between" >
+                        <DrawerTitle>
+                            <p>
+                                Send
+                            </p>
+                        </DrawerTitle>
+                    </div>
+                </DrawerHeader>
+                <div className="flex flex-col w-full h-full items-center " >
+                    <SendToKnownLayout />
+                </div>
+            </DrawerContent>
+        </Drawer>
+    )
+}
+
+
+function SendToKnownLayout() {
     const { currentStep } = useFlow()
 
-    const renderStep = useCallback(()=> {
+    const renderStep = useCallback(() => {
         switch (currentStep) {
             case "select-token": {
-                return <SelectToken/>
+                return <SelectToken />
+            }
+            case "address-search": {
+                return <AddressSearch />
             }
             default: {
                 return (
@@ -67,7 +79,7 @@ function SendToKnownLayout(){
             }
         }
     }, [currentStep])
-    
+
     return (
         <div className="w-full flex flex-col h-full" >
             {renderStep()}
