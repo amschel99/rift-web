@@ -1,17 +1,29 @@
 import React, { useMemo } from "react";
-import { type IUserBalance } from "@/hooks/useTokenDetails";
+import { useTokenBalance } from "@/hooks/token/useTokenBalance";
+import { FaSpinner } from "react-icons/fa6";
 
 interface BalanceContainerProps {
-  userBalance: IUserBalance;
+  id: string | undefined;
 }
 
-function BalanceContainer({ userBalance }: BalanceContainerProps) {
-  const isPositive = userBalance.usdPriceChange > 0;
+function BalanceContainer({ id }: BalanceContainerProps) {
+  const {
+    userBalanceDetails,
+    isLoadingUserBalanceDetails,
+    errorUserBalanceDetails,
+  } = useTokenBalance(id);
 
   const { usdPriceChangeDisplay, percentPriceChangeDisplay } = useMemo(() => {
+    if (!userBalanceDetails || "status" in userBalanceDetails) {
+      return { usdPriceChangeDisplay: "$0", percentPriceChangeDisplay: "0%" };
+    }
+
+    const isPositive = userBalanceDetails.usdPriceChange > 0;
     if (!isPositive) {
-      const usdPrice = userBalance.usdPriceChange.toString().replace("-", "");
-      const percentPrice = userBalance.percentPriceChange
+      const usdPrice = userBalanceDetails.usdPriceChange
+        .toString()
+        .replace("-", "");
+      const percentPrice = userBalanceDetails.percentPriceChange
         .toString()
         .replace("-", "");
       return {
@@ -20,16 +32,42 @@ function BalanceContainer({ userBalance }: BalanceContainerProps) {
       };
     } else {
       return {
-        usdPriceChangeDisplay: `$${userBalance.usdPriceChange}`,
-        percentPriceChangeDisplay: `${userBalance.percentPriceChange}%`,
+        usdPriceChangeDisplay: `$${userBalanceDetails.usdPriceChange}`,
+        percentPriceChangeDisplay: `${userBalanceDetails.percentPriceChange}%`,
       };
     }
-  }, [userBalance.usdPriceChange, userBalance.percentPriceChange, isPositive]);
+  }, [userBalanceDetails]);
+
+  if (isLoadingUserBalanceDetails) {
+    return (
+      <div className="w-full flex flex-col items-center justify center mt-16">
+        <FaSpinner className="animate-spin text-primary" size={24} />
+      </div>
+    );
+  }
+  if (
+    errorUserBalanceDetails ||
+    !userBalanceDetails ||
+    "status" in userBalanceDetails
+  ) {
+    return (
+      <div>
+        Error:{" "}
+        {errorUserBalanceDetails?.message ||
+          (userBalanceDetails && "status" in userBalanceDetails
+            ? userBalanceDetails.message
+            : "Unknown error")}
+      </div>
+    );
+  }
+
+  // TypeScript now knows userBalanceDetails is IUserBalance (not undefined or IError)
+  const isPositive = userBalanceDetails!.usdPriceChange > 0;
 
   return (
     <div className="w-full flex flex-col items-center justify center mt-16">
       <p className={`text-5xl font-bold text-primary`}>
-        ${userBalance.balance}
+        ${userBalanceDetails!.balance}
       </p>
       <div className="flex flex-row items-center justify-center my-2">
         <p
