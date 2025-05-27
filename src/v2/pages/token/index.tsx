@@ -49,7 +49,7 @@ function Token() {
         <h1 className={`text-xl font-bold text-primary`}>Sphere</h1>
         <p className=""></p>
       </div>
-      <BalanceContainer userBalance={userBalance} />
+      <BalanceContainer id={id} />
       <PriceChart historicalPrice={historicalPrice} />
       <div className="flex justify-between mx-2 mt-2 gap-2 select-none">
         {tokenActions.map((action) => (
