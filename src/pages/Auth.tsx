@@ -225,8 +225,6 @@ export default function Auth(): JSX.Element {
   useEffect(() => {
     if (socket && httpAuthOk) {
       const handleAccountCreationSuccess = (data: any) => {
-        console.log("account creation success");
-
         if (data?.user == tgUserId) {
           if (data?.address) localStorage.setItem("ethaddress", data.address);
           if (data?.accessToken)
