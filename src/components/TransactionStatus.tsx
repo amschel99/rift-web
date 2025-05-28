@@ -15,33 +15,33 @@ export const TransactionStatus = (): JSX.Element => {
   } = useTransactionStatus();
 
   useEffect(() => {
-    if (!socket) return;
+    if (socket && txStatusBarVisible) {
+      socket.on("TXConfirmed", () => {
+        console.log("TXConfirmed event - the transaction was completed");
 
-    socket.on("TXConfirmed", () => {
-      console.log("TXConfirmed event - the transaction was completed");
+        showTxStatusBar("PROCESSED", "Transaction completed");
 
-      showTxStatusBar("PROCESSED", "Transaction completed");
+        setTimeout(() => {
+          hideTxStatusBar();
+        }, 5000);
+      });
 
-      setTimeout(() => {
-        hideTxStatusBar();
-      }, 5000);
-    });
+      socket.on("TXFailed", () => {
+        console.log("TXFailed event - the transaction failed");
 
-    socket.on("TXFailed", () => {
-      console.log("TXFailed event - the transaction failed");
+        showTxStatusBar("FAILED", "Transaction failed");
 
-      showTxStatusBar("FAILED", "Transaction failed");
+        setTimeout(() => {
+          hideTxStatusBar();
+        }, 5000);
+      });
 
-      setTimeout(() => {
-        hideTxStatusBar();
-      }, 5000);
-    });
-
-    return () => {
-      socket.off("TXConfirmed");
-      socket.off("TXFailed");
-    };
-  }, [socket, showTxStatusBar]);
+      return () => {
+        socket.off("TXConfirmed");
+        socket.off("TXFailed");
+      };
+    }
+  }, [socket, txStatusBarVisible]);
 
   return (
     <Fragment>

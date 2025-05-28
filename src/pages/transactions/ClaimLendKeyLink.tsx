@@ -151,56 +151,54 @@ export default function ClaimLendKeyLink(): JSX.Element {
       : Number(paysecretamount || 0) * 0.99;
 
   useEffect(() => {
-    if (!socket) return;
+    if (socket && showTxStatus) {
+      socket.on("TXConfirmed", (data) => {
+        setTxStatus("PROCESSED");
+        setTxMessage("Transaction completed");
+        setShowTxStatus(true);
 
-    socket.on("TXConfirmed", (data) => {
-      setTxStatus("PROCESSED");
-      setTxMessage("Transaction completed");
-      setShowTxStatus(true);
+        doKeyPaymentSuccess(
+          paysecretnonce as string,
+          paysecretreceiver as string,
+          data?.transactionHash,
+          secretAmountInUSD
+        ).then(() => {
+          setProcessing(false);
+          setUserGotKey(true);
+          localStorage.removeItem("txverified");
+        });
 
-      doKeyPaymentSuccess(
-        paysecretnonce as string,
-        paysecretreceiver as string,
-        data?.transactionHash,
-        secretAmountInUSD
-      ).then(() => {
-        setProcessing(false);
-        setUserGotKey(true);
-        localStorage.removeItem("txverified");
+        setTimeout(() => {
+          setShowTxStatus(false);
+        }, 4500);
+
+        socket.on("KeyUnlocked", () => {
+          showsuccesssnack("Key was unlocked successfully");
+          setProcessing(false);
+          setUserGotKey(true);
+        });
       });
 
-      setTimeout(() => {
-        setShowTxStatus(false);
-      }, 4500);
+      socket.on("TXFailed", () => {
+        setTxStatus("FAILED");
+        setTxMessage("Transaction failed");
+        setShowTxStatus(true);
 
-      socket.on("KeyUnlocked", () => {
-        showsuccesssnack("Key was unlocked successfully");
+        showerrorsnack("Transaction failed, please try again");
         setProcessing(false);
-        setUserGotKey(true);
+
+        setTimeout(() => {
+          setShowTxStatus(false);
+        }, 4500);
       });
-    });
 
-    socket.on("TXFailed", () => {
-      setTxStatus("FAILED");
-      setTxMessage("Transaction failed");
-      setShowTxStatus(true);
-
-      showerrorsnack("Transaction failed, please try again");
-      setProcessing(false);
-
-      setTimeout(() => {
-        setShowTxStatus(false);
-      }, 4500);
-    });
-
-    return () => {
-      if (!socket) return;
-
-      socket.off("TXConfirmed");
-      socket.off("TXFailed");
-      socket.off("KeyUnlocked");
-    };
-  }, [showTxStatus]);
+      return () => {
+        socket.off("TXConfirmed");
+        socket.off("TXFailed");
+        socket.off("KeyUnlocked");
+      };
+    }
+  }, [socket, showTxStatus]);
 
   useBackButton(goBack);
 
