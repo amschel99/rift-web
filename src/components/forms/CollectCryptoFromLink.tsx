@@ -95,68 +95,65 @@ export const CollectCryptoFromLink = (): JSX.Element => {
   });
 
   useEffect(() => {
-    if (!socket) return;
+    if (socket && utxoVal !== null) {
+      const handleTxConfirmed = () => {
+        setTxStatus("PROCESSED");
+        setTxMessage("Transaction completed");
+        setShowTxStatus(true);
 
-    const handleTxConfirmed = () => {
-      setTxStatus("PROCESSED");
-      setTxMessage("Transaction completed");
-      setShowTxStatus(true);
+        queryclient
+          .invalidateQueries({
+            queryKey: [
+              "ethbalance",
+              "berabalance",
+              "polygonusdcbalance",
+              "berausdcbalance",
+              "unlockedTokens",
+            ],
+          })
+          .then(() => {
+            showsuccesssnack(
+              `Successfully collected ${base64ToString(
+                utxoVal
+              )} ${utxoCurrency}`
+            );
+            setTimeout(() => {
+              setShowTxStatus(false);
+              closeAppDrawer();
+            }, 4500);
+          })
+          .catch(() => {
+            showsuccesssnack(
+              `Successfully collected ${base64ToString(
+                utxoVal
+              )} ${utxoCurrency}`
+            );
 
-      queryclient
-        .invalidateQueries({
-          queryKey: [
-            "ethbalance",
-            "berabalance",
-            "polygonusdcbalance",
-            "berausdcbalance",
-            "unlockedTokens",
-          ],
-        })
-        .then(() => {
-          showsuccesssnack(
-            `Successfully collected ${base64ToString(utxoVal)} ${utxoCurrency}`
-          );
-          setTimeout(() => {
-            setShowTxStatus(false);
-            closeAppDrawer();
-          }, 4500);
-        })
-        .catch(() => {
-          showsuccesssnack(
-            `Successfully collected ${base64ToString(utxoVal)} ${utxoCurrency}`
-          );
+            setTimeout(() => {
+              setShowTxStatus(false);
+              closeAppDrawer();
+            }, 4500);
+          });
+      };
 
-          setTimeout(() => {
-            setShowTxStatus(false);
-            closeAppDrawer();
-          }, 4500);
-        });
-    };
+      const handleTxFailed = () => {
+        setTxStatus("FAILED");
+        setTxMessage("Transaction failed");
+        setShowTxStatus(true);
 
-    const handleTxFailed = () => {
-      setTxStatus("FAILED");
-      setTxMessage("Transaction failed");
-      setShowTxStatus(true);
+        showerrorsnack("The transaction could not be completed");
+        closeAppDrawer();
+      };
 
-      showerrorsnack("The transaction could not be completed");
-      closeAppDrawer();
-    };
+      socket.on("TXConfirmed", handleTxConfirmed);
+      socket.on("TXFailed", handleTxFailed);
 
-    socket.on("TXConfirmed", handleTxConfirmed);
-    socket.on("TXFailed", handleTxFailed);
-
-    return () => {
-      socket.off("TXConfirmed", handleTxConfirmed);
-      socket.off("TXFailed", handleTxFailed);
-    };
-  }, [
-    socket,
-    queryclient,
-    utxoVal,
-    showsuccesssnack,
-    showerrorsnack,
-    closeAppDrawer,
-  ]);
+      return () => {
+        socket.off("TXConfirmed", handleTxConfirmed);
+        socket.off("TXFailed", handleTxFailed);
+      };
+    }
+  }, [socket, utxoVal]);
 
   return (
     <div id="collectcryptofromlink">
