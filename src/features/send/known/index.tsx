@@ -5,6 +5,8 @@ import { ReactNode, useCallback, useState } from "react"
 import FlowContextProvider, { useFlow } from "./flow-context"
 import { SelectToken } from "./select-token"
 import AddressSearch from "./address-search"
+import AmountInput from "../components/amount-input"
+import ConfirmTransaction from "./confirm-transaction"
 
 interface Props {
     renderTrigger: () => ReactNode
@@ -63,12 +65,19 @@ function SendToKnownLayout() {
     const { currentStep } = useFlow()
 
     const renderStep = useCallback(() => {
+        // TODO: add framer motion animation for screen motion fluidity
         switch (currentStep) {
             case "select-token": {
                 return <SelectToken />
             }
             case "address-search": {
                 return <AddressSearch />
+            }
+            case "amount-input": {
+                return <AmountInput />
+            }
+            case "confirm": {
+                return <ConfirmTransaction />
             }
             default: {
                 return (

@@ -9,7 +9,7 @@ interface TokenArgs {
 async function getToken(args: TokenArgs){
     // TODO: Make request to the backend for tokens
 
-    return WALLET_TOKENS
+    return WALLET_TOKENS?.at(0)
 }
 
 
