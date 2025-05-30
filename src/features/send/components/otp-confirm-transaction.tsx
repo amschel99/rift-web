@@ -36,19 +36,39 @@ export default function OTPConfirm(props: OTPConfirmProps){
     const handleConfirm = async (values: OTP_SCHEMA) => {
         console.log("Values::",values)
         try {
-            await verifyOTPMutation.mutateAsync({
+            const isValid = await verifyOTPMutation.mutateAsync({
                 otp: values.code
             })
 
-            console.log("Current Step", flow.currentStep)
+            if (!isValid) {
+                // TODO: toast to say otp invalid
+                return
+            }
 
-            flow.goToNext()
+            const state = flow.state?.getValues()
+
+            if (!state) {
+                return
+            }
+
+            flow.goToNext("processing") // navigate to processing then send the transaction
+            // These are all expected to be defined at this point in the flow 
+            flow.sendTransactionMutation!.mutate({
+                amount: state.amount!,
+                chain: state.chain!,
+                recipient: state.recipient!,
+                token: state.token!
+            })
+
+
         } catch (e)
         {
             console.log("Error::", e)
             // TODO: handle error
         }
     }   
+
+    const IS_CODE_VALID = form.watch("code")?.trim()?.length == 6
     
 
 
@@ -87,7 +107,7 @@ export default function OTPConfirm(props: OTPConfirmProps){
                                     </InputOTP>
                                 </div>
                                 <div className="flex flex-row items-center justify-center" >
-                                    <button onClick={form.handleSubmit(handleConfirm)} className="flex flex-row items-center justify-center rounded-full px-2 py-2 flex-1 bg-accent-primary cursor-pointer active:scale-95" >
+                                    <button disabled={!IS_CODE_VALID} onClick={form.handleSubmit(handleConfirm)} className="flex flex-row items-center justify-center rounded-full px-2 py-2 flex-1 bg-accent-primary cursor-pointer active:scale-95" >
                                         <p className="font-semibold text-white" >
                                             Confirm
                                         </p>

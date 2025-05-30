@@ -7,24 +7,25 @@ import { SelectToken } from "./select-token"
 import AddressSearch from "./address-search"
 import AmountInput from "../components/amount-input"
 import ConfirmTransaction from "./confirm-transaction"
+import Processing from "./processing"
 
 interface Props {
     renderTrigger: () => ReactNode
 }
 
 export default function SendToKnown(props: Props) {
+    const disclosure = useDisclosure()
 
     return (
-        <FlowContextProvider>
-            <_SendToKnown {...props} />
+        <FlowContextProvider onClose={disclosure.onClose} >
+            <_SendToKnown {...props} {...disclosure} />
         </FlowContextProvider>
     )
 }
 
-function _SendToKnown(props: Props) {
+function _SendToKnown(props: Props & ReturnType<typeof useDisclosure>) {
     const { state } = useFlow()
-    const { renderTrigger } = props
-    const { isOpen, onOpen, onClose, toggle } = useDisclosure()
+    const { renderTrigger, isOpen, onOpen, onClose, toggle } = props
 
     return (
         <Drawer modal open={isOpen} onClose={() => {
@@ -78,6 +79,9 @@ function SendToKnownLayout() {
             }
             case "confirm": {
                 return <ConfirmTransaction />
+            }
+            case "processing": {
+                return <Processing />
             }
             default: {
                 return (

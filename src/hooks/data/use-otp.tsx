@@ -11,10 +11,12 @@ async function requestOTP(){
 interface VerifyOTPArgs {
     otp: string
 }
-async function verifyOTP(args: VerifyOTPArgs){
+async function verifyOTP(args: VerifyOTPArgs): Promise<boolean> {
     const { otp } = args
     // TODO: verify otp
     // do some fancy shinanigans
+
+    return true // return false in case of invalid otp
 }
 
 

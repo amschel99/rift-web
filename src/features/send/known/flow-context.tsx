@@ -1,4 +1,6 @@
+import useSendTranaction, { SendTransactionArgs, TransactionResult } from "@/hooks/wallet/use-send-transaction"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { UseMutationResult } from "@tanstack/react-query"
 import { createContext, ReactNode, useCallback, useContext } from "react"
 import { useForm, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
@@ -9,7 +11,7 @@ const stateSchema = z.object({
     amount: z.string().optional(),
     hash: z.string().optional(),
     recipient: z.string().optional(),
-    active: z.enum(['select-token', 'address-search', 'amount-input', 'confirm', 'success', 'error']),
+    active: z.enum(['select-token', 'address-search', 'amount-input', 'confirm', 'success', 'error', 'processing']),
 }) 
 
 type State = z.infer<typeof stateSchema>
@@ -17,7 +19,9 @@ type State = z.infer<typeof stateSchema>
 interface FlowContext {
     goToNext:(target?: State['active'])=> void,
     goBack: (target?: State['active']) => void,
-    state: UseFormReturn<State> | null
+    state: UseFormReturn<State> | null,
+    sendTransactionMutation: UseMutationResult<TransactionResult, Error, SendTransactionArgs, unknown> | null,
+    closeAndReset: () => void
 }
 
 
@@ -28,7 +32,11 @@ const flowContext = createContext<FlowContext>({
     goToNext() {
         
     },
-    state: null
+    state: null,
+    sendTransactionMutation: null,
+    closeAndReset() {
+
+    },
 })
 
 interface Props {
@@ -39,6 +47,8 @@ interface Props {
 
 export default function FlowContextProvider(props: Props){
     const { children, onClose } = props
+
+    const { sendTransactionMutation } = useSendTranaction()
     const form = useForm<State>({
         resolver: zodResolver(stateSchema),
         defaultValues: {
@@ -110,12 +120,19 @@ export default function FlowContextProvider(props: Props){
         }
     }
 
+    function closeAndReset() {
+        onClose?.()
+        form.reset()
+    }
+
     return (
         <flowContext.Provider
             value={{
                 goBack: back,
                 goToNext: next,
-                state: form
+                state: form,
+                sendTransactionMutation,
+                closeAndReset
             }}
         >
             {children}
