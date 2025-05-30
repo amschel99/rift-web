@@ -4,6 +4,7 @@ import useGeckoPrice from "@/hooks/data/use-gecko-price";
 import formatAddress from "@/utils/address-formatter";
 import useChain from "@/hooks/data/use-chain";
 import OTPConfirm from "../components/otp-confirm-transaction";
+import CreateLink from "./create-link";
 
 
 // TODO: confirm OTP component
@@ -32,28 +33,33 @@ export default function ConfirmTransaction(){
             >
 
                 <div className="flex flex-row items-center justify-between w-full gap-5" >
-                    <div className="flex flex-row flex-1" >
 
-                        <OTPConfirm 
-                            render={()=>{
-                                return (
-                                    <button className="w-full flex flex-row items-center justify-center rounded-full px-2 py-2 flex-1 bg-accent-primary cursor-pointer active:scale-95" >
-                                        <p className="font-semibold text-white" >
-                                            Confirm
-                                        </p>
-                                        
-                                    </button>
-                                )
-                            }}
-                        />
-                    </div>
+                    <OTPConfirm
+                        render={() => {
+                            return (
+                                <button className="w-full flex flex-row items-center justify-center rounded-full px-2 py-2 flex-1 bg-accent-primary cursor-pointer active:scale-95" >
+                                    <p className="font-semibold text-white" >
+                                        Confirm
+                                    </p>
+
+                                </button>
+                            )
+                        }}
+                    />
                     
-                    <button className="flex flex-row items-center justify-center rounded-full px-2 py-2 flex-1 bg-accent-primary cursor-pointer active:scale-95" >
-                        <p className="font-semibold text-white" >
-                            Link
-                        </p>
-                        
-                    </button>
+                    <CreateLink
+                        renderPaymentLink={() => {
+                            return (
+                                <button className="w-full flex flex-row items-center justify-center rounded-full px-2 py-2 flex-1 bg-accent-primary cursor-pointer active:scale-95" >
+                                    <p className="font-semibold text-white" >
+                                        Link
+                                    </p>
+
+                                </button>
+                            )
+                        }}
+                    />
+
                 </div>
 
             </div>
