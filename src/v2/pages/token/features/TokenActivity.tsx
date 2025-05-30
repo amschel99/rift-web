@@ -44,28 +44,27 @@ function TokenActivity({ tokenID }: { tokenID: string | undefined }) {
   }
 
   return (
-    <div className="flex items-center justify-center flex-col mb-32">
+    <div className="flex items-center justify-center flex-col mb-32 mx-2">
       {tokenActivity.map((activity, index) => (
         <div
           key={`${activity.date}-${index}`}
-          className="mb-4 p-4 bg-accent rounded-lg mx-2"
+          className="mb-4 p-4 bg-secondary rounded-lg mx-2 w-full"
         >
           <div className="flex items-center gap-2">
             <img
               src={activity.imageUrl}
               alt={activity.type}
-              width={32}
-              height={32}
-              className="rounded-full"
+              width={44}
+              height={44}
+              className="rounded-2xl"
             />
             <div>
-              <p className="text-sm font-semibold text-primary">
+              <p className="text-lg font-semibold text-primary">
                 {activity.title}
               </p>
-              <p className="text-xs text-textsecondary">
+              <p className="text-xs text-textsecondary font-medium mt-1">
                 {activity.description}
               </p>
-              <p className="text-xs text-textsecondary">{activity.date}</p>
             </div>
           </div>
         </div>
