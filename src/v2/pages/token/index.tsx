@@ -14,19 +14,19 @@ import { CiLink } from "react-icons/ci";
 
 const tokenActions = [
   {
-    icon: <FaQrcode color={colors.accent} size={24} />,
+    icon: <FaQrcode color={colors.textprimary} size={24} />,
     label: "Receive",
   },
   {
-    icon: <BsSendFill color={colors.accent} size={24} />,
+    icon: <BsSendFill color={colors.textprimary} size={24} />,
     label: "Send",
   },
   {
-    icon: <FaRetweet color={colors.accent} size={24} />,
+    icon: <FaRetweet color={colors.textprimary} size={24} />,
     label: "Swap",
   },
   {
-    icon: <CiLink color={colors.accent} size={24} />,
+    icon: <CiLink color={colors.textprimary} size={24} />,
     label: "Link",
   },
 ];
