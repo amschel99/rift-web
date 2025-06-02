@@ -3,11 +3,13 @@ import { useNavigate, useParams } from "react-router";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { MdBackspace } from "react-icons/md";
 import { tokenListData } from "./mock/tokenDetailsMockData";
+import ConfirmTransaction from "./components/ConfirmTransaction";
 
 function CompleteSendTransaction() {
   const { address, id } = useParams();
   const navigate = useNavigate();
   const [amount, setAmount] = useState("0");
+  const [confirm, setConfirm] = useState(false);
 
   const handleNumberClick = (num: string) => {
     if (amount === "0") {
@@ -41,12 +43,27 @@ function CompleteSendTransaction() {
 
   function handleExchangeRate(amount: string) {
     console.log("Handling exchange rate for:", id);
-    return parseFloat(amount) * 1.02;
+    return parseFloat(amount) * 2600;
   }
 
   const handleContinue = () => {
     console.log("Continue with amount:", amount);
+    setConfirm(true);
   };
+
+  if (confirm) {
+    const confirmationProps = {
+      tokenName: tokenListData.find((token) => token.symbol === id)?.name || "",
+      tokenSymbol:
+        tokenListData.find((token) => token.symbol === id)?.symbol || "",
+      tokenImageUrl:
+        tokenListData.find((token) => token.symbol === id)?.imageUrl || "",
+      value: amount,
+      toAddress: address || "",
+      exchangeRate: handleExchangeRate(amount),
+    };
+    return <ConfirmTransaction confirmationProps={confirmationProps} />;
+  }
 
   return (
     <div className="flex flex-col w-full h-screen relative px-4">
@@ -72,9 +89,14 @@ function CompleteSendTransaction() {
         </p>
       </div>
       <div className="flex flex-col items-center mt-8 mb-4 h-1/2 w-full justify-center">
-        <div className="text-7xl font-bold text-white mb-2">{amount}</div>
+        <div className="text-7xl font-bold text-white mb-2">
+          {amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </div>
         <div className="text-text-subtle text-xl">
-          ≈ ${handleExchangeRate(amount).toFixed(2)}
+          ≈ $
+          {handleExchangeRate(amount)
+            .toFixed(2)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </div>
       </div>
 
