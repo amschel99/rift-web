@@ -1,17 +1,14 @@
 import BottomTabs from "./bottom-tabs";
 import ShellContextProvider from "./shell-context";
 import PageContainer from "./page-container";
+import Onboarding from "@/features/onboarding";
+import { Routes } from "react-router";
 
 export default function AppShell() {
   return (
     <ShellContextProvider>
-      <div className="w-screen flex flex-col items-center bg-app-background">
-        <div className="flex flex-col w-full flex-1 ">
-          <PageContainer />
-        </div>
-        <div className="flex flex-row items-center justify-center px-5 bg-surface-subtle w-full shadow-2xl shadow-surface-subtle ">
-          <BottomTabs />
-        </div>
+      <div className="w-screen h-screen flex flex-col items-center bg-app-background relative">
+        <PageContainer />
       </div>
     </ShellContextProvider>
   );
