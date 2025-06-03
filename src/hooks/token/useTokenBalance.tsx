@@ -4,8 +4,13 @@ import {
   IError,
   userBalanceData,
 } from "@/v2/pages/token/mock/tokenDetailsMockData";
-
-// const TOKEN_BALANCE_URL = import.meta.env.VITE_TOKEN_BALANCE_URL;
+import Sphere, {
+  Environment,
+  WalletChain,
+  WalletToken,
+  ApiResponse,
+} from "@stratosphere-network/wallet";
+import sphere from "@/v2/pages/token/mock/auth";
 
 export const useTokenBalance = (id: string | undefined) => {
   const {
@@ -34,7 +39,42 @@ async function getUserBalanceDetails(
         "Token ID missing! Token ID is required to fetch user balance details",
     };
   }
-  //TODO: Implement the logic to fetch the user balance details from the backend
+
+  try {
+    const userOwnedTokens = await getUserOwnedTokens();
+    console.log("userOwnedTokens", userOwnedTokens);
+  } catch (error) {
+    console.error("Error fetching user tokens:", error);
+    return userBalanceData as IUserBalance;
+  }
 
   return userBalanceData as IUserBalance;
+}
+
+async function getUserOwnedTokens(): Promise<WalletToken[] | null> {
+  if (!sphere.isAuthenticated()) {
+    console.error("User must be authenticated to fetch owned tokens");
+    return null;
+  }
+
+  try {
+    const response = await sphere.assets.getUserTokens();
+
+    if (response.data) {
+      console.log(`User owns ${response.data.length} different tokens:`);
+      response.data.forEach((token) => {
+        console.log(`\n  Token: ${token.name}`);
+        console.log(`  ID: ${token.id}`);
+        console.log(`  Chain: ${token.chain_id}`);
+        if (token.contract_address) {
+          console.log(`  Contract: ${token.contract_address}`);
+        }
+      });
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching user tokens:", error);
+    throw error;
+  }
 }

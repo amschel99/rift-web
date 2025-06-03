@@ -10,7 +10,6 @@ interface TokenContainerProps {
 }
 
 function TokenContainer({ tokenID }: TokenContainerProps) {
-  console.log(tokenID);
   const {
     userBalanceDetails,
     isLoadingUserBalanceDetails,

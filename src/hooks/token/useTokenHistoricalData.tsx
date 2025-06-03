@@ -26,6 +26,7 @@ async function getHistoricalData(
       "Token ID missing! Token ID is required to fetch historical data"
     );
   }
+
   //TODO: Implement the logic to fetch the historical data from the backend
   return priceChartData;
 }

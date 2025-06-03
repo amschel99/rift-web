@@ -26,6 +26,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.2
         version: 1.2.2(@types/react@18.3.21)(react@18.3.1)
+      '@stratosphere-network/wallet':
+        specifier: ^6.2.1
+        version: 6.2.1
       '@tanstack/react-query':
         specifier: ^5.65.1
         version: 5.76.1(react@18.3.1)
@@ -895,6 +898,9 @@ packages:
 
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
+
+  '@stratosphere-network/wallet@6.2.1':
+    resolution: {integrity: sha512-KpvnpCYHfDqTWjsPp3EVCoMFoAaTvwIciw/owFzyhG4n4UoVHHS+7JHCaV4RWsxVjQVH1iT2Oyb0LXb0VdIxIg==}
 
   '@swc/core-darwin-arm64@1.11.24':
     resolution: {integrity: sha512-dhtVj0PC1APOF4fl5qT2neGjRLgHAAYfiVP8poJelhzhB/318bO+QCFWAiimcDoyMgpCXOhTp757gnoJJrheWA==}
@@ -3499,6 +3505,14 @@ snapshots:
   '@socket.io/component-emitter@3.1.2': {}
 
   '@standard-schema/utils@0.3.0': {}
+
+  '@stratosphere-network/wallet@6.2.1':
+    dependencies:
+      socket.io-client: 4.8.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
 
   '@swc/core-darwin-arm64@1.11.24':
     optional: true
