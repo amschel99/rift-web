@@ -65,7 +65,7 @@ export function PriceChart({
 
   return (
     <Card className="shadow-none border-none bg-transparent">
-      <CardContent className="px-1 sm:p-2">
+      <CardContent className="sm:p-2">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[300px] w-full"

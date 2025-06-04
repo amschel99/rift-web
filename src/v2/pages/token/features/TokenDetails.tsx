@@ -68,11 +68,11 @@ function TokenDetails({ tokenID }: TokenDetailsProps) {
   ];
 
   return (
-    <div className="flex flex-col gap-1 bg-accent rounded-md p-2 mx-2">
+    <div className="flex flex-col gap-1 rounded-2xl px-2 mx-2 bg-accent">
       {itemDetails.map((detail, index) => (
         <div
           key={index}
-          className="border-b border-gray-600"
+          className="border-b border-surface-subtle"
           style={{
             borderBottomWidth: itemDetails.length - 1 === index ? 0 : "0.5px",
           }}

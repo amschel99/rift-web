@@ -4,6 +4,31 @@ import {
   tokenDetailsData,
 } from "@/v2/pages/token/mock/tokenDetailsMockData";
 import { useQuery } from "@tanstack/react-query";
+import { WalletToken } from "@stratosphere-network/wallet";
+import sphere from "@/lib/sphere";
+
+async function getUserOwnedTokens(): Promise<WalletToken[] | null> {
+  try {
+    const response = await sphere.assets.getUserTokens();
+
+    if (response.data) {
+      console.log(`User owns ${response.data.length} different tokens:`);
+      response.data.forEach((token) => {
+        console.log(`\n  Token: ${token.name}`);
+        console.log(`  ID: ${token.id}`);
+        console.log(`  Chain: ${token.chain_id}`);
+        if (token.contract_address) {
+          console.log(`  Contract: ${token.contract_address}`);
+        }
+      });
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching user tokens:", error);
+    throw error;
+  }
+}
 
 export const useTokenDetails = (id: string | undefined) => {
   const {
@@ -28,6 +53,8 @@ async function getTokenDetails(
       message: "Token ID is required",
     };
   }
+  // const userOwnedTokens = await getUserOwnedTokens();
+  // console.log(userOwnedTokens);
   // const response = await fetch(`${HISTORICAL_URL}/details/${id}`);
   // console.log(response);
   return tokenDetailsData;

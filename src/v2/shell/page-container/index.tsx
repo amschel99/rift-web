@@ -5,7 +5,7 @@ import Home from "@/v2/pages/home";
 import OnRamp from "@/v2/pages/onramp";
 import History from "@/v2/pages/history";
 import Explore from "@/v2/pages/explore";
-import Token from "@/v2/pages/token";
+import Token from "@/v2/pages/token/index";
 import AuthenticatedShell from "./authenticated-shell";
 import Onboarding from "@/features/onboarding";
 
@@ -29,7 +29,9 @@ export default function PageContainer() {
   }, [form]);
 
   const RenderScreenWithShell = useCallback(
-    (props: { screen: "home" | "on-ramp" | "history" | "explore" }) => {
+    (props: {
+      screen: "home" | "on-ramp" | "history" | "explore" | "token";
+    }) => {
       const { screen } = props;
       switch (screen) {
         case "home": {
@@ -61,7 +63,8 @@ export default function PageContainer() {
           );
         }
         default: {
-          return null;
+          // TODO: remove this(replace with null), this is for testing
+          return <Token />;
         }
       }
     },
@@ -88,6 +91,10 @@ export default function PageContainer() {
       <Route
         path="/app/explore"
         element={<RenderScreenWithShell screen="explore" />}
+      />
+      <Route
+        path="/app/token/:id"
+        element={<RenderScreenWithShell screen="token" />}
       />
     </Routes>
   );
