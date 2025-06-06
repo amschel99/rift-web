@@ -6,6 +6,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { WalletToken } from "@stratosphere-network/wallet";
 import sphere from "@/lib/sphere";
+import { fetchCoinInfo } from "@/utils/coingecko/markets";
 
 // async function getUserOwnedTokens(): Promise<WalletToken[] | null> {
 //   try {
@@ -29,28 +30,24 @@ import sphere from "@/lib/sphere";
 //   }
 // }
 
-export const useTokenDetails = (id: string | undefined) => {
+export const useTokenDetails = (id: string) => {
   const {
     data: tokenDetails,
     isLoading: isLoadingTokenDetails,
     error: errorTokenDetails,
   } = useQuery({
     queryKey: ["tokenDetails", id],
-    queryFn: () => getTokenDetails(id),
+    queryFn: () => fetchCoinInfo(id),
     enabled: !!id,
   });
 
-  return { tokenDetails, isLoadingTokenDetails, errorTokenDetails };
-};
-
-async function getTokenDetails(
-  id: string | undefined
-): Promise<ITokenDetails | IError> {
-  if (!id) {
+  if (tokenDetails && "error" in tokenDetails) {
     return {
-      status: "error",
-      message: "Token ID is required",
+      tokenDetails: null,
+      isLoadingTokenDetails: false,
+      errorTokenDetails: tokenDetails.error,
     };
   }
-  return tokenDetailsData;
-}
+
+  return { tokenDetails, isLoadingTokenDetails, errorTokenDetails };
+};

@@ -1,15 +1,14 @@
-import { priceChartData } from "@/v2/pages/token/mock/tokenDetailsMockData";
 import { useQuery } from "@tanstack/react-query";
-import { IHistoricalPrice } from "@/v2/pages/token/mock/tokenDetailsMockData";
+import { fetchCoinPrices } from "@/utils/coingecko/markets";
 
-export const useTokenHistoricalData = (id: string) => {
+export const useTokenHistoricalData = (id: string, daysRange: number) => {
   const {
     data: historicalData,
     isLoading: isLoadingHistoricalData,
     error: errorHistoricalData,
   } = useQuery({
     queryKey: ["historicalData", id],
-    queryFn: () => getHistoricalData(id),
+    queryFn: () => fetchCoinPrices(id, daysRange),
   });
   return {
     historicalData,
@@ -17,16 +16,3 @@ export const useTokenHistoricalData = (id: string) => {
     errorHistoricalData,
   };
 };
-
-async function getHistoricalData(
-  id: string
-): Promise<IHistoricalPrice[] | undefined> {
-  if (!id) {
-    throw new Error(
-      "Token ID missing! Token ID is required to fetch historical data"
-    );
-  }
-
-  //TODO: Implement the logic to fetch the historical data from the backend
-  return priceChartData;
-}

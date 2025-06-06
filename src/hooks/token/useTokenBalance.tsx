@@ -11,70 +11,23 @@ import Sphere, {
   ApiResponse,
 } from "@stratosphere-network/wallet";
 import sphere from "@/lib/sphere";
+import { fetchCoinInfo } from "@/utils/coingecko/markets";
 
-export const useTokenBalance = (id: string | undefined) => {
+export const useTokenPriceChange = (id: string) => {
   const {
-    data: userBalanceDetails,
-    isLoading: isLoadingUserBalanceDetails,
-    error: errorUserBalanceDetails,
+    data: tokenPriceChange,
+    isLoading: isLoadingTokenPriceChange,
+    error: errorTokenPriceChange,
   } = useQuery({
-    queryKey: ["userBalanceDetails", id],
-    queryFn: () => getUserBalanceDetails(id),
+    queryKey: ["tokenPriceChange", id],
+    queryFn: () => fetchCoinInfo(id),
     enabled: !!id,
   });
   return {
-    userBalanceDetails,
-    isLoadingUserBalanceDetails,
-    errorUserBalanceDetails,
+    tokenPriceChange: tokenPriceChange?.market_data.price_change_percentage_24h,
+    tokenPriceChangeUsd:
+      tokenPriceChange?.market_data.price_change_24h_in_currency.usd,
+    isLoadingTokenPriceChange,
+    errorTokenPriceChange,
   };
 };
-
-async function getUserBalanceDetails(
-  id: string | undefined
-): Promise<IUserBalance | IError> {
-  if (!id) {
-    return {
-      status: "error",
-      message:
-        "Token ID missing! Token ID is required to fetch user balance details",
-    };
-  }
-
-  try {
-    const userOwnedTokens = await getUserOwnedTokens();
-    console.log("userOwnedTokens", userOwnedTokens);
-  } catch (error) {
-    console.error("Error fetching user tokens:", error);
-    return userBalanceData as IUserBalance;
-  }
-
-  return userBalanceData as IUserBalance;
-}
-
-async function getUserOwnedTokens(): Promise<WalletToken[] | null> {
-  if (!sphere.isAuthenticated()) {
-    console.error("User must be authenticated to fetch owned tokens");
-    return null;
-  }
-
-  try {
-    const response = await sphere.assets.getUserTokens();
-
-    if (response.data) {
-      console.log(`User owns ${response.data.length} different tokens:`);
-      response.data.forEach((token) => {
-        console.log(`\n  Token: ${token.name}`);
-        console.log(`  ID: ${token.id}`);
-        console.log(`  Chain: ${token.chain_id}`);
-        if (token.contract_address) {
-          console.log(`  Contract: ${token.contract_address}`);
-        }
-      });
-      return response.data;
-    }
-    return null;
-  } catch (error) {
-    console.error("Error fetching user tokens:", error);
-    throw error;
-  }
-}

@@ -4,9 +4,8 @@ import Title from "./components/Title";
 import TokenContainer from "./features/TokenContainer";
 import TokenDetails from "./features/TokenDetails";
 import TokenActivity from "./features/TokenActivity";
-import { useTokenHistoricalData } from "@/hooks/token/useTokenHistoricalData";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { FaQrcode, FaSpinner, FaRetweet } from "react-icons/fa6";
+import { FaQrcode, FaRetweet } from "react-icons/fa6";
 import { colors } from "@/constants";
 import { BsSendFill } from "react-icons/bs";
 import { CiLink } from "react-icons/ci";
@@ -33,9 +32,8 @@ const tokenActions = [
 
 function Token() {
   const { id } = useParams();
-
-  const { historicalData, isLoadingHistoricalData, errorHistoricalData } =
-    useTokenHistoricalData(id || "");
+  // TODO: get user balance from path params
+  const userBalance = 7.68;
 
   if (!id) {
     return (
@@ -45,35 +43,21 @@ function Token() {
     );
   }
 
-  if (isLoadingHistoricalData) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <FaSpinner className="animate-spin text-primary" size={24} />
-      </div>
-    );
-  }
-
-  if (errorHistoricalData || !historicalData) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-danger">Error loading data</p>
-      </div>
-    );
-  }
-
   return (
     <div className="">
       <div className="fixed z-10 bg-app-background max-w-lg w-full h-16 flex flex-row items-center justify-between px-2 ">
         <IoMdArrowRoundBack className="text-2xl text-primary" />
-        <h1 className={`text-xl font-bold text-primary mx-2`}>Sphere</h1>
+        <h1 className={`text-xl font-bold text-primary mx-2`}>
+          {id.toUpperCase()}
+        </h1>
       </div>
-      <BalanceContainer id={id} />
-      <PriceChart historicalPrice={historicalData} />
+      <BalanceContainer id={id} userBalance={userBalance} />
+      <PriceChart tokenID={id as string} />
       <div className="flex justify-between mx-2 mt-2 gap-2 select-none">
         {tokenActions.map((action) => (
           <div
             key={action.label}
-            className="w-24 h-24 rounded-lg flex items-center justify-center bg-accent flex flex-col gap-2"
+            className="w-24 h-24 rounded-lg items-center justify-center bg-accent flex flex-col gap-2"
           >
             {action.icon}
             <p className="text-sm font-medium">{action.label}</p>
@@ -81,7 +65,7 @@ function Token() {
         ))}
       </div>
       <Title title="Your Balance" />
-      <TokenContainer tokenID={id} />
+      <TokenContainer tokenID={id} userBalance={userBalance} />
       <Title title="Token Details" />
       <TokenDetails tokenID={id} />
       <Title title="Activity" />

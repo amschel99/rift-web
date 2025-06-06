@@ -11,32 +11,37 @@ import { colors } from "@/constants";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { IHistoricalPrice } from "../mock/tokenDetailsMockData";
+import { useTokenHistoricalData } from "@/hooks/token/useTokenHistoricalData";
+import { CandlestickData } from "lightweight-charts";
 
 const chartConfig = {
-  token: {
-    label: "Token Price",
+  close: {
+    label: "Close Price",
     color: colors.accent,
   },
 } as const;
 
 type ChartKey = keyof typeof chartConfig;
 
-export function PriceChart({
-  historicalPrice,
-}: {
-  historicalPrice: IHistoricalPrice[];
-}) {
-  const activeChart: ChartKey = "token";
+const daysRangeMapping = {
+  "1D": 1,
+  "1W": 7,
+  "1M": 30,
+  "1Y": 365,
+  YTD: 365,
+  ALL: 10000,
+};
+
+export function PriceChart({ tokenID }: { tokenID: string }) {
+  const activeChart: ChartKey = "close";
   const [activeRange, setActiveRange] = useState<
     "1D" | "1W" | "1M" | "1Y" | "YTD" | "ALL"
   >("1M");
+  const { historicalData, isLoadingHistoricalData, errorHistoricalData } =
+    useTokenHistoricalData(tokenID, daysRangeMapping[activeRange]);
 
-  function filterChartData(
-    data: IHistoricalPrice[],
-    range: typeof activeRange
-  ) {
-    const now = new Date(data[data.length - 1].date);
+  function filterChartData(data: CandlestickData[], range: typeof activeRange) {
+    const now = new Date(data[data.length - 1].time as number);
     switch (range) {
       case "1D":
         return [data[data.length - 1]];
@@ -46,11 +51,11 @@ export function PriceChart({
         return data.slice(-30);
       case "1Y":
         return data.filter(
-          (d) => new Date(d.date).getFullYear() === now.getFullYear()
+          (d) => new Date(d.time as number).getFullYear() === now.getFullYear()
         );
       case "YTD":
         return data.filter(
-          (d) => new Date(d.date).getFullYear() === now.getFullYear()
+          (d) => new Date(d.time as number).getFullYear() === now.getFullYear()
         );
       case "ALL":
       default:
@@ -58,10 +63,27 @@ export function PriceChart({
     }
   }
 
-  if (!historicalPrice) {
-    return <div>Loading...</div>;
+  if (isLoadingHistoricalData) {
+    return (
+      <div className="flex justify-center items-center bg-accent p-4 mx-2 animate-pulse h-[350px] mb-4 rounded-xl"></div>
+    );
   }
-  const chartData = historicalPrice;
+  if (errorHistoricalData) {
+    return (
+      <div className="flex bg-accent rounded-xl p-4 mx-2">
+        <p className="text-danger text-sm">Error loading data</p>
+        <p className="text-danger text-sm">{errorHistoricalData?.toString()}</p>
+      </div>
+    );
+  }
+
+  if (!historicalData) {
+    return (
+      <div className="flex justify-center items-center bg-accent p-4 mx-2 h-[350px] mb-4 rounded-xl">
+        <p className="text-sm">No data available</p>
+      </div>
+    );
+  }
 
   return (
     <Card className="shadow-none border-none bg-transparent">
@@ -72,7 +94,7 @@ export function PriceChart({
         >
           <LineChart
             accessibilityLayer
-            data={filterChartData(chartData, activeRange)}
+            data={filterChartData(historicalData, activeRange)}
             margin={{
               left: 12,
               right: 12,
@@ -80,7 +102,7 @@ export function PriceChart({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
+              dataKey="time"
               tickLine={false}
               hide
               axisLine={false}
@@ -95,19 +117,30 @@ export function PriceChart({
               }}
             />
             <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  className="w-[150px]"
-                  nameKey="token"
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    });
-                  }}
-                />
-              }
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="rounded-lg border border-text-subtle bg-app-background p-2 shadow-sm">
+                      <div className="text-xs font-medium">
+                        {new Date(data.time as number).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-1">
+                        <div className="w-3 h-3 rounded-xs bg-accent-secondary" />
+                        Close: ${data.close.toLocaleString()}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
             />
             <Line
               dataKey={activeChart}

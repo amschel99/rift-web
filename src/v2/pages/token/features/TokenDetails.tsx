@@ -14,8 +14,7 @@ interface TokenRowItem {
 
 function TokenDetails({ tokenID }: TokenDetailsProps) {
   const { tokenDetails, isLoadingTokenDetails, errorTokenDetails } =
-    useTokenDetails(tokenID);
-
+    useTokenDetails(tokenID as string);
   if (!tokenID) {
     return (
       <div className="flex justify-center items-center bg-accent rounded-md p-4 mx-2">
@@ -32,10 +31,13 @@ function TokenDetails({ tokenID }: TokenDetailsProps) {
     );
   }
 
-  if (errorTokenDetails || !tokenDetails || "status" in tokenDetails) {
+  if (errorTokenDetails || !tokenDetails) {
     return (
       <div className="flex justify-center items-center bg-accent rounded-md p-4 mx-2">
-        <p className="text-danger text-sm">Error loading token details</p>
+        <p className="text-danger text-sm">Error loading token details: </p>
+        <p className="text-danger text-sm">
+          {errorTokenDetails?.toString() || "Unknown error"}
+        </p>
       </div>
     );
   }
@@ -43,7 +45,7 @@ function TokenDetails({ tokenID }: TokenDetailsProps) {
   const itemDetails: TokenRowItem[] = [
     {
       title: "Symbol",
-      value: tokenDetails.symbol,
+      value: tokenDetails.symbol.toUpperCase(),
     },
     {
       title: "Name",
@@ -51,19 +53,19 @@ function TokenDetails({ tokenID }: TokenDetailsProps) {
     },
     {
       title: "Decimals",
-      value: tokenDetails.decimals,
+      value: tokenDetails.market_data.total_supply,
     },
     {
       title: "Total Supply",
-      value: tokenDetails.totalSupply.toLocaleString(),
+      value: tokenDetails.market_data.total_supply.toLocaleString(),
     },
     {
       title: "Circulating Supply",
-      value: tokenDetails.circulatingSupply.toLocaleString(),
+      value: tokenDetails.market_data.circulating_supply.toLocaleString(),
     },
     {
       title: "Max Supply",
-      value: tokenDetails.maxSupply.toLocaleString(),
+      value: tokenDetails.market_data.max_supply.toLocaleString(),
     },
   ];
 

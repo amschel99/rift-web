@@ -1,48 +1,37 @@
 import React, { useMemo } from "react";
-import { useTokenBalance } from "@/hooks/token/useTokenBalance";
+import { useTokenPriceChange } from "@/hooks/token/useTokenBalance";
 import { FaSpinner } from "react-icons/fa6";
 import { useTokenDetails } from "@/hooks/token/useTokenDetails";
-// TODO: Replace with actual token logo
-import logo from "@/assets/images/logos/bera.png";
 
 interface TokenContainerProps {
   tokenID: string | undefined;
+  userBalance: number;
 }
 
-function TokenContainer({ tokenID }: TokenContainerProps) {
+function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
   const {
-    userBalanceDetails,
-    isLoadingUserBalanceDetails,
-    errorUserBalanceDetails,
-  } = useTokenBalance(tokenID);
+    tokenPriceChange,
+    tokenPriceChangeUsd,
+    isLoadingTokenPriceChange,
+    errorTokenPriceChange,
+  } = useTokenPriceChange(tokenID as string);
 
   const { tokenDetails, isLoadingTokenDetails, errorTokenDetails } =
-    useTokenDetails(tokenID);
+    useTokenDetails(tokenID as string);
 
-  const { usdPriceChangeDisplay } = useMemo(() => {
-    if (!userBalanceDetails || "status" in userBalanceDetails) {
-      return { usdPriceChangeDisplay: "$0", percentPriceChangeDisplay: "0%" };
-    }
-
-    const isPositive = userBalanceDetails.usdPriceChange > 0;
-    if (!isPositive) {
-      const usdPrice = userBalanceDetails.usdPriceChange
-        .toString()
-        .replace("-", "");
-      const percentPrice = userBalanceDetails.percentPriceChange
-        .toString()
-        .replace("-", "");
-      return {
-        usdPriceChangeDisplay: `-$${usdPrice}`,
-        percentPriceChangeDisplay: `-${percentPrice}%`,
-      };
-    } else {
-      return {
-        usdPriceChangeDisplay: `$${userBalanceDetails.usdPriceChange}`,
-        percentPriceChangeDisplay: `${userBalanceDetails.percentPriceChange}%`,
-      };
-    }
-  }, [userBalanceDetails]);
+  const { isPositive, usdPriceChangeDisplay, percentPriceChangeDisplay } =
+    useMemo(() => {
+      const isPositive = tokenPriceChange && tokenPriceChange > 0;
+      const usdPriceChangeDisplay = `$${tokenPriceChangeUsd?.toLocaleString(
+        undefined,
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }
+      )}`;
+      const percentPriceChangeDisplay = `${tokenPriceChange?.toFixed(2)}%`;
+      return { isPositive, usdPriceChangeDisplay, percentPriceChangeDisplay };
+    }, [tokenPriceChange]);
 
   if (!tokenID) {
     return (
@@ -52,7 +41,7 @@ function TokenContainer({ tokenID }: TokenContainerProps) {
     );
   }
 
-  if (isLoadingTokenDetails || isLoadingUserBalanceDetails) {
+  if (isLoadingTokenDetails || isLoadingTokenPriceChange) {
     return (
       <div className="flex items-center justify-center mx-2 bg-accent rounded-lg p-2 py-4 h-20">
         <FaSpinner className="animate-spin text-primary" size={20} />
@@ -60,7 +49,7 @@ function TokenContainer({ tokenID }: TokenContainerProps) {
     );
   }
 
-  if (errorTokenDetails || errorUserBalanceDetails) {
+  if (errorTokenDetails || errorTokenPriceChange) {
     return (
       <div className="flex items-center justify-center mx-2 bg-accent rounded-lg p-2 py-4 h-20">
         <p className="text-danger text-sm">Error loading data</p>
@@ -68,26 +57,19 @@ function TokenContainer({ tokenID }: TokenContainerProps) {
     );
   }
 
-  if (
-    !tokenDetails ||
-    "status" in tokenDetails ||
-    !userBalanceDetails ||
-    "status" in userBalanceDetails
-  ) {
+  if (!tokenDetails || "status" in tokenDetails || !tokenPriceChange) {
     return (
       <div className="flex items-center justify-center mx-2 bg-accent rounded-lg p-2 py-4 h-20">
         <p className="text-danger text-sm">Error loading data</p>
       </div>
     );
   }
-
-  const isPositive = userBalanceDetails.usdPriceChange > 0;
 
   return (
     <div className="flex items-center justify-between mx-2 bg-accent rounded-lg p-2 py-4">
       <div className="flex items-center gap-2">
         <img
-          src={tokenDetails.imageUrl || logo}
+          src={tokenDetails.image.small}
           alt="logo"
           width={44}
           height={44}
@@ -96,13 +78,19 @@ function TokenContainer({ tokenID }: TokenContainerProps) {
         <div className="flex flex-col">
           <p className="text-lg font-bold text-primary">{tokenDetails.name}</p>
           <p className="text-xs font-medium text-textsecondary">
-            {userBalanceDetails.balance} {tokenDetails.symbol}
+            {userBalance} {tokenDetails.symbol}
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-2 flex-col">
+      <div className="flex items-end gap-2 flex-col justify-end ">
         <p className="text-xl font-bold text-primary">
-          ${userBalanceDetails.usdBalance}
+          $
+          {(
+            userBalance * tokenDetails.market_data.current_price.usd
+          ).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </p>
         <div className="flex items-center gap-1">
           <p
