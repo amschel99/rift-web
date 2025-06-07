@@ -67,7 +67,7 @@ export const useTokenPriceChange = (id: string): UseTokenPriceChangeResult => {
     error: errorTokenPriceChange,
   } = queryResult;
 
-  if ("error" in (data as any)) {
+  if (data && "error" in (data as any)) {
     return {
       tokenPriceChange: undefined,
       tokenPriceChangeUsd: undefined,
