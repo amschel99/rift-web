@@ -3,6 +3,7 @@ import { getTokens } from "@/lib/assets/tokens"
 import { WalletChain } from "@/lib/entities"
 import sphere from "@/lib/sphere"
 import { sleep } from "@/lib/utils"
+import { CreateSendLinkInput } from "@stratosphere-network/wallet"
 import { useMutation } from "@tanstack/react-query"
 
 interface CreatePaymentLinkArgs {
@@ -32,20 +33,18 @@ async function createPaymentLink(args: CreatePaymentLinkArgs): Promise<CreatePay
 
     if (!token || !chain) throw new Error("Token not found");
 
-    const response = args.type == "specific" ? await sphere.paymentLinks.createSpecificSendLink({
+    const request = {
         chain: chain.backend_id! as any,
         receiver: args.recipient!,
         time: args.duration,
         token: token.name as any,
         value: args.amount
-    }) : await sphere.paymentLinks.createOpenSendLink({
-        chain: chain.backend_id! as any,
-        time: args.duration,
-        token: token.name as any,
-        value: args.amount
-    })
+    }
 
-    console.log("Payment link response:: ", response)
+    const response = args.type == "specific" ?
+        await sphere.paymentLinks.createSpecificSendLink(request) :
+        await sphere.paymentLinks.createOpenSendLink(request)
+
 
     const url = response?.data
 
