@@ -1,22 +1,35 @@
+import { getTokens } from "@/lib/assets/tokens";
 import { getChains } from "@/lib/assets/chains";
-import { WALLET_CHAINS } from "@/lib/tokens";
 import { useQuery } from "@tanstack/react-query";
-
+import { WalletToken } from "@stratosphere-network/wallet";
+import { WalletChain } from "@/lib/entities";
 
 async function getWalletChains() {
-    return await getChains()
+  // TODO: make request
+  const chains = await getChains() as WalletChain[];
+  return chains;
 }
 
+async function getWalletAssets() {
+  // TODO: make request
+  const assets = await getTokens() as WalletToken[];
+  return assets;
+}
 
-export default function useChains(){
-    
-    const query = useQuery({
-        queryKey: ['chains'],
-        queryFn: async ()=> {
-            return getWalletChains()
-        }
-    })
+export default function useChains() {
+  const chainsquery = useQuery({
+    queryKey: ["chains"],
+    queryFn: async () => {
+      return getWalletChains();
+    },
+  });
 
+  const assetsquery = useQuery({
+    queryKey: ["assets"],
+    queryFn: async () => {
+      return getWalletAssets();
+    },
+  });
 
-    return query
+  return { chainsquery, assetsquery };
 }
