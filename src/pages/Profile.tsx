@@ -1,6 +1,5 @@
 import { JSX, ReactNode } from "react";
-import { usePlatformDetection } from "../utils/platform";
-import { miniApp } from "@telegram-apps/sdk-react";
+import { useLaunchParams, miniApp } from "@telegram-apps/sdk-react";
 import { useNavigate } from "react-router";
 import { Avatar } from "@mui/material";
 import { useTabs } from "../hooks/tabs";
@@ -11,7 +10,7 @@ import { colors } from "../constants";
 import "../styles/pages/profile.scss";
 
 export default function Profile(): JSX.Element {
-  const { isTelegram, telegramUser } = usePlatformDetection();
+  const { initData } = useLaunchParams();
   const navigate = useNavigate();
   const { switchtab } = useTabs();
   const { showsuccesssnack } = useSnackbar();
@@ -33,12 +32,7 @@ export default function Profile(): JSX.Element {
 
   const onLogOut = () => {
     localStorage.clear();
-    if (isTelegram) {
-      miniApp.close();
-    } else {
-      // For browser mode, redirect to home or show logout message
-      navigate("/");
-    }
+    miniApp.close();
   };
 
   const goToNotifications = () => {
@@ -51,22 +45,17 @@ export default function Profile(): JSX.Element {
     <section id="profile">
       <div className="profilepicture">
         <Avatar
-          src={isTelegram ? telegramUser?.photoUrl : undefined}
-          alt={isTelegram ? telegramUser?.username : "User"}
+          src={initData?.user?.photoUrl}
+          alt={initData?.user?.username}
           sx={{ width: 100, height: 100 }}
         />
 
         <div className="tguid">
-          {isTelegram ? (
-            <>
-              <Telegram color={colors.accent} />
-              <span className="id">
-                @{telegramUser?.username || telegramUser?.id}
-              </span>
-            </>
-          ) : (
-            <span className="id">Browser User</span>
-          )}
+          <Telegram color={colors.accent} />
+
+          <span className="id">
+            @{initData?.user?.username || initData?.user?.id}
+          </span>
         </div>
       </div>
 
@@ -99,30 +88,28 @@ export default function Profile(): JSX.Element {
   );
 }
 
-interface profileactionprops {
-  icon: ReactNode;
-  title: string;
-  description: string;
-  onclick: () => void;
-}
-
 const ProfileAction = ({
   icon,
   title,
   description,
   onclick,
-}: profileactionprops): JSX.Element => (
-  <div className="profileaction" onClick={onclick}>
-    <div className="leadingsection">
-      {icon}
-
-      <div className="textcontent">
-        <span className="actiontitle">{title}</span>
-
-        <span className="actiondescription">{description}</span>
+}: {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  onclick: () => void;
+}): JSX.Element => {
+  return (
+    <div className="profileaction" onClick={onclick}>
+      <div className="icon-title-desc">
+        <span className="icon">{icon}</span>
+        <p className="title-desc">
+          {title}
+          <span className="desc">{description}</span>
+        </p>
       </div>
-    </div>
 
-    <ArrowRight color={colors.textsecondary} />
-  </div>
-);
+      <ArrowRight color={colors.textsecondary} />
+    </div>
+  );
+};
