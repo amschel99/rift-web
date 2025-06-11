@@ -20,6 +20,9 @@ interface TokenDetails {
   readonly name: string;
   readonly symbol: string;
   readonly market_data: TokenMarketData;
+  readonly image: {
+    readonly small: string;
+  };
 }
 
 interface TokenDetailsError {

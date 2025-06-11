@@ -2,10 +2,11 @@ import React, { useMemo } from "react";
 import { useTokenPriceChange } from "@/hooks/token/useTokenBalance";
 import { FaSpinner } from "react-icons/fa6";
 import { useTokenDetails } from "@/hooks/token/useTokenDetails";
+import { Balance } from "@/lib/entities";
 
 interface TokenContainerProps {
   tokenID: string | undefined;
-  userBalance: number;
+  userBalance: Balance | undefined;
 }
 
 function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
@@ -78,16 +79,14 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
         <div className="flex flex-col">
           <p className="text-lg font-bold text-primary">{tokenDetails.name}</p>
           <p className="text-xs font-medium text-textsecondary">
-            {userBalance} {tokenDetails.symbol}
+            {userBalance?.amount} {tokenDetails.symbol}
           </p>
         </div>
       </div>
       <div className="flex items-end gap-2 flex-col justify-end ">
         <p className="text-xl font-bold text-primary">
           $
-          {(
-            userBalance * tokenDetails.market_data.current_price.usd
-          ).toLocaleString(undefined, {
+          {userBalance?.usd?.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}

@@ -4,7 +4,6 @@ import { useTokenDetails } from "@/hooks/token/useTokenDetails";
 
 interface BalanceContainerProps {
   readonly id: string;
-  readonly userBalance: number;
 }
 
 interface PriceDisplayData {
@@ -104,10 +103,7 @@ const usePriceDisplayData = (
   }, [tokenPriceChange, tokenPriceChangeUsd, currentPrice]);
 };
 
-const PriceContainer: React.FC<BalanceContainerProps> = ({
-  id,
-  userBalance,
-}) => {
+const PriceContainer: React.FC<BalanceContainerProps> = ({ id }) => {
   const {
     tokenPriceChange,
     tokenPriceChangeUsd,
