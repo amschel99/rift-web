@@ -46,11 +46,9 @@ async function signIn(args: signInArgs){
         throw new Error("No Phone Number Found")
     }
     const response = await sphere.auth.login({
-        externalId: args.externalId,
         otpCode: args.otpCode,
-        phoneNumber: phoneNumber
+        phoneNumber: phoneNumber?.replace('-', '')
     })
-    console.log("Response from sign in ::", response)
     sphere.auth.setBearerToken(response.accessToken)
   
     localStorage.setItem('token', response.accessToken)
@@ -70,10 +68,9 @@ async function signUpUser(args: signUpArgs){
         if (ERROR_OUT) throw new Error("Testing Error handling");
         return {} as any as SignupResponse
     }
-    localStorage.setItem('phoneNumber', args.phoneNumber)
+    localStorage.setItem('phoneNumber', args.phoneNumber?.replace('-', ''))
     localStorage.setItem('externalId', args.externalId)
     const response = await sphere.auth.signup({
-        externalId: args.externalId,
         phoneNumber: args.phoneNumber
     })
 
@@ -103,7 +100,6 @@ export default function useWalletAuth(){
         queryKey: ['user'], 
         queryFn: async ()=> {
             const user = await sphere.auth.getUser()
-            console.log("User::", user)
             return user
         },
         throwOnError: false
