@@ -60,7 +60,7 @@ export default function Identifier(props: Props){
         
         try {
             await sendOTPMutation.mutateAsync({
-                phoneNumber: phoneNum
+                phoneNumber: phoneNum?.replace('-', '')
             })
             
             if(flowType == "login"){
