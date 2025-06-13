@@ -10,8 +10,7 @@ interface TransactionItemProps {
 
 export const TransactionItem = ({ transaction, }: Partial<TransactionItemProps>) => {
   const { token, transaction_hash, amount, created_at } = transaction as Transaction;
-  const { data: TOKEN } = useToken({ id: token });
-  console.log(TOKEN);
+  const { data: TOKEN } = useToken({ backend_id: token });
 
 
   return (

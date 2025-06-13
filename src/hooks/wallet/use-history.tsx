@@ -1,17 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import sphere from "@/lib/sphere";
+import { Transaction } from "@stratosphere-network/wallet";
 
 async function getTransactionHistory() {
-  const txhistory = await sphere.transactions.getHistory({});
+  const txhistory = (await sphere.transactions.getHistory({})) as unknown as { transactions: Array<Transaction> };
 
   return txhistory;
 }
 
 export default function useWalletTxHistory() {
-  const wallettxhistory = useQuery({
-    queryKey: ["wallettxhistory"],
+  const walletHistoryQuery = useQuery({
+    queryKey: ["wallet-history"],
     queryFn: getTransactionHistory,
   });
 
-  return { wallettxhistory };
+  return walletHistoryQuery
 }
