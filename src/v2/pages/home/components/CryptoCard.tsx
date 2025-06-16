@@ -26,11 +26,11 @@ export default function CryptoCard({ tokenid, chain }: CryptoCardProps) {
       <div className="flex items-center">
         <div className="flex flex-row items-end justify-end">
           <img src={TOKEN_INFO?.icon} alt={TOKEN_INFO?.name} className="w-10 h-10 rounded-full" />
-          <span className="bg-white w-6 h-6 p-1 -translate-x-3 translate-y-2 rounded-full">
+          <span className="bg-white w-5 h-5 -translate-x-3 translate-y-2 rounded-full">
             <img
               src={CHAIN_INFO?.icon}
               alt={chain}
-              className="w-full h-full object-cover"
+              className="w-full h-full"
             />
           </span>
         </div>

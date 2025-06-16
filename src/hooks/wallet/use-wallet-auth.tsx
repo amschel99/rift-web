@@ -80,6 +80,21 @@ async function signUpUser(args: signUpArgs) {
   return response
 }
 
+async function getUser() {
+  const response = await sphere.auth.getUser()
+  const user = response.user ?? null
+  if (user) {
+    if (user.phoneNumber) {
+      localStorage.setItem('phoneNumber', user.phoneNumber ?? "")
+    }
+
+    if (user.email) {
+      localStorage.setItem('email', user.email)
+    }
+  }
+  return user
+}
+
 
 export default function useWalletAuth() {
   const { platform, initData } = useLaunchParams()
@@ -100,10 +115,7 @@ export default function useWalletAuth() {
 
   const userQuery = useQuery({
     queryKey: ['user'],
-    queryFn: async () => {
-      const user = await sphere.auth.getUser()
-      return user
-    },
+    queryFn: () => getUser(),
     throwOnError: false,
     enabled: !!localStorage.getItem('token')
   })
