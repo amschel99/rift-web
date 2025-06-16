@@ -53,7 +53,7 @@ export default function TokenSearch(props: Props) {
             render={({ field, formState })=> {
                 return (
                     <div className="w-full flex flex-row items-center gap-x-2 bg-black  rounded-md px-3 py-3" >
-                        <input {...field} ref={inputRef.current} className="flex bg-transparent border-none outline-none bg-none h-full text-white placeholder:text-white/75 flex-1" placeholder="Token" />
+                        <input {...field} ref={inputRef} className="flex bg-transparent border-none outline-none bg-none h-full text-white placeholder:text-white/75 flex-1" placeholder="Token" />
                         <div className="cursor-pointer active:scale-95" >
                             <SearchIcon className="text-white" />
                         </div>
