@@ -32,7 +32,7 @@ export default function StepsPicker() {
         amount: kesAmount,
         cryptoAsset: purchaseToken,
         cryptoWalletAddress: String(address),
-        externalReference: USER_INFO?.user?.externalId as string,
+        externalReference: USER_INFO?.externalId as string,
         phone: mpesaNumber,
     };
 
