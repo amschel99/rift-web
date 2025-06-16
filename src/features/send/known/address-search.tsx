@@ -6,6 +6,7 @@ import { useFlow } from "./flow-context"
 import { CgSpinner } from "react-icons/cg"
 import AddressRenderer from "../components/address-renderer"
 import { WalletAddress } from "@/lib/entities"
+import { useEffect, useRef } from "react"
 
 const search = z.object({
     searchInput: z.string()
@@ -15,6 +16,7 @@ type Search = z.infer<typeof search>
 
 export default function AddressSearch(){
     const flowState = useFlow()
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const form = useForm<Search>({
         resolver: zodResolver(search),
         defaultValues: {
@@ -22,9 +24,17 @@ export default function AddressSearch(){
         }
     })
 
+
     const address = form.watch("searchInput")
     const chain = flowState.state?.watch("chain")
+    const token = flowState.state?.watch("token")
     const SEARCH_EMPTY = (address?.trim()?.length ?? 0) == 0
+
+    useEffect(() => {
+        if (token) {
+            inputRef?.current?.blur()
+        }
+    }, [token])
 
 
     return (
@@ -35,7 +45,7 @@ export default function AddressSearch(){
                 render={({ field }) => {
                     return (
                         <div className="flex flex-row items-center w-full gap-x-2 bg-black rounded-md px-3 py-3" >
-                            <input {...field} className="flex bg-transparent border-none outline-none h-full text-white placeholder:text-white/75 flex-1" placeholder="Address, ENS or Telegram Username" />
+                            <input {...field} ref={inputRef} className="flex bg-transparent border-none outline-none h-full text-white placeholder:text-white/75 flex-1" placeholder="Address, ENS or Telegram Username" />
                         </div>
                     )
                 }}
