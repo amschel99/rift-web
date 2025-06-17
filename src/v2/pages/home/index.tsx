@@ -12,6 +12,7 @@ import ReceiveCrypto from "@/features/receive";
 import useChainsBalance from "@/hooks/wallet/use-chains-balances";
 import useOwnedTokens from "@/hooks/data/use-owned-tokens";
 import { TokenSketleton } from "./components/TokenSketleton";
+import TokenDrawer from "@/features/token";
 
 export default function Home() {
   const { onOpen, onClose, isOpen } = useDisclosure();
@@ -53,10 +54,18 @@ export default function Home() {
             <TokenSketleton />
           </>
         ) : OWNED_TOKENS?.map((_token, idx) => (
-          <CryptoCard
+          <TokenDrawer
             key={_token?.id + idx}
-            tokenid={_token?.id}
+            tokenName={_token?.name}
+            tokenId={_token?.id}
             chain={_token?.chain_id}
+            renderTrigger={() => (
+              <CryptoCard
+                key={_token?.id + idx}
+                tokenid={_token?.id}
+                chain={_token?.chain_id}
+              />
+            )}
           />
         ))}
       </div>
