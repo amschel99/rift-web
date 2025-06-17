@@ -1,20 +1,19 @@
-import { Transaction } from "@stratosphere-network/wallet";
 import useToken from "@/hooks/data/use-token";
 import { dateDistance, shortenString, formatNumberUsd } from "@/lib/utils";
-import useTokens from "@/hooks/data/use-tokens";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Transaction } from "@/lib/entities";
 
 interface TransactionItemProps {
   transaction: Transaction;
 }
 
 export const TransactionItem = ({ transaction, }: Partial<TransactionItemProps>) => {
-  const { token, transaction_hash, amount, created_at } = transaction as Transaction;
-  const { data: TOKEN } = useToken({ backend_id: token });
+  const { amount, chain, token, id, transactionHash, createdAt } = transaction as Transaction;
+  const { data: TOKEN } = useToken({ name: token });
 
 
   return (
-    <div className="w-full border-b border-[rgba(255,255,255,0.1)] py-2.5 px-4">
+    <div className="bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors">
       <div className="flex items-center gap-2">
         <div className="w-10 h-10 flex items-center justify-center">
           <img
@@ -30,18 +29,18 @@ export const TransactionItem = ({ transaction, }: Partial<TransactionItemProps>)
               {formatNumberUsd(Number(amount))} {token}
             </span>
             <span className="text-[rgba(255,255,255,0.5)] text-sm">
-              {dateDistance(created_at)}
+              {dateDistance(createdAt)}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <a
-              href={`https://etherscan.io/tx/${transaction_hash}`}
+              href={`https://etherscan.io/tx/${transactionHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#3498db] hover:text-[#2980b9] transition-colors font-medium text-sm"
+              className="text-[#3498db] font-bold text-md"
             >
-              {shortenString(transaction_hash)}
+              {shortenString(transactionHash)}
             </a>
           </div>
         </div>
