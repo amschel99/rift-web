@@ -13,36 +13,32 @@ export const TransactionItem = ({ transaction, }: Partial<TransactionItemProps>)
 
 
   return (
-    <div className="bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors">
-      <div className="flex items-center gap-2">
-        <div className="w-10 h-10 flex items-center justify-center">
-          <img
-            src={TOKEN?.icon}
-            alt={TOKEN?.name}
-            className="w-8 h-8 object-contain"
-          />
+    <div className="bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors flex flex-row items-center justify-between">
+      <img
+        src={TOKEN?.icon}
+        alt={TOKEN?.name}
+        className="w-8 h-8 object-contain mr-2"
+      />
+
+      <div className="flex-1 flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="text-white font-semibold">
+            {formatNumberUsd(Number(amount))} {token}
+          </span>
+          <span className="text-[rgba(255,255,255,0.5)] text-sm">
+            {dateDistance(createdAt)}
+          </span>
         </div>
 
-        <div className="flex-1 flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-white font-semibold">
-              {formatNumberUsd(Number(amount))} {token}
-            </span>
-            <span className="text-[rgba(255,255,255,0.5)] text-sm">
-              {dateDistance(createdAt)}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <a
-              href={`https://etherscan.io/tx/${transactionHash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#3498db] font-bold text-md"
-            >
-              {shortenString(transactionHash)}
-            </a>
-          </div>
+        <div className="flex items-center gap-2">
+          <a
+            href={`https://etherscan.io/tx/${transactionHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#3498db] font-bold text-md"
+          >
+            {shortenString(transactionHash)}
+          </a>
         </div>
       </div>
     </div>
