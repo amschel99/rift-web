@@ -46,7 +46,13 @@ export default function Home() {
 
 
       <div className="space-y-2">
-        {OWNED_TOKENS_PENDING ? (<TokenSketleton />) : OWNED_TOKENS?.map((_token, idx) => (
+        {OWNED_TOKENS_PENDING ? (
+          <>
+            <TokenSketleton />
+            <TokenSketleton />
+            <TokenSketleton />
+          </>
+        ) : OWNED_TOKENS?.map((_token, idx) => (
           <CryptoCard
             key={_token?.id + idx}
             tokenid={_token?.id}
