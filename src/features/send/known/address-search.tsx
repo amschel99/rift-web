@@ -62,9 +62,7 @@ export default function AddressSearch() {
 
             </div>
 
-            <div className="">
-                <ActionButton variant='secondary' className="w-fit px-10 gap-1">Send To Anyone <FiLink className="text-text-default" /></ActionButton>
-            </div>
+            <ActionButton variant='secondary' className="w-fit px-10 gap-1 mt-6">Send To Anyone <FiLink className="text-text-default" /></ActionButton>
         </div>
     )
 }
