@@ -12,9 +12,9 @@ export default function RequestToken() {
   const searchFilter = state?.watch("searchfilter");
 
   const TOKENS = useMemo(() => {
-    if (!searchFilter) return ownedTokensQuery?.data ?? [];
-    if ((searchFilter?.trim().length ?? 0) == 0)
-      return ownedTokensQuery?.data ?? [];
+    // Only show tokens when user starts typing
+    if (!searchFilter || (searchFilter?.trim().length ?? 0) == 0) return [];
+
     const filtered = ownedTokensQuery?.data?.filter((token) =>
       token.name
         .toLocaleLowerCase()
@@ -58,6 +58,17 @@ export default function RequestToken() {
             <TokenSketleton />
             <TokenSketleton />
           </>
+        ) : !searchFilter || searchFilter.trim().length === 0 ? (
+          <div className="text-center py-8">
+            <div className="space-y-2">
+              <p className="text-muted-foreground text-lg">
+                Start typing to search for tokens
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Enter a token name to see your available tokens
+              </p>
+            </div>
+          </div>
         ) : TOKENS?.length > 0 ? (
           TOKENS.map((token) => (
             <TokenRenderer
@@ -68,7 +79,9 @@ export default function RequestToken() {
           ))
         ) : (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No tokens found</p>
+            <p className="text-muted-foreground">
+              No tokens found matching "{searchFilter}"
+            </p>
           </div>
         )}
       </div>
