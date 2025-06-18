@@ -55,11 +55,11 @@ function BuyCryptoContainer(props: Props & ReturnType<typeof useDisclosure>) {
       <DrawerTrigger asChild>
         {renderTrigger()}
       </DrawerTrigger>
-      <DrawerHeader>
-        <DrawerTitle className="hidden">Buy Crypto</DrawerTitle>
-        <DrawerDescription className="hidden">Buy Crypto with cash via M-pesa</DrawerDescription>
-      </DrawerHeader>
       <DrawerContent className="h-[95vh]">
+        <DrawerHeader>
+          <DrawerTitle className="hidden">Buy Crypto</DrawerTitle>
+          <DrawerDescription className="hidden">Buy Crypto with cash via M-pesa</DrawerDescription>
+        </DrawerHeader>
         <div className="w-full h-full p-4">
           {renderCurrentStep()}
           <StepsPicker />

@@ -52,11 +52,11 @@ function _SendToKnown(props: Props & ReturnType<typeof useDisclosure>) {
             <DrawerTrigger asChild>
                 {renderTrigger()}
             </DrawerTrigger>
-            <DrawerHeader>
-                <DrawerTitle className="hidden">Send Crypto</DrawerTitle>
-                <DrawerDescription className="hidden">Send Crypto to address or via links</DrawerDescription>
-            </DrawerHeader>
             <DrawerContent className="h-[98vh]" >
+                <DrawerHeader>
+                    <DrawerTitle className="hidden">Send Crypto</DrawerTitle>
+                    <DrawerDescription className="hidden">Send Crypto to address or via links</DrawerDescription>
+                </DrawerHeader>
                 <DrawerHeader>
                     <div className="flex flex-row items-center justify-between" >
                         <div onClick={handleBackPress} className="flex cursor-pointer flex-row items-center gap-x-5" >
