@@ -56,6 +56,20 @@ async function createPaymentLink(args: CreatePaymentLinkArgs): Promise<CreatePay
 
 }
 
+
+interface createPaymentRequestArgs {
+    amount: string,
+    chain: string,
+    token: string
+}
+
+async function createRequestLink(args: createPaymentRequestArgs) {
+    const response = await sphere.paymentLinks.requestPayment({ amount: parseFloat(args?.amount), chain: args?.chain as any, token: args?.token as any })
+
+    return { link: response?.data }
+}
+
+
 interface CancelPaymentLinkArgs {
     id: string
 }
@@ -66,10 +80,16 @@ async function cancelPaymentLink(args: CancelPaymentLinkArgs) {
 }
 
 
+
+
 export default function useCreatePaymentLink() {
 
     const createPaymentLinkMutation = useMutation({
         mutationFn: createPaymentLink
+    })
+
+    const createRequestLinkMutation = useMutation({
+        mutationFn: createRequestLink
     })
 
     const cancelPaymentLinkMutation = useMutation({
@@ -78,6 +98,7 @@ export default function useCreatePaymentLink() {
 
     return {
         createPaymentLinkMutation,
+        createRequestLinkMutation,
         cancelPaymentLinkMutation
     }
 }

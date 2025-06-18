@@ -1,7 +1,9 @@
+import { openLink } from "@telegram-apps/sdk-react";
 import useToken from "@/hooks/data/use-token";
 import { dateDistance, shortenString, formatNumberUsd } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Transaction } from "@/lib/entities";
+import { usePlatformDetection } from "@/utils/platform";
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -9,11 +11,15 @@ interface TransactionItemProps {
 
 export const TransactionItem = ({ transaction, }: Partial<TransactionItemProps>) => {
   const { amount, chain, token, id, transactionHash, createdAt } = transaction as Transaction;
+  const { isTelegram } = usePlatformDetection()
   const { data: TOKEN } = useToken({ name: token });
 
+  const handleClick = () => {
+    isTelegram ? openLink(transactionHash) : window.open(transactionHash);
+  }
 
   return (
-    <div className="bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors flex flex-row items-center justify-between">
+    <div onClick={handleClick} className="bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors flex flex-row items-center justify-between">
       <img
         src={TOKEN?.icon}
         alt={TOKEN?.name}
@@ -31,14 +37,9 @@ export const TransactionItem = ({ transaction, }: Partial<TransactionItemProps>)
         </div>
 
         <div className="flex items-center gap-2">
-          <a
-            href={`https://etherscan.io/tx/${transactionHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#3498db] font-bold text-md"
-          >
-            {shortenString(transactionHash)}
-          </a>
+          <p className="text-[#3498db] font-bold text-md">
+            {shortenString(id)}
+          </p>
         </div>
       </div>
     </div>

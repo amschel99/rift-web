@@ -62,17 +62,18 @@ export default function AddressSearch() {
 
             </div>
 
-            <div onClick={() => {
-                flowState.state?.setValue('recipient', 'anonymous');
-                flowState.goToNext('amount-input');
-            }} className="absolute bottom-0 left-0 right-0 bg-surface-alt flex flex-row flex-nowrap items-center justify-between gap-2 p-4 cursor-pointer">
+            <div
+                onClick={() => {
+                    flowState.state?.setValue('recipient', 'anonymous');
+                    flowState.goToNext('amount-input');
+                }}
+                className="absolute bottom-0 left-0 right-0 bg-surface-subtle flex flex-row flex-nowrap items-center justify-between gap-2 p-4 cursor-pointer">
                 <p className="flex flex-col items-start justify-start text-md font-bold">
                     Sphere Open Links
                     <span className="text-md text-text-subtle font-medium">Create a Sphere open link that lets you send crypto to anyone</span>
                 </p>
                 <FaChevronRight />
             </div>
-
         </div>
     )
 }
