@@ -74,6 +74,7 @@ async function createRequestLink(args: createPaymentRequestArgs) {
 interface CancelPaymentLinkArgs {
   id: string;
 }
+
 async function cancelPaymentLink(args: CancelPaymentLinkArgs) {
   const { id } = args;
 

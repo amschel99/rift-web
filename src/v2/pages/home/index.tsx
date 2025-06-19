@@ -11,6 +11,7 @@ import useChainsBalance from "@/hooks/wallet/use-chains-balances";
 import useOwnedTokens from "@/hooks/data/use-owned-tokens";
 import { TokenSketleton } from "./components/TokenSketleton";
 import TokenDrawer from "@/features/token";
+import RedirectLinks from "@/features/redirectlinks";
 
 export default function Home() {
   const { data: AGGREGATE_BALANCE } = useChainsBalance();
@@ -46,7 +47,17 @@ export default function Home() {
           )}
         />
 
-        <BuyCrypto
+        {/* <BuyCrypto
+          renderTrigger={() => (
+            <ActionButton
+              icon={<FaMoneyBillTransfer className="w-6 h-6" />}
+              title="Buy"
+            />
+          )}
+        /> */}
+        <RedirectLinks
+          redirectLinkNonceId="ZG2XvpdJHGOi"
+          redirectType="SEND-TO-REQUEST-LINK"
           renderTrigger={() => (
             <ActionButton
               icon={<FaMoneyBillTransfer className="w-6 h-6" />}

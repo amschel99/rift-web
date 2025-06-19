@@ -64,7 +64,6 @@ function ReceiveCryptoContainer(
         </DrawerHeader>
 
         <div className="w-full h-full overflow-y-auto">
-          {/* Tab Navigation */}
           <div className="sticky bottom-0 bg-app-background border-b border-border z-10">
             <div className="flex items-center justify-center p-4">
               <div className="flex bg-muted/30 rounded-lg p-1 w-full max-w-md">
@@ -94,7 +93,6 @@ function ReceiveCryptoContainer(
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-4">
             {mode === "receive" ? <MyAddress /> : renderRequestContent()}
           </div>
