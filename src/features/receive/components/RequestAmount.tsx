@@ -111,8 +111,8 @@ export default function RequestAmount() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-[75vh] space-y-4">
+      <div className="flex items-center justify-between px-4">
         <button
           onClick={goBack}
           className="flex flex-row items-center justify-start p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer"
@@ -130,9 +130,10 @@ export default function RequestAmount() {
           let ENABLE_BUTTON =
             !Number.isNaN(value) && parseFloat(field.value ?? "0") > 0;
           return (
-            <div className="flex flex-col items-center px-5 py-5 gap-5 h-full mt-6">
-              <div className="flex flex-col w-full">
-                <div className="flex  flex-row items-center justify-center">
+            <div className="flex flex-col items-center px-4 gap-6 flex-1">
+              {/* Amount Display */}
+              <div className="flex flex-col w-full items-center">
+                <div className="flex flex-row items-center justify-center mb-2">
                   <p
                     className={cn(
                       "font-semibold text-6xl ",
@@ -150,70 +151,65 @@ export default function RequestAmount() {
                 </div>
               </div>
 
-              <div className="flex flex-row items-center w-full px-2">
-                <div className="flex flex-row items-center justify-between w-full">
-                  <div className="flex flex-row items-center gap-2 ">
-                    <img
-                      alt={TOKEN_INFO?.name}
-                      src={TOKEN_INFO?.icon}
-                      className="w-8 h-8"
-                    />
-
-                    <p>
-                      Requesting <br />{" "}
-                      <span className="text-md font-semibold">
-                        {TOKEN_INFO?.name}
-                      </span>{" "}
-                      on{" "}
-                      <span className="text-md font-semibold">
-                        {CHAIN_INFO?.description}
-                      </span>
+              {/* Token Info */}
+              <div className="flex flex-row items-center w-full justify-center">
+                <div className="flex flex-row items-center gap-3">
+                  <img
+                    alt={TOKEN_INFO?.name}
+                    src={TOKEN_INFO?.icon}
+                    className="w-10 h-10"
+                  />
+                  <div className="text-center">
+                    <p className="text-lg font-semibold">
+                      Requesting {TOKEN_INFO?.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      on {CHAIN_INFO?.description}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col flex-1 w-full justify-between">
-                <div />
-                <div className="flex flex-col w-full gap-5">
-                  <div className="w-full grid grid-cols-3">
-                    {KEYBOARD_BUTTONS?.map((BUTTON, i) => {
-                      const handlePress = () => {
-                        handleButtonClick(BUTTON.kind, field);
-                      };
+              {/* Keyboard and Button */}
+              <div className="flex flex-col w-full gap-6 flex-1 justify-end">
+                <div className="w-full grid grid-cols-3 gap-2">
+                  {KEYBOARD_BUTTONS?.map((BUTTON, i) => {
+                    const handlePress = () => {
+                      handleButtonClick(BUTTON.kind, field);
+                    };
 
-                      if (BUTTON.render)
-                        return BUTTON.render(BUTTON.kind, field, handlePress);
+                    if (BUTTON.render)
+                      return BUTTON.render(BUTTON.kind, field, handlePress);
 
-                      return (
-                        <div
-                          onClick={handlePress}
-                          className="flex flex-row items-center justify-center px-2 py-2 cursor-pointer text-3xl font-semibold"
-                        >
-                          {BUTTON.kind}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="flex flex-row items-center w-full">
-                    <SendRequestLink
-                      renderSendReqLink={() => (
-                        <ActionButton
-                          onClick={handleCreateRequestLink}
-                          disabled={!AMOUNT_IS_VALID}
-                          variant={"secondary"}
-                          loading={createRequestLinkMutation.isPending}
-                        >
-                          <p className="font-semibold text-xl">
-                            {createRequestLinkMutation.isPending
-                              ? "Please wait..."
-                              : "Create Link"}
-                          </p>
-                        </ActionButton>
-                      )}
-                      requestLink={createRequestLinkMutation?.data?.link || ""}
-                    />
-                  </div>
+                    return (
+                      <div
+                        key={i}
+                        onClick={handlePress}
+                        className="flex flex-row items-center justify-center py-4 cursor-pointer text-3xl font-semibold hover:bg-muted/50 rounded-lg transition-colors"
+                      >
+                        {BUTTON.kind}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-row items-center w-full pb-4">
+                  <SendRequestLink
+                    renderSendReqLink={() => (
+                      <ActionButton
+                        onClick={handleCreateRequestLink}
+                        disabled={!AMOUNT_IS_VALID}
+                        variant={"secondary"}
+                        loading={createRequestLinkMutation.isPending}
+                      >
+                        <p className="font-semibold text-xl">
+                          {createRequestLinkMutation.isPending
+                            ? "Please wait..."
+                            : "Create Link"}
+                        </p>
+                      </ActionButton>
+                    )}
+                    requestLink={createRequestLinkMutation?.data?.link || ""}
+                  />
                 </div>
               </div>
             </div>
