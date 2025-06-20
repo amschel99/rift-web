@@ -7,6 +7,7 @@ import { AnalyticsListener } from "./hocs/posthog-provider.tsx";
 import { enableTelegramMock } from "./development/mock.ts";
 import { DevelopmentTools } from "./development/development-tools.tsx";
 import { Toaster } from "./components/ui/sonner.tsx";
+import { PWAInstallPrompt } from "./components/pwa-install-prompt.tsx";
 import AppShell from "./v2/shell/index.tsx";
 import BlurProvider from "./hocs/blur-provider.tsx";
 import "./styles/index.scss";
@@ -61,6 +62,7 @@ createRoot(document.getElementById("root")!).render(
       </BrowserRouter>
 
       <Toaster />
+      <PWAInstallPrompt />
       <AnalyticsListener />
       <DevelopmentTools />
     </QueryClientProvider>
