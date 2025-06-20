@@ -45,7 +45,7 @@ export default function Splash() {
 
       if (
         startparam?.includes("request_link") ||
-        searchParamsData?.includes("send_link")
+        searchParamsData?.includes("request_link")
       ) {
         // handle payment request >> request_link-base64 encoded payment request object
         const requestobjectb64 = isTelegram
