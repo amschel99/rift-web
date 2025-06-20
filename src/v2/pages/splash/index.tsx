@@ -13,6 +13,13 @@ export default function Splash() {
   const address = localStorage.getItem("address");
   const token = localStorage.getItem("token");
 
+  const startparam = safeLaunchParams?.startParam;
+  const searchParamsData = searchParams.get("data");
+
+  console.log("splash page to handle start params");
+  console.log("startparams -> ", startparam);
+  console.log("searcparams -> ", searchParamsData);
+
   const isAuthenticated = () => {
     if (address == null || token == null) {
       navigate("/auth");
@@ -22,12 +29,6 @@ export default function Splash() {
   };
 
   const handleStartParams = useCallback(() => {
-    const startparam = safeLaunchParams?.startParam;
-    const searchParamsData = searchParams.get("data");
-
-    console.log("splash page to handle start params");
-    console.log("startparams -> ", startparam);
-
     if (startparam || searchParamsData) {
       if (
         startparam?.includes("send_link") ||
