@@ -12,21 +12,61 @@ import ReceiveCrypto from "@/features/receive";
 import { TokenSketleton } from "./components/TokenSketleton";
 import TokenDrawer from "@/features/token";
 import RedirectLinks from "@/features/redirectlinks";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Home() {
   const { data: AGGREGATE_BALANCE } = useChainsBalance();
   const { data: OWNED_TOKENS, isPending: OWNED_TOKENS_PENDING } =
     useOwnedTokens();
 
-  const collectobjectb64 = localStorage.getItem("collectobject");
-  const requestobjectb64 = localStorage.getItem("requestobject");
+  const [isRedirectDrawerOpen, setIsRedirectDrawerOpen] = useState(false);
+  const [redirectType, setRedirectType] = useState<
+    "RECEIVE-FROM-COLLECT-LINK" | "SEND-TO-REQUEST-LINK"
+  >("RECEIVE-FROM-COLLECT-LINK");
 
-  const redirectHandlersOpen = useCallback(() => {
-    return collectobjectb64 !== null || requestobjectb64 !== null
-      ? true
-      : false;
-  }, [collectobjectb64, requestobjectb64]);
+  // Function to check and handle redirect objects
+  const checkRedirectObjects = useCallback(() => {
+    const collectobjectb64 = localStorage.getItem("collectobject");
+    const requestobjectb64 = localStorage.getItem("requestobject");
+
+    if (collectobjectb64 !== null) {
+      setRedirectType("RECEIVE-FROM-COLLECT-LINK");
+      setIsRedirectDrawerOpen(true);
+    } else if (requestobjectb64 !== null) {
+      setRedirectType("SEND-TO-REQUEST-LINK");
+      setIsRedirectDrawerOpen(true);
+    } else {
+      setIsRedirectDrawerOpen(false);
+    }
+  }, []);
+
+  // Check for redirect objects on mount and periodically
+  useEffect(() => {
+    // Initial check
+    checkRedirectObjects();
+
+    // Set up periodic check (every 2 seconds) to catch any new redirect objects
+    const interval = setInterval(checkRedirectObjects, 2000);
+
+    // Listen for storage events (when localStorage changes)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "collectobject" || e.key === "requestobject") {
+        checkRedirectObjects();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [checkRedirectObjects]);
+
+  const handleCloseRedirectDrawer = useCallback(() => {
+    setIsRedirectDrawerOpen(false);
+    // Clean up will be handled by the RedirectLinks component
+  }, []);
 
   return (
     <div className="w-full h-full overflow-y-auto mb-18 p-4">
@@ -90,12 +130,9 @@ export default function Home() {
       </div>
 
       <RedirectLinks
-        isOpen={redirectHandlersOpen()}
-        redirectType={
-          collectobjectb64 !== null
-            ? "RECEIVE-FROM-COLLECT-LINK"
-            : "SEND-TO-REQUEST-LINK"
-        }
+        isOpen={isRedirectDrawerOpen}
+        onClose={handleCloseRedirectDrawer}
+        redirectType={redirectType}
       />
     </div>
   );

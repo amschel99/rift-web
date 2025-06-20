@@ -12,12 +12,13 @@ import CollectLinkHandler from "./components/CollectLinkHandler";
 
 interface Props {
   redirectType: "RECEIVE-FROM-COLLECT-LINK" | "SEND-TO-REQUEST-LINK";
+  isOpen?: boolean;
+  onClose?: () => void;
+  onOpen?: () => void;
 }
 
-export default function RedirectLinks(
-  props: Props & Partial<ReturnType<typeof useDisclosure>>
-) {
-  const { isOpen, onOpen, onClose } = props;
+export default function RedirectLinks(props: Props) {
+  const { isOpen, onOpen, onClose, redirectType } = props;
 
   const onDismissDrawer = useCallback(() => {
     console.log("closing drawer");
@@ -29,7 +30,7 @@ export default function RedirectLinks(
   }, [onClose]);
 
   const renderRedirectLinkHandler = useCallback(() => {
-    switch (props.redirectType) {
+    switch (redirectType) {
       case "RECEIVE-FROM-COLLECT-LINK": {
         return <CollectLinkHandler onDismissDrawer={onDismissDrawer} />;
       }
@@ -40,7 +41,7 @@ export default function RedirectLinks(
         return <></>;
       }
     }
-  }, [props.redirectType, onDismissDrawer]);
+  }, [redirectType, onDismissDrawer]);
 
   return (
     <Drawer
