@@ -21,6 +21,10 @@ export function detectPlatformSync(): PlatformType {
     const testBrowserMode = import.meta.env.VITE_TEST_BROWSER_MODE === "true";
     return testBrowserMode ? "browser" : "telegram";
   }
+  if (import.meta.env.MODE === "production") {
+    const prodBrowserMode = import.meta.env.VITE_PROD_BROWSER_MODE === "true";
+    return prodBrowserMode ? "browser" : "telegram";
+  }
 
   // Check if Telegram WebApp is available
   if (typeof window !== "undefined" && window.Telegram?.WebApp) {
