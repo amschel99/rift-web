@@ -18,6 +18,9 @@ export default function Home() {
   const { data: OWNED_TOKENS, isPending: OWNED_TOKENS_PENDING } =
     useOwnedTokens();
 
+  const collectobjectb64 = localStorage.getItem("collectobject");
+  const requestobjectb64 = localStorage.getItem("requestobject");
+
   return (
     <div className="w-full h-full overflow-y-auto mb-18 p-4">
       <div className="text-center mt-8 mb-4">
@@ -47,17 +50,7 @@ export default function Home() {
           )}
         />
 
-        {/* <BuyCrypto
-          renderTrigger={() => (
-            <ActionButton
-              icon={<FaMoneyBillTransfer className="w-6 h-6" />}
-              title="Buy"
-            />
-          )}
-        /> */}
-        <RedirectLinks
-          redirectLinkNonceId="ZG2XvpdJHGOi"
-          redirectType="SEND-TO-REQUEST-LINK"
+        <BuyCrypto
           renderTrigger={() => (
             <ActionButton
               icon={<FaMoneyBillTransfer className="w-6 h-6" />}
@@ -88,6 +81,15 @@ export default function Home() {
           ))
         )}
       </div>
+
+      <RedirectLinks
+        isOpen={collectobjectb64 !== null || requestobjectb64 !== null}
+        redirectType={
+          collectobjectb64 !== null
+            ? "RECEIVE-FROM-COLLECT-LINK"
+            : "SEND-TO-REQUEST-LINK"
+        }
+      />
     </div>
   );
 }
