@@ -1,20 +1,20 @@
+import { useNavigate } from "react-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { ArrowLeft } from "lucide-react";
+import { z } from "zod";
+import { useFlow } from "../context";
+import { CgSpinner } from "react-icons/cg";
+import { toast } from "sonner";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { useFlow } from "../context";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router";
-import ActionButton from "@/components/ui/action-button";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
-import { CgSpinner } from "react-icons/cg";
-import { toast } from "sonner";
 import { usePlatformDetection } from "@/utils/platform";
 import RenderErrorToast from "@/components/ui/helpers/render-error-toast";
+import ActionButton from "@/components/ui/action-button";
 
 const codeSchema = z.object({
   code: z.string().max(4),
@@ -31,8 +31,7 @@ export default function Code(props: Props) {
   const navigate = useNavigate();
   const flow = useFlow();
   const { isTelegram, telegramUser } = usePlatformDetection();
-  // const { initData } = useLaunchParams()
-  const { sendOTPMutation, userQuery } = useWalletAuth();
+  const { sendOTPMutation } = useWalletAuth();
   const stored = flow.stateControl.getValues();
   const form = useForm<CODE_SCHEMA>({
     resolver: zodResolver(codeSchema),
@@ -57,8 +56,6 @@ export default function Code(props: Props) {
       if (flowType == "login") {
         try {
           await flow.signInMutation.mutateAsync({
-            // externalId: initData?.user?.id?.toString()!,
-            // externalId: isTelegram ? telegramUser?.id.toString()! : "WEB_USER",
             otpCode: values.code,
             phoneNumber: stored.identifier!?.replace("-", ""),
           });
@@ -81,12 +78,10 @@ export default function Code(props: Props) {
         }
 
         flow.signUpMutation.mutateAsync({
-          // externalId: isTelegram ? telegramUser?.id.toString()! : "WEB_USER",
           phoneNumber: stored.identifier!?.replace("-", ""),
         });
 
         flow.signInMutation.mutate({
-          // externalId: isTelegram ? telegramUser?.id.toString()! : "WEB_USER",
           otpCode: values.code,
         });
       } catch (e) {
