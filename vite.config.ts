@@ -34,6 +34,56 @@ export default defineConfig({
             type: "image/jpeg",
           },
         ],
+        shortcuts: [
+          {
+            name: "Wallet Home",
+            short_name: "Home",
+            description: "View your wallet balance and tokens",
+            url: "/app",
+            icons: [
+              {
+                src: "icon-192x192.jpg",
+                sizes: "192x192",
+              },
+            ],
+          },
+          {
+            name: "Swap Tokens",
+            short_name: "Swap",
+            description: "Exchange cryptocurrencies",
+            url: "/app/swap",
+            icons: [
+              {
+                src: "icon-192x192.jpg",
+                sizes: "192x192",
+              },
+            ],
+          },
+          {
+            name: "Transaction History",
+            short_name: "History",
+            description: "View recent transactions",
+            url: "/app/history",
+            icons: [
+              {
+                src: "icon-192x192.jpg",
+                sizes: "192x192",
+              },
+            ],
+          },
+          {
+            name: "Buy Crypto",
+            short_name: "Buy",
+            description: "Purchase cryptocurrency",
+            url: "/app/oo",
+            icons: [
+              {
+                src: "icon-192x192.jpg",
+                sizes: "192x192",
+              },
+            ],
+          },
+        ],
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg}"],

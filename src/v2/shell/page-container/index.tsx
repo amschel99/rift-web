@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useShellContext } from "../shell-context";
 import { Route, Routes, useNavigate } from "react-router";
+import { usePWAShortcuts } from "@/hooks/use-pwa-shortcuts";
 import Home from "@/v2/pages/home";
 import History from "@/v2/pages/history";
 import AuthenticatedShell from "./authenticated-shell";
@@ -11,6 +12,9 @@ import Splash from "@/v2/pages/splash";
 export default function PageContainer() {
   const { form } = useShellContext();
   const navigate = useNavigate();
+
+  // Initialize PWA shortcuts functionality
+  usePWAShortcuts();
 
   useEffect(() => {
     const subscription = form?.watch((values) => {

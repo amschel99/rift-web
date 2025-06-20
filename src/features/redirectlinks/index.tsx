@@ -17,15 +17,16 @@ interface Props {
 export default function RedirectLinks(
   props: Props & Partial<ReturnType<typeof useDisclosure>>
 ) {
-  const { isOpen, onOpen, onClose, toggle } = props;
+  const { isOpen, onOpen, onClose } = props;
 
-  const onDismissDrawer = () => {
+  const onDismissDrawer = useCallback(() => {
     console.log("closing drawer");
-    onClose?.();
-    toggle?.();
+    // Clean up localStorage first
     localStorage.removeItem("collectobject");
     localStorage.removeItem("requestobject");
-  };
+    // Then close the drawer
+    onClose?.();
+  }, [onClose]);
 
   const renderRedirectLinkHandler = useCallback(() => {
     switch (props.redirectType) {
@@ -39,13 +40,12 @@ export default function RedirectLinks(
         return <></>;
       }
     }
-  }, [isOpen]);
+  }, [props.redirectType, onDismissDrawer]);
 
   return (
     <Drawer
       modal
       open={isOpen}
-      onClose={() => onDismissDrawer()}
       onOpenChange={(open) => {
         if (open) {
           onOpen?.();

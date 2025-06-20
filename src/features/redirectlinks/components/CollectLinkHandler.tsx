@@ -28,20 +28,20 @@ export default function CollectLinkHandler(props: Props) {
 
   const { collectFromSendLink } = usePaymentLinks();
 
-  const onCollect = () => {
-    collectFromSendLink
-      .mutateAsync({ id: collectobject?.id })
-      .then(() => {
-        toast.success(
-          `You successfully claimed ${collectobject?.amount} ${collectobject?.token}`
-        );
-        props.onDismissDrawer();
-      })
-      .catch((err) => {
-        console.log("error", err);
-        toast.warning("We couldn't process your link, please try again");
-        props.onDismissDrawer();
-      });
+  const onCollect = async () => {
+    try {
+      await collectFromSendLink.mutateAsync({ id: collectobject?.id });
+      toast.success(
+        `You successfully claimed ${collectobject?.amount} ${collectobject?.token}`
+      );
+      // Close drawer after successful collection
+      props.onDismissDrawer();
+    } catch (err) {
+      console.log("error", err);
+      toast.warning("We couldn't process your link, please try again");
+      // Close drawer even on error
+      props.onDismissDrawer();
+    }
   };
 
   return (
@@ -52,12 +52,11 @@ export default function CollectLinkHandler(props: Props) {
           {shortenString(collectobject?.username || "")}
         </span>{" "}
         <br />
-        Click <span className="font-semibold">"Receive"</span> to transafer them
+        Click <span className="font-semibold">"Receive"</span> to transfer them
         to your wallet{" "}
         <span className="font-semibold">
           {collectobject?.amount || 0} {collectobject?.token || ""}
-        </span>{" "}
-        to your wallet
+        </span>
       </p>
 
       <div className="border-t border-b border-sidebar-accent mt-6 flex flex-row items-center justify-between py-2">

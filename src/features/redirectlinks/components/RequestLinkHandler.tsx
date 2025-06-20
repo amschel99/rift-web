@@ -28,21 +28,22 @@ export default function RequestLinkHandler(props: Props) {
 
   const { payRequestPaymentLink } = usePaymentLinks();
 
-  const onReceive = () => {
-    payRequestPaymentLink
-      .mutateAsync({ nonce: requestobject?.id })
-      .then(() => {
-        toast.success(
-          `You successfully paid ${requestobject?.amount} ${requestobject?.token}`
-        );
-        props.onDismissDrawer();
-      })
-      .catch(() => {
-        toast.warning(
-          "We couldn't process the payment request, please try again"
-        );
-        props.onDismissDrawer();
-      });
+  const onReceive = async () => {
+    try {
+      await payRequestPaymentLink.mutateAsync({ nonce: requestobject?.id });
+      toast.success(
+        `You successfully paid ${requestobject?.amount} ${requestobject?.token}`
+      );
+      // Close drawer after successful payment
+      props.onDismissDrawer();
+    } catch (err) {
+      console.log("error", err);
+      toast.warning(
+        "We couldn't process the payment request, please try again"
+      );
+      // Close drawer even on error
+      props.onDismissDrawer();
+    }
   };
 
   return (
@@ -89,7 +90,7 @@ export default function RequestLinkHandler(props: Props) {
 type requestobjectType = {
   intent: "request";
   id: string;
-  amount: 2;
+  amount: string;
   username: string;
   chain: string;
   token: string;
