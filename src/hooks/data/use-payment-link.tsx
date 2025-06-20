@@ -17,6 +17,20 @@ interface CreatePaymentLinkResponse {
   link: string;
 }
 
+interface PayRequestLinkArgs {
+  nonce: string;
+}
+
+interface createPaymentRequestArgs {
+  amount: string;
+  chain: string;
+  token: string;
+}
+
+interface CollectFromSendLinkArgs {
+  id: string;
+}
+
 async function createPaymentLink(
   args: CreatePaymentLinkArgs
 ): Promise<CreatePaymentLinkResponse> {
@@ -55,12 +69,6 @@ async function createPaymentLink(
   };
 }
 
-interface createPaymentRequestArgs {
-  amount: string;
-  chain: string;
-  token: string;
-}
-
 async function createRequestLink(args: createPaymentRequestArgs) {
   const response = await sphere.paymentLinks.requestPayment({
     amount: parseFloat(args?.amount),
@@ -71,17 +79,18 @@ async function createRequestLink(args: createPaymentRequestArgs) {
   return { link: response?.data };
 }
 
-interface CancelPaymentLinkArgs {
-  id: string;
+async function payToRequestLink(args: PayRequestLinkArgs) {
+  const res = await sphere.paymentLinks.payPaymentRequest(args.nonce);
+
+  return res;
 }
 
-async function cancelPaymentLink(args: CancelPaymentLinkArgs) {
-  const { id } = args;
-
-  // TODO: make request to cancel payment link
+async function collectFromLink(args: CollectFromSendLinkArgs) {
+  const res = await sphere.paymentLinks.claimOpenSendLink({ id: args.id });
+  return res;
 }
 
-export default function useCreatePaymentLink() {
+export default function usePaymentLinks() {
   const createPaymentLinkMutation = useMutation({
     mutationFn: createPaymentLink,
   });
@@ -90,13 +99,14 @@ export default function useCreatePaymentLink() {
     mutationFn: createRequestLink,
   });
 
-  const cancelPaymentLinkMutation = useMutation({
-    mutationFn: cancelPaymentLink,
-  });
+  const payRequestPaymentLink = useMutation({ mutationFn: payToRequestLink });
+
+  const collectFromSendLink = useMutation({ mutationFn: collectFromLink });
 
   return {
     createPaymentLinkMutation,
     createRequestLinkMutation,
-    cancelPaymentLinkMutation,
+    payRequestPaymentLink,
+    collectFromSendLink,
   };
 }
