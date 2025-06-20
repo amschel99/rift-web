@@ -27,12 +27,12 @@ export default function Start() {
         </div>
         <div>
           <p className="font-semibold text-text-default text-3xl text-center">
-            <span>Your Secure</span> <br /> <span>Telegram Wallet</span>
+            <span>Your Secure</span> <br /> <span>multichain Wallet</span>
           </p>
         </div>
 
         <p className="text-muted-foreground text-center">
-          Create your <span className="font-semibold">secure</span> telegram
+          Create your <span className="font-semibold">secure</span> multichain
           wallet
         </p>
 
