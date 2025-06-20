@@ -17,5 +17,6 @@ export async function isTgUsernameValid(tgUsername: string) {
   const match = phoneNumber?.find((_phone) =>
     _phone.toLocaleLowerCase().includes(tgUsername)
   );
-  return match ? true : false;
+
+  return match;
 }

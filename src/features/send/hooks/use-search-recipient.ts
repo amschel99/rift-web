@@ -22,7 +22,7 @@ async function findRecipient(args: SearchArgs) {
 
   const is_address = isAddressValid(args.address, args.chain);
   const is_ens = isEnsValid(args.address);
-  const is_tg_username = await isTgUsernameValid(args.address);
+  const tg_user_phone = await isTgUsernameValid(args.address);
 
   if (is_address) {
     return {
@@ -33,18 +33,18 @@ async function findRecipient(args: SearchArgs) {
   }
 
   // 2. Check if it's a valid ens name
-  if (is_ens) {
-    return {
-      address: args.address?.trim(),
-      chain: args.chain,
-      type: "name-service",
-    } satisfies WalletAddress;
-  }
+  // if (is_ens) {
+  //   return {
+  //     address: args.address?.trim(),
+  //     chain: args.chain,
+  //     type: "name-service",
+  //   } satisfies WalletAddress;
+  // }
 
   // 3. Check if it's a valid telegram username
-  if (is_tg_username) {
+  if (tg_user_phone) {
     return {
-      address: args.address?.trim(),
+      address: tg_user_phone, // replace with phone number
       chain: args.chain,
       type: "telegram-username",
     } satisfies WalletAddress;

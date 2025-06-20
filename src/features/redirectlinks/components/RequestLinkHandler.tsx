@@ -13,15 +13,15 @@ interface Props {
 export default function RequestLinkHandler(props: Props) {
   const requestobjectb64 = localStorage.getItem("requestobject");
   const requestobject: requestobjectType = JSON.parse(
-    base64ToString(requestobjectb64) ?? ""
+    base64ToString(requestobjectb64) ?? "{}"
   );
 
   const { data: TOKEN_INFO } = useToken({
-    name: requestobject.token,
-    chain: requestobject.chain,
+    name: requestobject?.token,
+    chain: requestobject?.chain,
   });
   const { convertedAmount } = useGeckoPrice({
-    amount: Number(requestobject.amount),
+    amount: Number(requestobject?.amount),
     base: "usd",
     token: TOKEN_INFO?.id,
   });
@@ -30,10 +30,10 @@ export default function RequestLinkHandler(props: Props) {
 
   const onReceive = () => {
     payRequestPaymentLink
-      .mutateAsync({ nonce: requestobject.id })
+      .mutateAsync({ nonce: requestobject?.id })
       .then(() => {
         toast.success(
-          `You successfully paid ${requestobject.amount} ${requestobject.token}`
+          `You successfully paid ${requestobject?.amount} ${requestobject?.token}`
         );
         props.onDismissDrawer();
       })
@@ -41,6 +41,7 @@ export default function RequestLinkHandler(props: Props) {
         toast.warning(
           "We couldn't process the payment request, please try again"
         );
+        props.onDismissDrawer();
       });
   };
 
@@ -50,11 +51,11 @@ export default function RequestLinkHandler(props: Props) {
         You received a payment request <br />
         Click <span className="font-semibold">"Pay Now"</span> to pay{" "}
         <span className="font-semibold">
-          {requestobject.amount} {requestobject.token}
+          {requestobject.amount || 0} {requestobject.token || ""}
         </span>{" "}
         to{" "}
         <span className="font-semibold">
-          {shortenString(requestobject.username)}
+          {shortenString(requestobject.username || "")}
         </span>
       </p>
 
@@ -66,14 +67,19 @@ export default function RequestLinkHandler(props: Props) {
         />
 
         <p className="flex flex-col items-end justify-end font-semibold">
-          {requestobject.amount}
+          {requestobject.amount || 0}
           <span className="font-normal">
             {formatNumberUsd(convertedAmount || 0)}
           </span>
         </p>
       </div>
 
-      <ActionButton onClick={onReceive} className="mt-10">
+      <ActionButton
+        onClick={onReceive}
+        className="mt-10"
+        disabled={payRequestPaymentLink.isPending}
+        loading={payRequestPaymentLink.isPending}
+      >
         Pay Now
       </ActionButton>
     </div>

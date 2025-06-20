@@ -13,15 +13,15 @@ export default function CollectLinkHandler(props: Props) {
   const collectobjectb64 = localStorage.getItem("collectobject");
 
   const collectobject: collectobjectType = JSON.parse(
-    base64ToString(collectobjectb64) ?? ""
+    base64ToString(collectobjectb64) ?? "{}"
   );
 
   const { data: TOKEN_INFO } = useToken({
-    name: collectobject.token,
-    chain: collectobject.chain,
+    name: collectobject?.token,
+    chain: collectobject?.chain,
   });
   const { convertedAmount } = useGeckoPrice({
-    amount: Number(collectobject.amount),
+    amount: Number(collectobject?.amount),
     base: "usd",
     token: TOKEN_INFO?.id,
   });
@@ -30,16 +30,17 @@ export default function CollectLinkHandler(props: Props) {
 
   const onCollect = () => {
     collectFromSendLink
-      .mutateAsync({ id: collectobject.id })
+      .mutateAsync({ id: collectobject?.id })
       .then(() => {
         toast.success(
-          `You successfully claimed ${collectobject.amount} ${collectobject.token}`
+          `You successfully claimed ${collectobject?.amount} ${collectobject?.token}`
         );
         props.onDismissDrawer();
       })
       .catch((err) => {
         console.log("error", err);
         toast.warning("We couldn't process your link, please try again");
+        props.onDismissDrawer();
       });
   };
 
@@ -48,13 +49,13 @@ export default function CollectLinkHandler(props: Props) {
       <p className="text-center">
         You have received crypto via a Sphere link from{" "}
         <span className="font-semibold">
-          {shortenString(collectobject.username)}
+          {shortenString(collectobject?.username || "")}
         </span>{" "}
         <br />
         Click <span className="font-semibold">"Receive"</span> to transafer them
         to your wallet{" "}
         <span className="font-semibold">
-          {collectobject.amount} {collectobject.token}
+          {collectobject?.amount || 0} {collectobject?.token || ""}
         </span>{" "}
         to your wallet
       </p>
@@ -67,7 +68,7 @@ export default function CollectLinkHandler(props: Props) {
         />
 
         <p className="flex flex-col items-end justify-end font-semibold">
-          {collectobject.amount}
+          {collectobject?.amount}
           <span className="font-normal">
             {formatNumberUsd(convertedAmount || 0)}
           </span>

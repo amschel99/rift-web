@@ -1,4 +1,4 @@
-import { ReactNode, useCallback } from "react";
+import { useCallback } from "react";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import {
   Drawer,
@@ -6,7 +6,6 @@ import {
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import RequestLinkHandler from "./components/RequestLinkHandler";
 import CollectLinkHandler from "./components/CollectLinkHandler";
@@ -18,15 +17,23 @@ interface Props {
 export default function RedirectLinks(
   props: Props & Partial<ReturnType<typeof useDisclosure>>
 ) {
-  const { isOpen, onOpen, onClose } = props;
+  const { isOpen, onOpen, onClose, toggle } = props;
+
+  const onDismissDrawer = () => {
+    console.log("closing drawer");
+    onClose?.();
+    toggle?.();
+    localStorage.removeItem("collectobject");
+    localStorage.removeItem("requestobject");
+  };
 
   const renderRedirectLinkHandler = useCallback(() => {
     switch (props.redirectType) {
       case "RECEIVE-FROM-COLLECT-LINK": {
-        return <CollectLinkHandler onDismissDrawer={() => onClose?.()} />;
+        return <CollectLinkHandler onDismissDrawer={onDismissDrawer} />;
       }
       case "SEND-TO-REQUEST-LINK": {
-        return <RequestLinkHandler onDismissDrawer={() => onClose?.()} />;
+        return <RequestLinkHandler onDismissDrawer={onDismissDrawer} />;
       }
       default: {
         return <></>;
@@ -38,16 +45,12 @@ export default function RedirectLinks(
     <Drawer
       modal
       open={isOpen}
-      onClose={() => {
-        onClose?.();
-        localStorage.removeItem("collectobject");
-        localStorage.removeItem("requestobject");
-      }}
+      onClose={() => onDismissDrawer()}
       onOpenChange={(open) => {
         if (open) {
           onOpen?.();
         } else {
-          onClose?.();
+          onDismissDrawer();
         }
       }}
     >

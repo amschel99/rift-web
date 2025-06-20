@@ -12,6 +12,7 @@ import ReceiveCrypto from "@/features/receive";
 import { TokenSketleton } from "./components/TokenSketleton";
 import TokenDrawer from "@/features/token";
 import RedirectLinks from "@/features/redirectlinks";
+import { useCallback } from "react";
 
 export default function Home() {
   const { data: AGGREGATE_BALANCE } = useChainsBalance();
@@ -20,6 +21,12 @@ export default function Home() {
 
   const collectobjectb64 = localStorage.getItem("collectobject");
   const requestobjectb64 = localStorage.getItem("requestobject");
+
+  const redirectHandlersOpen = useCallback(() => {
+    return collectobjectb64 !== null || requestobjectb64 !== null
+      ? true
+      : false;
+  }, [collectobjectb64, requestobjectb64]);
 
   return (
     <div className="w-full h-full overflow-y-auto mb-18 p-4">
@@ -83,7 +90,7 @@ export default function Home() {
       </div>
 
       <RedirectLinks
-        isOpen={collectobjectb64 !== null || requestobjectb64 !== null}
+        isOpen={redirectHandlersOpen()}
         redirectType={
           collectobjectb64 !== null
             ? "RECEIVE-FROM-COLLECT-LINK"
