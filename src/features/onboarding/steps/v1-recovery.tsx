@@ -171,13 +171,14 @@ export default function V1Recovery() {
                 {telegramId || "Loading..."}
               </p>
               <p className="text-blue-600 text-sm mt-1">
-                This is your Telegram ID and cannot be changed
+                This is your Telegram ID associated with your old account. It
+                will be used as your username for your new account.
               </p>
             </div>
           </div>
         </div>
 
-        <p>Enter the password you used for your Version 1 account.</p>
+        <p>Enter a password to be used for your old account</p>
 
         <div className="flex flex-col w-full gap-4">
           <Controller
