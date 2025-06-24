@@ -52,46 +52,82 @@ export default function V1Recovery() {
     flow.stateControl.setValue("password", values.password);
 
     try {
+      let signupSucceeded = false;
+
       try {
         // First try to signup the user with Telegram ID
         await signUpMutation.mutateAsync({
           externalId: telegramId,
           password: values.password,
         });
+        signupSucceeded = true;
+        console.log("✅ Signup successful for V1 recovery");
       } catch (signupError: any) {
-        // Check if it's a 409 (user already exists) error
-        const is409Error =
-          signupError?.status === 409 ||
-          signupError?.response?.status === 409 ||
-          signupError?.message?.includes("409") ||
-          signupError?.message?.toLowerCase()?.includes("already exists");
+        console.log("🔍 Signup error:", signupError);
 
-        if (is409Error) {
-          console.log("User already exists, proceeding with login");
-          // Reset the signup mutation error state since 409 is expected
+        // More comprehensive check for "user already exists" errors
+        const errorString = JSON.stringify(signupError).toLowerCase();
+        const errorMessage = signupError?.message?.toLowerCase() || "";
+        const statusCode = signupError?.status || signupError?.response?.status;
+
+        const isUserExistsError =
+          statusCode === 409 ||
+          errorString.includes("409") ||
+          errorString.includes("already exists") ||
+          errorString.includes("user exists") ||
+          errorString.includes("duplicate") ||
+          errorMessage.includes("already exists") ||
+          errorMessage.includes("user exists") ||
+          errorMessage.includes("duplicate");
+
+        if (isUserExistsError) {
+          console.log(
+            "✅ User already exists (expected for V1 recovery), proceeding with login"
+          );
+          // Reset the signup mutation error state since this is expected
           signUpMutation.reset();
-          // Don't throw, just continue to login step
+          // Continue to login step
         } else {
-          // Re-throw if it's a different error
+          // Re-throw if it's a different error (like network issues, invalid data, etc.)
+          console.log("❌ Unexpected signup error:", signupError);
           throw signupError;
         }
       }
 
-      // Then sign them in (this runs regardless of signup success/409)
-      await signInMutation.mutateAsync({
-        externalId: telegramId,
-        password: values.password,
-      });
+      // Sign them in (runs regardless of signup success/409)
+      try {
+        await signInMutation.mutateAsync({
+          externalId: telegramId,
+          password: values.password,
+        });
 
-      // Set the isNewVersion flag after successful auth
-      localStorage.setItem("isNewVersion", "true");
+        if (signupSucceeded) {
+          console.log("✅ V1 recovery: New account created and logged in");
+        } else {
+          console.log("✅ V1 recovery: Existing account logged in");
+        }
 
-      // Only navigate after both operations succeed
-      flow.goToNext();
+        // Set the isNewVersion flag after successful auth
+        localStorage.setItem("isNewVersion", "true");
+
+        // Only navigate after login succeeds
+        flow.goToNext();
+      } catch (loginError) {
+        console.log("❌ Login failed after signup:", loginError);
+        throw new Error("Invalid password for this Telegram ID");
+      }
     } catch (e) {
-      console.log("Error:", e);
+      console.log("❌ V1 Recovery Error:", e);
       toast.custom(
-        () => <RenderErrorToast message="Invalid password for this account" />,
+        () => (
+          <RenderErrorToast
+            message={
+              e instanceof Error
+                ? e.message
+                : "Invalid password for this account"
+            }
+          />
+        ),
         {
           duration: 2000,
           position: "top-center",
