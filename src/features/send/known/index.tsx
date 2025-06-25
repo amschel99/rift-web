@@ -63,9 +63,9 @@ function _SendToKnown(props: Props & ReturnType<typeof useDisclosure>) {
     >
       <DrawerTrigger asChild>{renderTrigger()}</DrawerTrigger>
       <DrawerContent className="h-[98vh]">
-        <DrawerHeader>
-          <DrawerTitle className="hidden">Send Crypto</DrawerTitle>
-          <DrawerDescription className="hidden">
+        <DrawerHeader className="hidden">
+          <DrawerTitle>Send Crypto</DrawerTitle>
+          <DrawerDescription>
             Send Crypto to address or via links
           </DrawerDescription>
         </DrawerHeader>
