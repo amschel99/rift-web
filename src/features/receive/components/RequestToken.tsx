@@ -34,7 +34,7 @@ export default function RequestToken() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="h-[40vh] space-y-4">
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">Request Crypto</h2>
         <p className="text-muted-foreground">

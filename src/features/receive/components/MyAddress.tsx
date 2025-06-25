@@ -4,6 +4,7 @@ import { BiCopy } from "react-icons/bi";
 
 export default function MyAddress() {
   const address = localStorage.getItem("address");
+
   const onCopyAddress = () => {
     navigator.clipboard.writeText(address as string);
     toast.success("Address copied to clipboard");

@@ -111,7 +111,7 @@ export default function RequestAmount() {
   };
 
   return (
-    <div className="flex flex-col h-[75vh] space-y-4">
+    <div className="flex flex-col h-[70vh] space-y-4">
       <div className="flex items-center justify-between px-4">
         <button
           onClick={goBack}
@@ -157,7 +157,7 @@ export default function RequestAmount() {
                   <img
                     alt={TOKEN_INFO?.name}
                     src={TOKEN_INFO?.icon}
-                    className="w-10 h-10"
+                    className="w-10 h-10 rounded-full"
                   />
                   <div className="text-center">
                     <p className="text-lg font-semibold">

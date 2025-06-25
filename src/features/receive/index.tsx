@@ -55,15 +55,15 @@ function ReceiveCryptoContainer(
       }}
     >
       <DrawerTrigger asChild>{renderTrigger()}</DrawerTrigger>
-      <DrawerContent className="min-h-[95vh]">
-        <DrawerHeader>
-          <DrawerTitle className="hidden">Receive/Request Crypto</DrawerTitle>
-          <DrawerDescription className="hidden">
+      <DrawerContent className="min-h-fit max-h-[90vh]">
+        <DrawerHeader className="hidden">
+          <DrawerTitle>Receive/Request Crypto</DrawerTitle>
+          <DrawerDescription>
             Use your address to receive crypto or request from others
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="w-full h-full overflow-y-auto">
+        <div className="overflow-y-auto">
           <div className="sticky bottom-0 bg-app-background border-b border-border z-10">
             <div className="flex items-center justify-center p-4">
               <div className="flex bg-muted/30 rounded-lg p-1 w-full max-w-md">
@@ -93,7 +93,7 @@ function ReceiveCryptoContainer(
             </div>
           </div>
 
-          <div className="p-4">
+          <div className="p-4 ">
             {mode === "receive" ? <MyAddress /> : renderRequestContent()}
           </div>
         </div>
