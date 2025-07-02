@@ -193,16 +193,3 @@ export const LinkItem = ({ linkdata, requestlinkdata }: linkItemProps) => {
     </Fragment>
   );
 };
-
-export const LinkItemSkeleton = () => {
-  return (
-    <div className="p-2 flex flex-row gap-3 w-full items-center justify-start rounded-md bg-secondary">
-      <Skeleton className="mt-0 w-10 h-10 rounded-full" />
-
-      <div className="flex flex-col gap-2">
-        <Skeleton className="mt-0 w-12 h-2" />
-        <Skeleton className="mt-0 w-30 h-4" />
-      </div>
-    </div>
-  );
-};
