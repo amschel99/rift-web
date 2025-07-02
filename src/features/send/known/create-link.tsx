@@ -19,6 +19,8 @@ import usePaymentLinks from "@/hooks/data/use-payment-link";
 import { CgSpinner } from "react-icons/cg";
 import ActionButton from "@/components/ui/action-button";
 import { shortenString } from "@/lib/utils";
+import { usePlatformDetection } from "@/utils/platform";
+import { analyticsLog } from "@/analytics/events";
 
 const durationSchema = z.object({
   duration: z.enum(["30m", "1h", "2h"]),
@@ -36,6 +38,7 @@ export default function CreateLink(props: CreatePaymentLinkProps) {
   const { renderPaymentLink } = props;
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { state, closeAndReset } = useFlow();
+  const { telegramUser } = usePlatformDetection();
 
   const form = useForm<DURATION_SCHEMA>({
     resolver: zodResolver(durationSchema),
@@ -57,6 +60,11 @@ export default function CreateLink(props: CreatePaymentLinkProps) {
   const handleCopy = () => {
     if (URL) {
       window.navigator.clipboard.writeText(URL);
+
+      // Track copy action for analytics
+      const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+      analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
+
       form.setValue("copied", "copied");
       setTimeout(() => {
         form.setValue("copied", "not-copied");
