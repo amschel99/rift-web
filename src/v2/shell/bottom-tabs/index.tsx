@@ -103,7 +103,7 @@ export default function BottomTabs() {
           >
             <Avatar
               className={cn(
-                "p-[0.125rem] size-9",
+                "p-[0.125rem] bg-text-default",
                 active ? "border-1 border-accent-primary" : ""
               )}
             >
