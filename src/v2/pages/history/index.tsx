@@ -31,11 +31,11 @@ export default function History() {
         Recent Activity
       </h1>
 
-      <div className="flex bg-muted/30 rounded-lg p-1 w-full mt-4">
+      <div className="flex w-full mt-4">
         <button
           onClick={() => setActivity("transactions")}
           className={cn(
-            "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all",
+            "flex-1 py-2 rounded-md text-sm font-medium transition-all",
             activity == "transactions"
               ? "bg-white text-black shadow-sm"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -47,7 +47,7 @@ export default function History() {
         <button
           onClick={() => setActivity("sendlinks")}
           className={cn(
-            "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all",
+            "flex-1 py-2 rounded-md text-sm font-medium transition-all",
             activity == "sendlinks"
               ? "bg-white text-black shadow-sm"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -59,7 +59,7 @@ export default function History() {
         <button
           onClick={() => setActivity("requestlinks")}
           className={cn(
-            "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all",
+            "flex-1 py-2 rounded-md text-sm font-medium transition-all",
             activity == "requestlinks"
               ? "bg-white text-black shadow-sm"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -71,20 +71,20 @@ export default function History() {
 
       {activity == "requestlinks" &&
         listRequestLinks.data?.data?.length == 0 && (
-          <p className="text-center tex-lg font-semibold">
+          <p className="text-md text-center font-medium text-text-subtle mt-4">
             Start requesting payments via links to see them listed here
           </p>
         )}
 
       {activity == "sendlinks" && listSendLinks.data?.data?.length == 0 && (
-        <p className="text-center tex-lg font-semibold">
+        <p className="text-md text-center font-medium text-text-subtle mt-4">
           Start sending links to see them listed here
         </p>
       )}
 
       {activity == "transactions" &&
         walletHistoryQuery?.data?.transactions?.length == 0 && (
-          <p className="text-md text-center font-medium text-text-subtle">
+          <p className="text-md text-center font-medium text-text-subtle mt-4">
             You have no recent activity
           </p>
         )}

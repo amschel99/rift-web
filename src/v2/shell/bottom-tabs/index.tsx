@@ -8,7 +8,7 @@ import { ArrowRightLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useShellContext } from "../shell-context";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
-import spherelogo from "@/assets/sphere.png";
+import usericon from "@/assets/user.png";
 import { cn } from "@/lib/utils";
 
 const tabSchema = z.object({
@@ -101,15 +101,10 @@ export default function BottomTabs() {
             }}
             className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
           >
-            <Avatar
-              className={cn(
-                "p-[0.125rem] bg-text-default",
-                active ? "border-1 border-accent-primary" : ""
-              )}
-            >
+            <Avatar className="p-[0.125rem] border-1 border-accent-primary">
               <AvatarImage
                 className="rounded-full"
-                src={isTelegram ? telegramUser?.photoUrl : spherelogo}
+                src={isTelegram ? telegramUser?.photoUrl : usericon}
                 alt={
                   isTelegram
                     ? telegramUser?.username
