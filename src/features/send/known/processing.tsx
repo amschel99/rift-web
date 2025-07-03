@@ -1,11 +1,14 @@
 import { useFlow } from "./flow-context";
 import { CgSpinner } from "react-icons/cg";
 import useToken from "@/hooks/data/use-token";
-import formatAddress from "@/utils/address-formatter";
 import { Check, CircleX } from "lucide-react";
+import { useEffect } from "react";
+import { analyticsLog } from "@/analytics/events";
+import { usePlatformDetection } from "@/utils/platform";
+import { shortenString } from "@/lib/utils";
 
 export default function Processing() {
-  const { sendTransactionMutation, state, closeAndReset } = useFlow();
+  const { sendTransactionMutation, closeAndReset } = useFlow();
 
   return (
     <div className="flex flex-col items-center justify-between w-full h-full p-5">
@@ -32,7 +35,7 @@ export default function Processing() {
 }
 
 function PendingState() {
-  const { sendTransactionMutation, state } = useFlow();
+  const { state } = useFlow();
 
   const stored = state?.getValues();
 
@@ -51,7 +54,7 @@ function PendingState() {
       <p className="font-semibold text-xl">
         {stored?.amount} {data?.name}{" "}
         <span className="text-muted-foreground">to</span>{" "}
-        {formatAddress(stored?.recipient ?? "")}
+        {shortenString(stored?.recipient ?? "")}
       </p>
     </div>
   );
@@ -59,6 +62,7 @@ function PendingState() {
 
 function SuccessState() {
   const { state } = useFlow();
+  const { telegramUser } = usePlatformDetection();
 
   const stored = state?.getValues();
 
@@ -66,6 +70,12 @@ function SuccessState() {
     id: stored?.token!,
     chain: stored?.chain,
   });
+
+  // Track successful send transaction
+  useEffect(() => {
+    const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+    analyticsLog("SEND", { telegram_id: telegramId });
+  }, [telegramUser]);
 
   return (
     <div className="flex flex-col w-full items-center justify-center gap-3">
@@ -77,7 +87,7 @@ function SuccessState() {
       <p className="font-semibold text-xl">
         {stored?.amount} {data?.name}{" "}
         <span className="text-muted-foreground"> was successfully sent to</span>{" "}
-        {formatAddress(stored?.recipient ?? "")}
+        {shortenString(stored?.recipient ?? "")}
       </p>
     </div>
   );
@@ -107,7 +117,7 @@ function ErrorState() {
       <p className="font-semibold text-xl">
         {stored?.amount} {data?.name}{" "}
         <span className="text-muted-foreground"> was not sent to</span>{" "}
-        {formatAddress(stored?.recipient ?? "")}
+        {shortenString(stored?.recipient ?? "")}
       </p>
 
       <p

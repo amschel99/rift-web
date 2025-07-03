@@ -8,12 +8,12 @@ import AuthenticatedShell from "./authenticated-shell";
 import Onboarding from "@/features/onboarding";
 import Swap from "@/v2/pages/swap";
 import Splash from "@/v2/pages/splash";
+import Profile from "@/v2/pages/profile";
 
 export default function PageContainer() {
   const { form } = useShellContext();
   const navigate = useNavigate();
 
-  // Initialize PWA shortcuts functionality
   usePWAShortcuts();
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function PageContainer() {
   }, [form]);
 
   const RenderScreenWithShell = useCallback(
-    (props: { screen: "home" | "on-ramp" | "history" | "swap" }) => {
+    (props: { screen: "home" | "swap" | "history" | "profile" }) => {
       const { screen } = props;
       switch (screen) {
         case "home": {
@@ -54,6 +54,13 @@ export default function PageContainer() {
           return (
             <AuthenticatedShell>
               <Swap />
+            </AuthenticatedShell>
+          );
+        }
+        case "profile": {
+          return (
+            <AuthenticatedShell>
+              <Profile />
             </AuthenticatedShell>
           );
         }
@@ -80,12 +87,12 @@ export default function PageContainer() {
         element={<RenderScreenWithShell screen="swap" />}
       />
       <Route
-        path="/app/oo"
-        element={<RenderScreenWithShell screen="on-ramp" />}
-      />
-      <Route
         path="/app/history"
         element={<RenderScreenWithShell screen="history" />}
+      />
+      <Route
+        path="/app/profile"
+        element={<RenderScreenWithShell screen="profile" />}
       />
     </Routes>
   );
