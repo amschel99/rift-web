@@ -135,7 +135,10 @@ export default function BottomTabs() {
       name="tab"
       render={({ field }) => {
         return (
-          <div className="w-full flex flex-row items-center justify-center pb-3 gap-x-8">
+          <div
+            key={field.name}
+            className="w-full flex flex-row items-center justify-center pb-3 gap-x-8"
+          >
             {tabs.map((tab) => {
               return tab.render(field, field.value == tab.name);
             })}
