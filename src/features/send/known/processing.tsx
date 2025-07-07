@@ -1,10 +1,11 @@
-import { useFlow } from "./flow-context";
-import { CgSpinner } from "react-icons/cg";
-import useToken from "@/hooks/data/use-token";
-import { Check, CircleX } from "lucide-react";
 import { useEffect } from "react";
+import { CgSpinner } from "react-icons/cg";
+import { Check, CircleX } from "lucide-react";
+
+import useToken from "@/hooks/data/use-token";
 import useAnalaytics from "@/hooks/use-analytics";
 import { shortenString } from "@/lib/utils";
+import { useFlow } from "./flow-context";
 
 export default function Processing() {
   const { sendTransactionMutation, closeAndReset } = useFlow();
