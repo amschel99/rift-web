@@ -70,13 +70,14 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
             {tokenDetails.name}
           </p>
           <p className="text-lg font-bold text-primary">
-            {userBalance?.amount} {tokenDetails.symbol?.toUpperCase()}
+            {userBalance?.amount?.toFixed(3)}{" "}
+            {tokenDetails.symbol?.toUpperCase()}
           </p>
         </div>
       </div>
       <div className="flex items-end gap-2 flex-col justify-end ">
         <p className="text-lg font-bold text-primary">
-          {formatNumberUsd(convertedAmount || 0)}
+          {Number(formatNumberUsd(convertedAmount || 0)).toFixed(3)}
         </p>
       </div>
     </div>
