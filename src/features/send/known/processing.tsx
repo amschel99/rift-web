@@ -1,11 +1,11 @@
-import { useFlow } from "./flow-context";
-import { CgSpinner } from "react-icons/cg";
-import useToken from "@/hooks/data/use-token";
-import { Check, CircleX } from "lucide-react";
 import { useEffect } from "react";
-import { analyticsLog } from "@/analytics/events";
-import { usePlatformDetection } from "@/utils/platform";
+import { CgSpinner } from "react-icons/cg";
+import { Check, CircleX } from "lucide-react";
+
+import useToken from "@/hooks/data/use-token";
+import useAnalaytics from "@/hooks/use-analytics";
 import { shortenString } from "@/lib/utils";
+import { useFlow } from "./flow-context";
 
 export default function Processing() {
   const { sendTransactionMutation, closeAndReset } = useFlow();
@@ -40,7 +40,7 @@ function PendingState() {
   const stored = state?.getValues();
 
   const { data } = useToken({
-    id: stored?.token!,
+    id: stored?.token || "",
     chain: stored?.chain,
   });
 
@@ -62,20 +62,19 @@ function PendingState() {
 
 function SuccessState() {
   const { state } = useFlow();
-  const { telegramUser } = usePlatformDetection();
+  const { logEvent } = useAnalaytics();
 
   const stored = state?.getValues();
 
   const { data } = useToken({
-    id: stored?.token!,
+    id: stored?.token || "",
     chain: stored?.chain,
   });
 
   // Track successful send transaction
   useEffect(() => {
-    const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("SEND", { telegram_id: telegramId });
-  }, [telegramUser]);
+    logEvent("SEND");
+  }, [logEvent]);
 
   return (
     <div className="flex flex-col w-full items-center justify-center gap-3">
@@ -99,7 +98,7 @@ function ErrorState() {
   const stored = state?.getValues();
 
   const { data } = useToken({
-    id: stored?.token!,
+    id: stored?.token || "",
     chain: stored?.chain,
   });
 

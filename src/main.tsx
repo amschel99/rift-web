@@ -1,8 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { init } from "@telegram-apps/sdk-react";
+import posthog from "posthog-js";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { POSTHOG_HOST, POSTHOG_KEY } from "./constants.ts";
 import { enableTelegramMock } from "./development/mock.ts";
 import { DevelopmentTools } from "./development/development-tools.tsx";
 import { Toaster } from "./components/ui/sonner.tsx";
@@ -37,7 +39,7 @@ try {
   init();
 } catch (error) {
   console.warn(
-    "Failed to initialize Telegram SDK - probably running in browser mode",
+    "Failed to initialize Telegram SDK - probably running in browser mode"
   );
 }
 
@@ -47,6 +49,11 @@ if (import.meta.env.MODE === "development") {
     eruda.init();
   });
 }
+
+posthog.init(POSTHOG_KEY, {
+  api_host: POSTHOG_HOST,
+  person_profiles: "identified_only",
+});
 
 const queryclient = new QueryClient();
 
@@ -63,5 +70,5 @@ createRoot(document.getElementById("root")!).render(
       <PWAInstallPrompt />
       <DevelopmentTools />
     </QueryClientProvider>
-  </StrictMode>,
+  </StrictMode>
 );
