@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import usePaymentLinks from "@/hooks/data/use-payment-link";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { usePlatformDetection } from "@/utils/platform";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import {
   Drawer,
   DrawerContent,
@@ -64,7 +64,7 @@ export default function CreateLink(props: CreatePaymentLinkProps) {
 
       // Track copy action for analytics
       const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-      analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
+      // analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
 
       form.setValue("copied", "copied");
       setTimeout(() => {
@@ -116,10 +116,10 @@ export default function CreateLink(props: CreatePaymentLinkProps) {
       createPaymentLinkMutation.mutate(requestBody, {
         onSuccess(data) {
           form.setValue("url", data.link);
-          
+
           // Track payment link creation analytics
           const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-          analyticsLog("PAYMENT_LINK_CREATED", { telegram_id: telegramId });
+          // analyticsLog("PAYMENT_LINK_CREATED", { telegram_id: telegramId });
         },
       });
     }

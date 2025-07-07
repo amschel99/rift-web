@@ -3,7 +3,7 @@ import TokenInput from "./components/token-input";
 import SwapContextProvider, { useSwap } from "./swap-context";
 import { useState, useEffect } from "react";
 import SwapSummary from "./components/swap-summary";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 function SwapContent() {
@@ -53,11 +53,11 @@ function SwapContent() {
 export default function Swap() {
   const { telegramUser } = usePlatformDetection();
 
-  useEffect(() => {
-    // Track page visit
-    const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("PAGE_VISIT", { telegram_id: telegramId });
-  }, [telegramUser]);
+  // useEffect(() => {
+  //   // Track page visit
+  //   const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+  //   analyticsLog("PAGE_VISIT", { telegram_id: telegramId });
+  // }, [telegramUser]);
 
   return (
     <SwapContextProvider>

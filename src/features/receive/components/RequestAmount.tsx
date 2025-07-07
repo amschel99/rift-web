@@ -19,7 +19,7 @@ import ActionButton from "@/components/ui/action-button";
 import useChain from "@/hooks/data/use-chain";
 import { toast } from "sonner";
 import SendRequestLink from "./SendRequestLink";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 const amountSchema = z.object({
@@ -103,17 +103,20 @@ export default function RequestAmount() {
     const amount = form.getValues("amount");
 
     if (AMOUNT_IS_VALID && reqTokenId && reqTokenChainId) {
-      createRequestLinkMutation.mutate({
-        amount: amount,
-        chain: CHAIN_INFO?.backend_id!,
-        token: TOKEN_INFO?.name!,
-      }, {
-        onSuccess: () => {
-          // Track payment request creation analytics
-          const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-          analyticsLog("PAYMENT_REQUEST_CREATED", { telegram_id: telegramId });
+      createRequestLinkMutation.mutate(
+        {
+          amount: amount,
+          chain: CHAIN_INFO?.backend_id!,
+          token: TOKEN_INFO?.name!,
+        },
+        {
+          onSuccess: () => {
+            // Track payment request creation analytics
+            const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+            // analyticsLog("PAYMENT_REQUEST_CREATED", { telegram_id: telegramId });
+          },
         }
-      });
+      );
     } else {
       toast.warning("Sorry, we could create a link");
     }

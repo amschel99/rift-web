@@ -5,7 +5,7 @@ import useGeckoPrice from "@/hooks/data/use-gecko-price";
 import usePaymentLinks from "@/hooks/data/use-payment-link";
 import { usePlatformDetection } from "@/utils/platform";
 import { base64ToString, formatNumberUsd, shortenString } from "@/lib/utils";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import ActionButton from "@/components/ui/action-button";
 
 interface Props {
@@ -35,11 +35,11 @@ export default function CollectLinkHandler(props: Props) {
   const onCollect = async () => {
     try {
       await collectFromSendLink.mutateAsync({ id: collectobject?.id });
-      
+
       // Track successful payment link claim
-      const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-      analyticsLog("PAYMENT_LINK_CLAIMED", { telegram_id: telegramId });
-      
+      // const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+      // analyticsLog("PAYMENT_LINK_CLAIMED", { telegram_id: telegramId });
+
       toast.success(
         `You successfully claimed ${collectobject?.amount} ${collectobject?.token}`
       );

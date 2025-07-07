@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import useWalletTxHistory from "@/hooks/wallet/use-history";
 import usePaymentLinks from "@/hooks/data/use-payment-link";
 import {
@@ -22,7 +22,7 @@ export default function History() {
   useEffect(() => {
     // Track page visit
     const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("PAGE_VISIT", { telegram_id: telegramId });
+    // analyticsLog("PAGE_VISIT", { telegram_id: telegramId });
   }, [telegramUser]);
 
   return (

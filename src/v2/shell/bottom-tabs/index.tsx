@@ -5,12 +5,12 @@ import { GoHomeFill, GoHome } from "react-icons/go";
 import { usePlatformDetection } from "@/utils/platform";
 import { IoTimeOutline, IoTime } from "react-icons/io5";
 import { ArrowRightLeft } from "lucide-react";
+import useAnalaytics from "@/hooks/use-analytics";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useShellContext } from "../shell-context";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import { cn } from "@/lib/utils";
 import usericon from "@/assets/user.png";
-import { isActive } from "node_modules/@telegram-apps/sdk/dist/dts/scopes/components/mini-app/signals";
 
 const tabSchema = z.object({
   tab: z
@@ -33,6 +33,7 @@ export default function BottomTabs() {
   const { form } = useShellContext();
   const { isTelegram, telegramUser } = usePlatformDetection();
   const { userQuery } = useWalletAuth();
+  const { logEvent } = useAnalaytics();
 
   const tabs: Array<Tab> = [
     {
@@ -41,6 +42,7 @@ export default function BottomTabs() {
         return (
           <div
             onClick={() => {
+              logEvent("PAGE_VISIT_HOME");
               field.onChange("home");
             }}
             className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
@@ -60,6 +62,7 @@ export default function BottomTabs() {
         return (
           <div
             onClick={() => {
+              logEvent("PAGE_VISIT_SWAP");
               field.onChange("swap");
             }}
             className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
@@ -79,6 +82,7 @@ export default function BottomTabs() {
         return (
           <div
             onClick={() => {
+              logEvent("PAGE_VISIT_ACTIVITY");
               field.onChange("history");
             }}
             className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
@@ -98,6 +102,7 @@ export default function BottomTabs() {
         return (
           <div
             onClick={() => {
+              logEvent("PAGE_VISIT_PROFILE");
               field.onChange("profile");
             }}
             className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"

@@ -3,7 +3,7 @@ import { CgSpinner } from "react-icons/cg";
 import useToken from "@/hooks/data/use-token";
 import { Check, CircleX } from "lucide-react";
 import { useEffect } from "react";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 import { shortenString } from "@/lib/utils";
 
@@ -74,7 +74,7 @@ function SuccessState() {
   // Track successful send transaction
   useEffect(() => {
     const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("SEND", { telegram_id: telegramId });
+    // analyticsLog("SEND", { telegram_id: telegramId });
   }, [telegramUser]);
 
   return (

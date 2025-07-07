@@ -14,7 +14,7 @@ import TokenDrawer from "@/features/token";
 import RedirectLinks from "@/features/redirectlinks";
 import { useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 export default function Home() {
@@ -68,11 +68,11 @@ export default function Home() {
     };
   }, [checkRedirectObjects]);
 
-  useEffect(() => {
-    // Track page visit
-    const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("PAGE_VISIT", { telegram_id: telegramId });
-  }, [telegramUser]);
+  // useEffect(() => {
+  // Track page visit
+  // const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+  // analyticsLog("PAGE_VISIT", { telegram_id: telegramId });
+  // }, [telegramUser]);
 
   const handleCloseRedirectDrawer = useCallback(() => {
     setIsRedirectDrawerOpen(false);

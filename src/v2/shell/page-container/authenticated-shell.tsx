@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import BottomTabs from "../bottom-tabs";
 import sphere from "@/lib/sphere";
 import { useNavigate } from "react-router";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 interface Props {
@@ -32,8 +32,8 @@ export default function AuthenticatedShell(props: Props) {
       sphere.setBearerToken(auth_token);
 
       // Track app launch for authenticated users
-      const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-      analyticsLog("APP_LAUNCH", { telegram_id: telegramId });
+      // const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+      // analyticsLog("APP_LAUNCH", { telegram_id: telegramId });
     } else {
       navigate("/auth");
     }

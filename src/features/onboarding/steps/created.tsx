@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { usePlatformDetection } from "@/utils/platform";
 import { shortenString } from "@/lib/utils";
 import spherelogo from "@/assets/sphere.png";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 
 export default function Created() {
   const { signInMutation, signUpMutation } = useFlow();
@@ -14,15 +14,15 @@ export default function Created() {
   const { telegramUser } = usePlatformDetection();
 
   const navigate = useNavigate();
-  
+
   const handleOpenWallet = () => {
     // Set the isNewVersion flag when successfully opening wallet
     localStorage.setItem("isNewVersion", "true");
-    
+
     // Track wallet creation completion
     const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("WALLET_CREATED", { telegram_id: telegramId });
-    
+    // analyticsLog("WALLET_CREATED", { telegram_id: telegramId });
+
     navigate("/app");
   };
 
@@ -38,10 +38,7 @@ export default function Created() {
       </div>
       <div className="flex flex-row items-center justify-center w-full">
         {!loading && !error && (
-          <ActionButton
-            onClick={handleOpenWallet}
-            variant={"success"}
-          >
+          <ActionButton onClick={handleOpenWallet} variant={"success"}>
             Open Wallet
           </ActionButton>
         )}

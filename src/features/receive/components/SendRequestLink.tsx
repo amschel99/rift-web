@@ -11,7 +11,7 @@ import {
 import { Copy } from "lucide-react";
 import ActionButton from "@/components/ui/action-button";
 import { toast } from "sonner";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 interface sendRequestLinkProps {
@@ -28,11 +28,11 @@ export default function SendRequestLink({
 
   const handleCopy = () => {
     window.navigator.clipboard.writeText(requestLink);
-    
+
     // Track copy action for analytics
-    const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
-    
+    // const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+    // analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
+
     toast.success("Link copied to clipboard");
   };
 

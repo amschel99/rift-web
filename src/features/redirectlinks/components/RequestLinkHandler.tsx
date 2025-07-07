@@ -5,7 +5,7 @@ import { formatNumberUsd, shortenString } from "@/lib/utils";
 import { toast } from "sonner";
 import { base64ToString } from "@/lib/utils";
 import usePaymentLinks from "@/hooks/data/use-payment-link";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 export default function RequestLinkHandler(props: Props) {
   const requestobjectb64 = localStorage.getItem("requestobject");
   const { telegramUser } = usePlatformDetection();
-  
+
   const requestobject: requestobjectType = JSON.parse(
     base64ToString(requestobjectb64) ?? "{}"
   );
@@ -35,11 +35,11 @@ export default function RequestLinkHandler(props: Props) {
   const onReceive = async () => {
     try {
       await payRequestPaymentLink.mutateAsync({ nonce: requestobject?.id });
-      
+
       // Track successful payment request payment
-      const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-      analyticsLog("PAYMENT_REQUEST_PAID", { telegram_id: telegramId });
-      
+      // const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+      // analyticsLog("PAYMENT_REQUEST_PAID", { telegram_id: telegramId });
+
       toast.success(
         `You successfully paid ${requestobject?.amount} ${requestobject?.token}`
       );

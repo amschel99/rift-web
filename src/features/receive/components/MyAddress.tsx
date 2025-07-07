@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { BiCopy } from "react-icons/bi";
-import { analyticsLog } from "@/analytics/events";
+// import { analyticsLog } from "@/analytics/events";
 import { usePlatformDetection } from "@/utils/platform";
 
 export default function MyAddress() {
@@ -10,11 +10,11 @@ export default function MyAddress() {
 
   const onCopyAddress = () => {
     navigator.clipboard.writeText(address as string);
-    
+
     // Track copy action for analytics
-    const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
-    analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
-    
+    // const telegramId = telegramUser?.id?.toString() || "UNKNOWN USER";
+    // analyticsLog("COPY_REFFERAL", { telegram_id: telegramId });
+
     toast.success("Address copied to clipboard");
   };
 
