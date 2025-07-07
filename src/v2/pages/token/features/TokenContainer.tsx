@@ -15,7 +15,7 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
     useTokenPriceChange(tokenID as string);
 
   const { convertedAmount } = useGeckoPrice({
-    amount: Number(userBalance?.amount),
+    amount: userBalance?.amount,
     token: tokenID,
     base: "usd",
   });
@@ -70,7 +70,8 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
             {tokenDetails.name}
           </p>
           <p className="text-lg font-bold text-primary">
-            {userBalance?.amount} {tokenDetails.symbol?.toUpperCase()}
+            {userBalance?.amount?.toFixed(3)}{" "}
+            {tokenDetails.symbol?.toUpperCase()}
           </p>
         </div>
       </div>
