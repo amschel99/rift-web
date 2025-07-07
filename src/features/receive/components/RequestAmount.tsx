@@ -1,23 +1,25 @@
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { ReactNode, useMemo } from "react";
+import { MdKeyboardArrowLeft } from "react-icons/md";
 import {
   Controller,
   ControllerRenderProps,
   useForm,
   UseFormReturn,
 } from "react-hook-form";
-import { useReceiveCrypto } from "../context";
-import { MdKeyboardArrowLeft } from "react-icons/md";
+import { z } from "zod";
+import { toast } from "sonner";
 import { ChevronLeft, DotIcon } from "lucide-react";
-import { ReactNode, useMemo } from "react";
-import useToken from "@/hooks/data/use-token";
-import { cn } from "@/lib/utils";
 import { WalletToken } from "@stratosphere-network/wallet";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import useAnalaytics from "@/hooks/use-analytics";
+import useToken from "@/hooks/data/use-token";
 import usePaymentLinks from "@/hooks/data/use-payment-link";
 import useGeckoPrice from "@/hooks/data/use-gecko-price";
-import ActionButton from "@/components/ui/action-button";
 import useChain from "@/hooks/data/use-chain";
-import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import ActionButton from "@/components/ui/action-button";
+import { useReceiveCrypto } from "../context";
 import SendRequestLink from "./SendRequestLink";
 
 const amountSchema = z.object({
@@ -29,6 +31,7 @@ type AMOUNT_SCHEMA = z.infer<typeof amountSchema>;
 export default function RequestAmount() {
   const { switchRequestStep, state } = useReceiveCrypto();
   const { createRequestLinkMutation } = usePaymentLinks();
+  const { logEvent } = useAnalaytics();
   const reqTokenId = state?.getValues("requestToken");
   const reqTokenChainId = state?.getValues("requestTokenChain");
 
@@ -100,11 +103,19 @@ export default function RequestAmount() {
     const amount = form.getValues("amount");
 
     if (AMOUNT_IS_VALID && reqTokenId && reqTokenChainId) {
-      createRequestLinkMutation.mutate({
-        amount: amount,
-        chain: CHAIN_INFO?.backend_id!,
-        token: TOKEN_INFO?.name!,
-      });
+      createRequestLinkMutation.mutate(
+        {
+          amount: amount,
+          chain: CHAIN_INFO?.backend_id || "",
+          token: TOKEN_INFO?.name || "",
+        },
+        {
+          onSuccess: () => {
+            // Track payment request creation analytics
+            logEvent("PAYMENT_REQUEST_CREATED");
+          },
+        }
+      );
     } else {
       toast.warning("Sorry, we could create a link");
     }
@@ -126,9 +137,7 @@ export default function RequestAmount() {
         control={form.control}
         name="amount"
         render={({ field }) => {
-          let value = parseInt(field.value);
-          let ENABLE_BUTTON =
-            !Number.isNaN(value) && parseFloat(field.value ?? "0") > 0;
+         
           return (
             <div className="flex flex-col items-center px-4 gap-6 flex-1">
               {/* Amount Display */}
