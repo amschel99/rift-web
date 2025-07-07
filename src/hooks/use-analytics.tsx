@@ -2,7 +2,7 @@ import posthog from "posthog-js";
 import { usePlatformDetection } from "@/utils/platform";
 import useWalletAuth from "./wallet/use-wallet-auth";
 
-export type ANALYTIC_EVENT_TYPES =
+type ANALYTIC_EVENT_TYPES =
   | "SIGN_UP"
   | "SIGN_IN"
   | "APP_LAUNCH"
@@ -20,7 +20,7 @@ export type ANALYTIC_EVENT_TYPES =
   | "PAYMENT_LINK_CLAIMED"
   | "PAYMENT_REQUEST_PAID";
 
-export const analyticsLog = (event: ANALYTIC_EVENT_TYPES) => {
+const analyticsLog = (event: ANALYTIC_EVENT_TYPES) => {
   try {
     posthog.capture(event);
   } catch (error) {
