@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { Controller, ControllerRenderProps } from "react-hook-form";
 import { GoHomeFill, GoHome } from "react-icons/go";
 import { usePlatformDetection } from "@/utils/platform";
@@ -134,12 +134,13 @@ export default function BottomTabs() {
       name="tab"
       render={({ field }) => {
         return (
-          <div
-            key={field.name}
-            className="w-full flex flex-row items-center justify-center pb-3 gap-x-8"
-          >
-            {tabs.map((tab) => {
-              return tab.render(field, field.value == tab.name);
+          <div className="w-full flex flex-row items-center justify-center pb-3 gap-x-8">
+            {tabs.map((tab, idx) => {
+              return (
+                <Fragment key={tab.name + idx}>
+                  {tab.render(field, field.value == tab.name)}
+                </Fragment>
+              );
             })}
           </div>
         );
