@@ -1,7 +1,7 @@
 import { openLink } from "@telegram-apps/sdk-react";
 import useToken from "@/hooks/data/use-token";
-import { dateDistance, shortenString, formatNumberUsd } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { dateDistance, formatNumberUsd } from "@/lib/utils";
 import { Transaction } from "@/lib/entities";
 import { usePlatformDetection } from "@/utils/platform";
 
@@ -12,7 +12,7 @@ interface TransactionItemProps {
 export const TransactionItem = ({
   transaction,
 }: Partial<TransactionItemProps>) => {
-  const { amount, chain, token, id, transactionHash, createdAt } =
+  const { amount, token, transactionHash, createdAt } =
     transaction as Transaction;
   const { isTelegram } = usePlatformDetection();
   const { data: TOKEN } = useToken({ name: token });
@@ -40,12 +40,6 @@ export const TransactionItem = ({
           <span className="text-[rgba(255,255,255,0.5)] text-sm">
             {dateDistance(createdAt)}
           </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <p className="text-[#3498db] font-bold text-md">
-            {shortenString(id)}
-          </p>
         </div>
       </div>
     </div>

@@ -1,13 +1,12 @@
-import { useTokenPriceChange } from "@/hooks/token/useTokenBalance";
 import { FaSpinner } from "react-icons/fa6";
+import { useTokenPriceChange } from "@/hooks/token/useTokenBalance";
 import { useTokenDetails } from "@/hooks/token/useTokenDetails";
-import { Balance } from "@/lib/entities";
 import useGeckoPrice from "@/hooks/data/use-gecko-price";
-import { formatNumberUsd } from "@/lib/utils";
+import { shortenString, formatNumberUsd } from "@/lib/utils";
 
 interface TokenContainerProps {
-  tokenID: string | undefined;
-  userBalance: Balance | undefined;
+  tokenID: string;
+  userBalance: number;
 }
 
 function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
@@ -15,7 +14,7 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
     useTokenPriceChange(tokenID as string);
 
   const { convertedAmount } = useGeckoPrice({
-    amount: userBalance?.amount,
+    amount: userBalance,
     token: tokenID,
     base: "usd",
   });
@@ -56,7 +55,7 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
   }
 
   return (
-    <div className="flex items-center justify-between mx-2 bg-accent rounded-lg p-2 py-4">
+    <div className="flex items-center justify-between mx-2 bg-accent rounded-2xl p-2">
       <div className="flex items-center gap-2">
         <img
           src={tokenDetails.image.small}
@@ -67,16 +66,18 @@ function TokenContainer({ tokenID, userBalance }: TokenContainerProps) {
         />
         <div className="flex flex-col">
           <p className="text-md font-medium text-text-subtle">
-            {tokenDetails.name}
+            {tokenDetails?.name?.length > 18
+              ? shortenString(tokenDetails.name, { leading: 8, shorten: true })
+              : tokenDetails?.name}
           </p>
-          <p className="text-lg font-bold text-primary">
-            {userBalance?.amount?.toFixed(3)}{" "}
+          <p className="text-md font-bold text-primary">
+            {userBalance?.toFixed(3)}&nbsp;
             {tokenDetails.symbol?.toUpperCase()}
           </p>
         </div>
       </div>
       <div className="flex items-end gap-2 flex-col justify-end ">
-        <p className="text-lg font-bold text-primary">
+        <p className="text-md font-bold text-primary">
           {formatNumberUsd(convertedAmount || 0)}
         </p>
       </div>

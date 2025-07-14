@@ -1,17 +1,17 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { CandlestickData } from "lightweight-charts";
+import { useTokenHistoricalData } from "@/hooks/token/useTokenHistoricalData";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useTokenHistoricalData } from "@/hooks/token/useTokenHistoricalData";
 
 interface PriceChartProps {
   readonly tokenID: string;
 }
 
-type TimeRange = "1D" | "1W" | "1M" | "1Y" | "YTD" | "ALL";
+type TimeRange = "1D" | "1W" | "1M" | "1Y";
 
 interface ChartConfig {
   readonly [key: string]: {
@@ -36,7 +36,6 @@ interface ChartTooltipProps {
   readonly label?: string;
 }
 
-// Constants
 const CHART_CONFIG: ChartConfig = {
   close: {
     label: "Close Price",
@@ -49,8 +48,6 @@ const DAYS_RANGE_MAPPING: Record<TimeRange, number> = {
   "1W": 7,
   "1M": 30,
   "1Y": 365,
-  YTD: 365,
-  ALL: 10000,
 } as const;
 
 const TIME_RANGE_BUTTONS: TimeRangeButton[] = [
@@ -58,7 +55,6 @@ const TIME_RANGE_BUTTONS: TimeRangeButton[] = [
   { range: "1W", label: "1W" },
   { range: "1M", label: "1M" },
   { range: "1Y", label: "1Y" },
-  { range: "YTD", label: "YTD" },
 ] as const;
 
 const DEFAULT_RANGE: TimeRange = "1M";
@@ -84,11 +80,7 @@ const filterChartData = (
     case "1M":
       return data.slice(-30);
     case "1Y":
-    case "YTD":
-      return data.filter(
-        (d) => new Date(d.time as number).getFullYear() === now.getFullYear()
-      );
-    case "ALL":
+      return data.slice(-365);
     default:
       return data;
   }
@@ -112,7 +104,7 @@ const formatDateForTooltip = (timestamp: number): string => {
 };
 
 const LoadingState: React.FC = React.memo(() => (
-  <div className="flex justify-center items-center bg-accent p-4 mx-2 animate-pulse h-[350px] mb-4 rounded-xl">
+  <div className="flex justify-center items-center bg-accent p-4 mx-2 animate-pulse h-[200px] my-4 rounded-xl">
     <span className="sr-only">Loading chart data...</span>
   </div>
 ));
@@ -143,13 +135,13 @@ const CustomTooltip: React.FC<ChartTooltipProps> = React.memo(
     const data = payload[0].payload;
 
     return (
-      <div className="rounded-lg border border-text-subtle bg-app-background p-2 shadow-sm">
+      <div className="rounded-[0.625rem] border border-secondary bg-app-background p-2">
         <div className="text-xs font-medium">
           {formatDateForTooltip(data.time)}
         </div>
         <div className="text-sm text-muted-foreground flex items-center gap-1">
-          <div className="w-3 h-3 rounded-xs bg-accent-secondary" />
-          Close: ${data.close.toLocaleString()}
+          <div className="w-3 h-3 rounded-xs bg-accent-secondary" />$
+          {data.close.toLocaleString()}
         </div>
       </div>
     );
@@ -160,13 +152,16 @@ const TimeRangeSelector: React.FC<{
   activeRange: TimeRange;
   onRangeChange: (range: TimeRange) => void;
 }> = React.memo(({ activeRange, onRangeChange }) => (
-  <div className="flex items-center justify-between w-full">
+  <div className="flex items-center justify-center gap-10 w-full">
     {TIME_RANGE_BUTTONS.map(({ range, label }) => (
       <Button
         key={range}
         variant="ghost"
         onClick={() => onRangeChange(range)}
-        className={cn(activeRange === range && "bg-accent")}
+        className={cn(
+          activeRange === range && "bg-accent",
+          "py-1 px-5 rounded-full font-bold text-sm cursor-pointer"
+        )}
         aria-pressed={activeRange === range}
       >
         {label}
@@ -180,7 +175,7 @@ const PriceLineChart: React.FC<{
 }> = React.memo(({ data }) => (
   <ChartContainer
     config={CHART_CONFIG}
-    className="aspect-auto h-[300px] w-full"
+    className="aspect-auto h-[200px] w-full"
   >
     <LineChart accessibilityLayer data={data} margin={CHART_MARGINS}>
       <CartesianGrid vertical={false} />
@@ -205,7 +200,6 @@ const PriceLineChart: React.FC<{
   </ChartContainer>
 ));
 
-// Custom hook for range management
 const useTimeRange = (initialRange: TimeRange = DEFAULT_RANGE) => {
   const [activeRange, setActiveRange] = useState<TimeRange>(initialRange);
 
@@ -242,9 +236,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({ tokenID }) => {
 
   if (errorHistoricalData) {
     return (
-      <ErrorState
-        error={errorHistoricalData.message || "Unknown error occurred"}
-      />
+      <ErrorState error="An error occurred, please reload this page to view latest token information" />
     );
   }
 
@@ -257,6 +249,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({ tokenID }) => {
       <CardContent className="sm:p-2">
         <PriceLineChart data={filteredData} />
       </CardContent>
+
       <CardFooter>
         <TimeRangeSelector
           activeRange={activeRange}

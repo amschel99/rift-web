@@ -79,12 +79,6 @@ export const LinkItem = ({ linkdata, requestlinkdata }: linkItemProps) => {
               {Number(
                 linkdata ? linkdata?.value : requestlinkdata?.amount
               ).toFixed(4)}
-
-              {requestlinkdata && (
-                <span className="ml-2 text-[0.75rem] font-bold bg-text-subtle text-background px-1 p-[0.125rem] rounded-sm">
-                  {requestlinkdata?.status}
-                </span>
-              )}
             </p>
             <span className="text-[rgba(255,255,255,0.5)] text-sm">
               {dateDistance(
@@ -95,11 +89,11 @@ export const LinkItem = ({ linkdata, requestlinkdata }: linkItemProps) => {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <p className="text-[#3498db] font-bold text-md">
-              {linkdata ? linkdata?.urlId : requestlinkdata?.nonce}
-            </p>
-          </div>
+          {requestlinkdata && (
+            <span className="ml-2 text-[0.75rem] font-bold bg-text-subtle text-background px-1 p-[0.125rem] rounded-sm">
+              {requestlinkdata?.status}
+            </span>
+          )}
         </div>
       </div>
 

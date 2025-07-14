@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { motion } from "motion/react";
 import { toast } from "sonner";
 import { GoCopy } from "react-icons/go";
 import { IoIosPower } from "react-icons/io";
@@ -54,7 +55,12 @@ export default function Profile() {
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto mb-18 p-4">
+    <motion.div
+      initial={{ x: -4, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      className="w-full h-full overflow-y-auto mb-18 p-4"
+    >
       <div className="flex flex-row items-center justify-center mt-20">
         <Avatar className="size-24 border-1 border-accent-primary p-[0.25rem]">
           <AvatarImage
@@ -172,6 +178,6 @@ export default function Profile() {
           </div>
         </DrawerContent>
       </Drawer>
-    </div>
+    </motion.div>
   );
 }

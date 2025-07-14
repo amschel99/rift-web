@@ -11,6 +11,7 @@ import Splash from "@/v2/pages/splash";
 import Profile from "@/v2/pages/profile";
 import Recovery from "@/v2/pages/profile/recovery";
 import AgentPage from "@/v2/pages/agent";
+import TokenInfo from "@/features/token";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -106,6 +107,10 @@ export default function PageContainer() {
       <Route
         path="/app/agent"
         element={<RenderScreenWithShell screen="agent" />}
+      />
+      <Route
+        path="/app/token/:tokenId/:chain/:balance"
+        element={<TokenInfo />}
       />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
     </Routes>

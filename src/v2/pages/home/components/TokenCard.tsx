@@ -1,16 +1,19 @@
+import { useNavigate } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import useToken from "@/hooks/data/use-token";
 import useChain from "@/hooks/data/use-chain";
+import useTokenBalance from "@/hooks/data/use-token-balance";
 import useGeckoPrice from "@/hooks/data/use-gecko-price";
 import { formatNumberUsd } from "@/lib/utils";
-import useTokenBalance from "@/hooks/data/use-token-balance";
 
 interface CryptoCardProps {
   tokenid: string;
   chain: string;
 }
 
-export default function CryptoCard({ tokenid, chain }: CryptoCardProps) {
+export default function TokenCard({ tokenid, chain }: CryptoCardProps) {
+  const navigate = useNavigate();
+
   const { data: TOKEN_INFO, isPending: TOKEN_INFO_PENDING } = useToken({
     chain: chain,
     id: tokenid,
@@ -37,8 +40,15 @@ export default function CryptoCard({ tokenid, chain }: CryptoCardProps) {
     CHAIN_INFO_LOADING ||
     geckoQuery.isPending;
 
+  const goToTokenInfo = () => {
+    navigate(`/app/token/${tokenid}/${chain}/${tokenBalance}`);
+  };
+
   return (
-    <div className="flex items-center justify-between bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors">
+    <div
+      className="flex items-center justify-between bg-secondary rounded-xl p-4 py-3 cursor-pointer hover:bg-surface-subtle transition-colors"
+      onClick={goToTokenInfo}
+    >
       <div className="flex items-center">
         <div className="flex flex-row items-end justify-end">
           <img
@@ -46,8 +56,12 @@ export default function CryptoCard({ tokenid, chain }: CryptoCardProps) {
             alt={TOKEN_INFO?.name}
             className="w-10 h-10 rounded-full"
           />
-          <span className="bg-white w-5 h-5 -translate-x-3 translate-y-2 rounded-full">
-            <img src={CHAIN_INFO?.icon} alt={chain} className="w-full h-full" />
+          <span className="w-6 h-6 -translate-x-4 translate-y-1 rounded-full">
+            <img
+              src={CHAIN_INFO?.icon}
+              alt={chain}
+              className="w-full h-full rounded-full"
+            />
           </span>
         </div>
 

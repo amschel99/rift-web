@@ -54,7 +54,7 @@ const PriceDisplay: React.FC<{
           {priceChange.usdPriceChangeDisplay}
         </p>
         <p
-          className={`text-sm font-semibold mx-1 rounded-sm py-1 px-1 text-primary ${
+          className={`text-sm font-semibold mx-1 rounded-sm px-3 text-primary ${
             priceChange.isPositive ? "bg-success" : "bg-danger"
           }`}
         >
