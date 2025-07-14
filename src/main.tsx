@@ -10,19 +10,9 @@ import AppShell from "./v2/shell/index.tsx";
 import { Toaster } from "./components/ui/sonner.tsx";
 import { PWAInstallPrompt } from "./components/pwa-install-prompt.tsx";
 import sphere from "./lib/sphere.ts";
+import { enableTelegramMock } from "./development/mock.ts";
 import "./styles/index.scss";
 import "./styles/tailwind.css";
-
-const isRealBrowser = () => {
-  if (typeof window === "undefined") return false;
-
-  if (import.meta.env.MODE === "development") {
-    const testBrowserMode = import.meta.env.VITE_TEST_BROWSER_MODE === "true";
-    return testBrowserMode;
-  }
-
-  return !window.Telegram?.WebApp;
-};
 
 try {
   init();
@@ -35,6 +25,10 @@ try {
 const token = localStorage.getItem("token");
 if (token) {
   sphere.auth.setBearerToken(token);
+}
+
+if (import.meta.env.MODE === "development") {
+  enableTelegramMock();
 }
 
 if (import.meta.env.MODE === "development") {
