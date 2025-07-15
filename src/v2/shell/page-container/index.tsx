@@ -12,6 +12,7 @@ import Profile from "@/v2/pages/profile";
 import Recovery from "@/v2/pages/profile/recovery";
 import AgentPage from "@/v2/pages/agent";
 import TokenInfo from "@/features/token";
+import ReceiveFromAddress from "@/features/receive/address";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -112,6 +113,7 @@ export default function PageContainer() {
         path="/app/token/:tokenId/:chain/:balance"
         element={<TokenInfo />}
       />
+      <Route path="/app/receive/address" element={<ReceiveFromAddress />} />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
     </Routes>
   );

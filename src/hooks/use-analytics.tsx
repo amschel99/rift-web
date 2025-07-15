@@ -6,7 +6,7 @@ type ANALYTIC_EVENT_TYPES =
   | "SIGN_UP"
   | "SIGN_IN"
   | "APP_LAUNCH"
-  | "COPY_REFFERAL"
+  | "COPY_ADDRESS"
   | "OPEN_INTEGRATION"
   | "DEPOSIT"
   | "SEND"

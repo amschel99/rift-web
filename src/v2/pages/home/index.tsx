@@ -3,20 +3,16 @@ import { motion } from "motion/react";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  IoTrashOutline,
-  IoArrowUpCircle,
-  IoArrowDownCircle,
-} from "react-icons/io5";
+import { IoArrowUpCircle, IoArrowDownCircle } from "react-icons/io5";
 import { MdFilterAltOff } from "react-icons/md";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import useChainsBalance from "@/hooks/wallet/use-chains-balances";
 import useAnalaytics from "@/hooks/use-analytics";
 import SendToKnown from "@/features/send/known";
-import ReceiveCrypto from "@/features/receive";
 import RedirectLinks from "@/features/redirectlinks";
 import BuyCrypto from "@/features/buycrypto";
+import { ReceiveDrawer } from "@/features/receive/ReceiveDrawer";
 import {
   Drawer,
   DrawerContent,
@@ -32,8 +28,8 @@ import { Button } from "@/components/ui/button";
 import { formatNumberUsd } from "@/lib/utils";
 import useTokens from "@/hooks/data/use-tokens";
 import useChains from "@/hooks/data/use-chains";
-import { WalletChain } from "@/lib/entities";
 import useChain from "@/hooks/data/use-chain";
+import { WalletChain } from "@/lib/entities";
 
 const filter_schema = z.object({
   filterChainId: z.string().optional(),
@@ -47,6 +43,7 @@ export default function Home() {
   const { data: CHAINS } = useChains();
   const { logEvent } = useAnalaytics();
   const { isOpen, onClose, onOpen, toggle } = useDisclosure();
+  const receive_disclosure = useDisclosure();
 
   const [isRedirectDrawerOpen, setIsRedirectDrawerOpen] = useState(false);
   const [redirectType, setRedirectType] = useState<
@@ -137,7 +134,8 @@ export default function Home() {
           )}
         />
 
-        <ReceiveCrypto
+        <ReceiveDrawer
+          {...receive_disclosure}
           renderTrigger={() => (
             <ActionButton
               icon={<IoArrowDownCircle className="w-6 h-6" />}
