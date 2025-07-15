@@ -164,13 +164,13 @@ export default function BottomTabs() {
   }
 
   return (
-    <div className="flex flex-row items-center justify-center px-5 bg-app-background border-t-1 border-border backdrop-blur-1xl w-full shadow-2xl shadow-surface-subtle fixed bottom-0 pb-4">
+    <div className="w-full fixed bottom-0 pb-4 px-6 bg-app-background border-t-1 border-border backdrop-blur-1xl">
       <Controller
         control={form.control}
         name="tab"
         render={({ field }) => {
           return (
-            <div className="w-full flex flex-row items-center justify-center gap-x-8">
+            <div className="w-full flex flex-row items-center justify-between gap-x-8">
               {tabs.map((tab, idx) => {
                 return (
                   <Fragment key={tab.name + idx}>

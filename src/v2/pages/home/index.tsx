@@ -124,7 +124,7 @@ export default function Home() {
         </h1>
       </div>
 
-      <div className="w-full flex flex-row items-center justify-center gap-3 mb-6">
+      <div className="w-full flex flex-row items-center justify-center gap-3">
         <SendToKnown
           renderTrigger={() => (
             <ActionButton
@@ -154,18 +154,18 @@ export default function Home() {
         />
       </div>
 
-      <div className="flex flex-row items-center justify-between my-2 w-full ">
+      <div className="flex flex-row items-center justify-between mb-3 mt-2 w-full ">
         <div>
           {FILTER_CHAIN_ID !== "" && (
             <motion.div
               key={FILTER_CHAIN_ID}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ ease: "easeInOut" }}
-              className="flex flex-row items-center justify-start gap-1 pr-3 rounded-full border-1 border-secondary"
+              className="flex flex-row items-center justify-start gap-1 "
             >
               <img
-                className="w-10 h-10 rounded-full"
+                className="w-6 h-6 rounded-full"
                 src={SELECTED_CHAIN?.icon}
                 alt={SELECTED_CHAIN?.description}
               />
@@ -244,7 +244,7 @@ export default function Home() {
             <DrawerDescription>Filter tokens by chain</DrawerDescription>
           </DrawerHeader>
 
-          <div className="w-full h-full overflow-y-auto">
+          <div className="w-full h-full overflow-y-auto mt-3">
             <Controller
               control={filter_form.control}
               name="filterChainId"

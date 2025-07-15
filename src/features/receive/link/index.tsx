@@ -48,7 +48,7 @@ function ReceiveFromLinkCtr() {
     <motion.div className="w-full h-full p-4">
       <div className="border-b-1 border-accent -mx-4 pb-2 px-2">
         <h2 className="text-center text-xl font-bold">Sphere Link</h2>
-        <p className="text-center">
+        <p className="text-center text-sm">
           Create a link that lets others transfer tokens to your wallet
         </p>
       </div>

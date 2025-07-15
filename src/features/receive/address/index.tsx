@@ -36,7 +36,7 @@ export default function ReceiveFromAddress() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="w-full h-full p-4"
+      className="w-full p-4"
     >
       <h2 className="text-center text-xl font-bold">Receive Address</h2>
 
@@ -61,10 +61,10 @@ export default function ReceiveFromAddress() {
         </Button>
       </div>
 
-      <p className="mt-6 text-center">
+      <p className="mt-6 text-center text-sm">
         Use your address to receive compatible tokens
       </p>
-      <div className="mt-3 pb-2 flex flex-col w-full border-1 border-surface-subtle rounded-lg">
+      <div className="mt-2 mb-12 pb-2 flex flex-col w-full border-1 border-surface-subtle rounded-lg">
         {COMPATIBLE_TOKENS?.map((_token, idx) => (
           <CompatibleToken
             key={_token?.id}
@@ -119,7 +119,7 @@ const CompatibleToken = (props: {
       <div>
         <span className="font-bold text-sm">{TOKEN?.name}</span>
         <br />
-        <span className="text-text-subtle">{CHAIN?.description}</span>
+        <span className="text-text-subtle text-sm">{CHAIN?.description}</span>
       </div>
     </div>
   );

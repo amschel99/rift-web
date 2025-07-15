@@ -112,8 +112,9 @@ export default function SendRequestLink({
         <div className="w-full flex flex-col items-center p-2 h-[40vh] gap-4">
           <p className="text-center font-semibold">
             Your link was created successfully <br />
-            <span className="text-md font-light">
-              Copy & share it to receive {TOKEN_INFO?.name} in your wallet
+            <span className="text-md font-light text-sm">
+              Copy & share it to receive{" "}
+              <span className="font-semibold">{TOKEN_INFO?.name}</span>
             </span>
           </p>
 

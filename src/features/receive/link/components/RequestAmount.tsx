@@ -75,7 +75,7 @@ export default function RequestAmount() {
       </div>
 
       <div className="flex flex-row items-center justify-center">
-        <div className="min-w-fit min-h-fit flex items-end">
+        <div className="flex flex-row items-end max-w-fit">
           <img
             src={TOKEN_INFO?.icon}
             alt={TOKEN_INFO?.name}
@@ -93,19 +93,17 @@ export default function RequestAmount() {
         control={form.control}
         name="amount"
         render={({ field }) => (
-          <div>
-            <div className="w-full flex flex-row items-center gap-x-2 rounded-[0.75rem] px-3 py-3 bg-transparent">
-              <input
-                className="flex bg-transparent border-none outline-none h-full text-foreground placeholder:text-muted-foreground flex-1 text-center text-3xl font-semibold"
-                placeholder={`1 ${TOKEN_INFO?.name}`}
-                autoFocus
-                inputMode="numeric"
-                onChange={(e) => {
-                  field.onChange(e.target.value);
-                  state?.setValue("requestAmount", e.target.value);
-                }}
-              />
-            </div>
+          <div className="w-full py-3">
+            <input
+              className="flex border-none outline-none w-full text-foreground bg-transparent placeholder:text-muted-foreground flex-1 text-center text-3xl font-semibold"
+              placeholder={`1 ${TOKEN_INFO?.name}`}
+              autoFocus
+              inputMode="numeric"
+              onChange={(e) => {
+                field.onChange(e.target.value);
+                state?.setValue("requestAmount", e.target.value);
+              }}
+            />
 
             <p className="text-center font-semibold">
               {formatNumberUsd(handle_gecko_conversion().convertedAmount || 0)}
