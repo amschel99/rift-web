@@ -29,10 +29,9 @@ export default function TokenRenderer(props: TokenRendererProps) {
       onClick={() => {
         onClick?.(token);
       }}
-      className="flex flex-row items-center justify-between px-4 py-3 rounded-md cursor-pointer active:scale-95 bg-surface-alt w-full"
+      className="flex flex-row items-center justify-between p-2 rounded-[0.75rem] cursor-pointer active:scale-95 bg-secondary hover:bg-surface-subtle w-full"
     >
       <div className="flex flex-row items-center gap-x-2">
-        {/* Token Icon */}
         <div className="flex flex-col items-center justify-center relative">
           <img
             src={token.icon}

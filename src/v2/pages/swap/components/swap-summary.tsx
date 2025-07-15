@@ -138,6 +138,7 @@ export default function SwapSummary() {
           onClick={handleSwap}
           loading={swapMutation.isPending}
           variant={INSUFFICIENT_FUNDS ? "danger" : "secondary"}
+          className="p-[0.625rem]"
         >
           {INSUFFICIENT_FUNDS ? "Insufficient Funds" : "Swap Now"}
         </ActionButton>

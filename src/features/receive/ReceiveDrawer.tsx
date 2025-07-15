@@ -59,7 +59,7 @@ export function ReceiveDrawer(props: Props & ReturnType<typeof useDisclosure>) {
             <span className="font-bold text-lg">Receive</span>
             <br />
             <span className="font-light">
-              Receive funds into your wallet using your Address or Sphere links
+              Receive funds using your Address or Sphere links
             </span>
           </div>
 
@@ -80,16 +80,19 @@ export function ReceiveDrawer(props: Props & ReturnType<typeof useDisclosure>) {
             </p>
           </div>
 
-          <div className="w-full mt-2 border-b-2 border-surface flex flex-row items-center justify-start gap-3 p-2 px-3 cursor-pointer">
+          <div
+            onClick={receiveViaLink}
+            className="w-full mt-2 border-b-2 border-surface flex flex-row items-center justify-start gap-3 p-2 px-3 cursor-pointer"
+          >
             <span className="w-12 h-12 bg-surface-subtle flex flex-row items-center justify-center rounded-md">
               <IoIosLink className="w-6 h-6" />
             </span>
 
             <p>
-              <span className="font-semibold">Links</span>
+              <span className="font-semibold">Link</span>
               <br />
               <span className="text-text-default">
-                Create a link that lets others send you funds
+                Receive funds through a Sphere link
               </span>
             </p>
           </div>
