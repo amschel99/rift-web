@@ -47,9 +47,14 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
     navigate("/app/send/address");
   };
 
-  const sendViaLink = () => {
+  const onSendOpenLink = () => {
     onClose();
-    navigate("/app/receive/link");
+    navigate("/app/send/open-link");
+  };
+
+  const onSendSpecificLink = () => {
+    onClose();
+    // navigate("/app/send/specific-link");
   };
 
   return (
@@ -150,7 +155,10 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
               </span>
             </div>
 
-            <div className="w-full mt-1 border-b-2 border-surface flex flex-row items-center justify-start gap-3 p-2 px-3 cursor-pointer">
+            <div
+              onClick={onSendSpecificLink}
+              className="w-full mt-1 border-b-2 border-surface flex flex-row items-center justify-start gap-3 p-2 px-3 cursor-pointer"
+            >
               <span className="w-12 h-12 bg-surface-subtle flex flex-row items-center justify-center rounded-md">
                 <LiaUserSolid className="w-6 h-6" />
               </span>
@@ -164,7 +172,10 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
               </p>
             </div>
 
-            <div className="w-full mt-1 border-b-2 border-surface flex flex-row items-center justify-start gap-3 p-2 px-3 cursor-pointer">
+            <div
+              onClick={onSendOpenLink}
+              className="w-full mt-1 border-b-2 border-surface flex flex-row items-center justify-start gap-3 p-2 px-3 cursor-pointer"
+            >
               <span className="w-12 h-12 bg-surface-subtle flex flex-row items-center justify-center rounded-md">
                 <TbUserOff className="w-6 h-6" />
               </span>

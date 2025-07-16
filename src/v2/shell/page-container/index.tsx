@@ -15,6 +15,7 @@ import TokenInfo from "@/features/token";
 import ReceiveFromAddress from "@/features/receive/address";
 import ReceiveFromLink from "@/features/receive/link";
 import SendToAddress from "@/features/send/address";
+import SendOpenLink from "@/features/send/openlink";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -118,6 +119,7 @@ export default function PageContainer() {
       <Route path="/app/receive/address" element={<ReceiveFromAddress />} />
       <Route path="/app/receive/link" element={<ReceiveFromLink />} />
       <Route path="/app/send/address" element={<SendToAddress />} />
+      <Route path="/app/send/open-link" element={<SendOpenLink />} />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
     </Routes>
   );

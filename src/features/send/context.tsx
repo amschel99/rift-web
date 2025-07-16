@@ -9,6 +9,7 @@ const send_state = z.object({
   amount: z.string().optional(),
   hash: z.string().optional(),
   recipient: z.string().optional(),
+  linkduration: z.string().optional(),
   mode: z.enum(["send-to-address", "send-specific-link", "send-open-link"]),
   searchfilter: z.string().optional(),
   active: z.enum([
@@ -16,10 +17,6 @@ const send_state = z.object({
     "address-search",
     "user-search",
     "amount-input",
-    "confirm",
-    "success",
-    "error",
-    "processing",
   ]),
   authMethod: z
     .enum(["phone-otp", "email-otp", "external-id-password"])
