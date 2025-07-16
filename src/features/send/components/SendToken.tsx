@@ -5,6 +5,8 @@ import { WalletToken } from "@stratosphere-network/wallet";
 import { useSendContext } from "../context";
 import useTokens from "@/hooks/data/use-tokens";
 import TokenRenderer from "./token-renderer";
+import { FiArrowLeft } from "react-icons/fi";
+import { Button } from "@/components/ui/button";
 
 export default function SendToken() {
   const { switchCurrentStep, state } = useSendContext();
@@ -36,10 +38,14 @@ export default function SendToken() {
     if (send_mode == "send-to-address") {
       switchCurrentStep("address-search");
     } else if (send_mode == "send-specific-link") {
-      switchCurrentStep("user-search");
+      switchCurrentStep("amount-input");
     } else {
       switchCurrentStep("amount-input");
     }
+  };
+
+  const goBack = () => {
+    switchCurrentStep("user-search");
   };
 
   return (
@@ -49,6 +55,22 @@ export default function SendToken() {
       transition={{ duration: 0.2, ease: "easeInOut" }}
       className="space-y-4"
     >
+      {send_mode == "send-specific-link" && (
+        <div>
+          <Button
+            onClick={goBack}
+            variant="ghost"
+            className="w-9 h-9 rounded-full cursor-pointer bg-accent"
+          >
+            <FiArrowLeft className="text-4xl" />
+          </Button>
+
+          <span className="absolute left-1/2 -translate-x-1/2 transform text-xl font-bold capitalize text-center">
+            Choose a Token
+          </span>
+        </div>
+      )}
+
       <div className="w-full flex flex-row items-center gap-x-2 rounded-[0.75rem] px-3 py-3 bg-app-background border-1 border-border">
         <SearchIcon className="text-muted-foreground" size={18} />
         <input

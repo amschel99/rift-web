@@ -54,7 +54,7 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
 
   const onSendSpecificLink = () => {
     onClose();
-    // navigate("/app/send/specific-link");
+    navigate("/app/send/specific-link");
   };
 
   return (

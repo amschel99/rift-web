@@ -42,8 +42,7 @@ export interface WalletSocialProfile {
 
 export interface WalletAddress {
   address: string;
-  chain?: string;
-  type: "telegram-username" | "name-service" | "email" | "externalId";
+  type: "telegram-username" | "email" | "externalId";
   social_profile?: WalletSocialProfile;
   displayName?: string;
 }

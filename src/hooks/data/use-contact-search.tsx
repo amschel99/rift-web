@@ -1,13 +1,10 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { WalletAddress } from "@/lib/entities";
-import { isAddressValid } from "@/utils/address-verifier";
 import sphere from "@/lib/sphere";
 
 interface ContactSearchArgs {
-  // searchQuery?: "address" | "contact";
   searchTerm: string;
-  // chain?: string;
 }
 
 interface ContactData {
@@ -39,7 +36,6 @@ async function getAllContacts(): Promise<ContactData> {
 function contactToWalletAddress(
   contact: string,
   type: WalletAddress["type"]
-  // chain?: string
 ): WalletAddress {
   let displayName = "";
 
@@ -59,7 +55,6 @@ function contactToWalletAddress(
 
   return {
     address: contact,
-    // chain: chain,
     type: type,
     displayName: displayName,
   };
@@ -68,22 +63,12 @@ function contactToWalletAddress(
 function smartSearch(
   contacts: ContactData,
   searchTerm: string
-  // chain?: string,
-  // searchQuery?: "address" | "contact"
 ): WalletAddress[] {
   const trimmedSearch = searchTerm.trim().toLowerCase();
 
   if (!trimmedSearch) return [];
 
   const results: WalletAddress[] = [];
-
-  // if (isAddressValid(trimmedSearch, chain)) {
-  //   results.push({
-  //     address: trimmedSearch,
-  //     chain: chain,
-  //     type: "address",
-  //   });
-  // }
 
   const matchingPhones = contacts.phoneNumbers.filter((phone) =>
     phone.toLowerCase().includes(trimmedSearch)

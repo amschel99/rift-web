@@ -30,7 +30,8 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import ActionButton from "@/components/ui/action-button";
-import SendCollectLink from "../../specificlink/components/SendCollectLink";
+import SendCollectLink from "./SendCollectLink";
+import { shortenString } from "@/lib/utils";
 
 const otpSchema = z.object({
   code: z.string().length(4),
@@ -87,8 +88,9 @@ export default function Confirmation(
   const PASSWORD = password_form.watch("password");
   const TOKEN = state?.getValues("token");
   const CHAIN = state?.getValues("chain");
-  const RECEIVER_ADDRESS = state?.getValues("recipient");
+  const RECEIPIENT = state?.getValues("recipient");
   const AMOUNT = state?.getValues("amount");
+  const CONTACT_METHOD = state?.getValues("contactmethod");
   const DURATION = state?.getValues("linkduration");
 
   const OTP_IS_VALID = otp_form.watch("code")?.trim()?.length == 4;
@@ -98,13 +100,24 @@ export default function Confirmation(
   const { data: CHAIN_INFO } = useChain({ id: CHAIN! });
 
   const on_verify_to_send = () => {
-    const TX_ARGS: CreatePaymentLinkArgs = {
+    let TX_ARGS: CreatePaymentLinkArgs = {
       chain: CHAIN_INFO?.backend_id!,
       token: TOKEN_INFO?.name!,
       amount: AMOUNT!,
       duration: DURATION!,
-      type: "open",
+      type: "specific",
+      recipient: RECEIPIENT!,
     };
+
+    if (CONTACT_METHOD == "email") {
+      TX_ARGS.email = RECEIPIENT;
+    }
+    if (CONTACT_METHOD == "telegram-username") {
+      TX_ARGS.phoneNumber = RECEIPIENT;
+    }
+    if (CONTACT_METHOD == "externalId") {
+      TX_ARGS.externalId = RECEIPIENT;
+    }
 
     if (AUTH_METHOD == "external-id-password") {
       signInMutation
@@ -335,7 +348,8 @@ export default function Confirmation(
               </p>
 
               <p className="font-semibold text-sm text-center w-full">
-                Creating {TOKEN_INFO?.name} link
+                Creating {TOKEN_INFO?.name} link for{" "}
+                {shortenString(RECEIPIENT!)}
               </p>
 
               <p className="text-sm text-center w-full mt-3 font-semibold">

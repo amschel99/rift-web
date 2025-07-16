@@ -8,8 +8,9 @@ import SendToken from "../components/SendToken";
 import SendAmount from "./components/SendAmount";
 import Confirmation from "./components/Confirmation";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
+import UserSearch from "./components/UserSearch";
 
-function SendOpenLinkCtr() {
+function SendSpecificLinkCtr() {
   const navigate = useNavigate();
   const { state, switchCurrentStep } = useSendContext();
   const { userQuery } = useWalletAuth();
@@ -18,6 +19,7 @@ function SendOpenLinkCtr() {
   const SEND_STEP = state?.watch("active");
   const SEND_TOKEN = state?.watch("token");
   const SEND_TOKEN_CHAIN = state?.watch("chain");
+  const RECIPIENT = state?.watch("recipient");
   const SEND_AMOUNT = state?.watch("amount");
 
   const AMOUNT_IS_VALID = useMemo(() => {
@@ -33,6 +35,10 @@ function SendOpenLinkCtr() {
       switchCurrentStep("amount-input");
     }
 
+    if (SEND_STEP == "user-search" && RECIPIENT) {
+      switchCurrentStep("amount-input");
+    }
+
     if (SEND_STEP == "amount-input" && AMOUNT_IS_VALID) {
       confirmation_disclosure.onOpen();
     }
@@ -43,7 +49,8 @@ function SendOpenLinkCtr() {
   };
 
   const _initializeStateValues = useCallback(() => {
-    state?.setValue("mode", "send-open-link");
+    state?.setValue("mode", "send-specific-link");
+    state?.setValue("active", "user-search");
 
     if (userQuery?.data?.externalId) {
       state?.setValue("authMethod", "external-id-password");
@@ -65,12 +72,18 @@ function SendOpenLinkCtr() {
       <div className="w-full fixed top-0 pt-2 bg-surface border-b-1 border-accent -mx-4 pb-2 px-3 z-20">
         <h2 className="text-center text-xl font-bold">Sphere Link</h2>
         <p className="text-center text-sm">
-          Create a link that lets anyone collect crypto to your wallet
+          Create a link that lets others collect crypto to your wallet
         </p>
       </div>
 
       <div className="mt-16 mb-8">
-        {SEND_STEP == "select-token" ? <SendToken /> : <SendAmount />}
+        {SEND_STEP == "select-token" ? (
+          <SendToken />
+        ) : SEND_STEP == "user-search" ? (
+          <UserSearch />
+        ) : (
+          <SendAmount />
+        )}
         <Confirmation {...confirmation_disclosure} />
       </div>
 
@@ -95,10 +108,10 @@ function SendOpenLinkCtr() {
   );
 }
 
-export default function SendOpenLink() {
+export default function SendSpecificLink() {
   return (
     <SendCryptoProvider>
-      <SendOpenLinkCtr />
+      <SendSpecificLinkCtr />
     </SendCryptoProvider>
   );
 }

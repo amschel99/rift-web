@@ -53,18 +53,6 @@ interface payResponse extends PayPaymentRequestResponse {
 async function createPaymentLink(
   args: CreatePaymentLinkArgs
 ): Promise<CreatePaymentLinkResponse> {
-  // const tokens = await getTokens({
-  //   id: args.token,
-  //   chain: args.chain,
-  // });
-
-  // const chain = (await getChains(args?.chain)) as WalletChain | null;
-
-  // const token = tokens?.at(0);
-
-  // if (!token) throw new Error("Token not found");
-  // if (!chain) throw new Error("Chain not found");
-
   const response =
     args.type == "specific"
       ? await sphere.paymentLinks.createSpecificSendLink({

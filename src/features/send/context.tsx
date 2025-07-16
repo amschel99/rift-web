@@ -10,6 +10,7 @@ const send_state = z.object({
   hash: z.string().optional(),
   recipient: z.string().optional(),
   linkduration: z.string().optional(),
+  contactmethod: z.enum(["telegram-username", "email", "externalId"]),
   mode: z.enum(["send-to-address", "send-specific-link", "send-open-link"]),
   searchfilter: z.string().optional(),
   active: z.enum([
