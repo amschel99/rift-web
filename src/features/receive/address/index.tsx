@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { uniqBy } from "lodash";
 import { QRCodeSVG } from "qrcode.react";
 import { BiCopy } from "react-icons/bi";
 import useAnalaytics from "@/hooks/use-analytics";
@@ -18,7 +17,6 @@ export default function ReceiveFromAddress() {
   const { logEvent } = useAnalaytics();
   const { data: SUPPORTED_TOKENS } = useTokens({});
 
-  const COMPATIBLE_TOKENS = uniqBy(SUPPORTED_TOKENS, "id");
   const address = localStorage.getItem("address");
 
   const onCopyAddress = () => {
@@ -65,12 +63,12 @@ export default function ReceiveFromAddress() {
         Use your address to receive compatible tokens
       </p>
       <div className="mt-2 mb-12 pb-2 flex flex-col w-full border-1 border-surface-subtle rounded-lg">
-        {COMPATIBLE_TOKENS?.map((_token, idx) => (
+        {SUPPORTED_TOKENS?.map((_token, idx) => (
           <CompatibleToken
             key={_token?.id}
             tokenId={_token?.id}
             chainId={_token.chain_id}
-            isLast={idx == COMPATIBLE_TOKENS?.length - 1}
+            isLast={idx == SUPPORTED_TOKENS?.length - 1}
           />
         ))}
       </div>
