@@ -7,12 +7,11 @@ import { AiOutlineUser } from "react-icons/ai";
 import { PiDeviceRotate } from "react-icons/pi";
 import { usePlatformDetection } from "@/utils/platform";
 import { useShellContext } from "../shell-context";
-import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 type TSchema = {
-  tab?: "home" | "swap" | "history" | "profile" | "agent";
+  tab?: "home" | "swap" | "history" | "profile" | "explore";
 };
 
 interface Tab {
@@ -26,7 +25,6 @@ interface Tab {
 export default function BottomTabs() {
   const { form } = useShellContext();
   const { isTelegram, telegramUser } = usePlatformDetection();
-  const { userQuery } = useWalletAuth();
 
   const tabs: Array<Tab> = [
     {
@@ -93,7 +91,7 @@ export default function BottomTabs() {
         return (
           <div
             onClick={() => {
-              field.onChange("history");
+              field.onChange("explore");
             }}
             className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
           >

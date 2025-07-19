@@ -18,6 +18,7 @@ import SendToAddress from "@/features/send/address";
 import SendOpenLink from "@/features/send/openlink";
 import SendSpecificLink from "@/features/send/specificlink";
 import BuyCrypto from "@/features/buycrypto";
+import Explore from "@/v2/pages/explore";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -42,7 +43,9 @@ export default function PageContainer() {
   }, [form]);
 
   const RenderScreenWithShell = useCallback(
-    (props: { screen: "home" | "swap" | "history" | "profile" }) => {
+    (props: {
+      screen: "home" | "swap" | "history" | "profile" | "explore";
+    }) => {
       const { screen } = props;
       switch (screen) {
         case "home": {
@@ -70,6 +73,13 @@ export default function PageContainer() {
           return (
             <AuthenticatedShell>
               <Profile />
+            </AuthenticatedShell>
+          );
+        }
+        case "explore": {
+          return (
+            <AuthenticatedShell>
+              <Explore />
             </AuthenticatedShell>
           );
         }
@@ -102,6 +112,10 @@ export default function PageContainer() {
       <Route
         path="/app/profile"
         element={<RenderScreenWithShell screen="profile" />}
+      />
+      <Route
+        path="/app/explore"
+        element={<RenderScreenWithShell screen="explore" />}
       />
       <Route path="/app/agent" element={<Agent />} />
       <Route
