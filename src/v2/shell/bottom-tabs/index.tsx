@@ -2,9 +2,12 @@ import { Fragment, ReactNode } from "react";
 import { Controller, ControllerRenderProps } from "react-hook-form";
 import { GoHomeFill, GoHome } from "react-icons/go";
 import { IoTimeOutline, IoTime } from "react-icons/io5";
-import { CiSearch } from "react-icons/ci";
-import { AiOutlineUser } from "react-icons/ai";
-import { PiDeviceRotate } from "react-icons/pi";
+import { RiSearch2Line, RiSearch2Fill } from "react-icons/ri";
+import { HiOutlineUser, HiMiniUser } from "react-icons/hi2";
+import {
+  MdOutlineSwapHorizontalCircle,
+  MdSwapHorizontalCircle,
+} from "react-icons/md";
 import { usePlatformDetection } from "@/utils/platform";
 import { useShellContext } from "../shell-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,12 +38,12 @@ export default function BottomTabs() {
             onClick={() => {
               field.onChange("home");
             }}
-            className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
+            className="flex flex-row items-center justify-center cursor-pointer active:scale-95 px-2"
           >
             {active ? (
-              <GoHomeFill className="text-3xl text-accent-primary" />
+              <GoHomeFill className="text-[1.75rem] text-accent-primary" />
             ) : (
-              <GoHome className="text-3xl text-accent-foreground/50" />
+              <GoHome className="text-[1.75rem] text-accent-foreground/50" />
             )}
           </div>
         );
@@ -54,14 +57,13 @@ export default function BottomTabs() {
             onClick={() => {
               field.onChange("swap");
             }}
-            className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
+            className="flex flex-row items-center justify-center cursor-pointer active:scale-95 px-2"
           >
-            <PiDeviceRotate
-              className={cn(
-                "text-3xl text-accent-foreground/50",
-                active && "text-accent-primary"
-              )}
-            />
+            {active ? (
+              <MdSwapHorizontalCircle className="text-[1.75rem] text-accent-primary" />
+            ) : (
+              <MdOutlineSwapHorizontalCircle className="text-[1.75rem] text-accent-foreground/50" />
+            )}
           </div>
         );
       },
@@ -74,12 +76,12 @@ export default function BottomTabs() {
             onClick={() => {
               field.onChange("history");
             }}
-            className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
+            className="flex flex-row items-center justify-center cursor-pointer active:scale-95 px-2"
           >
             {active ? (
-              <IoTime className="text-3xl text-accent-primary" />
+              <IoTime className="text-[1.75rem] text-accent-primary" />
             ) : (
-              <IoTimeOutline className="text-3xl text-accent-foreground/50" />
+              <IoTimeOutline className="text-[1.75rem] text-accent-foreground/50" />
             )}
           </div>
         );
@@ -93,14 +95,13 @@ export default function BottomTabs() {
             onClick={() => {
               field.onChange("explore");
             }}
-            className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
+            className="h-full flex flex-row items-center justify-center cursor-pointer active:scale-95 px-2"
           >
-            <CiSearch
-              className={cn(
-                "text-3xl text-accent-foreground/50",
-                active && "text-accent-primary"
-              )}
-            />
+            {active ? (
+              <RiSearch2Fill className="text-[1.75rem] text-accent-primary" />
+            ) : (
+              <RiSearch2Line className="text-[1.75rem] text-accent-foreground/50" />
+            )}
           </div>
         );
       },
@@ -113,7 +114,7 @@ export default function BottomTabs() {
             onClick={() => {
               field.onChange("profile");
             }}
-            className="flex flex-row items-center justify-center pt-3 cursor-pointer active:scale-95"
+            className="flex flex-row items-center justify-center cursor-pointer active:scale-95 px-2"
           >
             {isTelegram ? (
               <Avatar
@@ -129,13 +130,10 @@ export default function BottomTabs() {
                 />
                 <AvatarFallback>{telegramUser?.username}</AvatarFallback>
               </Avatar>
+            ) : active ? (
+              <HiMiniUser className="text-[1.75rem] text-accent-primary" />
             ) : (
-              <AiOutlineUser
-                className={cn(
-                  "text-3xl text-accent-foreground/50",
-                  active && "text-accent-primary"
-                )}
-              />
+              <HiOutlineUser className="text-[1.75rem] text-accent-foreground/50" />
             )}
           </div>
         );
@@ -148,13 +146,13 @@ export default function BottomTabs() {
   }
 
   return (
-    <div className="w-full fixed bottom-0 pb-4 px-6 bg-app-background border-t-1 border-border">
+    <div className="w-full h-14 fixed bottom-0 bg-app-background border-t-1 border-border">
       <Controller
         control={form.control}
         name="tab"
         render={({ field }) => {
           return (
-            <div className="w-full flex flex-row items-center justify-between gap-x-8">
+            <div className="w-full h-full px-6 flex flex-row items-center justify-between gap-x-8">
               {tabs.map((tab, idx) => {
                 return (
                   <Fragment key={tab.name + idx}>

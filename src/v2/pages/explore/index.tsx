@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { motion } from "motion/react";
-import { FiChevronRight } from "react-icons/fi";
 import ChatBot from "../home/components/ChatBot";
 
 export default function Explore() {
@@ -17,6 +16,12 @@ export default function Explore() {
           <span className="text-accent-primary text-sm font-medium">
             See More
           </span>
+        </div>
+
+        <div className="w-full h-20 bg-accent mt-2 rounded-lg">
+          <div className="">
+            <p>Will President William Ruto announce a cabinet reshuffle..</p>
+          </div>
         </div>
       </motion.div>
 

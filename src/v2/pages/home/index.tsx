@@ -5,7 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { IoArrowUpCircle, IoArrowDownCircle } from "react-icons/io5";
-import { PiDeviceRotate } from "react-icons/pi";
+import { MdSwapHorizontalCircle } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { useDisclosure } from "@/hooks/use-disclosure";
@@ -159,7 +159,7 @@ export default function Home() {
           />
 
           <ActionButton
-            icon={<PiDeviceRotate className="w-6 h-6" />}
+            icon={<MdSwapHorizontalCircle className="w-6 h-6" />}
             title="Swap"
             onClick={onSwap}
           />
@@ -171,9 +171,11 @@ export default function Home() {
           />
         </div>
 
-        <div className="flex flex-row items-center justify-between mb-3 mt-2 w-full ">
+        <div className="flex flex-row items-center justify-between my-2 w-full ">
           <div>
-            {FILTER_CHAIN_ID !== "" && (
+            {FILTER_CHAIN_ID == "" ? (
+              <p className="text-sm font-medium">All Chains</p>
+            ) : (
               <motion.div
                 key={FILTER_CHAIN_ID}
                 initial={{ opacity: 0, y: 4 }}

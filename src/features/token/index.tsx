@@ -40,7 +40,7 @@ export default function TokenInfo() {
       initial={{ x: -8, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeInOut" }}
-      className="w-full h-full overflow-y-auto p-4"
+      className="w-full h-full overflow-y-auto p-4 px-2"
     >
       <div className="fixed top-0 left-0 right-0 py-3 bg-surface z-10">
         <Button
@@ -69,7 +69,7 @@ export default function TokenInfo() {
       <TokenDetails tokenID={tokenId} />
 
       <Title title="About" />
-      <p className="text-md font-medium text-text-subtle mx-2">
+      <p className="text-md text-text-subtle mx-2">
         {tokenDetails?.description?.en}
       </p>
 

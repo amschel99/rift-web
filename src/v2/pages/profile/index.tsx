@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { GoCopy } from "react-icons/go";
-import { AiOutlineUser } from "react-icons/ai";
+import { HiMiniUser } from "react-icons/hi2";
 import { IoIosPower } from "react-icons/io";
 import { FaArrowsRotate } from "react-icons/fa6";
 import { MdAlternateEmail } from "react-icons/md";
@@ -86,8 +86,8 @@ export default function Profile() {
             <AvatarFallback>{telegramUser?.username}</AvatarFallback>
           </Avatar>
         ) : (
-          <div className="flex flex-row items-center justify-center border-1 border-accent-primary/25 p-[0.25rem] rounded-full w-30 h-30">
-            <AiOutlineUser className="text-6xl text-accent-secondary" />
+          <div className="flex flex-row items-center justify-center border-1 border-accent-primary/10 p-[0.25rem] rounded-full w-30 h-30">
+            <HiMiniUser className="text-6xl text-accent-primary" />
           </div>
         )}
       </div>
