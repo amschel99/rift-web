@@ -26,6 +26,7 @@ export default function Explore() {
           {MARKETS?.slice(0, 4)?.map((_market, idx) => (
             <MarketPreview
               key={_market?.id + idx}
+              marketsLoading={MARKETS_LOADING}
               marketId={_market?.id}
               isLast={idx == MARKETS?.length - 1}
             />

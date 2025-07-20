@@ -6,9 +6,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface Props {
   marketId: string;
   isLast: boolean;
+  marketsLoading: boolean;
 }
 
-export default function MarketPreview({ marketId, isLast }: Props) {
+export default function MarketPreview({
+  marketId,
+  isLast,
+  marketsLoading,
+}: Props) {
   const { data: MARKET_DATA, isLoading: MARKET_LOADING } = useMarket(marketId);
 
   return (
@@ -20,7 +25,7 @@ export default function MarketPreview({ marketId, isLast }: Props) {
     >
       <div className="flex flex-col">
         <span className="text-sm">
-          {MARKET_LOADING ? (
+          {MARKET_LOADING || marketsLoading ? (
             <Skeleton className="mt-0 w-40 h-4" />
           ) : (
             MARKET_DATA?.question
@@ -28,8 +33,8 @@ export default function MarketPreview({ marketId, isLast }: Props) {
         </span>
 
         <div>
-          {MARKET_LOADING ? (
-            <Skeleton className="mt-0 w-20 h-4" />
+          {MARKET_LOADING || marketsLoading ? (
+            <Skeleton className="mt-1 w-20 h-4" />
           ) : (
             <>
               <span className="w-fit px-2 rounded-full bg-text-subtle/10 font-medium text-xs text-text-subtle">
@@ -44,7 +49,7 @@ export default function MarketPreview({ marketId, isLast }: Props) {
         </div>
       </div>
 
-      {MARKET_LOADING ? (
+      {MARKET_LOADING || marketsLoading ? (
         <Skeleton className="mt-0 w-4 h-4" />
       ) : (
         <IoChevronForwardOutline className="text-xl text-text-subtle" />

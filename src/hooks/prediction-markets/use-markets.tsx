@@ -5,7 +5,7 @@ export const useMarkets = () => {
   return useQuery({
     queryKey: ["markets"],
     queryFn: () => marketsApi.getAll().then((res) => res.data),
-    staleTime: 1000 * 60 * 2,
+    // staleTime: 1000 * 60 * 2,
   });
 };
 
@@ -22,7 +22,7 @@ export const useMarketStats = (id: string) => {
     queryKey: ["market-stats", id],
     queryFn: () => marketsApi.getStats(id).then((res) => res.data),
     enabled: !!id,
-    staleTime: 1000 * 30, // 30 seconds
+    // staleTime: 1000 * 30, // 30 seconds
   });
 };
 
@@ -31,7 +31,7 @@ export const useMarketHistory = (id: string) => {
     queryKey: ["market-history", id],
     queryFn: () => marketsApi.getHistory(id).then((res) => res.data),
     enabled: !!id,
-    staleTime: 1000 * 60, // 1 minute
+    // staleTime: 1000 * 60, // 1 minute
   });
 };
 
@@ -45,7 +45,7 @@ export const useCanEarlyExit = (marketId: string, userAddress?: string) => {
         .canEarlyExit(marketId, userAddress!)
         .then((res) => res.data.data),
     enabled: !!marketId && !!userAddress,
-    staleTime: 1000 * 30, // 30 seconds
+    // staleTime: 1000 * 30, // 30 seconds
   });
 };
 
@@ -57,7 +57,7 @@ export const useEarlyExitValue = (marketId: string, userAddress?: string) => {
         .getEarlyExitValue(marketId, userAddress!)
         .then((res) => res.data.data),
     enabled: !!marketId && !!userAddress,
-    staleTime: 1000 * 30, // 30 seconds
+    // staleTime: 1000 * 30, // 30 seconds
   });
 };
 
@@ -66,7 +66,7 @@ export const useMarketListings = (marketId: string) => {
     queryKey: ["market-listings", marketId],
     queryFn: () => p2pApi.getListings(marketId).then((res) => res.data),
     enabled: !!marketId,
-    staleTime: 1000 * 30, // 30 seconds
+    // staleTime: 1000 * 30, // 30 seconds
   });
 };
 
@@ -84,7 +84,6 @@ export const useStakeMarket = () => {
       amount: string;
     }) => marketsApi.stake(marketId, position, amount),
     onSuccess: () => {
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ["markets"] });
       queryClient.invalidateQueries({ queryKey: ["user-positions"] });
       queryClient.invalidateQueries({ queryKey: ["user-stats"] });
