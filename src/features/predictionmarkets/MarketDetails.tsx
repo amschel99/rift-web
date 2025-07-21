@@ -21,7 +21,8 @@ export default function PredictionMarketDetails() {
   const navigate = useNavigate();
   const { data: MARKET_IFNO, isLoading: MARKET_LOADING } = useMarket(id);
   const { data: PTOP_LISTINGS } = useP2PListings(id);
-  const buymarket_disclosure = useDisclosure();
+  const buy_yes_market_disclosure = useDisclosure();
+  const buy_no_market_disclosure = useDisclosure();
 
   const onGoBack = () => {
     navigate(-1);
@@ -32,7 +33,7 @@ export default function PredictionMarketDetails() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="w-full h-full overflow-y-auto p-4 pt-0 mb-10"
+      className="w-full h-full overflow-y-auto p-4 pt-0 mb-12"
     >
       <Button
         onClick={onGoBack}
@@ -86,7 +87,39 @@ export default function PredictionMarketDetails() {
         </div>
       </div>
 
+      <Title title="Price" ctrClassName="mt-2 mx-0" />
+
       <div className="mt-2 rounded-2xl bg-accent">
+        <div className="border-b-1 border-app-background">
+          <TokenRow
+            title="Yes"
+            value={`${MARKET_IFNO?.metrics?.yesPrice ?? 0} rETH`}
+          />
+        </div>
+
+        <TokenRow
+          title="No"
+          value={`${MARKET_IFNO?.metrics?.noPrice ?? 0} rETH`}
+        />
+      </div>
+
+      <Title title="Outcome" ctrClassName="mt-2 mx-0" />
+
+      <div className="mt-2 rounded-2xl bg-accent">
+        <div className="border-b-1 border-app-background">
+          <TokenRow
+            title="Yes %"
+            value={`${MARKET_IFNO?.metrics?.yesPercentage ?? 0}%`}
+          />
+        </div>
+
+        <div className="border-b-1 border-app-background">
+          <TokenRow
+            title="No %"
+            value={`${MARKET_IFNO?.metrics?.noPercentage ?? 0}%`}
+          />
+        </div>
+
         <TokenRow
           title="Outcome"
           value={
@@ -119,6 +152,7 @@ export default function PredictionMarketDetails() {
         title={`P2P Listings (${PTOP_LISTINGS?.length || 0})`}
         ctrClassName="mt-2 mx-0"
       />
+
       <div className="flex flex-col rounded-2xl bg-accent">
         {PTOP_LISTINGS?.map((_listing, idx) => (
           <div
@@ -138,26 +172,26 @@ export default function PredictionMarketDetails() {
 
       <div className="flex flex-row flex-nowrap gap-3 fixed bottom-0 left-0 right-0 p-4 py-2 border-t-1 border-border bg-app-background">
         <BuyMarket
-          {...buymarket_disclosure}
+          {...buy_yes_market_disclosure}
           marketId={id}
           position="Yes"
           renderTrigger={() => (
             <ActionButton variant="success" className="p-[0.5rem] border-0">
-              Buy Yes
+              Buy Yes {formatFloatNumber(MARKET_IFNO?.metrics?.yesPrice ?? 0)}
             </ActionButton>
           )}
         />
 
         <BuyMarket
-          {...buymarket_disclosure}
+          {...buy_no_market_disclosure}
           marketId={id}
-          position="Yes"
+          position="No"
           renderTrigger={() => (
             <ActionButton
               variant="danger"
               className="p-[0.5rem] font-medium border-0"
             >
-              Buy No
+              Buy No {formatFloatNumber(MARKET_IFNO?.metrics?.noPrice ?? 0)}
             </ActionButton>
           )}
         />

@@ -36,7 +36,7 @@ export default function BuyMarket(
       }}
     >
       <DrawerTrigger asChild>{renderTrigger()}</DrawerTrigger>
-      <DrawerContent className="h-[40vh]">
+      <DrawerContent className="h-[60vh]">
         <DrawerHeader className="hidden">
           <DrawerTitle>Send Crypto</DrawerTitle>
           <DrawerDescription>
@@ -44,7 +44,7 @@ export default function BuyMarket(
           </DrawerDescription>
         </DrawerHeader>
 
-        <div>
+        <div className="p-4">
           <p>
             Buy {position} for market {marketId}
           </p>
