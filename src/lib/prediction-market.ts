@@ -50,6 +50,7 @@ export interface BackendMarket {
     noPercentage: number;
     yesPrice: number;
     noPrice: number;
+    liquidityScore?: string;
     totalStake: number;
     priceDisplay: {
       yes: string;
@@ -81,6 +82,7 @@ export interface Market {
   metrics?: {
     yesPercentage: number;
     noPercentage: number;
+    liquidityScore?: string;
     yesPrice: number;
     noPrice: number;
     totalStake: number;
