@@ -24,6 +24,10 @@ export interface CreatePaymentLinkArgs {
   externalId?: string;
   otpCode?: string;
   password?: string;
+  //
+  recipientPhoneNumber?: string;
+  recipientEmail?: string;
+  recipientExternalId?: string;
 }
 
 interface CreatePaymentLinkResponse {
@@ -62,6 +66,13 @@ async function createPaymentLink(
           time: args.duration,
           token: args.token,
           value: args.amount,
+          ...(args.recipientEmail && { recipientEmail: args.recipientEmail }),
+          ...(args.recipientExternalId && {
+            recipientExternalId: args.recipientExternalId,
+          }),
+          ...(args.recipientPhoneNumber && {
+            recipientPhoneNumber: args.recipientPhoneNumber,
+          }),
           ...(args.phoneNumber && {
             phoneNumber: args.phoneNumber,
             otpCode: args.otpCode,

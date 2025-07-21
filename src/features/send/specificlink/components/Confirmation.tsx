@@ -55,9 +55,9 @@ export default function Confirmation(
   const { isOpen, onOpen, onClose } = props;
   const { state } = useSendContext();
   const { logEvent } = useAnalaytics();
-  const { userQuery, signInMutation } = useWalletAuth();
-  const { requestOTPMutation, verifyOTPMutation } = useOTP();
-  const { requestEmailOTPMutation, verifyEmailOTPMutation } = useEmailOTP();
+  const { userQuery } = useWalletAuth();
+  const { requestOTPMutation } = useOTP();
+  const { requestEmailOTPMutation } = useEmailOTP();
   const { createPaymentLinkMutation } = usePaymentLinks();
 
   const AUTH_METHOD = state?.getValues("authMethod");
@@ -90,7 +90,7 @@ export default function Confirmation(
   const CHAIN = state?.getValues("chain");
   const RECEIPIENT = state?.getValues("recipient");
   const AMOUNT = state?.getValues("amount");
-  const CONTACT_METHOD = state?.getValues("contactmethod");
+  const RECIPIENT_CONTACT_METHOD = state?.getValues("contactmethod");
   const DURATION = state?.getValues("linkduration");
 
   const OTP_IS_VALID = otp_form.watch("code")?.trim()?.length == 4;
@@ -99,7 +99,7 @@ export default function Confirmation(
   const { data: TOKEN_INFO } = useToken({ id: TOKEN, chain: CHAIN });
   const { data: CHAIN_INFO } = useChain({ id: CHAIN! });
 
-  const on_verify_to_send = () => {
+  const on_create_link = () => {
     let TX_ARGS: CreatePaymentLinkArgs = {
       chain: CHAIN_INFO?.backend_id!,
       token: TOKEN_INFO?.name!,
@@ -109,6 +109,15 @@ export default function Confirmation(
       recipient: RECEIPIENT!,
     };
 
+    if (RECIPIENT_CONTACT_METHOD == "email") {
+      TX_ARGS.recipientEmail = RECEIPIENT;
+    }
+    if (RECIPIENT_CONTACT_METHOD == "externalId") {
+      TX_ARGS.recipientExternalId = RECEIPIENT;
+    }
+    if (RECIPIENT_CONTACT_METHOD == "telegram-username") {
+      TX_ARGS.recipientPhoneNumber = RECEIPIENT;
+    }
     if (AUTH_METHOD == "email-otp") {
       TX_ARGS.email = userQuery?.data?.email;
       TX_ARGS.otpCode = OTP;
@@ -122,70 +131,15 @@ export default function Confirmation(
       TX_ARGS.password = PASSWORD;
     }
 
-    if (AUTH_METHOD == "external-id-password") {
-      signInMutation
-        .mutateAsync({
-          externalId: userQuery?.data?.externalId,
-          password: PASSWORD,
-        })
-        .then(() => {
-          console.log("going to creating link now");
-          toast.success("Password verified successfully");
-          steps_form.setValue("currentstep", "processing");
-          createPaymentLinkMutation
-            .mutateAsync(TX_ARGS)
-            .then(() => {
-              console.log("created link successfully");
-              steps_form.setValue("currentstep", "success");
-            })
-            .catch((e) => {
-              console.log("failed to create link because", e);
-              steps_form.setValue("currentstep", "failed");
-            });
-        })
-        .catch(() => {
-          toast.error("Sorry, we couldn't verify it's you, please try again");
-          password_form.reset();
-        });
-    } else if (AUTH_METHOD == "phone-otp") {
-      verifyOTPMutation
-        .mutateAsync({ otp: OTP })
-        .then(() => {
-          toast.success("OTP verified successfully");
-          steps_form.setValue("currentstep", "processing");
-          createPaymentLinkMutation
-            .mutateAsync(TX_ARGS)
-            .then(() => {
-              steps_form.setValue("currentstep", "success");
-            })
-            .catch(() => {
-              steps_form.setValue("currentstep", "failed");
-            });
-        })
-        .catch(() => {
-          toast.error("Sorry, we couldn't verify it's you, please try again");
-          onClose();
-        });
-    } else {
-      verifyEmailOTPMutation
-        .mutateAsync({ otp: OTP })
-        .then(() => {
-          toast.success("OTP verified successfully");
-          steps_form.setValue("currentstep", "processing");
-          createPaymentLinkMutation
-            .mutateAsync(TX_ARGS)
-            .then(() => {
-              steps_form.setValue("currentstep", "success");
-            })
-            .catch(() => {
-              steps_form.setValue("currentstep", "failed");
-            });
-        })
-        .catch(() => {
-          toast.error("Sorry, we couldn't verify it's you, please try again");
-          onClose();
-        });
-    }
+    steps_form.setValue("currentstep", "processing");
+    createPaymentLinkMutation
+      .mutateAsync(TX_ARGS)
+      .then(() => {
+        steps_form.setValue("currentstep", "success");
+      })
+      .catch((e) => {
+        steps_form.setValue("currentstep", "failed");
+      });
   };
 
   const requires_send_otp = useCallback(() => {
@@ -318,15 +272,10 @@ export default function Confirmation(
                 <ActionButton
                   disabled={
                     AUTH_METHOD == "external-id-password"
-                      ? !PASSWORD_IS_VALID || signInMutation.isPending
+                      ? !PASSWORD_IS_VALID
                       : !OTP_IS_VALID
                   }
-                  loading={
-                    signInMutation.isPending ||
-                    verifyOTPMutation.isPending ||
-                    verifyEmailOTPMutation.isPending
-                  }
-                  onClick={on_verify_to_send}
+                  onClick={on_create_link}
                   variant="secondary"
                   className="p-[0.625rem]"
                 >

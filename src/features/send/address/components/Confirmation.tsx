@@ -55,11 +55,10 @@ export default function Confirmation(
   const { isOpen, onOpen, onClose } = props;
   const { state } = useSendContext();
   const { logEvent } = useAnalaytics();
-  const { userQuery, signInMutation } = useWalletAuth();
-  const { requestOTPMutation, verifyOTPMutation } = useOTP();
-  const { requestEmailOTPMutation, verifyEmailOTPMutation } = useEmailOTP();
-  const { sendBaseTransactionMutation, sendTransactionMutation } =
-    useSendTranaction();
+  const { userQuery } = useWalletAuth();
+  const { requestOTPMutation } = useOTP();
+  const { requestEmailOTPMutation } = useEmailOTP();
+  const { sendTransactionMutation } = useSendTranaction();
 
   const AUTH_METHOD = state?.getValues("authMethod");
 
@@ -98,7 +97,7 @@ export default function Confirmation(
   const { data: TOKEN_INFO } = useToken({ id: TOKEN, chain: CHAIN });
   const { data: CHAIN_INFO } = useChain({ id: CHAIN! });
 
-  const on_verify_to_send = () => {
+  const on_send_to_address = () => {
     let TX_ARGS: SendTransactionArgs = {
       token: TOKEN_INFO?.name as TokenSymbol,
       chain: CHAIN_INFO?.backend_id as ChainName,
@@ -123,67 +122,16 @@ export default function Confirmation(
       TX_ARGS.password = PASSWORD;
     }
 
-    if (AUTH_METHOD == "external-id-password") {
-      signInMutation
-        .mutateAsync({
-          externalId: userQuery?.data?.externalId,
-          password: PASSWORD,
-        })
-        .then(() => {
-          toast.success("Password confirmed successfully");
-          steps_form.setValue("currentstep", "processing");
-          sendTransactionMutation
-            .mutateAsync(TX_ARGS)
-            .then(() => {
-              steps_form.setValue("currentstep", "success");
-            })
-            .catch(() => {
-              steps_form.setValue("currentstep", "failed");
-            });
-        })
-        .catch(() => {
-          toast.error("Sorry, we couldn't verify it's you, please try again");
-          password_form.reset();
-        });
-    } else if (AUTH_METHOD == "phone-otp") {
-      verifyOTPMutation
-        .mutateAsync({ otp: OTP })
-        .then(() => {
-          toast.success("OTP verified successfully");
-          steps_form.setValue("currentstep", "processing");
-          sendTransactionMutation
-            .mutateAsync(TX_ARGS)
-            .then(() => {
-              steps_form.setValue("currentstep", "success");
-            })
-            .catch(() => {
-              steps_form.setValue("currentstep", "failed");
-            });
-        })
-        .catch(() => {
-          toast.error("Sorry, we couldn't verify it's you, please try again");
-          onClose();
-        });
-    } else {
-      verifyEmailOTPMutation
-        .mutateAsync({ otp: OTP })
-        .then(() => {
-          toast.success("OTP verified successfully");
-          steps_form.setValue("currentstep", "processing");
-          sendTransactionMutation
-            .mutateAsync(TX_ARGS)
-            .then(() => {
-              steps_form.setValue("currentstep", "success");
-            })
-            .catch(() => {
-              steps_form.setValue("currentstep", "failed");
-            });
-        })
-        .catch(() => {
-          toast.error("Sorry, we couldn't verify it's you, please try again");
-          onClose();
-        });
-    }
+    steps_form.setValue("currentstep", "processing");
+    sendTransactionMutation
+      .mutateAsync(TX_ARGS)
+      .then(() => {
+        steps_form.setValue("currentstep", "success");
+      })
+      .catch((err) => {
+        console.log(err);
+        steps_form.setValue("currentstep", "failed");
+      });
   };
 
   const requires_send_otp = useCallback(() => {
@@ -316,15 +264,10 @@ export default function Confirmation(
                 <ActionButton
                   disabled={
                     AUTH_METHOD == "external-id-password"
-                      ? !PASSWORD_IS_VALID || signInMutation.isPending
+                      ? !PASSWORD_IS_VALID
                       : !OTP_IS_VALID
                   }
-                  loading={
-                    signInMutation.isPending ||
-                    verifyOTPMutation.isPending ||
-                    verifyEmailOTPMutation.isPending
-                  }
-                  onClick={on_verify_to_send}
+                  onClick={on_send_to_address}
                   variant="secondary"
                   className="p-[0.625rem]"
                 >
