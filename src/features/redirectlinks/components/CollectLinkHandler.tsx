@@ -40,6 +40,7 @@ export default function CollectLinkHandler(props: Props) {
     logEvent("PAYMENT_LINK_CLAIMED");
     props.onDismissDrawer();
   };
+
   const onCollectFailure = () => {
     toast.warning("We couldn't process your link, please try again");
     props.onDismissDrawer();
@@ -61,14 +62,14 @@ export default function CollectLinkHandler(props: Props) {
 
   return (
     <div>
-      <p className="text-center">
-        You have received crypto via a Sphere link from{" "}
+      <p className="text-sm text-center">
+        You have received crypto via a Sphere link from&nbsp;
         <span className="font-medium">
           {shortenString(collectobject?.username || "")}
-        </span>{" "}
+        </span>
         <br />
         Click <span className="font-medium">"Receive"</span> to transfer them to
-        your wallet{" "}
+        your wallet&nbsp;
         <span className="font-medium">
           {collectobject?.amount || 0} {collectobject?.token || ""}
         </span>
@@ -81,7 +82,7 @@ export default function CollectLinkHandler(props: Props) {
           className="w-10 h-10 rounded-full object-contain"
         />
 
-        <p className="flex flex-col items-end justify-end font-medium">
+        <p className="text-sm flex flex-col items-end justify-end font-medium">
           {collectobject?.amount}
           <span className="font-normal">
             {formatNumberUsd(convertedAmount || 0)}
@@ -91,9 +92,16 @@ export default function CollectLinkHandler(props: Props) {
 
       <ActionButton
         onClick={onCollect}
+        variant="secondary"
         className="mt-10"
-        disabled={collectFromOpenSendLink.isPending}
-        loading={collectFromOpenSendLink.isPending}
+        disabled={
+          collectFromOpenSendLink.isPending ||
+          collectFromSpecificSendLink.isPending
+        }
+        loading={
+          collectFromOpenSendLink.isPending ||
+          collectFromSpecificSendLink.isPending
+        }
       >
         Receive
       </ActionButton>
