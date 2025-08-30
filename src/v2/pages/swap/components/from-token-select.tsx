@@ -64,7 +64,7 @@ export default function FromTokenSelect(props: Props) {
       {tokensQuery?.data?.length == 0 && (
         <p className="text-sm text-center text-text-subtle mt-16">
           You do not have any tokens on Arbitrum <br />
-          Deposit now to experience gassless swaps
+          Deposit now to experience gasless swaps
         </p>
       )}
 

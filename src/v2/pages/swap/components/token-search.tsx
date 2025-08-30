@@ -6,7 +6,6 @@ import { z } from "zod";
 import useTokens from "@/hooks/data/use-tokens";
 import { useSwap } from "../swap-context";
 import RenderToken from "./render-token";
-import { useMemo } from "react";
 
 const searchSchema = z.object({
   search: z.string(),

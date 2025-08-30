@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import useSwapPairPricing from "@/hooks/data/use-swap-pair-pricing";
 import useSwapFee from "@/hooks/data/use-swap-fee";
@@ -10,11 +10,33 @@ import ActionButton from "@/components/ui/action-button";
 import RenderErrorToast from "@/components/ui/helpers/render-error-toast";
 import RenderSuccessToast from "@/components/ui/helpers/render-success-toast";
 import { formatFloatNumber } from "@/lib/utils";
+import useTransferQuote from "@/hooks/data/use-transfer-quote";
+const BASE_USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+const POLYGON_USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 
 export default function SwapSummary() {
   const swap = useSwap();
   const swapState = swap.state.getValues();
   const swapMutation = useSwapTransaction();
+
+  const { transferQuoteMutation, transferQuotePending, transferQuoteData} = useTransferQuote();
+
+  useEffect(() => {
+    const address = localStorage.getItem("address");
+    if (!address) return;
+    
+    transferQuoteMutation({
+      from_chain: swapState.from_chain,
+      to_chain: swapState.to_chain,
+      from_token: BASE_USDC_ADDRESS,
+      to_token: POLYGON_USDC_ADDRESS,
+      amount: swapState.amount_in,
+      from_address: address,
+      to_address: address,
+      from_amount: swapState.amount_in,
+      order: "FASTEST",
+    });
+  }, [swapState.from_chain, swapState.to_chain, swapState.from_token, swapState.to_token, swapState.amount_in]);
 
   const fromBalanceQuery = useTokenBalance({
     token: swapState.from_token,
@@ -31,12 +53,7 @@ export default function SwapSummary() {
     return (
       (fromBalanceQuery.data?.amount ?? 0) < parseFloat(swapState.amount_in)
     );
-  }, [
-    swapState.amount_in,
-    swapState.from_token,
-    swapState.from_chain,
-    fromBalanceQuery.isLoading,
-  ]);
+  }, [swapState.amount_in, fromBalanceQuery.isLoading, fromBalanceQuery.data]);
 
   const { SELL_TOKEN_PRICE, BUY_TOKEN_PRICE } = useSwapPairPricing({
     from_chain: swapState.from_chain,
@@ -74,13 +91,14 @@ export default function SwapSummary() {
         amount_in: swapState.amount_in,
       },
       {
-        onSuccess(data, variables, context) {
+        onSuccess: () => {
           toast.custom(() => <RenderSuccessToast message="Swap Complete" />, {
             position: "top-center",
             duration: 2000,
           });
         },
-        onError(error, variables, context) {
+        onError(error) {
+          console.error(error)
           toast.custom(() => <RenderErrorToast message="Swap failed" />, {
             position: "top-center",
             duration: 2000,
@@ -89,6 +107,7 @@ export default function SwapSummary() {
       }
     );
   };
+  console.log(transferQuoteData);
 
   return (
     <div className="w-full flex flex-col gap-y-2 flex-1 items-center justify-between">
