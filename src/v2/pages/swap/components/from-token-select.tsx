@@ -6,6 +6,7 @@ import { z } from "zod";
 import RenderToken from "./render-token";
 import { WalletToken } from "@/lib/entities";
 import { useSwap } from "../swap-context";
+import { SUPPORTED_CHAINS } from "@/hooks/data/use-lifi-transfer";
 
 const searchSchema = z.object({
   search: z.string(),
@@ -32,6 +33,22 @@ export default function FromTokenSelect(props: Props) {
   const search = form.watch("search");
 
   const tokensQuery = useOwnedTokens(true);
+
+  // Filter tokens to only show stablecoins on supported chains
+  const filteredTokens = tokensQuery?.data?.filter((token) => {
+    // Only show tokens on supported chains
+    const isSupportedChain = Object.values(SUPPORTED_CHAINS).includes(token.chain_id as "8453" | "137" | "42161" | "80085");
+    if (!isSupportedChain) return false;
+    
+    // Only show stable coins (USDC, USDT)
+    const isStablecoin = token.name === "USDC" || token.name === "USDT";
+    if (!isStablecoin) return false;
+    
+    // Don't show the same token that's selected as "to" token
+    if (token.id == to_token && token.chain_id == to_chain) return false;
+    
+    return true;
+  });
 
   const handleTokenSelect = (token: WalletToken) => {
     onSelect({
@@ -61,18 +78,16 @@ export default function FromTokenSelect(props: Props) {
         />
       </div>
 
-      {tokensQuery?.data?.length == 0 && (
+      {filteredTokens?.length == 0 && (
         <p className="text-sm text-center text-text-subtle mt-16">
-          You do not have any tokens on Arbitrum <br />
-          Deposit now to experience gasless swaps
+          You do not have any stablecoins on supported chains <br />
+          Deposit USDC or USDT to experience cross-chain transfers
         </p>
       )}
 
       <div className="flex flex-col gap-2 mt-9">
-        {tokensQuery?.data
+        {filteredTokens
           ?.filter((token) => {
-            if (token.id == to_token && token.chain_id == to_chain)
-              return false;
             if (search.trim().length == 0) return true;
             if (token.name.toLowerCase()?.includes(search.toLowerCase().trim()))
               return true;

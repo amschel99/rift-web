@@ -3,13 +3,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Search } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import useTokens from "@/hooks/data/use-tokens";
 import { useSwap } from "../swap-context";
 import RenderToken from "./render-token";
+import { SUPPORTED_CHAINS } from "@/hooks/data/use-lifi-transfer";
+import { getTokens } from "@/lib/assets/tokens";
+import { useEffect, useState } from "react";
 
 const searchSchema = z.object({
   search: z.string(),
-  chain: z.string(),
   token: z.string(),
 });
 
@@ -18,6 +19,7 @@ type SEARCH_SCHEMA = z.infer<typeof searchSchema>;
 interface Props {
   onSelect: (data: Omit<SEARCH_SCHEMA, "search">) => void;
 }
+
 
 export default function TokenSearch(props: Props) {
   const { onSelect } = props;
@@ -29,20 +31,30 @@ export default function TokenSearch(props: Props) {
   const form = useForm<SEARCH_SCHEMA>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      chain: "42161", // TODO: default to arbitrum while we wait for cross chain support
       search: "",
       token: "",
     },
   });
 
-  const chain = form.watch("chain");
-  const search = form.watch("search");
-
-  const tokensQuery = useTokens({
-    chain,
-    search,
-    swappable: true,
-  });
+  // Get all tokens directly from the static data
+  const [allTokens, setAllTokens] = useState<WalletToken[]>([]);
+  
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        // Get all tokens and filter for supported chains
+        const tokens = await getTokens();
+        const supportedTokens = tokens.filter((token) => {
+          return Object.values(SUPPORTED_CHAINS).includes(token.chain_id as "8453" | "137" | "42161" | "80085");
+        });
+        setAllTokens(supportedTokens);
+      } catch (error) {
+        console.error("Error fetching tokens:", error);
+      }
+    };
+    
+    fetchTokens();
+  }, []);
 
   function handleTokenSelect(token: WalletToken) {
     form.setValue("token", token.name);
@@ -53,7 +65,6 @@ export default function TokenSearch(props: Props) {
       token: token.id,
     });
   }
-
   return (
     <div className="w-full p-4">
       <div className="flex flex-col w-full h-14 bg-app-background fixed top-0 left-0 p-3 mt-1 z-10 border-b-1 border-border">
@@ -105,13 +116,23 @@ export default function TokenSearch(props: Props) {
       </div>
 
       <div className="flex flex-col gap-2 mt-9">
-        {tokensQuery?.data
-          ?.filter((token) => {
-            if (from_token == token.id && from_chain == token.chain_id)
-              return false;
+        {allTokens
+          ?.filter((token: WalletToken) => {
+            // Only show tokens on supported chains
+            const isSupportedChain = Object.values(SUPPORTED_CHAINS).includes(token.chain_id as "8453" | "137" | "42161" | "80085");
+            if (!isSupportedChain) return false;
+            
+            // Only show stable coins (USDC, USDT)
+            const isStablecoin = token.name === "USDC" || token.name === "USDT";
+            if (!isStablecoin) return false;
+            
+            // Don't show the same token that's selected as "from" token
+            const isSameAsFrom = from_token == token.id && from_chain == token.chain_id;
+            if (isSameAsFrom) return false;
+            
             return true;
           })
-          ?.map((token, idx) => {
+          ?.map((token: WalletToken, idx: number) => {
             return (
               <RenderToken
                 key={token.name + idx}

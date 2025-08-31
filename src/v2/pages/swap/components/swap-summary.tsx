@@ -1,42 +1,52 @@
 import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import useSwapPairPricing from "@/hooks/data/use-swap-pair-pricing";
-import useSwapFee from "@/hooks/data/use-swap-fee";
 import useToken from "@/hooks/data/use-token";
-import useSwapTransaction from "@/hooks/data/use-swap-transaction";
 import useTokenBalance from "@/hooks/data/use-token-balance";
 import { useSwap } from "../swap-context";
 import ActionButton from "@/components/ui/action-button";
 import RenderErrorToast from "@/components/ui/helpers/render-error-toast";
-import RenderSuccessToast from "@/components/ui/helpers/render-success-toast";
 import { formatFloatNumber } from "@/lib/utils";
-import useTransferQuote from "@/hooks/data/use-transfer-quote";
-const BASE_USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-const POLYGON_USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+import useLifiTransfer, { SUPPORTED_CHAINS, STABLECOIN_ADDRESSES } from "@/hooks/data/use-lifi-transfer";
+import useLifiTransaction from "@/hooks/data/use-lifi-transaction";
 
 export default function SwapSummary() {
   const swap = useSwap();
   const swapState = swap.state.getValues();
-  const swapMutation = useSwapTransaction();
+  const { executeTransaction, isExecuting } = useLifiTransaction();
 
-  const { transferQuoteMutation, transferQuotePending, transferQuoteData} = useTransferQuote();
+  const { transferQuoteMutation, transferQuotePending, transferQuoteData } = useLifiTransfer();
 
   useEffect(() => {
     const address = localStorage.getItem("address");
-    if (!address) return;
+    if (!address || !swapState.amount_in || parseFloat(swapState.amount_in) === 0) {
+      swap.state.setValue("amount_out", "0");
+      return;
+    }
+    
+    // Get token addresses for the selected chains
+    const fromChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.from_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
+    const toChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.to_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
+    
+    if (!fromChainName || !toChainName) return;
+    
+    // For now, we'll use USDC for all transfers
+    const fromTokenAddress = STABLECOIN_ADDRESSES[fromChainName]?.USDC;
+    const toTokenAddress = STABLECOIN_ADDRESSES[toChainName]?.USDC;
+    
+    if (!fromTokenAddress || !toTokenAddress) return;
     
     transferQuoteMutation({
       from_chain: swapState.from_chain,
       to_chain: swapState.to_chain,
-      from_token: BASE_USDC_ADDRESS,
-      to_token: POLYGON_USDC_ADDRESS,
+      from_token: fromTokenAddress,
+      to_token: toTokenAddress,
       amount: swapState.amount_in,
       from_address: address,
       to_address: address,
       from_amount: swapState.amount_in,
       order: "FASTEST",
     });
-  }, [swapState.from_chain, swapState.to_chain, swapState.from_token, swapState.to_token, swapState.amount_in]);
+  }, [swapState.from_chain, swapState.to_chain, swapState.from_token, swapState.to_token, swapState.amount_in, swap.state, transferQuoteMutation]);
 
   const fromBalanceQuery = useTokenBalance({
     token: swapState.from_token,
@@ -55,21 +65,17 @@ export default function SwapSummary() {
     );
   }, [swapState.amount_in, fromBalanceQuery.isLoading, fromBalanceQuery.data]);
 
-  const { SELL_TOKEN_PRICE, BUY_TOKEN_PRICE } = useSwapPairPricing({
-    from_chain: swapState.from_chain,
-    to_chain: swapState.to_chain,
-    from_token: swapState.from_token,
-    to_token: swapState.to_token,
-  });
-
-  const buySellTokenEquiv = SELL_TOKEN_PRICE / BUY_TOKEN_PRICE;
-
-  const feeQuery = useSwapFee({
-    from_chain: swapState.from_chain,
-    to_chain: swapState.to_chain,
-    from_token: swapState.from_token,
-    to_token: swapState.to_token,
-  });
+  const exchangeRate = useMemo(() => {
+    if (!transferQuoteData?.transfer) return 0;
+    const fromAmount = parseFloat(transferQuoteData.transfer.from.amountFormatted);
+    const toAmount = parseFloat(transferQuoteData.transfer.to.amountFormatted);
+    
+    if (toAmount > 0) {
+      swap.state.setValue("amount_out", toAmount.toString());
+    }
+    
+    return fromAmount > 0 ? toAmount / fromAmount : 0;
+  }, [transferQuoteData, swap.state]);
 
   const fromTokenDetailsQuery = useToken({
     chain: swapState.from_chain,
@@ -81,31 +87,38 @@ export default function SwapSummary() {
     id: swapState.to_token,
   });
 
-  const handleSwap = async () => {
-    swapMutation.mutate(
-      {
-        from_chain: swapState.from_chain,
-        to_chain: swapState.to_chain,
-        from_token: swapState.from_token,
-        to_token: swapState.to_token,
-        amount_in: swapState.amount_in,
-      },
-      {
-        onSuccess: () => {
-          toast.custom(() => <RenderSuccessToast message="Swap Complete" />, {
-            position: "top-center",
-            duration: 2000,
-          });
-        },
-        onError(error) {
-          console.error(error)
-          toast.custom(() => <RenderErrorToast message="Swap failed" />, {
-            position: "top-center",
-            duration: 2000,
-          });
-        },
-      }
-    );
+  const handleTransfer = async () => {
+    if (!transferQuoteData?.transaction) {
+      toast.custom(() => <RenderErrorToast message="No transfer quote available" />, {
+        position: "top-center",
+        duration: 2000,
+      });
+      return;
+    }
+
+    const address = localStorage.getItem("address");
+    if (!address) {
+      toast.custom(() => <RenderErrorToast message="No wallet address found" />, {
+        position: "top-center",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Get token addresses for approval
+    const fromChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.from_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
+    const fromTokenAddress = fromChainName ? STABLECOIN_ADDRESSES[fromChainName]?.USDC : undefined;
+    
+    // Get approval address from the LiFi response
+    const approvalAddress = (transferQuoteData.rawData as { estimate?: { approvalAddress?: string } })?.estimate?.approvalAddress;
+    
+    executeTransaction({
+      transaction: transferQuoteData.transaction,
+      fromAddress: address,
+      approvalAddress: approvalAddress,
+      tokenAddress: fromTokenAddress,
+      amount: swapState.amount_in,
+    });
   };
   console.log(transferQuoteData);
 
@@ -113,13 +126,13 @@ export default function SwapSummary() {
     <div className="w-full flex flex-col gap-y-2 flex-1 items-center justify-between">
       <div className="flex flex-col w-full px-3 py-2 rounded-lg bg-surface-subtle">
         <div className="flex flex-row items-center justify-between w-full px-2 py-2 border-b border-accent">
-          <p className="font-medium">Pricing</p>
-          {fromTokenDetailsQuery.isLoading || toTokenDetailsQuery.isLoading ? (
+          <p className="font-medium">Exchange Rate</p>
+          {transferQuotePending ? (
             <LoadingPill />
           ) : (
             <p className="text-muted-foreground font-medium">
               1 {fromTokenDetailsQuery?.data?.name} &asymp;{" "}
-              {formatFloatNumber(buySellTokenEquiv ?? 0)}{" "}
+              {formatFloatNumber(exchangeRate)}{" "}
               {toTokenDetailsQuery?.data?.name}
             </p>
           )}
@@ -132,15 +145,14 @@ export default function SwapSummary() {
 
         <div className="flex flex-row items-center justify-between w-full px-2 py-2 border-b border-accent">
           <p className="font-medium">Fees</p>
-          {feeQuery?.isLoading ? (
+          {transferQuotePending ? (
             <LoadingPill />
           ) : (
             <p className="font-medium text-muted-foreground">
-              {Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-                maximumSignificantDigits: 8,
-              }).format(feeQuery?.data?.fee ?? 0)}
+              {transferQuoteData?.transfer?.fees?.totalUSD 
+                ? `$${transferQuoteData.transfer.fees.totalUSD.toFixed(4)}`
+                : "$0.00"
+              }
             </p>
           )}
         </div>
@@ -151,14 +163,15 @@ export default function SwapSummary() {
           disabled={
             INSUFFICIENT_FUNDS ||
             swapState.amount_in == "0" ||
-            swapState.amount_in == ""
+            swapState.amount_in == "" ||
+            !transferQuoteData?.transaction
           }
-          onClick={handleSwap}
-          loading={swapMutation.isPending}
+          onClick={handleTransfer}
+          loading={isExecuting}
           variant={INSUFFICIENT_FUNDS ? "danger" : "secondary"}
           className="p-[0.625rem]"
         >
-          {INSUFFICIENT_FUNDS ? "Insufficient Funds" : "Swap Now"}
+          {INSUFFICIENT_FUNDS ? "Insufficient Funds" : "Transfer Now"}
         </ActionButton>
       </div>
     </div>
@@ -167,6 +180,6 @@ export default function SwapSummary() {
 
 function LoadingPill() {
   return (
-    <div className="flex flex-row items-center w-[100px] h-10 rounded-full bg-surface-alt animate-ping"></div>
+    <div className="flex flex-row items-center w-[50px] md:w-[100px] h-10 rounded-full bg-surface-alt animate-ping"></div>
   );
 }

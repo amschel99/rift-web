@@ -1,0 +1,206 @@
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import RenderErrorToast from "@/components/ui/helpers/render-error-toast";
+import RenderSuccessToast from "@/components/ui/helpers/render-success-toast";
+import sphere from "@/lib/sphere";
+// Note: ChainName needs to be imported differently depending on SDK version
+// Using string literals instead of enum for compatibility
+type SupportedChainName = "BASE" | "POLYGON" | "ARBITRUM" | "BERACHAIN";
+
+interface LifiTransactionArgs {
+  transaction: {
+    to: string;
+    data: string;
+    value: string;
+    gasLimit: string;
+    gasPrice?: string;
+    maxFeePerGas?: string;
+    maxPriorityFeePerGas?: string;
+    chainId: number;
+  };
+  fromAddress: string;
+  approvalAddress?: string;
+  tokenAddress?: string;
+  amount?: string;
+}
+
+const getChainName = (chainId: number): SupportedChainName => {
+  switch (chainId) {
+    case 8453: return "BASE";
+    case 137: return "POLYGON";
+    case 42161: return "ARBITRUM";
+    case 80085: return "BERACHAIN";
+    default: throw new Error(`Unsupported chain ID: ${chainId}`);
+  }
+};
+
+async function handleTokenApproval(
+  chainName: SupportedChainName,
+  tokenAddress: string,
+  spenderAddress: string,
+  amount: string
+): Promise<void> {
+  try {
+    const approveSelector = "0x095ea7b3";
+    
+    const paddedSpender = spenderAddress.slice(2).padStart(64, "0");
+    const paddedAmount = BigInt(amount).toString(16).padStart(64, "0");
+    
+    const data = `${approveSelector}${paddedSpender}${paddedAmount}`;
+    
+    const approvalTx = {
+      to: tokenAddress,
+      value: "0",
+      data: data,
+      gasLimit: "60000",
+      maxFeePerGas: "30000000000", // 30 Gwei
+      maxPriorityFeePerGas: "2000000000", // 2 Gwei
+      type: 2, // EIP-1559
+    };
+
+    console.log("Sending token approval transaction...");
+    const result = await sphere.proxyWallet.sendTransaction({
+      chain: chainName,
+      transactionData: approvalTx,
+    });
+
+    console.log("Token approval successful:", result.hash);
+    
+    toast.custom(() => <RenderSuccessToast message="Token approval successful!" />, {
+      position: "top-center",
+      duration: 2000,
+    });
+
+  } catch (error) {
+    console.error("Token approval failed:", error);
+    toast.custom(() => <RenderErrorToast message="Token approval failed" />, {
+      position: "top-center",
+      duration: 3000,
+    });
+    throw error;
+  }
+}
+
+async function checkNativeBalance(
+  chainName: SupportedChainName,
+  walletAddress: string,
+  estimatedGasCost: string
+): Promise<boolean> {
+  try {
+    const walletInstance = await sphere.proxyWallet.getWalletInstance({
+      chain: chainName,
+    });
+    
+    if (!walletInstance) {
+      throw new Error("Failed to get wallet instance for balance check");
+    }
+
+    // TODO: Implement actual native balance checking
+    
+    console.log("Checking native balance for gas fees...");
+    console.log("Wallet address:", walletAddress);
+    console.log("Estimated gas cost:", estimatedGasCost);
+    console.log("Provider URL:", walletInstance.provider.url);
+    
+    return true;
+  } catch (error) {
+    console.error("Balance check failed:", error);
+    return false;
+  }
+}
+
+export default function useLifiTransaction() {
+  const { mutate: executeTransaction, isPending: isExecuting } = useMutation({
+    mutationFn: async (args: LifiTransactionArgs) => {
+      if (import.meta.env.VITE_TEST === "true") {
+        // Simulate transaction for testing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return { hash: "0x1234567890abcdef", success: true };
+      }
+
+      try {
+        const chainName = getChainName(args.transaction.chainId);
+        
+        console.log("Getting wallet instance...");
+        const walletInstance = await sphere.proxyWallet.getWalletInstance({
+          chain: chainName,
+        });
+        
+        if (!walletInstance) {
+          throw new Error("Failed to get wallet instance");
+        }
+
+        console.log("Wallet instance retrieved:", walletInstance.address);
+
+        const estimatedGasCost = (BigInt(args.transaction.gasLimit) * BigInt(args.transaction.gasPrice || args.transaction.maxFeePerGas || "20000000000")).toString();
+        const hasBalance = await checkNativeBalance(chainName, walletInstance.address, estimatedGasCost);
+        
+        if (!hasBalance) {
+          throw new Error("Insufficient native token balance for gas fees");
+        }
+
+        if (args.approvalAddress && args.tokenAddress && args.amount) {
+          console.log("Handling token approval...");
+          await handleTokenApproval(
+            chainName,
+            args.tokenAddress,
+            args.approvalAddress,
+            args.amount
+          );
+        }
+
+        console.log("Executing LiFi transaction...");
+        const result = await sphere.proxyWallet.sendTransaction({
+          chain: chainName,
+          transactionData: {
+            to: args.transaction.to,
+            data: args.transaction.data,
+            value: args.transaction.value,
+            gasLimit: args.transaction.gasLimit,
+            gasPrice: args.transaction.gasPrice,
+            maxFeePerGas: args.transaction.maxFeePerGas,
+            maxPriorityFeePerGas: args.transaction.maxPriorityFeePerGas,
+            chainId: args.transaction.chainId,
+            type: args.transaction.maxFeePerGas ? 2 : 0, // EIP-1559 vs legacy
+          },
+        });
+
+        console.log("LiFi transaction successful:", result.hash);
+        return { hash: result.hash, success: true };
+        
+      } catch (error) {
+        console.error('LiFi transaction execution error:', error);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      toast.custom(() => <RenderSuccessToast message="Cross-chain transfer initiated successfully!" />, {
+        position: "top-center",
+        duration: 3000,
+      });
+      console.log('LiFi transaction successful:', data.hash);
+    },
+    onError: (error) => {
+      console.error('LiFi transaction error:', error);
+      let errorMessage = "Transfer failed";
+      
+      if (error.message.includes("Insufficient")) {
+        errorMessage = "Insufficient balance for gas fees";
+      } else if (error.message.includes("approval")) {
+        errorMessage = "Token approval failed";
+      } else if (error.message.includes("Unsupported chain")) {
+        errorMessage = "Unsupported blockchain network";
+      }
+      
+      toast.custom(() => <RenderErrorToast message={errorMessage} />, {
+        position: "top-center",
+        duration: 4000,
+      });
+    }
+  });
+
+  return {
+    executeTransaction,
+    isExecuting,
+  };
+}

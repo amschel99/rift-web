@@ -7,7 +7,6 @@ import useToken from "@/hooks/data/use-token";
 import useTokenBalance from "@/hooks/data/use-token-balance";
 import useGeckoPrice from "@/hooks/data/use-gecko-price";
 import useChain from "@/hooks/data/use-chain";
-import useSwapPairPricing from "@/hooks/data/use-swap-pair-pricing";
 import TokenSelect from "./token-select";
 import { cn, formatFloatNumber, formatNumberUsd } from "@/lib/utils";
 
@@ -32,13 +31,6 @@ export default function TokenInput(props: Props) {
     position == "from" ? state.watch("from_chain") : state.watch("to_chain");
   const AMOUNT =
     position == "from" ? state.watch("amount_in") : state.watch("amount_out");
-
-  const { SELL_TOKEN_PRICE, BUY_TOKEN_PRICE } = useSwapPairPricing({
-    from_chain: swapState.from_chain,
-    to_chain: swapState.to_chain,
-    from_token: swapState.from_token,
-    to_token: swapState.to_token,
-  });
 
   const tokenDetailsQuery = useToken({
     chain: CHAIN,
@@ -66,17 +58,14 @@ export default function TokenInput(props: Props) {
         (balanceQuery?.data?.amount ?? parseFloat("0"))
       : true;
 
+  // For LiFi transfers, we don't calculate the output amount here
+  // It will be calculated by the LiFi quote in the swap summary
   useEffect(() => {
-    if (SELL_TOKEN_PRICE && BUY_TOKEN_PRICE) {
-      const buySellTokenEquiv = SELL_TOKEN_PRICE / BUY_TOKEN_PRICE;
-      let inAmount = parseFloat(swapState.amount_in);
-      inAmount = Number.isNaN(inAmount) ? 0 : inAmount;
-      const outAmount = inAmount * (buySellTokenEquiv ?? 0);
-      state.setValue("amount_out", `${outAmount}`);
-    } else {
+    if (position === "to") {
+      // The "to" amount will be set by the LiFi quote
       state.setValue("amount_out", "0");
     }
-  }, [swapState.amount_in]);
+  }, [swapState.amount_in, position]);
 
   return (
     <div className="w-full flex flex-col px-5 py-5 rounded-lg bg-surface-subtle gap-2">
