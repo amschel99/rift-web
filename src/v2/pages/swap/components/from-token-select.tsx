@@ -36,16 +36,7 @@ export default function FromTokenSelect(props: Props) {
 
   // Filter tokens to only show stablecoins on supported chains
   const filteredTokens = tokensQuery?.data?.filter((token) => {
-    // Only show tokens on supported chains
-    const isSupportedChain = Object.values(SUPPORTED_CHAINS).includes(token.chain_id as "8453" | "137" | "42161" | "80085");
-    if (!isSupportedChain) return false;
-    
-    // Only show stable coins (USDC, USDT)
-    const isStablecoin = token.name === "USDC" || token.name === "USDT";
-    if (!isStablecoin) return false;
-    
-    // Don't show the same token that's selected as "to" token
-    if (token.id == to_token && token.chain_id == to_chain) return false;
+   // remove filter for now
     
     return true;
   });

@@ -12,7 +12,8 @@ export const SUPPORTED_CHAINS = {
 
 export const STABLECOIN_ADDRESSES = {
   "base": {
-    "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "USDT": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"  // Base USDT - verified from tokens.ts
   },
   "polygon": {
     "USDC": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
@@ -23,8 +24,8 @@ export const STABLECOIN_ADDRESSES = {
     "USDT": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
   },
   "berachain": {
-    "USDC": "0x549943e04f40284185054145c6E4e9568C1D3241 ",  // TODO: Placeholder - need actual address
-    "USDT": "0xA0CF472E6132F6B822a944f6F31aA7b261c7c375"
+    "USDC": "0x549943e04f40284185054145c6E4e9568C1D3241",  // Berachain USDC.e - verified from tokens.ts
+    "USDT": undefined  // USDT not available on Berachain yet
   }
 } as const;
 

@@ -17,7 +17,7 @@ const searchSchema = z.object({
 type SEARCH_SCHEMA = z.infer<typeof searchSchema>;
 
 interface Props {
-  onSelect: (data: Omit<SEARCH_SCHEMA, "search">) => void;
+  onSelect: (data: { token: string; chain: string }) => void;
 }
 
 
@@ -59,10 +59,9 @@ export default function TokenSearch(props: Props) {
   function handleTokenSelect(token: WalletToken) {
     form.setValue("token", token.name);
 
-    const values = form.getValues();
     onSelect({
-      ...values,
       token: token.id,
+      chain: token.chain_id,
     });
   }
   return (

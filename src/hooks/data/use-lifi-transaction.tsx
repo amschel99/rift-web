@@ -3,9 +3,19 @@ import { toast } from "sonner";
 import RenderErrorToast from "@/components/ui/helpers/render-error-toast";
 import RenderSuccessToast from "@/components/ui/helpers/render-success-toast";
 import sphere from "@/lib/sphere";
-// Note: ChainName needs to be imported differently depending on SDK version
-// Using string literals instead of enum for compatibility
+// Use string literals for chain names to avoid SDK enum issues
 type SupportedChainName = "BASE" | "POLYGON" | "ARBITRUM" | "BERACHAIN";
+
+// Map our chain IDs to chain names
+const getChainName = (chainId: number): SupportedChainName => {
+  switch (chainId) {
+    case 8453: return "BASE";
+    case 137: return "POLYGON";  
+    case 42161: return "ARBITRUM";
+    case 80085: return "BERACHAIN";
+    default: throw new Error(`Unsupported chain ID: ${chainId}`);
+  }
+};
 
 interface LifiTransactionArgs {
   transaction: {
@@ -24,15 +34,7 @@ interface LifiTransactionArgs {
   amount?: string;
 }
 
-const getChainName = (chainId: number): SupportedChainName => {
-  switch (chainId) {
-    case 8453: return "BASE";
-    case 137: return "POLYGON";
-    case 42161: return "ARBITRUM";
-    case 80085: return "BERACHAIN";
-    default: throw new Error(`Unsupported chain ID: ${chainId}`);
-  }
-};
+
 
 async function handleTokenApproval(
   chainName: SupportedChainName,
@@ -41,24 +43,38 @@ async function handleTokenApproval(
   amount: string
 ): Promise<void> {
   try {
+    console.log("Sending token approval using Sphere proxy wallet...");
+    
+    // ERC-20 approve function: approve(address spender, uint256 amount)
     const approveSelector = "0x095ea7b3";
     
-    const paddedSpender = spenderAddress.slice(2).padStart(64, "0");
-    const paddedAmount = BigInt(amount).toString(16).padStart(64, "0");
+    // Use maximum approval to avoid future approvals
+    const maxApproval = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
     
+    // Encode function call data
+    const paddedSpender = spenderAddress.slice(2).padStart(64, "0");
+    const paddedAmount = maxApproval.slice(2).padStart(64, "0");
     const data = `${approveSelector}${paddedSpender}${paddedAmount}`;
     
     const approvalTx = {
       to: tokenAddress,
       value: "0",
       data: data,
-      gasLimit: "60000",
-      maxFeePerGas: "30000000000", // 30 Gwei
-      maxPriorityFeePerGas: "2000000000", // 2 Gwei
-      type: 2, // EIP-1559
+      gasLimit: "100000",
+      gasPrice: "2000000000", // 2 Gwei
+      chainId: chainName === "BASE" ? 8453 : 
+               chainName === "POLYGON" ? 137 : 
+               chainName === "ARBITRUM" ? 42161 : 80085,
+      type: 0, // Legacy transaction
     };
 
-    console.log("Sending token approval transaction...");
+    console.log("Approval transaction details:", {
+      tokenAddress,
+      spenderAddress,
+      chainName,
+      data: data.slice(0, 20) + "..." // Truncate for readability
+    });
+
     const result = await sphere.proxyWallet.sendTransaction({
       chain: chainName,
       transactionData: approvalTx,
@@ -139,17 +155,32 @@ export default function useLifiTransaction() {
           throw new Error("Insufficient native token balance for gas fees");
         }
 
+        // Check if token approval is needed
         if (args.approvalAddress && args.tokenAddress && args.amount) {
-          console.log("Handling token approval...");
-          await handleTokenApproval(
-            chainName,
-            args.tokenAddress,
-            args.approvalAddress,
-            args.amount
-          );
+          console.log("Approval required for:", {
+            tokenAddress: args.tokenAddress,
+            spenderAddress: args.approvalAddress,
+            amount: args.amount
+          });
+          
+          try {
+            console.log("Handling token approval...");
+            await handleTokenApproval(
+              chainName,
+              args.tokenAddress,
+              args.approvalAddress,
+              args.amount
+            );
+          } catch (approvalError) {
+            console.log("Token approval failed, attempting transfer anyway:", approvalError);
+          }
+        } else {
+          console.log("No token approval needed - proceeding directly to transfer");
         }
 
         console.log("Executing LiFi transaction...");
+        
+        // Use Sphere proxy wallet for the LiFi transfer (this was working)
         const result = await sphere.proxyWallet.sendTransaction({
           chain: chainName,
           transactionData: {
@@ -161,7 +192,7 @@ export default function useLifiTransaction() {
             maxFeePerGas: args.transaction.maxFeePerGas,
             maxPriorityFeePerGas: args.transaction.maxPriorityFeePerGas,
             chainId: args.transaction.chainId,
-            type: args.transaction.maxFeePerGas ? 2 : 0, // EIP-1559 vs legacy
+            type: args.transaction.maxFeePerGas ? 2 : 0,
           },
         });
 

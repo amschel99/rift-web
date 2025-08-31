@@ -9,6 +9,13 @@ import { formatFloatNumber } from "@/lib/utils";
 import useLifiTransfer, { SUPPORTED_CHAINS, STABLECOIN_ADDRESSES } from "@/hooks/data/use-lifi-transfer";
 import useLifiTransaction from "@/hooks/data/use-lifi-transaction";
 
+// Helper function to get token type from token ID
+function getTokenType(tokenId: string): "USDC" | "USDT" | null {
+  if (tokenId === "usd-coin") return "USDC";
+  if (tokenId === "tether") return "USDT";
+  return null;
+}
+
 export default function SwapSummary() {
   const swap = useSwap();
   const swapState = swap.state.getValues();
@@ -17,9 +24,18 @@ export default function SwapSummary() {
   const { transferQuoteMutation, transferQuotePending, transferQuoteData } = useLifiTransfer();
 
   useEffect(() => {
+    console.log("🔄 Quote useEffect triggered with:", {
+      from_chain: swapState.from_chain,
+      to_chain: swapState.to_chain,
+      from_token: swapState.from_token,
+      to_token: swapState.to_token,
+      amount_in: swapState.amount_in
+    });
+
     const address = localStorage.getItem("address");
     if (!address || !swapState.amount_in || parseFloat(swapState.amount_in) === 0) {
       swap.state.setValue("amount_out", "0");
+      console.log("❌ Quote skipped: invalid address or amount");
       return;
     }
     
@@ -27,13 +43,52 @@ export default function SwapSummary() {
     const fromChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.from_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
     const toChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.to_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
     
-    if (!fromChainName || !toChainName) return;
+    if (!fromChainName || !toChainName) {
+      console.log("❌ Quote skipped: invalid chain names", { fromChainName, toChainName });
+      return;
+    }
     
-    // For now, we'll use USDC for all transfers
-    const fromTokenAddress = STABLECOIN_ADDRESSES[fromChainName]?.USDC;
-    const toTokenAddress = STABLECOIN_ADDRESSES[toChainName]?.USDC;
+    // Get the actual token types from the user's selection
+    const fromTokenType = getTokenType(swapState.from_token);
+    const toTokenType = getTokenType(swapState.to_token);
     
-    if (!fromTokenAddress || !toTokenAddress) return;
+    if (!fromTokenType || !toTokenType) {
+      console.log("❌ Quote skipped: unsupported token type", { 
+        from: swapState.from_token, 
+        to: swapState.to_token,
+        fromTokenType,
+        toTokenType 
+      });
+      return;
+    }
+    
+    // Get the correct contract addresses based on user's actual selection
+    const fromChainAddresses = STABLECOIN_ADDRESSES[fromChainName];
+    const toChainAddresses = STABLECOIN_ADDRESSES[toChainName];
+    const fromTokenAddress = fromChainAddresses?.[fromTokenType as keyof typeof fromChainAddresses];
+    const toTokenAddress = toChainAddresses?.[toTokenType as keyof typeof toChainAddresses];
+    
+    if (!fromTokenAddress || !toTokenAddress) {
+      console.log("❌ Quote skipped: missing token addresses", { 
+        fromChainName, 
+        toChainName, 
+        fromTokenType, 
+        toTokenType,
+        fromTokenAddress, 
+        toTokenAddress 
+      });
+      return;
+    }
+
+    console.log("✅ Fetching LiFi quote with:", {
+      fromChainName,
+      toChainName,
+      fromTokenType,
+      toTokenType,
+      fromTokenAddress,
+      toTokenAddress,
+      amount: swapState.amount_in
+    });
     
     transferQuoteMutation({
       from_chain: swapState.from_chain,
@@ -107,10 +162,19 @@ export default function SwapSummary() {
 
     // Get token addresses for approval
     const fromChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.from_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
-    const fromTokenAddress = fromChainName ? STABLECOIN_ADDRESSES[fromChainName]?.USDC : undefined;
+    const fromTokenType = getTokenType(swapState.from_token);
+    const fromChainAddresses = fromChainName ? STABLECOIN_ADDRESSES[fromChainName] : undefined;
+    const fromTokenAddress = fromChainAddresses && fromTokenType ? fromChainAddresses[fromTokenType as keyof typeof fromChainAddresses] : undefined;
     
     // Get approval address from the LiFi response
     const approvalAddress = (transferQuoteData.rawData as { estimate?: { approvalAddress?: string } })?.estimate?.approvalAddress;
+    
+    console.log("Transfer execution data:", {
+      approvalAddress,
+      fromTokenAddress,
+      amount: swapState.amount_in,
+      transaction: transferQuoteData.transaction
+    });
     
     executeTransaction({
       transaction: transferQuoteData.transaction,
