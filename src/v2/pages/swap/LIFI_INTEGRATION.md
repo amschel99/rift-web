@@ -4,11 +4,18 @@ This document describes the integration of LiFi Protocol for cross-chain stablec
 
 ## Overview
 
-The swap functionality has been completely rewritten to use LiFi Protocol for secure cross-chain transfers of stablecoins (USDC and USDT) across supported networks:
-- **Base** (8453)
-- **Polygon** (137)
-- **Arbitrum** (42161)
-- **Berachain** (80085)
+The swap functionality has been completely rewritten to use LiFi Protocol for secure cross-chain transfers of stablecoins (USDC and USDT) across supported networks.
+
+### 🎯 **Current Status:**
+- ✅ **Base ↔ Arbitrum**: Fully functional (USDC and USDT transfers working)
+- 🔄 **Polygon**: In development 
+- 🔄 **Berachain**: In development (USDC only - USDT not available)
+
+### 🌐 **Supported Networks:**
+- **Base** (8453) - ✅ Production Ready
+- **Arbitrum** (42161) - ✅ Production Ready  
+- **Polygon** (137) - 🔄 In Testing
+- **Berachain** (80085) - 🔄 In Testing
 
 The integration uses Sphere's **Proxy Wallet Service** for direct blockchain interaction, providing full control over transaction signing, gas management, and smart contract interactions.
 
@@ -45,19 +52,21 @@ VITE_LIFI_API_URL=https://super-straight-forward-swap.onrender.com
 
 ## Supported Token Addresses
 
-### Base (8453)
-- USDC: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`
+### ✅ Base (8453) - Production Ready
+- **USDC**: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` ✅ Verified & Working
+- **USDT**: `0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2` ✅ Verified & Working
 
-### Polygon (137)
-- USDC: `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`
-- USDT: `0xc2132D05D31c914a87C6611C10748AEb04B58e8F`
+### ✅ Arbitrum (42161) - Production Ready
+- **USDC**: `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` ✅ Verified & Working
+- **USDT**: `0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9` ✅ Verified & Working
 
-### Arbitrum (42161)
-- USDC: `0xaf88d065e77c8cC2239327C5EDb3A432268e5831`
-- USDT: `0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9`
+### 🔄 Polygon (137) - In Testing
+- **USDC**: `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359` 🔍 Needs Testing
+- **USDT**: `0xc2132D05D31c914a87C6611C10748AEb04B58e8F` 🔍 Needs Testing
 
-### Berachain (80085)
-- USDC: `0x4200000000000000000000000000000000000006` (Placeholder - needs actual address)
+### 🔄 Berachain (80085) - In Testing  
+- **USDC**: `0x549943e04f40284185054145c6E4e9568C1D3241` 🔍 Needs Testing (USDC.e)
+- **USDT**: ❌ Not Available (not in token list yet)
 
 ## How It Works
 
@@ -187,17 +196,40 @@ try {
 
 ## Future Enhancements
 
+### 🎯 **Immediate Next Steps**
+1. **Polygon Testing**: Verify USDC and USDT transfers work on Polygon
+2. **Berachain Testing**: Test USDC transfers on Berachain  
+3. **Add Berachain USDT**: Research and add USDT support if available
+4. **Remove Debug Logs**: Clean up console.log statements after testing
+
 ### Phase 1 (Short-term)
-1. **Real Balance Checking**: Implement native token balance verification using RPC calls
-2. **Slippage Protection**: Add user-configurable slippage tolerance
-3. **Transaction Status**: Real-time cross-chain transfer status tracking
+5. **Real Balance Checking**: Implement native token balance verification using RPC calls
+6. **Slippage Protection**: Add user-configurable slippage tolerance
+7. **Transaction Status**: Real-time cross-chain transfer status tracking
 
 ### Phase 2 (Medium-term)
-4. **More Stablecoins**: Add support for DAI, FRAX, and other major stablecoins
-5. **More Chains**: Expand to Optimism, BSC, and other L1/L2 networks
-6. **Gas Optimization**: Implement dynamic gas pricing and EIP-1559 support
+8. **More Stablecoins**: Add support for DAI, FRAX, and other major stablecoins
+9. **More Chains**: Expand to Optimism, BSC, and other L1/L2 networks
+10. **Gas Optimization**: Implement dynamic gas pricing and EIP-1559 support
 
 ### Phase 3 (Long-term)
-7. **Batch Transfers**: Support for multiple transfers in a single transaction
-8. **Scheduled Transfers**: Time-based and condition-based transfer execution
-9. **Advanced Routing**: Multi-hop transfers with optimal path finding
+11. **Batch Transfers**: Support for multiple transfers in a single transaction
+12. **Scheduled Transfers**: Time-based and condition-based transfer execution
+13. **Advanced Routing**: Multi-hop transfers with optimal path finding
+
+## 🧪 **Testing Status**
+
+### ✅ **Working Combinations (Verified)**
+- USDC Arbitrum → USDC Base ✅
+- USDT Arbitrum → USDT Base ✅ 
+- USDC Base → USDC Arbitrum ✅
+- USDT Base → USDT Arbitrum ✅
+
+### 🔍 **Need Testing**
+- All Polygon USDC/USDT combinations
+- All Berachain USDC combinations  
+- Cross-network combinations (e.g., Arbitrum USDC → Polygon USDT)
+
+### ❌ **Known Limitations**
+- Berachain USDT transfers (token not available)
+- Any transfers involving chains/tokens not in STABLECOIN_ADDRESSES
