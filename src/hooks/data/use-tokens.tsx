@@ -11,12 +11,7 @@ interface TokenArgs {
 async function _getTokens(args: TokenArgs) {
   const response = await sphere.assets.getAllTokens();
   const token_list = response?.data?.map((d) => d.id);
-  const tokens = await getTokens({
-    list: token_list,
-    chain: args.chain,
-    description: args.search,
-    swappable: args.swappable,
-  });
+  const tokens = await getTokens();
   return tokens;
 }
 
