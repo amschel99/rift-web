@@ -269,6 +269,17 @@ const tokens: Array<WalletToken> = [
     backend_id: "ETHEREUM-DAI",
   },
   {
+    id: "tether",
+    name: "USDT",
+    description: "USDT on Polygon",
+    enabled: true,
+    contract_address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+    chain_id: "137",
+    icon: "https://coin-images.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+    backend_id: "POLYGON-USDT",
+    onramp_id: "POL-USDT",
+  },
+  {
     id: "arbitrum-bridged-wsteth-arbitrum",
     name: "WSTETH",
     description: "Arbitrum Bridged wstETH (Arbitrum)",

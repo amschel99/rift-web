@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
@@ -46,7 +47,7 @@ export default function TokenInput(props: Props) {
     token: TOKEN,
   });
 
-  const { convertedAmount, geckoQuery } = useGeckoPrice({
+  const { convertedAmount } = useGeckoPrice({
     amount: AMOUNT.length > 0 ? parseFloat(AMOUNT) : 0,
     base: "usd",
     token: TOKEN,
@@ -58,8 +59,6 @@ export default function TokenInput(props: Props) {
         (balanceQuery?.data?.amount ?? parseFloat("0"))
       : true;
 
-  // For LiFi transfers, we don't calculate the output amount here
-  // It will be calculated by the LiFi quote in the swap summary
   useEffect(() => {
     if (position === "to") {
       // The "to" amount will be set by the LiFi quote
@@ -101,7 +100,7 @@ export default function TokenInput(props: Props) {
                 <div className="px-2 py-1 rounded-full bg-surface-alt flex flex-row items-center gap-x-2 cursor-pointer">
                   <div className="w-6 h-6 relative">
                     <img
-                      src={tokenDetailsQuery?.data?.icon}
+                      src={tokenDetailsQuery.data?.icon}
                       className="w-6 h-6 rounded-full"
                     />
                     {chainQuery?.data &&

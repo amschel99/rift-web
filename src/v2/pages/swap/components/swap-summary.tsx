@@ -10,9 +10,10 @@ import useLifiTransfer, { SUPPORTED_CHAINS, STABLECOIN_ADDRESSES } from "@/hooks
 import useLifiTransaction from "@/hooks/data/use-lifi-transaction";
 
 // Helper function to get token type from token ID
-function getTokenType(tokenId: string): "USDC" | "USDT" | null {
+function getTokenType(tokenId: string): "USDC" | "USDT" | "USDC.e" | null {
   if (tokenId === "usd-coin") return "USDC";
   if (tokenId === "tether") return "USDT";
+  if (tokenId === "bob-network-bridged-usdce-bob-network") return "USDC.e";
   return null;
 }
 
@@ -24,7 +25,7 @@ export default function SwapSummary() {
   const { transferQuoteMutation, transferQuotePending, transferQuoteData } = useLifiTransfer();
 
   useEffect(() => {
-    console.log("🔄 Quote useEffect triggered with:", {
+    console.log("🔄 Quote triggered with:", {
       from_chain: swapState.from_chain,
       to_chain: swapState.to_chain,
       from_token: swapState.from_token,
@@ -35,7 +36,7 @@ export default function SwapSummary() {
     const address = localStorage.getItem("address");
     if (!address || !swapState.amount_in || parseFloat(swapState.amount_in) === 0) {
       swap.state.setValue("amount_out", "0");
-      console.log("❌ Quote skipped: invalid address or amount");
+      console.log("❌ Quote skipped: invalid user address or amount");
       return;
     }
     
@@ -51,6 +52,8 @@ export default function SwapSummary() {
     // Get the actual token types from the user's selection
     const fromTokenType = getTokenType(swapState.from_token);
     const toTokenType = getTokenType(swapState.to_token);
+    console.log("fromTokenType", fromTokenType);
+    console.log("toTokenType", toTokenType);
     
     if (!fromTokenType || !toTokenType) {
       console.log("❌ Quote skipped: unsupported token type", { 

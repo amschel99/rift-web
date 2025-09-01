@@ -5,8 +5,6 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import RenderToken from "./render-token";
 import { WalletToken } from "@/lib/entities";
-import { useSwap } from "../swap-context";
-import { SUPPORTED_CHAINS } from "@/hooks/data/use-lifi-transfer";
 
 const searchSchema = z.object({
   search: z.string(),
@@ -20,9 +18,7 @@ interface Props {
 
 export default function FromTokenSelect(props: Props) {
   const { onSelect } = props;
-  const { state } = useSwap();
-  const to_token = state.watch("to_token");
-  const to_chain = state.watch("to_chain");
+  
   const form = useForm<SEARCH_SCHEMA>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
@@ -34,10 +30,10 @@ export default function FromTokenSelect(props: Props) {
 
   const tokensQuery = useOwnedTokens(true);
 
-  // Filter tokens to only show stablecoins on supported chains
+  // Filter tokens to only show stable coins on supported chains
   const filteredTokens = tokensQuery?.data?.filter((token) => {
    // remove filter for now
-    
+   
     return true;
   });
 
@@ -90,10 +86,10 @@ export default function FromTokenSelect(props: Props) {
               return true;
             return false;
           })
-          ?.map((token) => {
+          ?.map((token, index) => {
             return (
               <RenderToken
-                key={token.name}
+                key={token.name + index}
                 token={token}
                 onPress={handleTokenSelect}
               />

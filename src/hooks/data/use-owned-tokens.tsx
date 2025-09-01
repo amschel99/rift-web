@@ -34,17 +34,16 @@ export const MOCK_STABLE_COINS: WalletToken[] = [
     icon: "https://coin-images.coingecko.com/coins/images/6319/large/usdc.png?1696506694",
     is_native: false,
   },
-  {
-    id: "usd-coin",
-    name: "USD Coin",
-    description: "USDC on Berachain",
-    enabled: true,
-    contract_address: "0x0000000000000000000000000000000000000000",
-    chain_id: "80085",
-    icon: "https://coin-images.coingecko.com/coins/images/6319/large/usdc.png?1696506694",
-    is_native: false,
-  },
-  
+  // {
+  //   id: "bob-network-bridged-usdce-bob-network",
+  //   name: "USDC.e",
+  //   description: "BOB Network Bridged USDC.E (BOB Network)",
+  //   enabled: true,
+  //   contract_address: "0x549943e04f40284185054145c6E4e9568C1D3241",
+  //   chain_id: "80085",
+  //   icon: "https://coin-images.coingecko.com/coins/images/6319/large/usdc.png?1696506694",
+  //   is_native: false,
+  // },
   {
     id: "tether",
     name: "Tether USD",
@@ -74,17 +73,7 @@ export const MOCK_STABLE_COINS: WalletToken[] = [
     chain_id: "42161",
     icon: "https://coin-images.coingecko.com/coins/images/325/large/Tether.png?1696501661",
     is_native: false,
-  },
-  {
-    id: "tether",
-    name: "Tether USD",
-    description: "USDT on Berachain",
-    enabled: true,
-    contract_address: "0x0000000000000000000000000000000000000000",
-    chain_id: "80085",
-    icon: "https://coin-images.coingecko.com/coins/images/325/large/Tether.png?1696501661",
-    is_native: false,
-  },
+  }
 ];
 
 
@@ -108,6 +97,7 @@ async function getOwnedTokens(args?: Args) {
     list: token_list,
     swappable: args?.is_swappable,
   });
+
   //TODO: return actual_tokens remove this mock
   return MOCK_STABLE_COINS;
 }
