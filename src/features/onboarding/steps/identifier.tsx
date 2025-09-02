@@ -161,7 +161,7 @@ export default function Identifier(props: Props) {
                     <input
                       className="flex bg-transparent border-none outline-none h-full text-foreground placeholder:text-muted-foreground flex-1"
                       placeholder="Search..."
-                      value={PHONE_SEARCH_FILTER ?? ""}
+                      value={PHONE_SEARCH_FILTER || ""}
                       onChange={(e) =>
                         flow.stateControl.setValue(
                           "phonesearchfilter",
@@ -208,7 +208,10 @@ export default function Identifier(props: Props) {
                 type="tel"
                 className="w-full flex flex-row items-center text-sm outline-none px-2 py-3.5"
                 placeholder="000 - 000 - 000"
-                {...field}
+                value={field.value || ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
               />
             );
           }}

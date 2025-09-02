@@ -128,7 +128,7 @@ function RecoveryCtr() {
                       <input
                         className="flex bg-transparent border-none outline-none h-full text-foreground placeholder:text-muted-foreground flex-1"
                         placeholder="Search..."
-                        value={PHONE_SEARCH_FILTER ?? ""}
+                        value={PHONE_SEARCH_FILTER || ""}
                         onChange={(e) =>
                           form.setValue("phonesearchfilter", e.target.value)
                         }
@@ -172,7 +172,10 @@ function RecoveryCtr() {
                   type="tel"
                   className="w-full flex flex-row items-center text-sm outline-none px-2 py-3.5"
                   placeholder="Phone Number"
-                  {...field}
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
                 />
               );
             }}
@@ -189,7 +192,10 @@ function RecoveryCtr() {
               return (
                 <div className="w-full flex flex-row items-center rounded-[0.75rem] px-3 py-4 bg-app-background border-1 border-border mt-2">
                   <input
-                    {...field}
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    name={field.name}
                     type="text"
                     inputMode="email"
                     placeholder="your-email-address@email.com"
