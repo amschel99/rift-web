@@ -56,6 +56,7 @@ export function WalletConnectEventHandler({
   onNewConnection 
 }: WalletConnectEventHandlerProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   const showApprovalPopup = useCallback((requestData: WCRequestData) => {
     // Call the parent handler

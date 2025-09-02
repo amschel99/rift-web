@@ -85,15 +85,9 @@ async function createPaymentLink(
           time: args.duration,
           token: args.token as any,
           value: args.amount,
-          ...(args.phoneNumber && {
-            phoneNumber: args.phoneNumber,
-            otpCode: args.otpCode,
-          }),
-          ...(args.email && { email: args.email, otpCode: args.otpCode }),
-          ...(args.externalId && {
-            externalId: args.externalId,
-            password: args.password,
-          }),
+          // Ensure required fields are provided
+          email: args.email || '',
+          otpCode: args.otpCode || '',
         });
 
   const url = response?.data;
