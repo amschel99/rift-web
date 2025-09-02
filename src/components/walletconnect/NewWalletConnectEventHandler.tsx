@@ -119,11 +119,15 @@ export function WalletConnectEventHandler({
 
     // Basic connection handling
     socketInstance.on('connect', () => {
-      setIsConnected(true);
+      if (import.meta.env.DEV) {
+        console.log('✅ Connected to WalletConnect backend');
+      }
     });
 
     socketInstance.on('disconnect', () => {
-      setIsConnected(false);
+      if (import.meta.env.DEV) {
+        console.log('❌ Disconnected from WalletConnect backend');
+      }
     });
 
     // WalletConnect events
