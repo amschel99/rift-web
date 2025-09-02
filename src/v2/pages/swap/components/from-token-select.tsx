@@ -5,7 +5,6 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import RenderToken from "./render-token";
 import { WalletToken } from "@/lib/entities";
-import { useSwap } from "../swap-context";
 
 const searchSchema = z.object({
   search: z.string(),
@@ -19,9 +18,7 @@ interface Props {
 
 export default function FromTokenSelect(props: Props) {
   const { onSelect } = props;
-  const { state } = useSwap();
-  const to_token = state.watch("to_token");
-  const to_chain = state.watch("to_chain");
+  
   const form = useForm<SEARCH_SCHEMA>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
@@ -32,6 +29,13 @@ export default function FromTokenSelect(props: Props) {
   const search = form.watch("search");
 
   const tokensQuery = useOwnedTokens(true);
+
+  // Filter tokens to only show stable coins on supported chains
+  const filteredTokens = tokensQuery?.data?.filter((token) => {
+   // remove filter for now
+   
+    return true;
+  });
 
   const handleTokenSelect = (token: WalletToken) => {
     onSelect({
@@ -61,18 +65,16 @@ export default function FromTokenSelect(props: Props) {
         />
       </div>
 
-      {tokensQuery?.data?.length == 0 && (
+      {filteredTokens?.length == 0 && (
         <p className="text-sm text-center text-text-subtle mt-16">
-          You do not have any tokens on Arbitrum <br />
-          Deposit now to experience gassless swaps
+          You do not have any stablecoins on supported chains <br />
+          Deposit USDC or USDT to experience cross-chain transfers
         </p>
       )}
 
       <div className="flex flex-col gap-2 mt-9">
-        {tokensQuery?.data
+        {filteredTokens
           ?.filter((token) => {
-            if (token.id == to_token && token.chain_id == to_chain)
-              return false;
             if (search.trim().length == 0) return true;
             if (token.name.toLowerCase()?.includes(search.toLowerCase().trim()))
               return true;
@@ -84,10 +86,10 @@ export default function FromTokenSelect(props: Props) {
               return true;
             return false;
           })
-          ?.map((token) => {
+          ?.map((token, index) => {
             return (
               <RenderToken
-                key={token.name}
+                key={token.name + index}
                 token={token}
                 onPress={handleTokenSelect}
               />

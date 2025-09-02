@@ -8,8 +8,7 @@ import SwapSummary from "./components/swap-summary";
 
 function SwapContent() {
   const { state } = useSwap();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [fromFirst, setFromFirst] = useState(false);
+  const [, setFromFirst] = useState(false);
 
   function handleSwap() {
     const stored = state.getValues();

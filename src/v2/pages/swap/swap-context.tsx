@@ -32,10 +32,10 @@ export default function SwapContextProvider(props: Props) {
     defaultValues: {
       amount_in: "0",
       amount_out: "0",
-      from_token: "ethereum", // these default values should be tokens already owned by the user
-      to_token: "usd-coin",
-      from_chain: "42161", // TODO: arbitrum default while @amschel99 works on cross chain swaps
-      to_chain: "42161",
+      from_token: "usd-coin", // Default to USDC
+      to_token: "usd-coin", // Default to USDC
+      from_chain: "42161", // Default to Arbitrum
+      to_chain: "8453", // Default to Base
     },
   });
 

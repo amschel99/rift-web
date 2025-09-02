@@ -42,9 +42,7 @@ export default function RenderToken(props: Props) {
         </div>
         <div className="flex flex-col ">
           <p className="text-sm font-medium text-white">
-            {token.description?.length > 18
-              ? shortenString(token.description, { leading: 10, trailing: 4 })
-              : token.description}
+            {token.name}
           </p>
           {balanceQuery?.isLoading ? (
             <div className="px-5 py-2 rounded-full w-fit bg-muted-foreground animate-pulse" />

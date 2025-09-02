@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+
 
 export interface WalletIconProps {
   className: string;
