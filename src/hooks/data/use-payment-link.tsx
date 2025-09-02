@@ -85,9 +85,7 @@ async function createPaymentLink(
           time: args.duration,
           token: args.token as any,
           value: args.amount,
-          email: args.email || 'default@example.com',
-          otpCode: args.otpCode || '000000',
-        });
+        } as any);
 
   const url = response?.data;
 
