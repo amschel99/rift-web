@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["rift.png", "icon-192x192.jpg", "icon-512x512.jpg"],
+      includeAssets: ["rift.png"],
       manifest: {
         name: "Rift Payment Solutions",
         short_name: "Rift",
@@ -24,14 +24,14 @@ export default defineConfig({
         start_url: "/",
         icons: [
           {
-            src: "icon-192x192.jpg",
+            src: "rift.png",
             sizes: "192x192",
-            type: "image/jpeg",
+            type: "image/png",
           },
           {
-            src: "icon-512x512.jpg",
+            src: "rift.png",
             sizes: "512x512",
-            type: "image/jpeg",
+            type: "image/png",
           },
         ],
         shortcuts: [
@@ -42,7 +42,7 @@ export default defineConfig({
             url: "/app",
             icons: [
               {
-                src: "icon-192x192.jpg",
+                src: "rift.png",
                 sizes: "192x192",
               },
             ],
@@ -54,7 +54,7 @@ export default defineConfig({
             url: "/app/swap",
             icons: [
               {
-                src: "icon-192x192.jpg",
+                src: "rift.png",
                 sizes: "192x192",
               },
             ],
@@ -66,7 +66,7 @@ export default defineConfig({
             url: "/app/history",
             icons: [
               {
-                src: "icon-192x192.jpg",
+                src: "rift.png",
                 sizes: "192x192",
               },
             ],
@@ -78,7 +78,7 @@ export default defineConfig({
             url: "/app/oo",
             icons: [
               {
-                src: "icon-192x192.jpg",
+                src: "rift.png",
                 sizes: "192x192",
               },
             ],

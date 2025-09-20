@@ -74,7 +74,7 @@ export const PWAInstallPrompt: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-            Install Sphere Wallet
+            Install Rift
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
             Add to your home screen for quick access
