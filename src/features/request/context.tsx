@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import { CreateInvoiceRequest } from "@/hooks/data/use-create-invoice";
 
 export type RequestStep = "amount" | "description" | "sharing";
+export type RequestType = "request" | "topup";
 
 interface RequestContextType {
   currentStep: RequestStep;
@@ -11,6 +12,8 @@ interface RequestContextType {
   updateRequestData: (updates: Partial<CreateInvoiceRequest>) => void;
   createdInvoice: any;
   setCreatedInvoice: (invoice: any) => void;
+  requestType: RequestType;
+  setRequestType: (type: RequestType) => void;
 }
 
 const RequestContext = createContext<RequestContextType | undefined>(undefined);
@@ -26,6 +29,7 @@ export function RequestProvider({ children }: RequestProviderProps) {
     token: "USDC",
   });
   const [createdInvoice, setCreatedInvoice] = useState<any>(null);
+  const [requestType, setRequestType] = useState<RequestType>("request");
 
   const updateRequestData = (updates: Partial<CreateInvoiceRequest>) => {
     setRequestData(prev => ({ ...prev, ...updates }));
@@ -41,6 +45,8 @@ export function RequestProvider({ children }: RequestProviderProps) {
         updateRequestData,
         createdInvoice,
         setCreatedInvoice,
+        requestType,
+        setRequestType,
       }}
     >
       {children}

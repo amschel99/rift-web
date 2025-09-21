@@ -205,8 +205,7 @@ export default function HistoryTabs({
       {/* Action Buttons - Show only in simple mode */}
       {!isAdvancedMode && (
         <div className="w-full mb-6">
-          {/* First row */}
-          <div className="w-full flex flex-row items-center justify-center gap-2 mb-3">
+          <div className="w-full flex flex-row items-center justify-center gap-2">
             <ActionButton
               icon={<IoWalletOutline className="w-5 h-5" />}
               title="Withdraw"

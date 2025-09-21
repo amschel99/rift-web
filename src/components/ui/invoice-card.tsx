@@ -2,12 +2,15 @@ import { formatDistanceToNow } from "date-fns";
 import { Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Invoice } from "@/hooks/data/use-invoices";
+import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
 
 interface InvoiceCardProps {
   invoice: Invoice;
 }
 
 export default function InvoiceCard({ invoice }: InvoiceCardProps) {
+  const { data: balanceData } = useBaseUSDCBalance();
+  
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Link copied to clipboard");
@@ -15,6 +18,20 @@ export default function InvoiceCard({ invoice }: InvoiceCardProps) {
 
   const openInvoiceUrl = () => {
     window.open(invoice.url, '_blank');
+  };
+
+  // Convert USDC amount to KES using exchange rate
+  const getDisplayAmount = () => {
+    const usdcAmount = Number(invoice.amount || 0);
+    const exchangeRate = balanceData?.exchangeRate || 0;
+    
+    if (exchangeRate > 0) {
+      const kesAmount = usdcAmount * exchangeRate;
+      return `KSh ${kesAmount.toLocaleString()}`;
+    }
+    
+    // Fallback to USDC if no exchange rate
+    return `${usdcAmount.toFixed(2)} ${invoice.token}`;
   };
 
   return (
@@ -31,11 +48,11 @@ export default function InvoiceCard({ invoice }: InvoiceCardProps) {
       </div>
 
       <div className="flex justify-between items-center">
-               <div className="flex-1">
-                 <p className="text-sm font-semibold text-text-default">
-                   {Number(invoice.amount || 0).toFixed(2)} {invoice.token}
-                 </p>
-               </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-text-default">
+            {getDisplayAmount()}
+          </p>
+        </div>
         <div className="flex gap-1 ml-2">
           <button
             onClick={() => copyToClipboard(invoice.url)}

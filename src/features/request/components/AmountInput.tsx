@@ -7,16 +7,27 @@ import ActionButton from "@/components/ui/action-button";
 
 export default function AmountInput() {
   const navigate = useNavigate();
-  const { updateRequestData, setCurrentStep } = useRequest();
+  const { updateRequestData, setCurrentStep, requestType } = useRequest();
   const [kesAmount, setKesAmount] = useState("");
 
   const handleNext = () => {
     if (!kesAmount || parseFloat(kesAmount) <= 0) return;
     
-    updateRequestData({
-      amount: parseFloat(kesAmount),
-    });
-    setCurrentStep("description");
+    if (requestType === "topup") {
+      // For top-ups, skip description and go straight to creating the invoice
+      updateRequestData({
+        amount: parseFloat(kesAmount),
+        description: "Rift wallet top-up",
+      });
+      // We'll handle the invoice creation in the sharing options component
+      setCurrentStep("sharing");
+    } else {
+      // For requests, go to description step
+      updateRequestData({
+        amount: parseFloat(kesAmount),
+      });
+      setCurrentStep("description");
+    }
   };
 
   const isValidAmount = kesAmount && parseFloat(kesAmount) > 0;
@@ -36,14 +47,21 @@ export default function AmountInput() {
         >
           <FiArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold">Request Payment</h1>
+        <h1 className="text-xl font-semibold">
+          {requestType === "topup" ? "Top Up Account" : "Request Payment"}
+        </h1>
       </div>
 
       {/* Amount Input */}
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-medium mb-2">Enter Amount</h2>
-          <p className="text-text-subtle">How much do you want to request?</p>
+          <p className="text-text-subtle">
+            {requestType === "topup" 
+              ? "How much do you want to add to your account?" 
+              : "How much do you want to request?"
+            }
+          </p>
         </div>
 
         <div className="w-full max-w-sm">

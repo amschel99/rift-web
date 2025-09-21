@@ -8,7 +8,7 @@ import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
 
 export default function DescriptionInput() {
-  const { requestData, updateRequestData, setCurrentStep, setCreatedInvoice } = useRequest();
+  const { requestData, updateRequestData, setCurrentStep, setCreatedInvoice, requestType } = useRequest();
   const [description, setDescription] = useState("");
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
@@ -104,20 +104,29 @@ export default function DescriptionInput() {
         >
           <FiArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold">Request Payment</h1>
+        <h1 className="text-xl font-semibold">
+          {requestType === "topup" ? "Top Up Account" : "Request Payment"}
+        </h1>
       </div>
 
       {/* Description Input */}
       <div className="flex-1 flex flex-col">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-medium mb-2">Add Description</h2>
-          <p className="text-text-subtle">What is this payment for?</p>
+          <p className="text-text-subtle">
+            {requestType === "topup" 
+              ? "What is this top-up for?" 
+              : "What is this payment for?"
+            }
+          </p>
         </div>
 
         {/* Amount Summary */}
         <div className="bg-surface-subtle rounded-lg p-4 mb-6">
           <div className="text-center">
-            <p className="text-text-subtle text-sm">Requesting</p>
+            <p className="text-text-subtle text-sm">
+              {requestType === "topup" ? "Adding to account" : "Requesting"}
+            </p>
             <p className="text-2xl font-bold">KSh {(requestData.amount || 0).toLocaleString()}</p>
           </div>
         </div>

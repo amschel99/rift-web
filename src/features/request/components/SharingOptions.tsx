@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { FiArrowLeft, FiCopy, FiPhone, FiCheck, FiShare2, FiX, FiCreditCard } from "react-icons/fi";
 import { toast } from "sonner";
@@ -6,11 +6,12 @@ import { useNavigate } from "react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { useRequest } from "../context";
 import ActionButton from "@/components/ui/action-button";
+import useCreateInvoice from "@/hooks/data/use-create-invoice";
 import rift from "@/lib/rift";
 
 export default function SharingOptions() {
   const navigate = useNavigate();
-  const { createdInvoice } = useRequest();
+  const { createdInvoice, requestType, requestData, setCreatedInvoice } = useRequest();
   const [copied, setCopied] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [sendingToPhone, setSendingToPhone] = useState(false);
@@ -18,9 +19,74 @@ export default function SharingOptions() {
   const [mpesaNumber, setMpesaNumber] = useState("");
   const [sendingMpesaPrompt, setSendingMpesaPrompt] = useState(false);
   const [showMpesaDrawer, setShowMpesaDrawer] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [creatingInvoice, setCreatingInvoice] = useState(false);
+  const createInvoiceMutation = useCreateInvoice();
+
+  // Auto-create invoice for top-ups when component mounts
+  useEffect(() => {
+    const createInvoiceForTopup = async () => {
+      // Only create invoice if it's a top-up and no invoice exists yet
+      if (requestType === "topup" && !createdInvoice && !creatingInvoice) {
+        setCreatingInvoice(true);
+        
+        try {
+          // Fetch exchange rate
+          const authToken = localStorage.getItem("token");
+          if (!authToken) {
+            throw new Error("No authentication token found");
+          }
+          
+          rift.setBearerToken(authToken);
+          
+          const exchangeResponse = await rift.offramp.previewExchangeRate({
+            currency: "KES" as any
+          });
+          
+          setExchangeRate(exchangeResponse.rate);
+          
+          // Convert KES amount to USD using the fetched exchange rate
+          const kesAmount = requestData.amount || 0;
+          const usdAmount = kesAmount / exchangeResponse.rate;
+
+          const invoiceRequest = {
+            ...requestData,
+            amount: usdAmount, // Send USD amount to API
+            description: requestData.description || "Rift wallet top-up",
+          } as any;
+
+          const response = await createInvoiceMutation.mutateAsync(invoiceRequest);
+          
+          // Store both KES and USD amounts for display purposes
+          const invoiceWithKes = {
+            ...response,
+            kesAmount: kesAmount, // Store original KES amount for display
+          };
+          
+          setCreatedInvoice(invoiceWithKes);
+          toast.success("Top-up link created successfully!");
+        } catch (error) {
+          console.error("Error creating top-up invoice:", error);
+          toast.error("Failed to create top-up link. Please try again.");
+          // Go back to amount step on error
+          navigate("/app/request?type=topup");
+        } finally {
+          setCreatingInvoice(false);
+        }
+      }
+    };
+
+    createInvoiceForTopup();
+  }, [requestType, createdInvoice, creatingInvoice, requestData, createInvoiceMutation, setCreatedInvoice, navigate]);
 
   const handleBack = () => {
-    navigate("/app");
+    if (requestType === "topup") {
+      // For top-ups, go back to amount step
+      navigate("/app/request?type=topup");
+    } else {
+      // For requests, go back to home
+      navigate("/app");
+    }
   };
 
   const handleCopyUrl = async () => {
@@ -279,10 +345,15 @@ export default function SharingOptions() {
   };
 
 
-  if (!createdInvoice) {
+  if (!createdInvoice || creatingInvoice) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <p>Loading...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary mx-auto mb-4"></div>
+          <p className="text-text-subtle">
+            {requestType === "topup" ? "Creating top-up link..." : "Loading..."}
+          </p>
+        </div>
       </div>
     );
   }
@@ -302,7 +373,9 @@ export default function SharingOptions() {
         >
           <FiArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold">Payment Request Created</h1>
+        <h1 className="text-xl font-semibold">
+          {requestType === "topup" ? "Top-Up Link Created" : "Payment Request Created"}
+        </h1>
       </div>
 
       {/* Success Message */}
@@ -310,14 +383,23 @@ export default function SharingOptions() {
         <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
           <FiCheck className="w-5 h-5 text-white" />
         </div>
-        <h2 className="text-lg font-medium mb-1">Request Created!</h2>
-        <p className="text-text-subtle text-xs">Share this payment request with your client</p>
+        <h2 className="text-lg font-medium mb-1">
+          {requestType === "topup" ? "Top-Up Link Ready!" : "Request Created!"}
+        </h2>
+        <p className="text-text-subtle text-xs">
+          {requestType === "topup" 
+            ? "Use this link to add funds to your account" 
+            : "Share this payment request with your client"
+          }
+        </p>
       </div>
 
       {/* Request Summary & QR Code - Combined */}
       <div className="bg-surface-subtle rounded-lg p-4 mb-4">
         <div className="text-center mb-3">
-          <p className="text-xs text-text-subtle">Requesting</p>
+          <p className="text-xs text-text-subtle">
+            {requestType === "topup" ? "Adding to account" : "Requesting"}
+          </p>
           <p className="text-lg font-bold">KSh {(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()}</p>
           <p className="text-xs text-text-subtle mt-1">{createdInvoice.description}</p>
         </div>
@@ -486,7 +568,7 @@ export default function SharingOptions() {
               <div className="space-y-4">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
                   <p className="text-sm text-green-800">
-                    <strong>M-Pesa Prompt:</strong> Customer will receive a payment request directly on their phone to pay KSh {(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()}.
+                    <strong>M-Pesa Prompt:</strong> The owner of the M-Pesa number will receive a payment request directly on their phone to pay KSh {(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()}.
                   </p>
                 </div>
                 

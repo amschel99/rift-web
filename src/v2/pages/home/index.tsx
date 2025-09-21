@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
-import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline } from "react-icons/io5";
+import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline, IoEyeOutline, IoEyeOffOutline, IoAddCircleOutline } from "react-icons/io5";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
 import useAnalaytics from "@/hooks/use-analytics";
@@ -38,6 +38,9 @@ export default function Home() {
 
   // Advanced mode state
   const { isAdvanced, setIsAdvanced } = useAdvancedMode();
+
+  // Balance visibility state
+  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
   // Simple mode data
   const { data: INVOICES, isLoading: INVOICES_LOADING } = useInvoices({ 
@@ -150,13 +153,42 @@ export default function Home() {
       >
         {/* Balance Section with margin */}
         <div className="text-center mt-6 mb-8">
-          <h1 className="text-4xl mb-2">
-            {BASE_USDC_LOADING ? (
-              <span className="animate-pulse">Loading...</span>
-            ) : (
-              `${selectedCurrency.symbol} ${(BASE_USDC_BALANCE?.kesAmount ?? 0).toFixed(2)}`
-            )}
-          </h1>
+          <div className="flex items-center justify-center gap-3">
+            <h1 className="text-4xl mb-2">
+              {BASE_USDC_LOADING ? (
+                <span className="animate-pulse">Loading...</span>
+              ) : isBalanceVisible ? (
+                `${selectedCurrency.symbol} ${(BASE_USDC_BALANCE?.kesAmount ?? 0).toFixed(2)}`
+              ) : (
+                `${selectedCurrency.symbol} ****`
+              )}
+            </h1>
+            <button
+              onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+              className="p-2 hover:bg-surface-subtle rounded-full transition-colors"
+              title={isBalanceVisible ? "Hide balance" : "Show balance"}
+            >
+              {isBalanceVisible ? (
+                <IoEyeOutline className="w-5 h-5 text-text-subtle" />
+              ) : (
+                <IoEyeOffOutline className="w-5 h-5 text-text-subtle" />
+              )}
+            </button>
+          </div>
+          
+          {/* Top Up Button - Integrated with balance */}
+          <div className="mt-4">
+            <button
+              onClick={() => {
+                logEvent("TOPUP_BUTTON_CLICKED");
+                navigate("/app/request?type=topup");
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+            >
+              <IoAddCircleOutline className="w-4 h-4" />
+              Top Up
+            </button>
+          </div>
         </div>
 
         {/* Action Buttons - Show only in advanced mode */}
@@ -202,21 +234,22 @@ export default function Home() {
               <ActionButton
                 icon={<IoReceiptOutline className="w-5 h-5" />}
                 title="Request"
-                className="w-[30%]"
+                className="w-[45%]"
                 onClick={() => {
                   logEvent("REQUEST_BUTTON_CLICKED");
-                  navigate("/app/request");
+                  navigate("/app/request?type=request");
                 }}
               />
 
               <ActionButton
                 icon={<IoCashOutline className="w-5 h-5" />}
                 title="Pay"
-                className="w-[30%]"
+                className="w-[45%]"
+                onClick={() => {
+                  logEvent("PAY_BUTTON_CLICKED");
+                  navigate("/app/pay");
+                }}
               />
-              
-              {/* Empty space to balance the layout */}
-              <div className="w-[30%]"></div>
             </div>
           </div>
         )}
@@ -240,7 +273,7 @@ export default function Home() {
             }}
             onRequestClick={() => {
               logEvent("REQUEST_BUTTON_CLICKED");
-              navigate("/app/request");
+              navigate("/app/request?type=request");
             }}
             onPayClick={() => {
               logEvent("PAY_BUTTON_CLICKED");

@@ -1,10 +1,20 @@
-import { RequestProvider, useRequest } from "./context";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router";
+import { RequestProvider, useRequest, RequestType } from "./context";
 import AmountInput from "./components/AmountInput";
 import DescriptionInput from "./components/DescriptionInput";
 import SharingOptions from "./components/SharingOptions";
 
 function RequestContainer() {
-  const { currentStep } = useRequest();
+  const { currentStep, setRequestType } = useRequest();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const type = searchParams.get('type') as RequestType;
+    if (type === 'request' || type === 'topup') {
+      setRequestType(type);
+    }
+  }, [searchParams, setRequestType]);
 
   const renderCurrentStep = () => {
     switch (currentStep) {
