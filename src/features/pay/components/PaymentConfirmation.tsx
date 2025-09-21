@@ -258,7 +258,7 @@ export default function PaymentConfirmation() {
       <div className="mt-auto">
         <ActionButton
           onClick={handleConfirmPayment}
-          disabled={loadingRate || (paymentData.amount && paymentData.amount > availableForPayment)}
+          disabled={loadingRate || !!(paymentData.amount && paymentData.amount > availableForPayment)}
           loading={paymentMutation.isPending || loadingRate}
           className="w-full"
         >
