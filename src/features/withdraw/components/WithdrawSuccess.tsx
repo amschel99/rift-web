@@ -15,7 +15,7 @@ export default function WithdrawSuccess() {
 
   const handleViewHistory = () => {
     resetWithdraw();
-    navigate("/app/history");
+    navigate("/app");
   };
 
   return (
@@ -82,7 +82,7 @@ export default function WithdrawSuccess() {
           onClick={handleViewHistory}
           className="w-full bg-surface-subtle text-text-subtle"
         >
-          View Transaction History
+          View Withdrawals
         </ActionButton>
       </div>
     </motion.div>

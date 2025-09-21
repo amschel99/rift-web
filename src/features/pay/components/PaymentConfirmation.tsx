@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { usePay } from "../context";
 import usePayment from "@/hooks/data/use-payment";
+import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
+import useWithdrawalFee from "@/hooks/data/use-withdrawal-fee";
 import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
 
@@ -15,6 +17,20 @@ export default function PaymentConfirmation() {
   const [loadingRate, setLoadingRate] = useState(true);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const paymentMutation = usePayment();
+  
+  // Get user's balance
+  const { data: balanceData } = useBaseUSDCBalance();
+  const kesBalance = balanceData?.kesAmount || 0;
+  
+  // Fetch withdrawal fee for the payment amount
+  const { data: feeData } = useWithdrawalFee(
+    paymentData.amount || 0,
+    !!(paymentData.amount && paymentData.amount > 0)
+  );
+  
+  // Calculate available balance after fee
+  const withdrawalFee = feeData?.fee || 0;
+  const availableForPayment = Math.max(0, kesBalance - withdrawalFee);
 
   // Fetch exchange rate on component mount
   useEffect(() => {
@@ -52,6 +68,13 @@ export default function PaymentConfirmation() {
   const handleConfirmPayment = async () => {
     if (!exchangeRate || !paymentData.amount || !paymentData.recipient) {
       toast.error("Missing payment information");
+      return;
+    }
+
+    // Check if user has sufficient balance after fee
+    const paymentAmount = paymentData.amount;
+    if (paymentAmount > availableForPayment) {
+      toast.error(`Insufficient balance. You can pay up to KSh ${availableForPayment.toLocaleString()} (after FX spread).`);
       return;
     }
 
@@ -197,8 +220,33 @@ export default function PaymentConfirmation() {
             </div>
           </div>
 
+          {/* Balance Information */}
+          <div className="pt-4 border-t border-surface space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-text-subtle text-sm">Your Balance</span>
+              <span className="text-sm">KSh {kesBalance.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-text-subtle text-sm">FX Spread</span>
+              <span className="text-sm text-orange-600">-KSh {withdrawalFee.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Available for Payment</span>
+              <span className="text-sm font-bold text-green-600">KSh {availableForPayment.toLocaleString()}</span>
+            </div>
+          </div>
+
         </div>
       </div>
+
+      {/* Insufficient Balance Warning */}
+      {paymentData.amount && paymentData.amount > availableForPayment && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+          <p className="text-sm text-red-700 dark:text-red-300">
+            ⚠️ Insufficient balance. You need KSh {paymentData.amount.toLocaleString()} but only have KSh {availableForPayment.toLocaleString()} available after FX spread.
+          </p>
+        </div>
+      )}
 
       {/* Warning */}
       <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6">
@@ -210,11 +258,13 @@ export default function PaymentConfirmation() {
       <div className="mt-auto">
         <ActionButton
           onClick={handleConfirmPayment}
-          disabled={loadingRate}
+          disabled={loadingRate || (paymentData.amount && paymentData.amount > availableForPayment)}
           loading={paymentMutation.isPending || loadingRate}
           className="w-full"
         >
-          {loadingRate ? "Loading..." : "Confirm & Pay"}
+          {loadingRate ? "Loading..." : 
+           (paymentData.amount && paymentData.amount > availableForPayment) ? "Insufficient Balance" : 
+           "Confirm & Pay"}
         </ActionButton>
       </div>
     </motion.div>

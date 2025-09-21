@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft, FiAlertCircle } from "react-icons/fi";
 import { useNavigate } from "react-router";
@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useWithdraw } from "../context";
 import useUser from "@/hooks/data/use-user";
 import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
+import useWithdrawalFee from "@/hooks/data/use-withdrawal-fee";
 import ActionButton from "@/components/ui/action-button";
 
 export default function WithdrawAmountInput() {
@@ -20,15 +21,25 @@ export default function WithdrawAmountInput() {
 
   // Get KES balance directly from useBaseUSDCBalance (same as homepage)
   const kesBalance = balanceData?.kesAmount || 0;
+  
+  // Fetch withdrawal fee for the entered amount
+  const { data: feeData, isLoading: feeLoading } = useWithdrawalFee(
+    parseFloat(kesAmount) || 0,
+    !!kesAmount && parseFloat(kesAmount) > 0
+  );
+  
+  // Calculate available balance after fee
+  const withdrawalFee = feeData?.fee || 0;
+  const availableForWithdrawal = Math.max(0, kesBalance - withdrawalFee);
 
   const handleAmountChange = (value: string) => {
     const numericValue = parseFloat(value);
     
     // Allow empty input or valid numbers
     if (value === "" || !isNaN(numericValue)) {
-      // If there's a balance limit, don't allow typing beyond it
-      if (kesBalance && numericValue > kesBalance) {
-        toast.error(`Maximum withdrawal amount is KSh ${kesBalance.toLocaleString()}`);
+      // If there's a balance limit, don't allow typing beyond available amount after fee
+      if (availableForWithdrawal && numericValue > availableForWithdrawal) {
+        toast.error(`Maximum withdrawal amount is KSh ${availableForWithdrawal.toLocaleString()} (after FX spread)`);
         return;
       }
       setKesAmount(value);
@@ -43,14 +54,14 @@ export default function WithdrawAmountInput() {
       return;
     }
     
-    if (amount < 50) {
-      toast.error("Minimum withdrawal amount is KSh 50");
+    if (amount < 30) {
+      toast.error("Minimum withdrawal amount is KSh 30");
       return;
     }
     
-    // Check if user has sufficient KES balance
-    if (kesBalance && amount > kesBalance) {
-      toast.error(`Insufficient balance. You have KSh ${kesBalance.toLocaleString()} available.`);
+    // Check if user has sufficient KES balance after fee
+    if (availableForWithdrawal && amount > availableForWithdrawal) {
+      toast.error(`Insufficient balance. You can withdraw up to KSh ${availableForWithdrawal.toLocaleString()} (after FX spread).`);
       return;
     }
     
@@ -63,7 +74,7 @@ export default function WithdrawAmountInput() {
     toast.info("Please setup your withdrawal account in profile settings");
   };
 
-  const isValidAmount = kesAmount && parseFloat(kesAmount) >= 50;
+  const isValidAmount = kesAmount && parseFloat(kesAmount) >= 30;
 
   if (!hasPaymentAccount) {
     return (
@@ -158,8 +169,8 @@ export default function WithdrawAmountInput() {
 
         {/* Quick Amount Buttons */}
         <div className="grid grid-cols-3 gap-2 mb-8">
-          {[50, 100, 500, 1000, 2000, 5000]
-            .filter(amount => !kesBalance || amount <= kesBalance) // Only show amounts within balance
+          {[30, 100, 500, 1000, 2000, 5000]
+            .filter(amount => !availableForWithdrawal || amount <= availableForWithdrawal) // Only show amounts within available balance after fee
             .map((amount) => (
             <button
               key={amount}
@@ -171,21 +182,49 @@ export default function WithdrawAmountInput() {
           ))}
           
           {/* Add "Max" button if balance is available and not already in the list */}
-          {kesBalance && kesBalance > 50 && ![50, 100, 500, 1000, 2000, 5000].includes(Math.floor(kesBalance)) && (
+          {availableForWithdrawal && availableForWithdrawal > 30 && ![30, 100, 500, 1000, 2000, 5000].includes(Math.floor(availableForWithdrawal)) && (
             <button
-              onClick={() => setKesAmount(Math.floor(kesBalance).toString())}
+              onClick={() => setKesAmount(Math.floor(availableForWithdrawal).toString())}
               className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-lg hover:bg-accent-primary/20 transition-colors text-sm font-medium text-accent-primary"
             >
-              Max: KSh {Math.floor(kesBalance).toLocaleString()}
+              Max: KSh {Math.floor(availableForWithdrawal).toLocaleString()}
             </button>
           )}
         </div>
 
-        {/* Minimum Amount Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-6">
-          <p className="text-sm text-blue-700 dark:text-blue-300">
-            ℹ️ Minimum withdrawal amount is KSh 50
-          </p>
+        {/* Balance and Fee Information */}
+        <div className="space-y-3 mb-6">
+          {/* Available Balance */}
+          <div className="bg-surface-subtle rounded-lg p-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-text-subtle">Total Balance</span>
+              <span className="text-sm font-medium">KSh {kesBalance.toLocaleString()}</span>
+            </div>
+            
+            {kesAmount && parseFloat(kesAmount) > 0 && (
+              <>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-text-subtle">FX Spread</span>
+                  <span className="text-sm text-orange-600">
+                    {feeLoading ? "Loading..." : `-KSh ${withdrawalFee.toLocaleString()}`}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-surface">
+                  <span className="text-sm font-medium text-text-default">Available to Withdraw</span>
+                  <span className="text-sm font-bold text-green-600">
+                    KSh {availableForWithdrawal.toLocaleString()}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+          
+          {/* Minimum Amount Notice */}
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              ℹ️ Minimum withdrawal amount is KSh 30
+            </p>
+          </div>
         </div>
       </div>
 
