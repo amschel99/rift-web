@@ -10,6 +10,7 @@ import { Toaster } from "./components/ui/sonner.tsx";
 import { PWAInstallPrompt } from "./components/pwa-install-prompt.tsx";
 import { WalletConnectSocketProvider } from "./hooks/walletconnect/use-walletconnect-socket.tsx";
 import { WalletConnectUserProvider } from "./components/walletconnect/WalletConnectUserProvider.tsx";
+import MaintenanceMode from "./components/MaintenanceMode.tsx";
 import rift from "./lib/rift.ts";
 import "./styles/index.scss";
 import "./styles/tailwind.css";
@@ -43,15 +44,17 @@ const queryclient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryclient}>
-      <BrowserRouter>
-        <WalletConnectUserProvider>
-          <AppShell />
-        </WalletConnectUserProvider>
-      </BrowserRouter>
+    <MaintenanceMode>
+      <QueryClientProvider client={queryclient}>
+        <BrowserRouter>
+          <WalletConnectUserProvider>
+            <AppShell />
+          </WalletConnectUserProvider>
+        </BrowserRouter>
 
-      <Toaster />
-      <PWAInstallPrompt />
-    </QueryClientProvider>
+        <Toaster />
+        <PWAInstallPrompt />
+      </QueryClientProvider>
+    </MaintenanceMode>
   </StrictMode>
 );
