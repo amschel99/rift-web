@@ -10,7 +10,14 @@ interface WithdrawalCardProps {
 export default function WithdrawalCard({ order }: WithdrawalCardProps) {
   const copyTransactionCode = () => {
     navigator.clipboard.writeText(order.transactionCode);
-    toast.success("Transaction code copied to clipboard");
+    toast.success("Transaction code copied!");
+  };
+
+  const copyMpesaCode = () => {
+    if (order.receipt_number) {
+      navigator.clipboard.writeText(order.receipt_number);
+      toast.success("M-Pesa code copied!");
+    }
   };
 
   return (
@@ -29,24 +36,41 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
         </div>
       </div>
 
-      <div className="flex justify-between items-center">
-               <div className="flex-1">
-                 <p className="text-sm font-semibold text-text-default">
-                   KSh {Number(order.amount || 0).toFixed(2)}
-                 </p>
-          <p className="text-xs text-text-subtle truncate">
+      <div className="space-y-2">
+        {/* Amount */}
+        <p className="text-sm font-semibold text-text-default">
+          KSh {Number(order.amount || 0).toFixed(2)}
+        </p>
+        
+        {/* Transaction Code */}
+        <div className="flex justify-between items-center">
+          <p className="text-xs text-text-subtle truncate flex-1">
             {order.transactionCode}
           </p>
-        </div>
-        <div className="ml-2">
           <button
             onClick={copyTransactionCode}
-            className="p-1 text-xs bg-surface hover:bg-surface-alt rounded transition-colors"
+            className="ml-2 p-1 text-xs bg-surface hover:bg-surface-alt rounded transition-colors"
             title="Copy Transaction Code"
           >
             <Copy className="w-3 h-3" />
           </button>
         </div>
+
+        {/* M-Pesa Receipt Number (if available) */}
+        {order.receipt_number && (
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-text-subtle truncate flex-1">
+              M-Pesa: {order.receipt_number}
+            </p>
+            <button
+              onClick={copyMpesaCode}
+              className="ml-2 text-xs text-accent-primary hover:text-accent-secondary transition-colors"
+              title="Copy M-Pesa Code"
+            >
+              Copy
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

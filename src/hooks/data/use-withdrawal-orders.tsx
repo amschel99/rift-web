@@ -7,6 +7,7 @@ export interface OfframpOrder {
   transactionCode: string;
   amount: number;
   createdAt: string;
+  receipt_number?: string | null;
 }
 
 async function getWithdrawalOrders(): Promise<OfframpOrder[]> {
