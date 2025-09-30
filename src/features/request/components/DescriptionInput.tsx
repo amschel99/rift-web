@@ -8,13 +8,20 @@ import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
 
 export default function DescriptionInput() {
-  const { requestData, updateRequestData, setCurrentStep, setCreatedInvoice, requestType } = useRequest();
+  const {
+    requestData,
+    updateRequestData,
+    setCurrentStep,
+    setCreatedInvoice,
+    requestType,
+  } = useRequest();
   const [description, setDescription] = useState("");
-  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [sellingRate, setSellingRate] = useState<number | null>(null);
+  const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
   const createInvoiceMutation = useCreateInvoice();
 
-  // Fetch exchange rate on component mount
+  // Fetch exchange rate on component mount (use .selling_rate for invoice/onramp)
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
@@ -22,19 +29,20 @@ export default function DescriptionInput() {
         if (!authToken) {
           throw new Error("No authentication token found");
         }
-        
+
         rift.setBearerToken(authToken);
-        
-        // Get exchange rate for KES
+
         const response = await rift.offramp.previewExchangeRate({
-          currency: "KES" as any
+          currency: "KES" as any,
         });
-        
-        setExchangeRate(response.rate);
+
+        setSellingRate(response.selling_rate); // Use .selling_rate for invoice/onramp
+        setWithdrawalRate(response.rate); // Use .rate to show how much they'll receive
       } catch (error) {
         console.error("Error fetching exchange rate:", error);
         // Fallback to approximate rate if API fails
-        setExchangeRate(136); // Approximate 136 KES = 1 USD
+        setSellingRate(136); // Approximate 136 KES = 1 USD
+        setWithdrawalRate(136);
         toast.warning("Using approximate exchange rate");
       } finally {
         setLoadingRate(false);
@@ -54,15 +62,16 @@ export default function DescriptionInput() {
       return;
     }
 
-    if (!exchangeRate) {
+    if (!sellingRate || !withdrawalRate) {
       toast.error("Exchange rate not loaded. Please try again.");
       return;
     }
 
     try {
-      // Convert KES amount to USD using the fetched exchange rate
+      // Convert KES amount to USD using the selling rate
       const kesAmount = requestData.amount || 0;
-      const usdAmount = kesAmount / exchangeRate;
+      const usdAmount = kesAmount / sellingRate;
+      const receiveAmount = usdAmount * withdrawalRate;
 
       const invoiceRequest = {
         ...requestData,
@@ -71,13 +80,14 @@ export default function DescriptionInput() {
       } as any;
 
       const response = await createInvoiceMutation.mutateAsync(invoiceRequest);
-      
+
       // Store both KES and USD amounts for display purposes
       const invoiceWithKes = {
         ...response,
         kesAmount: kesAmount, // Store original KES amount for display
+        receiveAmount: receiveAmount, // Amount user will actually receive
       };
-      
+
       setCreatedInvoice(invoiceWithKes);
       setCurrentStep("sharing");
       toast.success("Payment request created successfully!");
@@ -114,10 +124,9 @@ export default function DescriptionInput() {
         <div className="text-center mb-8">
           <h2 className="text-2xl font-medium mb-2">Add Description</h2>
           <p className="text-text-subtle">
-            {requestType === "topup" 
-              ? "What is this top-up for?" 
-              : "What is this payment for?"
-            }
+            {requestType === "topup"
+              ? "What is this top-up for?"
+              : "What is this payment for?"}
           </p>
         </div>
 
@@ -127,15 +136,30 @@ export default function DescriptionInput() {
             <p className="text-text-subtle text-sm">
               {requestType === "topup" ? "Adding to account" : "Requesting"}
             </p>
-            <p className="text-2xl font-bold">KSh {(requestData.amount || 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold">
+              KSh {(requestData.amount || 0).toLocaleString()}
+            </p>
+            {sellingRate && withdrawalRate && (
+              <div className="mt-3 pt-3 border-t border-surface">
+                <p className="text-xs text-text-subtle mb-1">
+                  You will receive
+                </p>
+                <p className="text-lg font-semibold text-green-600">
+                  KSh{" "}
+                  {(
+                    ((requestData.amount || 0) / sellingRate) *
+                    withdrawalRate
+                  ).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-text-subtle mt-1">in your wallet</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Description Input */}
         <div className="mb-8">
-          <label className="block text-sm font-medium mb-2">
-            Description
-          </label>
+          <label className="block text-sm font-medium mb-2">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -160,7 +184,7 @@ export default function DescriptionInput() {
               "Consultation fee",
               "Event ticket",
               "Subscription payment",
-              "Other"
+              "Other",
             ].map((option) => (
               <button
                 key={option}

@@ -28,9 +28,9 @@ export default function WithdrawConfirmation() {
 
     // Check if user has sufficient balance
     const kesAmount = withdrawData.amount;
-    const usdAmount = kesAmount / balanceData.exchangeRate;
+    const usdAmount = Math.floor(kesAmount / balanceData.exchangeRate);
     const availableKesBalance = balanceData.kesAmount || 0;
-    
+
     if (kesAmount > availableKesBalance) {
       toast.error("Insufficient balance for this withdrawal");
       return;
@@ -54,12 +54,11 @@ export default function WithdrawConfirmation() {
 
       console.log("Creating withdrawal order:", withdrawalRequest);
       const response = await createOrderMutation.mutateAsync(withdrawalRequest);
-      
+
       console.log("Withdrawal order response:", response);
       setCreatedOrder(response.order);
       setCurrentStep("success");
       toast.success("Withdrawal order created successfully!");
-      
     } catch (error) {
       console.error("Error creating withdrawal order:", error);
       toast.error("Failed to create withdrawal order. Please try again.");
@@ -70,17 +69,21 @@ export default function WithdrawConfirmation() {
   const getPaymentAccountDisplay = () => {
     const paymentAccount = user?.paymentAccount || user?.payment_account;
     if (!paymentAccount) return "Not configured";
-    
+
     try {
       const account = JSON.parse(paymentAccount);
-      return `${account.type}: ${account.accountIdentifier}${account.accountNumber ? ` - ${account.accountNumber}` : ''}${account.accountName ? ` (${account.accountName})` : ''}`;
+      return `${account.type}: ${account.accountIdentifier}${
+        account.accountNumber ? ` - ${account.accountNumber}` : ""
+      }${account.accountName ? ` (${account.accountName})` : ""}`;
     } catch {
       return "Account configured";
     }
   };
 
   const kesAmount = withdrawData.amount || 0;
-  const usdAmount = balanceData?.exchangeRate ? kesAmount / balanceData.exchangeRate : 0;
+  const usdAmount = balanceData?.exchangeRate
+    ? Math.floor(kesAmount / balanceData.exchangeRate)
+    : 0;
   const availableKesBalance = balanceData?.kesAmount || 0;
   const availableUsdBalance = balanceData?.usdcAmount || 0;
   const hasInsufficientBalance = kesAmount > availableKesBalance;
@@ -102,7 +105,9 @@ export default function WithdrawConfirmation() {
 
       <div className="text-center mb-8">
         <h2 className="text-2xl font-medium mb-2">Review Details</h2>
-        <p className="text-text-subtle">Please confirm your withdrawal details</p>
+        <p className="text-text-subtle">
+          Please confirm your withdrawal details
+        </p>
       </div>
 
       {/* Withdrawal Summary */}
@@ -111,15 +116,18 @@ export default function WithdrawConfirmation() {
           {/* Amount */}
           <div className="flex justify-between items-center">
             <span className="text-text-subtle">Withdrawal Amount</span>
-            <span className="font-bold text-lg">KSh {kesAmount.toLocaleString()}</span>
+            <span className="font-bold text-lg">
+              KSh {kesAmount.toLocaleString()}
+            </span>
           </div>
-
 
           {/* Withdrawal Account */}
           <div className="flex justify-between items-start">
             <span className="text-text-subtle">Withdrawal Account</span>
             <div className="text-right">
-              <div className="font-medium text-sm">{getPaymentAccountDisplay()}</div>
+              <div className="font-medium text-sm">
+                {getPaymentAccountDisplay()}
+              </div>
               <div className="text-xs text-text-subtle">via Safaricom</div>
             </div>
           </div>
@@ -127,8 +135,12 @@ export default function WithdrawConfirmation() {
           {/* Available Balance */}
           {balanceData && (
             <div className="flex justify-between items-center pt-2 border-t border-surface">
-              <span className="text-text-subtle text-sm">Available Balance</span>
-              <span className="text-sm">KSh {availableKesBalance.toLocaleString()}</span>
+              <span className="text-text-subtle text-sm">
+                Available Balance
+              </span>
+              <span className="text-sm">
+                KSh {availableKesBalance.toLocaleString()}
+              </span>
             </div>
           )}
         </div>
@@ -138,7 +150,8 @@ export default function WithdrawConfirmation() {
       {hasInsufficientBalance && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
           <p className="text-sm text-red-700 dark:text-red-300">
-            ⚠️ Insufficient balance. You need KSh {kesAmount.toLocaleString()} but only have KSh {availableKesBalance.toLocaleString()} available.
+            ⚠️ Insufficient balance. You need KSh {kesAmount.toLocaleString()}{" "}
+            but only have KSh {availableKesBalance.toLocaleString()} available.
           </p>
         </div>
       )}
@@ -146,7 +159,8 @@ export default function WithdrawConfirmation() {
       {/* Processing Notice */}
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
         <p className="text-sm text-blue-700 dark:text-blue-300">
-          ℹ️ Withdrawal will be processed to your configured M-Pesa account. Processing may take a few minutes.
+          ℹ️ Withdrawal will be processed to your configured M-Pesa account.
+          Processing may take a few minutes.
         </p>
       </div>
 
@@ -157,7 +171,11 @@ export default function WithdrawConfirmation() {
           loading={createOrderMutation.isPending || balanceLoading}
           className="w-full"
         >
-          {balanceLoading ? "Loading..." : hasInsufficientBalance ? "Insufficient Balance" : "Confirm Withdrawal"}
+          {balanceLoading
+            ? "Loading..."
+            : hasInsufficientBalance
+            ? "Insufficient Balance"
+            : "Confirm Withdrawal"}
         </ActionButton>
       </div>
     </motion.div>

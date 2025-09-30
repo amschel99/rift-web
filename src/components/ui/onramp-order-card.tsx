@@ -65,7 +65,12 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
       </div>
 
       {/* Amount - we don't have this in the API response, so we'll skip it */}
-      
+      {order.amount && (
+        <p className="text-sm font-medium mb-1">
+          {order.amount ? `KES ${order.amount}` : ""} 
+        </p>
+      )}
+
       {/* Transaction Code */}
       <p className="text-sm font-medium mb-1">
         {order.transactionCode}

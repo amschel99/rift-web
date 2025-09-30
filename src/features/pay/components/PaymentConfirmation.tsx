@@ -6,7 +6,6 @@ import { useNavigate } from "react-router";
 import { usePay } from "../context";
 import usePayment from "@/hooks/data/use-payment";
 import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
-import useWithdrawalFee from "@/hooks/data/use-withdrawal-fee";
 import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
 
@@ -17,22 +16,12 @@ export default function PaymentConfirmation() {
   const [loadingRate, setLoadingRate] = useState(true);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const paymentMutation = usePayment();
-  
+
   // Get user's balance
   const { data: balanceData } = useBaseUSDCBalance();
   const kesBalance = balanceData?.kesAmount || 0;
-  
-  // Fetch withdrawal fee for the payment amount
-  const { data: feeData } = useWithdrawalFee(
-    paymentData.amount || 0,
-    !!(paymentData.amount && paymentData.amount > 0)
-  );
-  
-  // Calculate available balance after fee
-  const withdrawalFee = feeData?.fee || 0;
-  const availableForPayment = Math.max(0, kesBalance - withdrawalFee);
 
-  // Fetch exchange rate on component mount
+  // Fetch exchange rate on component mount (use .rate for offramp/payment)
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
@@ -40,14 +29,14 @@ export default function PaymentConfirmation() {
         if (!authToken) {
           throw new Error("No authentication token found");
         }
-        
+
         rift.setBearerToken(authToken);
-        
+
         const response = await rift.offramp.previewExchangeRate({
-          currency: "KES" as any
+          currency: "KES" as any,
         });
-        
-        setExchangeRate(response.rate);
+
+        setExchangeRate(response.rate); // Use .rate for offramp
       } catch (error) {
         console.error("Error fetching exchange rate:", error);
         // Fallback to approximate rate if API fails
@@ -71,17 +60,19 @@ export default function PaymentConfirmation() {
       return;
     }
 
-    // Check if user has sufficient balance after fee
+    // Check if user has sufficient balance
     const paymentAmount = paymentData.amount;
-    if (paymentAmount > availableForPayment) {
-      toast.error(`Insufficient balance. You can pay up to KSh ${availableForPayment.toLocaleString()} (after FX spread).`);
+    if (paymentAmount > kesBalance) {
+      toast.error(
+        `Insufficient balance. You can pay up to KSh ${kesBalance.toLocaleString()}.`
+      );
       return;
     }
 
     try {
       // Convert KES amount to USD using the fetched exchange rate
       const kesAmount = paymentData.amount;
-      const usdAmount = kesAmount / exchangeRate;
+      const usdAmount = Math.floor(kesAmount / exchangeRate);
 
       // Create recipient JSON string
       const recipientString = JSON.stringify(paymentData.recipient);
@@ -96,17 +87,16 @@ export default function PaymentConfirmation() {
 
       console.log("Making payment:", paymentRequest);
       const response = await paymentMutation.mutateAsync(paymentRequest);
-      
+
       console.log("Payment response:", response);
       setPaymentSuccess(true);
       toast.success("Payment initiated successfully!");
-      
+
       // Reset after 3 seconds and navigate home
       setTimeout(() => {
         resetPayment();
         navigate("/app");
       }, 3000);
-      
     } catch (error) {
       console.error("Error making payment:", error);
       toast.error("Failed to process payment. Please try again.");
@@ -128,13 +118,16 @@ export default function PaymentConfirmation() {
 
   const getRecipientDisplay = () => {
     if (!paymentData.recipient) return "";
-    
-    const { accountIdentifier, accountNumber, accountName, type } = paymentData.recipient;
-    
+
+    const { accountIdentifier, accountNumber, accountName, type } =
+      paymentData.recipient;
+
     if (type === "PAYBILL") {
-      return `${accountIdentifier} - ${accountNumber}${accountName ? ` (${accountName})` : ""}`;
+      return `${accountIdentifier} - ${accountNumber}${
+        accountName ? ` (${accountName})` : ""
+      }`;
     }
-    
+
     return `${accountIdentifier}${accountName ? ` (${accountName})` : ""}`;
   };
 
@@ -149,22 +142,25 @@ export default function PaymentConfirmation() {
         <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-6">
           <FiCheck className="w-8 h-8 text-white" />
         </div>
-        
+
         <h2 className="text-2xl font-bold mb-2">Payment Initiated!</h2>
         <p className="text-text-subtle text-center mb-4">
-          Your payment is being processed. You'll receive a confirmation shortly.
+          Your payment is being processed. You'll receive a confirmation
+          shortly.
         </p>
-        
+
         <div className="bg-surface-subtle rounded-lg p-4 w-full max-w-sm">
           <div className="text-center">
             <p className="text-sm text-text-subtle">Amount Paid</p>
-            <p className="text-xl font-bold">KSh {(paymentData.amount || 0).toLocaleString()}</p>
+            <p className="text-xl font-bold">
+              KSh {(paymentData.amount || 0).toLocaleString()}
+            </p>
             <p className="text-sm text-text-subtle mt-1">
               To: {getRecipientDisplay()}
             </p>
           </div>
         </div>
-        
+
         <p className="text-sm text-text-subtle mt-6 text-center">
           Redirecting to home...
         </p>
@@ -204,7 +200,9 @@ export default function PaymentConfirmation() {
           {/* Amount */}
           <div className="flex justify-between items-center">
             <span className="text-text-subtle">Amount</span>
-            <span className="font-bold text-lg">KSh {(paymentData.amount || 0).toLocaleString()}</span>
+            <span className="font-bold text-lg">
+              KSh {(paymentData.amount || 0).toLocaleString()}
+            </span>
           </div>
 
           {/* Recipient */}
@@ -221,29 +219,24 @@ export default function PaymentConfirmation() {
           </div>
 
           {/* Balance Information */}
-          <div className="pt-4 border-t border-surface space-y-2">
+          <div className="pt-4 border-t border-surface">
             <div className="flex justify-between items-center">
               <span className="text-text-subtle text-sm">Your Balance</span>
-              <span className="text-sm">KSh {kesBalance.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-text-subtle text-sm">FX Spread</span>
-              <span className="text-sm text-orange-600">-KSh {withdrawalFee.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Available for Payment</span>
-              <span className="text-sm font-bold text-green-600">KSh {availableForPayment.toLocaleString()}</span>
+              <span className="text-sm font-medium">
+                KSh {kesBalance.toLocaleString()}
+              </span>
             </div>
           </div>
-
         </div>
       </div>
 
       {/* Insufficient Balance Warning */}
-      {paymentData.amount && paymentData.amount > availableForPayment && (
+      {paymentData.amount && paymentData.amount > kesBalance && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
           <p className="text-sm text-red-700 dark:text-red-300">
-            ⚠️ Insufficient balance. You need KSh {paymentData.amount.toLocaleString()} but only have KSh {availableForPayment.toLocaleString()} available after FX spread.
+            ⚠️ Insufficient balance. You need KSh{" "}
+            {paymentData.amount.toLocaleString()} but only have KSh{" "}
+            {kesBalance.toLocaleString()} available.
           </p>
         </div>
       )}
@@ -251,20 +244,26 @@ export default function PaymentConfirmation() {
       {/* Warning */}
       <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6">
         <p className="text-sm text-yellow-700 dark:text-yellow-300">
-          ⚠️ Please verify the recipient details carefully. Payments cannot be reversed once processed.
+          ⚠️ Please verify the recipient details carefully. Payments cannot be
+          reversed once processed.
         </p>
       </div>
 
       <div className="mt-auto">
         <ActionButton
           onClick={handleConfirmPayment}
-          disabled={loadingRate || !!(paymentData.amount && paymentData.amount > availableForPayment)}
+          disabled={
+            loadingRate ||
+            !!(paymentData.amount && paymentData.amount > kesBalance)
+          }
           loading={paymentMutation.isPending || loadingRate}
           className="w-full"
         >
-          {loadingRate ? "Loading..." : 
-           (paymentData.amount && paymentData.amount > availableForPayment) ? "Insufficient Balance" : 
-           "Confirm & Pay"}
+          {loadingRate
+            ? "Loading..."
+            : paymentData.amount && paymentData.amount > kesBalance
+            ? "Insufficient Balance"
+            : "Confirm & Pay"}
         </ActionButton>
       </div>
     </motion.div>

@@ -42,12 +42,11 @@ async function getBaseUSDCBalance(): Promise<BaseUSDCBalance> {
       };
     }
 
-    // 2. Get exchange rate from Rift offramp service
+    //use rift sdk to get exchange rate
     const exchangeRateResponse = await rift.offramp.previewExchangeRate({
-      currency: "KES" as any, // OfframpCurrency.KES
+      currency: "KES" as any,
     });
-
-    const exchangeRate = exchangeRateResponse.rate || 0;
+    const exchangeRate = exchangeRateResponse.rate;
     const kesAmount = usdcAmount * exchangeRate;
 
     return {

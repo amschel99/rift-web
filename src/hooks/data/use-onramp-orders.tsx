@@ -7,6 +7,7 @@ export interface OnrampOrder {
   createdAt: string;
   receipt_number?: string | null;
   transaction_hash?: string | null;
+  amount?: string | null;
 }
 
 export default function useOnrampOrders() {

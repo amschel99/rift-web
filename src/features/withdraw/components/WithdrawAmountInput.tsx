@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { useWithdraw } from "../context";
 import useUser from "@/hooks/data/use-user";
 import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
-import useWithdrawalFee from "@/hooks/data/use-withdrawal-fee";
 import ActionButton from "@/components/ui/action-button";
+import rift from "@/lib/rift";
 
 export default function WithdrawAmountInput() {
   const navigate = useNavigate();
@@ -15,31 +15,58 @@ export default function WithdrawAmountInput() {
   const { data: user } = useUser();
   const { data: balanceData, isLoading: balanceLoading } = useBaseUSDCBalance();
   const [kesAmount, setKesAmount] = useState("");
+  const [buyingRate, setBuyingRate] = useState<number | null>(null);
+  const [loadingRate, setLoadingRate] = useState(true);
 
   // Check if user has payment account configured
   const hasPaymentAccount = !!(user?.paymentAccount || user?.payment_account);
 
   // Get KES balance directly from useBaseUSDCBalance (same as homepage)
   const kesBalance = balanceData?.kesAmount || 0;
-  
-  // Fetch withdrawal fee for the entered amount
-  const { data: feeData, isLoading: feeLoading } = useWithdrawalFee(
-    parseFloat(kesAmount) || 0,
-    !!kesAmount && parseFloat(kesAmount) > 0
-  );
-  
-  // Calculate available balance after fee
-  const withdrawalFee = feeData?.fee || 0;
-  const availableForWithdrawal = Math.max(0, kesBalance - withdrawalFee);
+
+  // Fetch exchange rate to get buying_rate for minimum withdrawal calculation
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const authToken = localStorage.getItem("token");
+        if (!authToken) {
+          throw new Error("No authentication token found");
+        }
+
+        rift.setBearerToken(authToken);
+
+        const response = await rift.offramp.previewExchangeRate({
+          currency: "KES" as any,
+        });
+
+        // Minimum withdrawal is 1 USDC × buying_rate
+        setBuyingRate((response as any).buying_rate || response.rate);
+      } catch (error) {
+        console.error("Error fetching exchange rate:", error);
+        // Fallback
+        setBuyingRate(136);
+        toast.warning("Using approximate exchange rate");
+      } finally {
+        setLoadingRate(false);
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
+
+  // Calculate minimum withdrawal: 1 USDC × buying_rate
+  const minWithdrawalKES = buyingRate ? Math.ceil(1 * buyingRate) : 30;
 
   const handleAmountChange = (value: string) => {
     const numericValue = parseFloat(value);
-    
+
     // Allow empty input or valid numbers
     if (value === "" || !isNaN(numericValue)) {
-      // If there's a balance limit, don't allow typing beyond available amount after fee
-      if (availableForWithdrawal && numericValue > availableForWithdrawal) {
-        toast.error(`Maximum withdrawal amount is KSh ${availableForWithdrawal.toLocaleString()} (after FX spread)`);
+      // If there's a balance limit, don't allow typing beyond available amount
+      if (kesBalance && numericValue > kesBalance) {
+        toast.error(
+          `Maximum withdrawal amount is KSh ${kesBalance.toLocaleString()}`
+        );
         return;
       }
       setKesAmount(value);
@@ -48,23 +75,27 @@ export default function WithdrawAmountInput() {
 
   const handleNext = () => {
     const amount = parseFloat(kesAmount);
-    
+
     if (!amount || amount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
-    
-    if (amount < 30) {
-      toast.error("Minimum withdrawal amount is KSh 30");
+
+    if (amount < minWithdrawalKES) {
+      toast.error(
+        `Minimum withdrawal amount is KSh ${minWithdrawalKES.toLocaleString()}`
+      );
       return;
     }
-    
-    // Check if user has sufficient KES balance after fee
-    if (availableForWithdrawal && amount > availableForWithdrawal) {
-      toast.error(`Insufficient balance. You can withdraw up to KSh ${availableForWithdrawal.toLocaleString()} (after FX spread).`);
+
+    // Check if user has sufficient KES balance
+    if (kesBalance && amount > kesBalance) {
+      toast.error(
+        `Insufficient balance. You can withdraw up to KSh ${kesBalance.toLocaleString()}.`
+      );
       return;
     }
-    
+
     updateWithdrawData({ amount });
     setCurrentStep("confirmation");
   };
@@ -74,7 +105,7 @@ export default function WithdrawAmountInput() {
     toast.info("Please setup your withdrawal account in profile settings");
   };
 
-  const isValidAmount = kesAmount && parseFloat(kesAmount) >= 30;
+  const isValidAmount = kesAmount && parseFloat(kesAmount) >= minWithdrawalKES;
 
   if (!hasPaymentAccount) {
     return (
@@ -87,20 +118,17 @@ export default function WithdrawAmountInput() {
         <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6">
           <FiAlertCircle className="w-8 h-8 text-yellow-500" />
         </div>
-        
+
         <h2 className="text-2xl font-bold mb-2 text-center">Setup Required</h2>
         <p className="text-text-subtle text-center mb-8 max-w-sm">
           You need to setup a withdrawal account before you can withdraw funds.
         </p>
-        
+
         <div className="w-full max-w-sm space-y-3">
-          <ActionButton
-            onClick={handleSetupPaymentAccount}
-            className="w-full"
-          >
+          <ActionButton onClick={handleSetupPaymentAccount} className="w-full">
             Setup Withdrawal Account
           </ActionButton>
-          
+
           <ActionButton
             onClick={() => navigate("/app")}
             className="w-full bg-surface-subtle text-text-subtle"
@@ -137,7 +165,9 @@ export default function WithdrawAmountInput() {
         <div className="bg-surface-subtle rounded-lg p-4 mb-6">
           <div className="text-center">
             <p className="text-text-subtle text-sm">Available Balance</p>
-            <p className="text-xl font-bold">KSh {kesBalance.toLocaleString()}</p>
+            <p className="text-xl font-bold">
+              KSh {kesBalance.toLocaleString()}
+            </p>
           </div>
         </div>
       )}
@@ -169,72 +199,52 @@ export default function WithdrawAmountInput() {
 
         {/* Quick Amount Buttons */}
         <div className="grid grid-cols-3 gap-2 mb-8">
-          {[30, 100, 500, 1000, 2000, 5000]
-            .filter(amount => !availableForWithdrawal || amount <= availableForWithdrawal) // Only show amounts within available balance after fee
+          {[minWithdrawalKES, 100, 500, 1000, 2000, 5000]
+            .filter((amount, index, arr) => arr.indexOf(amount) === index) // Remove duplicates
+            .filter((amount) => !kesBalance || amount <= kesBalance)
+            .sort((a, b) => a - b)
             .map((amount) => (
-            <button
-              key={amount}
-              onClick={() => setKesAmount(amount.toString())}
-              className="p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors text-sm font-medium"
-            >
-              KSh {amount.toLocaleString()}
-            </button>
-          ))}
-          
+              <button
+                key={amount}
+                onClick={() => setKesAmount(amount.toString())}
+                className="p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors text-sm font-medium"
+              >
+                KSh {amount.toLocaleString()}
+              </button>
+            ))}
+
           {/* Add "Max" button if balance is available and not already in the list */}
-          {availableForWithdrawal && availableForWithdrawal > 30 && ![30, 100, 500, 1000, 2000, 5000].includes(Math.floor(availableForWithdrawal)) && (
-            <button
-              onClick={() => setKesAmount(Math.floor(availableForWithdrawal).toString())}
-              className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-lg hover:bg-accent-primary/20 transition-colors text-sm font-medium text-accent-primary"
-            >
-              Max: KSh {Math.floor(availableForWithdrawal).toLocaleString()}
-            </button>
-          )}
+          {kesBalance &&
+            kesBalance > minWithdrawalKES &&
+            ![minWithdrawalKES, 100, 500, 1000, 2000, 5000].includes(
+              Math.floor(kesBalance)
+            ) && (
+              <button
+                onClick={() => setKesAmount(Math.floor(kesBalance).toString())}
+                className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-lg hover:bg-accent-primary/20 transition-colors text-sm font-medium text-accent-primary"
+              >
+                Max: KSh {Math.floor(kesBalance).toLocaleString()}
+              </button>
+            )}
         </div>
 
-        {/* Balance and Fee Information */}
-        <div className="space-y-3 mb-6">
-          {/* Available Balance */}
-          <div className="bg-surface-subtle rounded-lg p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-text-subtle">Total Balance</span>
-              <span className="text-sm font-medium">KSh {kesBalance.toLocaleString()}</span>
-            </div>
-            
-            {kesAmount && parseFloat(kesAmount) > 0 && (
-              <>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-text-subtle">FX Spread</span>
-                  <span className="text-sm text-orange-600">
-                    {feeLoading ? "Loading..." : `-KSh ${withdrawalFee.toLocaleString()}`}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-surface">
-                  <span className="text-sm font-medium text-text-default">Available to Withdraw</span>
-                  <span className="text-sm font-bold text-green-600">
-                    KSh {availableForWithdrawal.toLocaleString()}
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
-          
-          {/* Minimum Amount Notice */}
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              ℹ️ Minimum withdrawal amount is KSh 30
-            </p>
-          </div>
+        {/* Minimum Amount Notice */}
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-6">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
+            ℹ️ Minimum withdrawal amount is KSh{" "}
+            {minWithdrawalKES.toLocaleString()} (1 USDC)
+          </p>
         </div>
       </div>
 
       <div className="mt-auto">
         <ActionButton
           onClick={handleNext}
-          disabled={!isValidAmount}
+          disabled={!isValidAmount || loadingRate}
+          loading={loadingRate}
           className="w-full"
         >
-          Continue
+          {loadingRate ? "Loading..." : "Continue"}
         </ActionButton>
       </div>
     </motion.div>

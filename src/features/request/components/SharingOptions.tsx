@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { FiArrowLeft, FiCopy, FiPhone, FiCheck, FiShare2, FiX, FiCreditCard } from "react-icons/fi";
+import {
+  FiArrowLeft,
+  FiCopy,
+  FiPhone,
+  FiCheck,
+  FiShare2,
+  FiX,
+  FiCreditCard,
+} from "react-icons/fi";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { QRCodeSVG } from "qrcode.react";
@@ -11,7 +19,8 @@ import rift from "@/lib/rift";
 
 export default function SharingOptions() {
   const navigate = useNavigate();
-  const { createdInvoice, requestType, requestData, setCreatedInvoice } = useRequest();
+  const { createdInvoice, requestType, requestData, setCreatedInvoice } =
+    useRequest();
   const [copied, setCopied] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [sendingToPhone, setSendingToPhone] = useState(false);
@@ -19,7 +28,8 @@ export default function SharingOptions() {
   const [mpesaNumber, setMpesaNumber] = useState("");
   const [sendingMpesaPrompt, setSendingMpesaPrompt] = useState(false);
   const [showMpesaDrawer, setShowMpesaDrawer] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [sellingRate, setSellingRate] = useState<number | null>(null);
+  const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
   const [creatingInvoice, setCreatingInvoice] = useState(false);
   const createInvoiceMutation = useCreateInvoice();
 
@@ -29,25 +39,27 @@ export default function SharingOptions() {
       // Only create invoice if it's a top-up and no invoice exists yet
       if (requestType === "topup" && !createdInvoice && !creatingInvoice) {
         setCreatingInvoice(true);
-        
+
         try {
-          // Fetch exchange rate
+          // Fetch exchange rate (use .selling_rate for invoice/onramp)
           const authToken = localStorage.getItem("token");
           if (!authToken) {
             throw new Error("No authentication token found");
           }
-          
+
           rift.setBearerToken(authToken);
-          
+
           const exchangeResponse = await rift.offramp.previewExchangeRate({
-            currency: "KES" as any
+            currency: "KES" as any,
           });
-          
-          setExchangeRate(exchangeResponse.rate);
-          
-          // Convert KES amount to USD using the fetched exchange rate
+
+          setSellingRate(exchangeResponse.selling_rate);
+          setWithdrawalRate(exchangeResponse.rate);
+
+          // Convert KES amount to USD using the selling rate
           const kesAmount = requestData.amount || 0;
-          const usdAmount = kesAmount / exchangeResponse.rate;
+          const usdAmount = kesAmount / exchangeResponse.selling_rate;
+          const receiveAmount = usdAmount * exchangeResponse.rate;
 
           const invoiceRequest = {
             ...requestData,
@@ -55,14 +67,17 @@ export default function SharingOptions() {
             description: requestData.description || "Rift wallet top-up",
           } as any;
 
-          const response = await createInvoiceMutation.mutateAsync(invoiceRequest);
-          
+          const response = await createInvoiceMutation.mutateAsync(
+            invoiceRequest
+          );
+
           // Store both KES and USD amounts for display purposes
           const invoiceWithKes = {
             ...response,
             kesAmount: kesAmount, // Store original KES amount for display
+            receiveAmount: receiveAmount, // Amount user will actually receive
           };
-          
+
           setCreatedInvoice(invoiceWithKes);
           toast.success("Top-up link created successfully!");
         } catch (error) {
@@ -77,7 +92,15 @@ export default function SharingOptions() {
     };
 
     createInvoiceForTopup();
-  }, [requestType, createdInvoice, creatingInvoice, requestData, createInvoiceMutation, setCreatedInvoice, navigate]);
+  }, [
+    requestType,
+    createdInvoice,
+    creatingInvoice,
+    requestData,
+    createInvoiceMutation,
+    setCreatedInvoice,
+    navigate,
+  ]);
 
   const handleBack = () => {
     if (requestType === "topup") {
@@ -101,60 +124,66 @@ export default function SharingOptions() {
   };
 
   const handleShare = async () => {
-    const shareText = `Payment request for KSh ${(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()} - ${createdInvoice.description}`;
+    const shareText = `Payment request for KSh ${(
+      createdInvoice.kesAmount || createdInvoice.amount
+    ).toLocaleString()} - ${createdInvoice.description}`;
     const shareUrl = createdInvoice.url;
-    
+
     // Check if we're on mobile and have Web Share API
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isSecureContext = window.isSecureContext || window.location.protocol === 'https:';
-    
-    console.log('Share attempt:', {
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+    const isSecureContext =
+      window.isSecureContext || window.location.protocol === "https:";
+
+    console.log("Share attempt:", {
       isMobile,
       isSecureContext,
       hasNavigatorShare: !!navigator.share,
-      userAgent: navigator.userAgent
+      userAgent: navigator.userAgent,
     });
-    
+
     // Try Web Share API first (works best on mobile)
     if (navigator.share && isSecureContext) {
       try {
         const shareData = {
-          title: 'Payment Request - Rift',
+          title: "Payment Request - Rift",
           text: shareText,
           url: shareUrl,
         };
-        
-        console.log('Sharing with Web Share API:', shareData);
+
+        console.log("Sharing with Web Share API:", shareData);
         await navigator.share(shareData);
-        console.log('Share successful');
+        console.log("Share successful");
         return;
       } catch (error: any) {
-        console.log('Web Share API error:', error);
-        if (error.name === 'AbortError') {
+        console.log("Web Share API error:", error);
+        if (error.name === "AbortError") {
           // User cancelled
           return;
         }
         // Fall through to other methods
       }
     }
-    
+
     // Fallback: Try to open WhatsApp directly on mobile
     if (isMobile) {
       const whatsappText = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
       const whatsappUrl = `https://wa.me/?text=${whatsappText}`;
-      
+
       try {
         // Try to open WhatsApp
-        window.open(whatsappUrl, '_blank');
-        console.log('Opened WhatsApp share');
+        window.open(whatsappUrl, "_blank");
+        console.log("Opened WhatsApp share");
         return;
       } catch (error: any) {
-        console.log('WhatsApp fallback failed:', error);
+        console.log("WhatsApp fallback failed:", error);
       }
     }
-    
+
     // Final fallback: Copy to clipboard
-    console.log('Using copy fallback');
+    console.log("Using copy fallback");
     toast.info("Copied to clipboard - paste in WhatsApp or any app");
     handleCopyUrl();
   };
@@ -162,33 +191,33 @@ export default function SharingOptions() {
   // Format phone number to international format
   const formatPhoneNumber = (phone: string) => {
     // Remove all non-digit characters
-    const cleaned = phone.replace(/\D/g, '');
-    
+    const cleaned = phone.replace(/\D/g, "");
+
     // If starts with 07, replace with 2547
-    if (cleaned.startsWith('07')) {
-      return '254' + cleaned.substring(1);
+    if (cleaned.startsWith("07")) {
+      return "254" + cleaned.substring(1);
     }
-    
+
     // If starts with 7 (without 0), add 254
-    if (cleaned.startsWith('7') && cleaned.length === 9) {
-      return '254' + cleaned;
+    if (cleaned.startsWith("7") && cleaned.length === 9) {
+      return "254" + cleaned;
     }
-    
+
     // If already starts with 254, keep as is
-    if (cleaned.startsWith('254')) {
+    if (cleaned.startsWith("254")) {
       return cleaned;
     }
-    
+
     // If starts with +254, remove + and keep as is
-    if (phone.startsWith('+254')) {
+    if (phone.startsWith("+254")) {
       return cleaned;
     }
-    
+
     // Default: assume it's a local number starting with 7
-    if (cleaned.length === 9 && cleaned.startsWith('7')) {
-      return '254' + cleaned;
+    if (cleaned.length === 9 && cleaned.startsWith("7")) {
+      return "254" + cleaned;
     }
-    
+
     // Return as is if we can't determine format
     return cleaned;
   };
@@ -205,26 +234,28 @@ export default function SharingOptions() {
       if (!authToken) {
         throw new Error("No authentication token found");
       }
-      
+
       rift.setBearerToken(authToken);
-      
+
       // Format phone number to international format
       const formattedPhone = formatPhoneNumber(phoneNumber.trim());
-      
+
       const request = {
         paymentLink: createdInvoice.url,
-        message: `Payment request for KSh ${(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()} - ${createdInvoice.description}`,
+        message: `Payment request for KSh ${(
+          createdInvoice.kesAmount || createdInvoice.amount
+        ).toLocaleString()} - ${createdInvoice.description}`,
         recipientPhone: formattedPhone,
       };
 
       const response = await rift.offramp.sendPaymentLink(request);
-      
+
       if (response.results?.smsSent) {
         toast.success("Payment request sent to phone number!");
       } else {
         toast.error("Failed to send SMS. Please try again.");
       }
-      
+
       setPhoneNumber("");
       setShowPhoneDrawer(false);
     } catch (error: any) {
@@ -238,39 +269,39 @@ export default function SharingOptions() {
   // Format phone number for M-Pesa (07... or 01... format)
   const formatMpesaNumber = (phone: string) => {
     // Remove all non-digit characters
-    const cleaned = phone.replace(/\D/g, '');
-    
+    const cleaned = phone.replace(/\D/g, "");
+
     // If starts with 254, convert to 0X format
-    if (cleaned.startsWith('254')) {
+    if (cleaned.startsWith("254")) {
       const localPart = cleaned.substring(3);
-      if (localPart.startsWith('7')) {
-        return '07' + localPart.substring(1);
+      if (localPart.startsWith("7")) {
+        return "07" + localPart.substring(1);
       }
-      if (localPart.startsWith('1')) {
-        return '01' + localPart.substring(1);
+      if (localPart.startsWith("1")) {
+        return "01" + localPart.substring(1);
       }
     }
-    
+
     // If starts with +254, remove + and convert
-    if (phone.startsWith('+254')) {
+    if (phone.startsWith("+254")) {
       return formatMpesaNumber(cleaned);
     }
-    
+
     // If starts with 7 (9 digits), add 07
-    if (cleaned.startsWith('7') && cleaned.length === 9) {
-      return '07' + cleaned.substring(1);
+    if (cleaned.startsWith("7") && cleaned.length === 9) {
+      return "07" + cleaned.substring(1);
     }
-    
-    // If starts with 1 (9 digits), add 01  
-    if (cleaned.startsWith('1') && cleaned.length === 9) {
-      return '01' + cleaned.substring(1);
+
+    // If starts with 1 (9 digits), add 01
+    if (cleaned.startsWith("1") && cleaned.length === 9) {
+      return "01" + cleaned.substring(1);
     }
-    
+
     // If already in 07... or 01... format, keep as is
-    if (cleaned.startsWith('07') || cleaned.startsWith('01')) {
+    if (cleaned.startsWith("07") || cleaned.startsWith("01")) {
       return cleaned;
     }
-    
+
     // Default: return cleaned number
     return cleaned;
   };
@@ -287,37 +318,39 @@ export default function SharingOptions() {
       if (!authToken) {
         throw new Error("No authentication token found");
       }
-      
+
       rift.setBearerToken(authToken);
-      
-      // Get exchange rate for KES to USD conversion
-      const exchangeRateResponse = await rift.offramp.previewExchangeRate({
-        currency: "KES" as any
+
+      // Get exchange rate for KES to USD conversion (use .selling_rate for onramp_v2)
+      const exchangeResponse = await rift.offramp.previewExchangeRate({
+        currency: "KES" as any,
       });
-      
+
       // Format phone number for M-Pesa
       const formattedMpesaNumber = formatMpesaNumber(mpesaNumber.trim());
-      
+
       // Get the original KES amount user typed and convert to USD
       const kesAmount = createdInvoice.kesAmount;
-      const usdAmount = kesAmount / exchangeRateResponse.rate;
-      
-        const request = {
-          shortcode: formattedMpesaNumber,
-          amount: usdAmount, // Send USD amount (KES ÷ exchange rate)
-          chain: "base" as any,
-          asset: "USDC" as any,
-          mobile_network: "Safaricom",
-          country_code: "KES",
-        };
+      const usdAmount = kesAmount / exchangeResponse.selling_rate;
 
-      console.log('Sending M-Pesa prompt:', request);
-      console.log('Auth token exists:', !!authToken);
-      
+      const request = {
+        shortcode: formattedMpesaNumber,
+        amount: usdAmount, // Send USD amount (KES ÷ selling rate)
+        chain: "base" as any,
+        asset: "USDC" as any,
+        mobile_network: "Safaricom",
+        country_code: "KES",
+      };
+
+      console.log("Sending M-Pesa prompt:", request);
+      console.log("Auth token exists:", !!authToken);
+
       const response = await rift.onrampV2.buy(request);
-      console.log('M-Pesa prompt response:', response);
-      
-      toast.success("M-Pesa prompt sent! Customer will receive payment request on their phone.");
+      console.log("M-Pesa prompt response:", response);
+
+      toast.success(
+        "M-Pesa prompt sent! Customer will receive payment request on their phone."
+      );
       setMpesaNumber("");
       setShowMpesaDrawer(false);
     } catch (error: any) {
@@ -326,24 +359,31 @@ export default function SharingOptions() {
         message: error.message,
         status: error.status,
         response: error.response,
-        stack: error.stack
+        stack: error.stack,
       });
-      
+
       // More specific error messages
-      if (error.message?.includes('404')) {
+      if (error.message?.includes("404")) {
         toast.error("M-Pesa prompt API not found. Please contact support.");
-      } else if (error.message?.includes('401') || error.message?.includes('403')) {
+      } else if (
+        error.message?.includes("401") ||
+        error.message?.includes("403")
+      ) {
         toast.error("Authentication failed. Please log in again.");
-      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      } else if (
+        error.message?.includes("network") ||
+        error.message?.includes("fetch")
+      ) {
         toast.error("Network error. Please check your connection.");
       } else {
-        toast.error(`Failed to send M-Pesa prompt: ${error.message || 'Unknown error'}`);
+        toast.error(
+          `Failed to send M-Pesa prompt: ${error.message || "Unknown error"}`
+        );
       }
     } finally {
       setSendingMpesaPrompt(false);
     }
   };
-
 
   if (!createdInvoice || creatingInvoice) {
     return (
@@ -374,7 +414,9 @@ export default function SharingOptions() {
           <FiArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-semibold">
-          {requestType === "topup" ? "Top-Up Link Created" : "Payment Request Created"}
+          {requestType === "topup"
+            ? "Top-Up Link Created"
+            : "Payment Request Created"}
         </h1>
       </div>
 
@@ -387,10 +429,9 @@ export default function SharingOptions() {
           {requestType === "topup" ? "Top-Up Link Ready!" : "Request Created!"}
         </h2>
         <p className="text-text-subtle text-xs">
-          {requestType === "topup" 
-            ? "Use this link to add funds to your account" 
-            : "Share this payment request with your client"
-          }
+          {requestType === "topup"
+            ? "Use this link to add funds to your account"
+            : "Share this payment request with your client"}
         </p>
       </div>
 
@@ -400,10 +441,29 @@ export default function SharingOptions() {
           <p className="text-xs text-text-subtle">
             {requestType === "topup" ? "Adding to account" : "Requesting"}
           </p>
-          <p className="text-lg font-bold">KSh {(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()}</p>
-          <p className="text-xs text-text-subtle mt-1">{createdInvoice.description}</p>
+          <p className="text-lg font-bold">
+            KSh{" "}
+            {(
+              createdInvoice.kesAmount || createdInvoice.amount
+            ).toLocaleString()}
+          </p>
+          {createdInvoice.receiveAmount && (
+            <div className="mt-2 pt-2 border-t border-surface">
+              <p className="text-xs text-text-subtle">You will receive</p>
+              <p className="text-md font-semibold text-green-600">
+                KSh{" "}
+                {createdInvoice.receiveAmount.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+              <p className="text-xs text-text-subtle">in your wallet</p>
+            </div>
+          )}
+          <p className="text-xs text-text-subtle mt-2">
+            {createdInvoice.description}
+          </p>
         </div>
-        
+
         {/* QR Code */}
         <div className="bg-white rounded-lg p-3 flex justify-center">
           <QRCodeSVG
@@ -413,7 +473,7 @@ export default function SharingOptions() {
             includeMargin={true}
           />
         </div>
-        
+
         <div className="text-center mt-2">
           <p className="text-xs text-text-subtle">Scan to pay</p>
         </div>
@@ -439,7 +499,11 @@ export default function SharingOptions() {
             onClick={handleCopyUrl}
             className="flex flex-col items-center gap-1 p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors"
           >
-            {copied ? <FiCheck className="w-4 h-4 text-green-500" /> : <FiCopy className="w-4 h-4" />}
+            {copied ? (
+              <FiCheck className="w-4 h-4 text-green-500" />
+            ) : (
+              <FiCopy className="w-4 h-4" />
+            )}
             <span className="text-xs font-medium">
               {copied ? "Copied!" : "Copy"}
             </span>
@@ -488,7 +552,7 @@ export default function SharingOptions() {
               onClick={() => setShowPhoneDrawer(false)}
               className="fixed inset-0 bg-black/50 z-40"
             />
-            
+
             {/* Drawer */}
             <motion.div
               initial={{ y: "100%" }}
@@ -506,10 +570,12 @@ export default function SharingOptions() {
                   <FiX className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Phone Number</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Phone Number
+                  </label>
                   <input
                     type="tel"
                     placeholder="0712 345 678"
@@ -519,7 +585,7 @@ export default function SharingOptions() {
                     autoFocus
                   />
                 </div>
-                
+
                 <ActionButton
                   onClick={handleSendToPhone}
                   disabled={!phoneNumber.trim()}
@@ -546,7 +612,7 @@ export default function SharingOptions() {
               onClick={() => setShowMpesaDrawer(false)}
               className="fixed inset-0 bg-black/50 z-40"
             />
-            
+
             {/* Drawer */}
             <motion.div
               initial={{ y: "100%" }}
@@ -564,16 +630,24 @@ export default function SharingOptions() {
                   <FiX className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
                   <p className="text-sm text-green-800">
-                    <strong>M-Pesa Prompt:</strong> The owner of the M-Pesa number will receive a payment request directly on their phone to pay KSh {(createdInvoice.kesAmount || createdInvoice.amount).toLocaleString()}.
+                    <strong>M-Pesa Prompt:</strong> The owner of the M-Pesa
+                    number will receive a payment request directly on their
+                    phone to pay KSh{" "}
+                    {(
+                      createdInvoice.kesAmount || createdInvoice.amount
+                    ).toLocaleString()}
+                    .
                   </p>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Customer's M-Pesa Number</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Customer's M-Pesa Number
+                  </label>
                   <input
                     type="tel"
                     placeholder="0712 345 678"
@@ -586,7 +660,7 @@ export default function SharingOptions() {
                     Enter the customer's M-Pesa number (07... or 01...)
                   </p>
                 </div>
-                
+
                 <ActionButton
                   onClick={handleMpesaPrompt}
                   disabled={!mpesaNumber.trim()}
@@ -600,7 +674,6 @@ export default function SharingOptions() {
           </>
         )}
       </AnimatePresence>
-
     </motion.div>
   );
 }
