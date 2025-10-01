@@ -217,13 +217,13 @@ export default function WithdrawAmountInput() {
           {kesBalance &&
             kesBalance > minWithdrawalKES &&
             ![minWithdrawalKES, 100, 500, 1000, 2000, 5000].includes(
-              Math.floor(kesBalance)
+              kesBalance
             ) && (
               <button
-                onClick={() => setKesAmount(Math.floor(kesBalance).toString())}
+                onClick={() => setKesAmount(kesBalance.toString())}
                 className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-lg hover:bg-accent-primary/20 transition-colors text-sm font-medium text-accent-primary"
               >
-                Max: KSh {Math.floor(kesBalance).toLocaleString()}
+                Max: KSh {kesBalance.toLocaleString()}
               </button>
             )}
         </div>

@@ -67,6 +67,14 @@ export const formatNumberUsd = (amount: number) => {
   return formattedNumber;
 };
 
+export const formatNumberWithCommas = (amount: number, decimals: number = 2) => {
+  const numValue = Number(amount || 0);
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(numValue);
+};
+
 export const base64ToString = (base64: string | null) => {
   try {
     if (!base64) throw new Error("Base64 string is missing");

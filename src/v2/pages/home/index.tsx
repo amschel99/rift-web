@@ -23,6 +23,7 @@ import { SendDrawer } from "@/features/send/SendDrawer";
 import ActionButton from "./components/ActionButton";
 import { usePlatformDetection } from "@/utils/platform";
 import { backButton } from "@telegram-apps/sdk-react";
+import { formatNumberWithCommas } from "@/lib/utils";
 
 
 export default function Home() {
@@ -158,7 +159,7 @@ export default function Home() {
               {BASE_USDC_LOADING ? (
                 <span className="animate-pulse">Loading...</span>
               ) : isBalanceVisible ? (
-                `${selectedCurrency.symbol} ${(BASE_USDC_BALANCE?.kesAmount ?? 0).toFixed(2)}`
+                `${selectedCurrency.symbol} ${formatNumberWithCommas(BASE_USDC_BALANCE?.kesAmount ?? 0)}`
               ) : (
                 `${selectedCurrency.symbol} ****`
               )}

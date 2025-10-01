@@ -72,7 +72,7 @@ export default function PaymentConfirmation() {
     try {
       // Convert KES amount to USD using the fetched exchange rate
       const kesAmount = paymentData.amount;
-      const usdAmount = Math.floor(kesAmount / exchangeRate);
+      const usdAmount = kesAmount / exchangeRate;
 
       // Create recipient JSON string
       const recipientString = JSON.stringify(paymentData.recipient);

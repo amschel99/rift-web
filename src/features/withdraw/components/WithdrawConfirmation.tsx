@@ -28,7 +28,7 @@ export default function WithdrawConfirmation() {
 
     // Check if user has sufficient balance
     const kesAmount = withdrawData.amount;
-    const usdAmount = Math.floor(kesAmount / balanceData.exchangeRate);
+    const usdAmount = kesAmount / balanceData.exchangeRate;
     const availableKesBalance = balanceData.kesAmount || 0;
 
     if (kesAmount > availableKesBalance) {
@@ -82,7 +82,7 @@ export default function WithdrawConfirmation() {
 
   const kesAmount = withdrawData.amount || 0;
   const usdAmount = balanceData?.exchangeRate
-    ? Math.floor(kesAmount / balanceData.exchangeRate)
+    ? (kesAmount / balanceData.exchangeRate)
     : 0;
   const availableKesBalance = balanceData?.kesAmount || 0;
   const availableUsdBalance = balanceData?.usdcAmount || 0;
