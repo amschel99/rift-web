@@ -70,13 +70,15 @@ export default function useBaseUSDCBalance() {
   const query = useQuery({
     queryKey: ["base-usdc-balance"],
     queryFn: getBaseUSDCBalance,
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 10000, // Consider data stale after 10 seconds
+    refetchInterval: 1000, // Refetch every 1 second for real-time updates
+    staleTime: 500, // Consider data stale after 500ms
+    refetchIntervalInBackground: true, // Continue refetching even when tab is not active
+    refetchOnWindowFocus: true, // Refetch when user comes back to tab
   });
 
   return {
     data: query.data,
-    isLoading: query.isPending,
+    isLoading: query.isPending || (!query.data && !query.error), // Don't show as loaded if we have no data
     error: query.error,
     refetch: query.refetch,
   };
