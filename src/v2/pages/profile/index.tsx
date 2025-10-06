@@ -15,7 +15,6 @@ import useUpdateUser from "@/hooks/data/use-update-user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ActionButton from "@/components/ui/action-button";
 import PaymentAccountSetup from "@/components/ui/payment-account-setup";
-import InstantWithdrawalsToggle from "@/components/ui/instant-withdrawals-toggle";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import {
   Drawer,
@@ -55,17 +54,6 @@ export default function Profile() {
     } catch (error) {
       console.error("Error updating payment account:", error);
       toast.error("Failed to update withdrawal account");
-    }
-  };
-
-  const handleToggleInstantWithdrawals = async (enabled: boolean) => {
-    try {
-      await updateUserMutation.mutateAsync({ instantWithdrawals: enabled });
-      toast.success(`Instant withdrawals ${enabled ? 'enabled' : 'disabled'}!`);
-    } catch (error) {
-      console.error("Error toggling instant withdrawals:", error);
-      toast.error("Failed to update instant withdrawals setting");
-      throw error; // Re-throw to handle in component
     }
   };
 
@@ -213,14 +201,6 @@ export default function Profile() {
             <IoWalletOutline className="text-text-subtle text-xl" />
           </span>
         </ActionButton>
-
-        {/* Instant Withdrawals Toggle */}
-        <InstantWithdrawalsToggle
-          enabled={user?.instantWithdrawals || false}
-          onToggle={handleToggleInstantWithdrawals}
-          disabled={updateUserMutation.isPending}
-          hasPaymentAccount={!!(user?.paymentAccount || user?.payment_account)}
-        />
       </div>
 
 

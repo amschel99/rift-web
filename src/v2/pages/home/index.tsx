@@ -17,6 +17,7 @@ import OnrampOrderCard from "@/components/ui/onramp-order-card";
 import WithdrawalCard from "@/components/ui/withdrawal-card";
 import OnchainTransactionCard from "@/components/ui/onchain-transaction-card";
 import { OnchainDepositCard } from "@/components/ui/onchain-deposit-card";
+import { Skeleton } from "@/components/ui/skeleton";
 import RedirectLinks from "@/features/redirectlinks";
 import { ReceiveDrawer } from "@/features/receive/ReceiveDrawer";
 import { SendDrawer } from "@/features/send/SendDrawer";
@@ -158,8 +159,10 @@ export default function Home() {
             <h1 className="text-4xl mb-2">
               {BASE_USDC_LOADING ? (
                 <span className="animate-pulse">Loading...</span>
+              ) : !BASE_USDC_BALANCE ? (
+                <Skeleton className="h-10 w-32 inline-block" />
               ) : isBalanceVisible ? (
-                `${selectedCurrency.symbol} ${formatNumberWithCommas(BASE_USDC_BALANCE?.kesAmount ?? 0)}`
+                `${selectedCurrency.symbol} ${formatNumberWithCommas(BASE_USDC_BALANCE.kesAmount)}`
               ) : (
                 `${selectedCurrency.symbol} ****`
               )}
