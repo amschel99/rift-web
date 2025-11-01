@@ -44,7 +44,7 @@ Updated the withdrawal account setup to support multiple countries and their res
 ```json
 {
   "accountIdentifier": "0712345678",
-  "accountNumber": "123456",  // Optional, for Paybill
+  "accountNumber": "123456",  // Optional, for Paybill.
   "accountName": "John Doe",   // Optional
   "institution": "Safaricom",
   "type": "MOBILE",            // MOBILE | PAYBILL | BUY_GOODS
