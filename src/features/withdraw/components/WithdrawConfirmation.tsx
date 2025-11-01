@@ -5,15 +5,32 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useWithdraw } from "../context";
 import useUser from "@/hooks/data/use-user";
-import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
+import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 import useCreateWithdrawalOrder from "@/hooks/data/use-create-withdrawal-order";
 import ActionButton from "@/components/ui/action-button";
+
+// Currency symbols map
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 export default function WithdrawConfirmation() {
   const navigate = useNavigate();
   const { withdrawData, setCurrentStep, setCreatedOrder } = useWithdraw();
   const { data: user } = useUser();
-  const { data: balanceData, isLoading: balanceLoading } = useBaseUSDCBalance();
+  
+  // Get withdrawal currency from withdraw data
+  const withdrawCurrency = (withdrawData.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[withdrawCurrency];
+  
+  const { data: balanceData, isLoading: balanceLoading } = useBaseUSDCBalance({
+    currency: withdrawCurrency,
+  });
   const createOrderMutation = useCreateWithdrawalOrder();
 
   const handleBack = () => {
@@ -27,11 +44,12 @@ export default function WithdrawConfirmation() {
     }
 
     // Check if user has sufficient balance
-    const kesAmount = withdrawData.amount;
-    const usdAmount = kesAmount / balanceData.exchangeRate;
-    const availableKesBalance = balanceData.kesAmount || 0;
+    const localAmount = withdrawData.amount;
+    // Round to 6 decimal places (USDC precision)
+    const usdAmount = Math.round((localAmount / balanceData.exchangeRate) * 1e6) / 1e6;
+    const availableLocalBalance = balanceData.localAmount || 0;
 
-    if (kesAmount > availableKesBalance) {
+    if (localAmount > availableLocalBalance) {
       toast.error("Insufficient balance for this withdrawal");
       return;
     }
@@ -47,7 +65,7 @@ export default function WithdrawConfirmation() {
       const withdrawalRequest = {
         token: "USDC" as const,
         amount: usdAmount, // Send USD amount to API
-        currency: "KES" as const,
+        currency: withdrawCurrency, // Send actual currency code (KES, ETB, NGN, etc.)
         chain: "base" as const,
         recipient: paymentAccount, // Use user's configured payment account
       };
@@ -72,21 +90,21 @@ export default function WithdrawConfirmation() {
 
     try {
       const account = JSON.parse(paymentAccount);
-      return `${account.type}: ${account.accountIdentifier}${
+      return `${account.institution}${account.type ? ` (${account.type})` : ''}: ${account.accountIdentifier}${
         account.accountNumber ? ` - ${account.accountNumber}` : ""
-      }${account.accountName ? ` (${account.accountName})` : ""}`;
+      }${account.accountName ? ` - ${account.accountName}` : ""}`;
     } catch {
       return "Account configured";
     }
   };
 
-  const kesAmount = withdrawData.amount || 0;
+  const localAmount = withdrawData.amount || 0;
   const usdAmount = balanceData?.exchangeRate
-    ? (kesAmount / balanceData.exchangeRate)
+    ? Math.round((localAmount / balanceData.exchangeRate) * 1e6) / 1e6
     : 0;
-  const availableKesBalance = balanceData?.kesAmount || 0;
+  const availableLocalBalance = balanceData?.localAmount || 0;
   const availableUsdBalance = balanceData?.usdcAmount || 0;
-  const hasInsufficientBalance = kesAmount > availableKesBalance;
+  const hasInsufficientBalance = localAmount > availableLocalBalance;
 
   return (
     <motion.div
@@ -117,7 +135,7 @@ export default function WithdrawConfirmation() {
           <div className="flex justify-between items-center">
             <span className="text-text-subtle">Withdrawal Amount</span>
             <span className="font-bold text-lg">
-              KSh {kesAmount.toLocaleString()}
+              {currencySymbol} {localAmount.toLocaleString()}
             </span>
           </div>
 
@@ -128,7 +146,6 @@ export default function WithdrawConfirmation() {
               <div className="font-medium text-sm">
                 {getPaymentAccountDisplay()}
               </div>
-              <div className="text-xs text-text-subtle">via Safaricom</div>
             </div>
           </div>
 
@@ -139,7 +156,7 @@ export default function WithdrawConfirmation() {
                 Available Balance
               </span>
               <span className="text-sm">
-                KSh {availableKesBalance.toLocaleString()}
+                {currencySymbol} {availableLocalBalance.toLocaleString()}
               </span>
             </div>
           )}
@@ -150,8 +167,8 @@ export default function WithdrawConfirmation() {
       {hasInsufficientBalance && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
           <p className="text-sm text-red-700 dark:text-red-300">
-            ⚠️ Insufficient balance. You need KSh {kesAmount.toLocaleString()}{" "}
-            but only have KSh {availableKesBalance.toLocaleString()} available.
+            ⚠️ Insufficient balance. You need {currencySymbol} {localAmount.toLocaleString()}{" "}
+            but only have {currencySymbol} {availableLocalBalance.toLocaleString()} available.
           </p>
         </div>
       )}
@@ -159,7 +176,7 @@ export default function WithdrawConfirmation() {
       {/* Processing Notice */}
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
         <p className="text-sm text-blue-700 dark:text-blue-300">
-          ℹ️ Withdrawal will be processed to your configured M-Pesa account.
+          ℹ️ Withdrawal will be processed to your configured withdrawal account ({withdrawCurrency}).
           Processing may take a few minutes.
         </p>
       </div>

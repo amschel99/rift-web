@@ -1,9 +1,10 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
-import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline, IoEyeOutline, IoEyeOffOutline, IoAddCircleOutline } from "react-icons/io5";
+import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline, IoEyeOutline, IoEyeOffOutline, IoAddCircleOutline, IoPhonePortraitOutline } from "react-icons/io5";
 import { useDisclosure } from "@/hooks/use-disclosure";
-import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
+import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+import useCountryDetection from "@/hooks/data/use-country-detection";
 import useAnalaytics from "@/hooks/use-analytics";
 import useOnrampOrders from "@/hooks/data/use-onramp-orders";
 import useWithdrawalOrders from "@/hooks/data/use-withdrawal-orders";
@@ -29,16 +30,52 @@ import { formatNumberWithCommas } from "@/lib/utils";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { data: BASE_USDC_BALANCE, isLoading: BASE_USDC_LOADING } = useBaseUSDCBalance();
   const { logEvent } = useAnalaytics();
   const { isTelegram } = usePlatformDetection();
   const receive_disclosure = useDisclosure();
   const send_disclosure = useDisclosure();
 
-  // Currency state - default to KES
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(
-    SUPPORTED_CURRENCIES.find(c => c.code === "KES") || SUPPORTED_CURRENCIES[0]
-  );
+  // Detect user's country and currency based on IP
+  const { data: countryInfo, isLoading: countryLoading } = useCountryDetection();
+
+  // Currency state - initialize with stored or detected currency
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(() => {
+    // Try to load from localStorage first
+    const stored = localStorage.getItem("selected_currency");
+    if (stored) {
+      const currency = SUPPORTED_CURRENCIES.find(c => c.code === stored);
+      if (currency) return currency;
+    }
+    return SUPPORTED_CURRENCIES.find(c => c.code === "USD") || SUPPORTED_CURRENCIES[0];
+  });
+
+  // Update selected currency when country is detected (only on first load)
+  useEffect(() => {
+    if (countryInfo && !countryLoading) {
+      const stored = localStorage.getItem("selected_currency");
+      // Only auto-set if user hasn't manually selected one
+      if (!stored) {
+        const detectedCurrency = SUPPORTED_CURRENCIES.find(
+          c => c.code === countryInfo.currency
+        );
+        if (detectedCurrency) {
+          setSelectedCurrency(detectedCurrency);
+          localStorage.setItem("selected_currency", detectedCurrency.code);
+        }
+      }
+    }
+  }, [countryInfo, countryLoading]);
+
+  // Save to localStorage when currency changes
+  const handleCurrencyChange = (currency: Currency) => {
+    setSelectedCurrency(currency);
+    localStorage.setItem("selected_currency", currency.code);
+  };
+
+  // Fetch balance with selected currency
+  const { data: BASE_USDC_BALANCE, isLoading: BASE_USDC_LOADING } = useBaseUSDCBalance({
+    currency: selectedCurrency.code as SupportedCurrency,
+  });
 
   // Advanced mode state
   const { isAdvanced, setIsAdvanced } = useAdvancedMode();
@@ -140,7 +177,7 @@ export default function Home() {
             />
             <CurrencySelector
               selectedCurrency={selectedCurrency.code}
-              onCurrencyChange={setSelectedCurrency}
+              onCurrencyChange={handleCurrencyChange}
             />
           </div>
         </div>
@@ -157,14 +194,14 @@ export default function Home() {
         <div className="text-center mt-6 mb-8">
           <div className="flex items-center justify-center gap-3">
             <h1 className="text-4xl mb-2">
-              {BASE_USDC_LOADING ? (
+              {BASE_USDC_LOADING || countryLoading ? (
                 <span className="animate-pulse">Loading...</span>
               ) : !BASE_USDC_BALANCE ? (
                 <Skeleton className="h-10 w-32 inline-block" />
               ) : isBalanceVisible ? (
-                `${selectedCurrency.symbol} ${formatNumberWithCommas(BASE_USDC_BALANCE.kesAmount)}`
+                `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${selectedCurrency.code}`
               ) : (
-                `${selectedCurrency.symbol} ****`
+                `**** ${selectedCurrency.code}`
               )}
             </h1>
             <button
@@ -238,7 +275,7 @@ export default function Home() {
               <ActionButton
                 icon={<IoReceiptOutline className="w-5 h-5" />}
                 title="Request"
-                className="w-[45%]"
+                className={selectedCurrency.code === "KES" ? "w-[30%]" : "w-[45%]"}
                 onClick={() => {
                   logEvent("REQUEST_BUTTON_CLICKED");
                   navigate("/app/request?type=request");
@@ -247,13 +284,26 @@ export default function Home() {
 
               <ActionButton
                 icon={<IoCashOutline className="w-5 h-5" />}
-                title="Pay"
-                className="w-[45%]"
+                title="Send"
+                className={selectedCurrency.code === "KES" ? "w-[30%]" : "w-[45%]"}
                 onClick={() => {
-                  logEvent("PAY_BUTTON_CLICKED");
+                  logEvent("SEND_BUTTON_CLICKED");
                   navigate("/app/pay");
                 }}
               />
+
+              {/* Utilities Button - Kenya Only */}
+              {selectedCurrency.code === "KES" && (
+                <ActionButton
+                  icon={<IoPhonePortraitOutline className="w-5 h-5" />}
+                  title="Utilities"
+                  className="w-[30%]"
+                  onClick={() => {
+                    logEvent("UTILITIES_BUTTON_CLICKED");
+                    navigate("/app/utilities");
+                  }}
+                />
+              )}
             </div>
           </div>
         )}
@@ -273,6 +323,7 @@ export default function Home() {
             onViewAllWithdrawals={() => setShowAllWithdrawals(true)}
             onViewAllOnchain={() => setShowAllOnchain(true)}
             isAdvancedMode={isAdvanced}
+            selectedCurrencyCode={selectedCurrency.code}
             onWithdrawClick={() => {
               logEvent("WITHDRAW_BUTTON_CLICKED");
               navigate("/app/withdraw");
@@ -282,8 +333,12 @@ export default function Home() {
               navigate("/app/request?type=request");
             }}
             onPayClick={() => {
-              logEvent("PAY_BUTTON_CLICKED");
+              logEvent("SEND_BUTTON_CLICKED");
               navigate("/app/pay");
+            }}
+            onUtilitiesClick={() => {
+              logEvent("UTILITIES_BUTTON_CLICKED");
+              navigate("/app/utilities");
             }}
           />
         </div>

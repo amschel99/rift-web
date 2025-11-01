@@ -16,11 +16,24 @@ import { useRequest } from "../context";
 import ActionButton from "@/components/ui/action-button";
 import useCreateInvoice from "@/hooks/data/use-create-invoice";
 import rift from "@/lib/rift";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 export default function SharingOptions() {
   const navigate = useNavigate();
   const { createdInvoice, requestType, requestData, setCreatedInvoice } =
     useRequest();
+  
+  const requestCurrency = (requestData.currency || createdInvoice?.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[requestCurrency];
   const [copied, setCopied] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [sendingToPhone, setSendingToPhone] = useState(false);
@@ -49,21 +62,33 @@ export default function SharingOptions() {
 
           rift.setBearerToken(authToken);
 
-          const exchangeResponse = await rift.offramp.previewExchangeRate({
-            currency: "KES" as any,
-          });
+          // For USD, no need to fetch exchange rate
+          const topupCurrency = (requestData.currency || "KES") as SupportedCurrency;
+          let exchangeRateData;
+          
+          if (topupCurrency === "USD") {
+            exchangeRateData = { selling_rate: 1, rate: 1 };
+          } else {
+            exchangeRateData = await rift.offramp.previewExchangeRate({
+              currency: topupCurrency as any,
+            });
+          }
 
-          setSellingRate(exchangeResponse.selling_rate);
-          setWithdrawalRate(exchangeResponse.rate);
+          setSellingRate(exchangeRateData.selling_rate);
+          setWithdrawalRate(exchangeRateData.rate);
 
-          // Convert KES amount to USD using the selling rate
-          const kesAmount = requestData.amount || 0;
-          const usdAmount = kesAmount / exchangeResponse.selling_rate;
-          const receiveAmount = usdAmount * exchangeResponse.rate;
+          // Convert local currency amount to USD using the selling rate
+          // Round to 6 decimal places (USDC precision)
+          const localAmount = requestData.amount || 0;
+          const usdAmount = topupCurrency === "USD" 
+            ? localAmount 
+            : Math.round((localAmount / exchangeRateData.selling_rate) * 1e6) / 1e6;
+          const receiveAmount = usdAmount * exchangeRateData.rate;
 
           const invoiceRequest = {
-            ...requestData,
-            amount: usdAmount, // Send USD amount to API
+            chain: requestData.chain,
+            token: requestData.token,
+            amount: usdAmount, // Send USD amount to API (rounded to 6 decimals)
             description: requestData.description || "Rift wallet top-up",
           } as any;
 
@@ -71,14 +96,15 @@ export default function SharingOptions() {
             invoiceRequest
           );
 
-          // Store both KES and USD amounts for display purposes
-          const invoiceWithKes = {
+          // Store both local currency and USD amounts for display purposes
+          const invoiceWithLocalAmount = {
             ...response,
-            kesAmount: kesAmount, // Store original KES amount for display
+            localAmount: localAmount, // Store original local currency amount for display
+            currency: topupCurrency, // Store the currency code
             receiveAmount: receiveAmount, // Amount user will actually receive
           };
 
-          setCreatedInvoice(invoiceWithKes);
+          setCreatedInvoice(invoiceWithLocalAmount);
           toast.success("Top-up link created successfully!");
         } catch (error) {
           console.error("Error creating top-up invoice:", error);
@@ -124,9 +150,8 @@ export default function SharingOptions() {
   };
 
   const handleShare = async () => {
-    const shareText = `Payment request for KSh ${(
-      createdInvoice.kesAmount || createdInvoice.amount
-    ).toLocaleString()} - ${createdInvoice.description}`;
+    const localAmount = createdInvoice.localAmount || createdInvoice.amount;
+    const shareText = `Payment request for ${currencySymbol} ${localAmount.toLocaleString()} (${requestCurrency}) - ${createdInvoice.description}`;
     const shareUrl = createdInvoice.url;
 
     // Check if we're on mobile and have Web Share API
@@ -240,11 +265,10 @@ export default function SharingOptions() {
       // Format phone number to international format
       const formattedPhone = formatPhoneNumber(phoneNumber.trim());
 
+      const localAmount = createdInvoice.localAmount || createdInvoice.amount;
       const request = {
         paymentLink: createdInvoice.url,
-        message: `Payment request for KSh ${(
-          createdInvoice.kesAmount || createdInvoice.amount
-        ).toLocaleString()} - ${createdInvoice.description}`,
+        message: `Payment request for ${currencySymbol} ${localAmount.toLocaleString()} (${requestCurrency}) - ${createdInvoice.description}`,
         recipientPhone: formattedPhone,
       };
 
@@ -330,12 +354,13 @@ export default function SharingOptions() {
       const formattedMpesaNumber = formatMpesaNumber(mpesaNumber.trim());
 
       // Get the original KES amount user typed and convert to USD
+      // Round to 6 decimal places (USDC precision)
       const kesAmount = createdInvoice.kesAmount;
-      const usdAmount = kesAmount / exchangeResponse.selling_rate;
+      const usdAmount = Math.round((kesAmount / exchangeResponse.selling_rate) * 1e6) / 1e6;
 
       const request = {
         shortcode: formattedMpesaNumber,
-        amount: usdAmount, // Send USD amount (KES ÷ selling rate)
+        amount: usdAmount, // Send USD amount (KES ÷ selling rate, rounded to 6 decimals)
         chain: "base" as any,
         asset: "USDC" as any,
         mobile_network: "Safaricom",
@@ -442,19 +467,16 @@ export default function SharingOptions() {
             {requestType === "topup" ? "Adding to account" : "Requesting"}
           </p>
           <p className="text-lg font-bold">
-            KSh{" "}
+            {currencySymbol}{" "}
             {(
-              createdInvoice.kesAmount || createdInvoice.amount
-            ).toLocaleString()}
+              createdInvoice.localAmount || createdInvoice.amount
+            ).toLocaleString()} ({requestCurrency})
           </p>
           {createdInvoice.receiveAmount && (
             <div className="mt-2 pt-2 border-t border-surface">
               <p className="text-xs text-text-subtle">You will receive</p>
               <p className="text-md font-semibold text-green-600">
-                KSh{" "}
-                {createdInvoice.receiveAmount.toLocaleString(undefined, {
-                  maximumFractionDigits: 2,
-                })}
+                {currencySymbol} {createdInvoice.receiveAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({requestCurrency})
               </p>
               <p className="text-xs text-text-subtle">in your wallet</p>
             </div>
@@ -518,14 +540,16 @@ export default function SharingOptions() {
             <span className="text-xs font-medium">Phone</span>
           </button>
 
-          {/* M-Pesa Prompt */}
-          <button
-            onClick={() => setShowMpesaDrawer(true)}
-            className="flex flex-col items-center gap-1 p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors"
-          >
-            <FiCreditCard className="w-4 h-4" />
-            <span className="text-xs font-medium">Prompt</span>
-          </button>
+          {/* M-Pesa Prompt - Only show for Kenya */}
+          {requestCurrency === "KES" && (
+            <button
+              onClick={() => setShowMpesaDrawer(true)}
+              className="flex flex-col items-center gap-1 p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors"
+            >
+              <FiCreditCard className="w-4 h-4" />
+              <span className="text-xs font-medium">Prompt</span>
+            </button>
+          )}
         </div>
       </div>
 

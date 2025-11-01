@@ -185,9 +185,9 @@ export default function Profile() {
                     const account = JSON.parse(paymentAccount);
                     return (
                       <span className="text-xs text-text-subtle/70">
-                        {account.type}: {account.accountIdentifier}
+                        {account.institution} {account.type ? `(${account.type})` : ''}: {account.accountIdentifier}
                         {account.accountNumber ? ` - ${account.accountNumber}` : ''}
-                        {account.accountName ? ` (${account.accountName})` : ''}
+                        {account.accountName ? ` - ${account.accountName}` : ''}
                       </span>
                     );
                   } catch {

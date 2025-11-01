@@ -3,74 +3,113 @@ import { motion } from "motion/react";
 import { FiArrowLeft } from "react-icons/fi";
 import { usePay } from "../context";
 import ActionButton from "@/components/ui/action-button";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+import type { Institution } from "../context";
+
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
+
+// Institutions per currency
+const INSTITUTIONS: Record<Exclude<SupportedCurrency, "USD">, string[]> = {
+  KES: ["Safaricom"],
+  ETB: ["Telebirr", "CBE Birr"],
+  UGX: ["MTN", "Airtel Money"],
+  GHS: ["MTN", "AirtelTigo", "Airtel Money"],
+  NGN: [], // TBD
+};
 
 export default function RecipientInput() {
   const { paymentData, updatePaymentData, setCurrentStep } = usePay();
   const [accountIdentifier, setAccountIdentifier] = useState("");
   const [accountNumber, setAccountNumber] = useState(""); // Only for PAYBILL
   const [accountName, setAccountName] = useState(""); // Optional display name
+  const [selectedInstitution, setSelectedInstitution] = useState<string>("");
+
+  const currency = (paymentData.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[currency];
+  const isKenya = currency === "KES";
 
   const handleBack = () => {
     setCurrentStep("amount");
   };
 
-  // Format phone number to 07... format
+  // Format phone number to 07... format (Kenya-specific)
   const formatPhoneNumber = (phone: string) => {
     // Remove all non-digit characters
-    const cleaned = phone.replace(/\D/g, '');
-    
+    const cleaned = phone.replace(/\D/g, "");
+
     // If starts with 254, convert to 07 format
-    if (cleaned.startsWith('254')) {
+    if (cleaned.startsWith("254")) {
       const localPart = cleaned.substring(3);
-      if (localPart.startsWith('7')) {
-        return '07' + localPart.substring(1);
+      if (localPart.startsWith("7")) {
+        return "07" + localPart.substring(1);
       }
-      if (localPart.startsWith('1')) {
-        return '01' + localPart.substring(1);
+      if (localPart.startsWith("1")) {
+        return "01" + localPart.substring(1);
       }
     }
-    
+
     // If starts with +254, remove + and convert
-    if (phone.startsWith('+254')) {
+    if (phone.startsWith("+254")) {
       return formatPhoneNumber(cleaned);
     }
-    
+
     // If starts with 7 (9 digits), add 07
-    if (cleaned.startsWith('7') && cleaned.length === 9) {
-      return '07' + cleaned.substring(1);
+    if (cleaned.startsWith("7") && cleaned.length === 9) {
+      return "07" + cleaned.substring(1);
     }
-    
-    // If starts with 1 (9 digits), add 01  
-    if (cleaned.startsWith('1') && cleaned.length === 9) {
-      return '01' + cleaned.substring(1);
+
+    // If starts with 1 (9 digits), add 01
+    if (cleaned.startsWith("1") && cleaned.length === 9) {
+      return "01" + cleaned.substring(1);
     }
-    
+
     // If already in 07... or 01... format, keep as is
-    if (cleaned.startsWith('07') || cleaned.startsWith('01')) {
+    if (cleaned.startsWith("07") || cleaned.startsWith("01")) {
       return cleaned;
     }
-    
+
     // Default: return cleaned number
     return cleaned;
   };
 
   const handleNext = () => {
     if (!accountIdentifier.trim()) return;
-    if (paymentData.type === "PAYBILL" && !accountNumber.trim()) return;
+    if (isKenya && paymentData.type === "PAYBILL" && !accountNumber.trim()) return;
+    if (!isKenya && !selectedInstitution) return;
 
-    // Format phone number for MOBILE type
-    const formattedIdentifier = paymentData.type === "MOBILE" 
-      ? formatPhoneNumber(accountIdentifier.trim())
-      : accountIdentifier.trim();
+    // Format phone number for Kenya MOBILE type
+    const formattedIdentifier =
+      isKenya && paymentData.type === "MOBILE"
+        ? formatPhoneNumber(accountIdentifier.trim())
+        : accountIdentifier.trim();
 
-    const recipient = {
+    const recipient: any = {
       accountIdentifier: formattedIdentifier,
-      ...(paymentData.type === "PAYBILL" && { accountNumber: accountNumber.trim() }),
-      ...(accountName.trim() && { accountName: accountName.trim() }),
-      institution: "Safaricom" as const,
-      type: paymentData.type!,
-      currency: "KES" as const,
+      currency: currency,
     };
+
+    if (isKenya) {
+      // Kenya: Include type and use Safaricom
+      recipient.type = paymentData.type;
+      recipient.institution = "Safaricom";
+      if (paymentData.type === "PAYBILL") {
+        recipient.accountNumber = accountNumber.trim();
+      }
+    } else {
+      // Other countries: Include selected institution, no type
+      recipient.institution = selectedInstitution;
+    }
+
+    if (accountName.trim()) {
+      recipient.accountName = accountName.trim();
+    }
 
     updatePaymentData({ recipient });
     setCurrentStep("confirmation");
@@ -78,55 +117,85 @@ export default function RecipientInput() {
 
   const isValidInput = () => {
     if (!accountIdentifier.trim()) return false;
-    if (paymentData.type === "PAYBILL" && !accountNumber.trim()) return false;
+    if (isKenya && paymentData.type === "PAYBILL" && !accountNumber.trim())
+      return false;
+    if (!isKenya && !selectedInstitution) return false;
     return true;
   };
 
   const getInputLabels = () => {
-    switch (paymentData.type) {
-      case "MOBILE":
-        return {
-          primary: "Mobile Number",
-          primaryPlaceholder: "0712 345 678",
-          secondary: null,
-          secondaryPlaceholder: null,
-        };
-      case "PAYBILL":
-        return {
-          primary: "Paybill Number",
-          primaryPlaceholder: "400200",
-          secondary: "Account Number",
-          secondaryPlaceholder: "Account number",
-        };
-      case "BUY_GOODS":
-        return {
-          primary: "Till Number",
-          primaryPlaceholder: "123456",
-          secondary: null,
-          secondaryPlaceholder: null,
-        };
-      default:
-        return {
-          primary: "Account",
-          primaryPlaceholder: "",
-          secondary: null,
-          secondaryPlaceholder: null,
-        };
+    if (isKenya) {
+      switch (paymentData.type) {
+        case "MOBILE":
+          return {
+            primary: "Mobile Number",
+            primaryPlaceholder: "0712 345 678",
+            secondary: null,
+            secondaryPlaceholder: null,
+          };
+        case "PAYBILL":
+          return {
+            primary: "Paybill Number",
+            primaryPlaceholder: "400200",
+            secondary: "Account Number",
+            secondaryPlaceholder: "Account number",
+          };
+        case "BUY_GOODS":
+          return {
+            primary: "Till Number",
+            primaryPlaceholder: "123456",
+            secondary: null,
+            secondaryPlaceholder: null,
+          };
+        default:
+          return {
+            primary: "Account",
+            primaryPlaceholder: "",
+            secondary: null,
+            secondaryPlaceholder: null,
+          };
+      }
+    } else {
+      // Non-Kenya countries - users enter without country code
+      const placeholders: Record<Exclude<SupportedCurrency, "USD" | "KES">, string> = {
+        ETB: "0912345678",  // Ethiopia format
+        UGX: "0772345678",  // Uganda format
+        GHS: "0241234567",  // Ghana format  
+        NGN: "0803456789",  // Nigeria format
+      };
+      return {
+        primary: "Phone Number",
+        primaryPlaceholder: placeholders[currency as keyof typeof placeholders] || "Phone number",
+        secondary: null,
+        secondaryPlaceholder: null,
+      };
     }
   };
 
   const labels = getInputLabels();
 
   const getPaymentTypeLabel = () => {
-    switch (paymentData.type) {
-      case "MOBILE":
-        return "Send Money";
-      case "PAYBILL":
-        return "Paybill Payment";
-      case "BUY_GOODS":
-        return "Buy Goods Payment";
-      default:
-        return "Payment";
+    if (isKenya) {
+      switch (paymentData.type) {
+        case "MOBILE":
+          return "Send Money";
+        case "PAYBILL":
+          return "Paybill Payment";
+        case "BUY_GOODS":
+          return "Buy Goods Payment";
+        default:
+          return "Payment";
+      }
+    } else {
+      const countryNames: Record<SupportedCurrency, string> = {
+        KES: "Kenya",
+        ETB: "Ethiopia",
+        UGX: "Uganda",
+        GHS: "Ghana",
+        NGN: "Nigeria",
+        USD: "International",
+      };
+      return `Send to ${countryNames[currency]}`;
     }
   };
 
@@ -146,23 +215,47 @@ export default function RecipientInput() {
       </div>
 
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-medium mb-2">Enter Details</h2>
+        <h2 className="text-2xl font-medium mb-2">Enter Recipient Details</h2>
         <p className="text-text-subtle">
-          {paymentData.type === "MOBILE" && "Enter the mobile number to send money to"}
-          {paymentData.type === "PAYBILL" && "Enter the paybill and account details"}
-          {paymentData.type === "BUY_GOODS" && "Enter the till number to pay to"}
+          {isKenya && paymentData.type === "MOBILE" && "Enter the mobile number to send money to"}
+          {isKenya && paymentData.type === "PAYBILL" && "Enter the paybill and account details"}
+          {isKenya && paymentData.type === "BUY_GOODS" && "Enter the till number to pay to"}
+          {!isKenya && "Enter the phone number and select the provider"}
         </p>
       </div>
 
       {/* Amount Summary */}
       <div className="bg-surface-subtle rounded-lg p-4 mb-6">
         <div className="text-center">
-          <p className="text-text-subtle text-sm">Amount to Pay</p>
-          <p className="text-2xl font-bold">KSh {(paymentData.amount || 0).toLocaleString()}</p>
+          <p className="text-text-subtle text-sm">Amount to Send</p>
+          <p className="text-2xl font-bold">
+            {currencySymbol} {(paymentData.amount || 0).toLocaleString()} ({currency})
+          </p>
         </div>
       </div>
 
       <div className="w-full max-w-sm mx-auto space-y-4">
+        {/* Institution Selector (Non-Kenya only) */}
+        {!isKenya && currency !== "USD" && (
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Provider <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={selectedInstitution}
+              onChange={(e) => setSelectedInstitution(e.target.value)}
+              className="w-full p-3 bg-surface-subtle border border-surface rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary text-base"
+            >
+              <option value="">Select provider</option>
+              {INSTITUTIONS[currency as keyof typeof INSTITUTIONS]?.map((inst) => (
+                <option key={inst} value={inst}>
+                  {inst}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Primary Input (Mobile/Paybill/Till Number) */}
         <div>
           <label className="block text-sm font-medium mb-2">
@@ -174,7 +267,7 @@ export default function RecipientInput() {
             onChange={(e) => setAccountIdentifier(e.target.value)}
             placeholder={labels.primaryPlaceholder}
             className="w-full p-3 bg-surface-subtle border border-surface rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary text-base"
-            autoFocus
+            autoFocus={isKenya} // Only autofocus for Kenya (since others need to select institution first)
           />
         </div>
 

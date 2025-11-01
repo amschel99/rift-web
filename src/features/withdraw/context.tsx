@@ -4,7 +4,8 @@ import { OfframpOrder } from "@/hooks/data/use-create-withdrawal-order";
 export type WithdrawStep = "amount" | "confirmation" | "success";
 
 export interface WithdrawData {
-  amount?: number; // KES amount entered by user
+  amount?: number; // Local currency amount entered by user
+  currency?: string; // Currency code (KES, ETB, NGN, etc.)
 }
 
 interface WithdrawContextType {

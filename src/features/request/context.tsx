@@ -7,9 +7,9 @@ export type RequestType = "request" | "topup";
 interface RequestContextType {
   currentStep: RequestStep;
   setCurrentStep: (step: RequestStep) => void;
-  requestData: Partial<CreateInvoiceRequest>;
-  setRequestData: (data: Partial<CreateInvoiceRequest>) => void;
-  updateRequestData: (updates: Partial<CreateInvoiceRequest>) => void;
+  requestData: Partial<CreateInvoiceRequest> & { currency?: string };
+  setRequestData: (data: Partial<CreateInvoiceRequest> & { currency?: string }) => void;
+  updateRequestData: (updates: Partial<CreateInvoiceRequest> & { currency?: string }) => void;
   createdInvoice: any;
   setCreatedInvoice: (invoice: any) => void;
   requestType: RequestType;
@@ -24,14 +24,14 @@ interface RequestProviderProps {
 
 export function RequestProvider({ children }: RequestProviderProps) {
   const [currentStep, setCurrentStep] = useState<RequestStep>("amount");
-  const [requestData, setRequestData] = useState<Partial<CreateInvoiceRequest>>({
+  const [requestData, setRequestData] = useState<Partial<CreateInvoiceRequest> & { currency?: string }>({
     chain: "BASE",
     token: "USDC",
   });
   const [createdInvoice, setCreatedInvoice] = useState<any>(null);
   const [requestType, setRequestType] = useState<RequestType>("request");
 
-  const updateRequestData = (updates: Partial<CreateInvoiceRequest>) => {
+  const updateRequestData = (updates: Partial<CreateInvoiceRequest> & { currency?: string }) => {
     setRequestData(prev => ({ ...prev, ...updates }));
   };
 

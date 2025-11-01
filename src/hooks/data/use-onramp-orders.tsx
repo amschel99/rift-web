@@ -8,6 +8,7 @@ export interface OnrampOrder {
   receipt_number?: string | null;
   transaction_hash?: string | null;
   amount?: string | null;
+  currency?: string; // Currency code (KES, ETB, UGX, GHS, etc.)
 }
 
 export default function useOnrampOrders() {

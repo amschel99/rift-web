@@ -18,18 +18,39 @@ const SUPPORTED_CURRENCIES: Currency[] = [
     available: true,
   },
   {
-    code: "UGX",
-    name: "Ugandan Shilling",
-    symbol: "USh",
-    flag: "🇺🇬",
-    available: false,
-  },
-  {
     code: "NGN",
     name: "Nigerian Naira",
     symbol: "₦",
     flag: "🇳🇬",
-    available: false,
+    available: false, // Not active yet
+  },
+  {
+    code: "ETB",
+    name: "Ethiopian Birr",
+    symbol: "Br",
+    flag: "🇪🇹",
+    available: true,
+  },
+  {
+    code: "UGX",
+    name: "Ugandan Shilling",
+    symbol: "USh",
+    flag: "🇺🇬",
+    available: true,
+  },
+  {
+    code: "GHS",
+    name: "Ghanaian Cedi",
+    symbol: "₵",
+    flag: "🇬🇭",
+    available: true,
+  },
+  {
+    code: "USD",
+    name: "US Dollar",
+    symbol: "$",
+    flag: "🌍",
+    available: true,
   },
   {
     code: "TZS",
@@ -109,16 +130,11 @@ export default function CurrencySelector({
 
       {isOpen && (
         <div className="absolute top-full right-0 mt-2 w-64 bg-surface-subtle border border-surface rounded-xl shadow-xl z-50 overflow-hidden">
-          {SUPPORTED_CURRENCIES.map((currency) => (
+          {SUPPORTED_CURRENCIES.filter(currency => currency.available).map((currency) => (
             <button
               key={currency.code}
               onClick={() => handleCurrencySelect(currency)}
-              disabled={!currency.available}
-              className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
-                !currency.available
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-surface-alt cursor-pointer"
-              } ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors hover:bg-surface-alt cursor-pointer ${
                 currency.code === selectedCurrency ? "bg-surface-alt" : ""
               }`}
             >
@@ -129,11 +145,6 @@ export default function CurrencySelector({
                   <span className="text-xs text-text-subtle">{currency.name}</span>
                 </div>
               </div>
-              {!currency.available && (
-                <span className="text-xs text-text-subtle bg-surface px-2 py-1 rounded-full">
-                  Coming Soon
-                </span>
-              )}
             </button>
           ))}
         </div>

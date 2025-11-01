@@ -6,11 +6,15 @@ import ActionButton from "@/components/ui/action-button";
 
 export default function PaymentTypeSelector() {
   const navigate = useNavigate();
-  const { updatePaymentData, setCurrentStep } = usePay();
+  const { paymentData, updatePaymentData, setCurrentStep } = usePay();
 
   const handleTypeSelect = (type: "MOBILE" | "PAYBILL" | "BUY_GOODS") => {
     updatePaymentData({ type });
     setCurrentStep("amount");
+  };
+
+  const handleBack = () => {
+    setCurrentStep("country");
   };
 
   return (
@@ -21,16 +25,16 @@ export default function PaymentTypeSelector() {
       className="flex flex-col h-full p-4"
     >
       <div className="flex items-center justify-between mb-8">
-        <button onClick={() => navigate("/app")} className="p-2">
+        <button onClick={handleBack} className="p-2">
           <FiArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold">Pay with Rift</h1>
+        <h1 className="text-xl font-semibold">Send to Kenya 🇰🇪</h1>
         <div className="w-5 h-5" /> {/* Placeholder for alignment */}
       </div>
 
       <div className="text-center mb-8">
         <h2 className="text-2xl font-medium mb-2">Choose Payment Type</h2>
-        <p className="text-text-subtle">Select how you want to pay</p>
+        <p className="text-text-subtle">Select how you want to send money</p>
       </div>
 
       <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
@@ -85,7 +89,7 @@ export default function PaymentTypeSelector() {
 
       <div className="mt-auto text-center">
         <p className="text-sm text-text-subtle">
-          Pay anywhere M-Pesa is accepted using your Rift balance
+          Send money anywhere M-Pesa is accepted using your Rift balance
         </p>
       </div>
     </motion.div>

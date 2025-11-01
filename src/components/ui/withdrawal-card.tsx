@@ -2,12 +2,24 @@ import { formatDistanceToNow } from "date-fns";
 import { Smartphone, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { OfframpOrder } from "@/hooks/data/use-withdrawal-orders";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 interface WithdrawalCardProps {
   order: OfframpOrder;
 }
 
 export default function WithdrawalCard({ order }: WithdrawalCardProps) {
+  const currency = (order.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[currency] || currency;
   const copyTransactionCode = () => {
     navigator.clipboard.writeText(order.transactionCode);
     toast.success("Transaction code copied!");
@@ -16,7 +28,7 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
   const copyMpesaCode = () => {
     if (order.receipt_number) {
       navigator.clipboard.writeText(order.receipt_number);
-      toast.success("M-Pesa code copied!");
+      toast.success("Receipt code copied!");
     }
   };
 
@@ -28,7 +40,7 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
             <Smartphone className="w-3 h-3 text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-medium text-text-default">M-Pesa</h3>
+            <h3 className="text-sm font-medium text-text-default">Mobile Money</h3>
             <p className="text-xs text-text-subtle">
               {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}
             </p>
@@ -39,7 +51,7 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
       <div className="space-y-2">
         {/* Amount */}
         <p className="text-sm font-semibold text-text-default">
-          KSh {Number(order.amount || 0).toFixed(2)}
+          {currencySymbol} {Number(order.amount || 0).toFixed(2)} ({currency})
         </p>
         
         {/* Transaction Code */}
@@ -56,16 +68,16 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
           </button>
         </div>
 
-        {/* M-Pesa Receipt Number (if available) */}
+        {/* Receipt Number (if available) */}
         {order.receipt_number && (
           <div className="flex justify-between items-center">
             <p className="text-xs text-text-subtle truncate flex-1">
-              M-Pesa: {order.receipt_number}
+              Receipt: {order.receipt_number}
             </p>
             <button
               onClick={copyMpesaCode}
               className="ml-2 text-xs text-accent-primary hover:text-accent-secondary transition-colors"
-              title="Copy M-Pesa Code"
+              title="Copy Receipt Code"
             >
               Copy
             </button>

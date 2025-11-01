@@ -2,12 +2,24 @@ import { motion } from "motion/react";
 import { ExternalLink, Copy } from "lucide-react";
 import { OnrampOrder } from "@/hooks/data/use-onramp-orders";
 import { toast } from "sonner";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 interface OnrampOrderCardProps {
   order: OnrampOrder;
 }
 
 export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
+  const currency = (order.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[currency] || currency;
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -25,7 +37,7 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
   const handleCopyMpesaCode = () => {
     if (order.receipt_number) {
       navigator.clipboard.writeText(order.receipt_number);
-      toast.success("M-Pesa code copied!");
+      toast.success("Receipt code copied!");
     }
   };
 
@@ -52,7 +64,7 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
             <span className="text-accent-primary font-medium text-sm">M</span>
           </div>
           <div>
-            <p className="text-sm font-medium">M-Pesa</p>
+            <p className="text-sm font-medium">Mobile Money</p>
             <p className="text-xs text-text-subtle">{formatDate(order.createdAt)}</p>
           </div>
         </div>
@@ -64,10 +76,10 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
         </button>
       </div>
 
-      {/* Amount - we don't have this in the API response, so we'll skip it */}
+      {/* Amount */}
       {order.amount && (
         <p className="text-sm font-medium mb-1">
-          {order.amount ? `KES ${Number(order.amount).toFixed(2)}` : ""} 
+          {currencySymbol} {Number(order.amount).toFixed(2)} ({currency})
         </p>
       )}
 
@@ -76,7 +88,7 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
         {order.transactionCode}
       </p>
 
-      {/* M-Pesa Code */}
+      {/* Receipt Code */}
       {order.receipt_number && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-text-subtle">{order.receipt_number}</p>

@@ -6,6 +6,16 @@ import { useRequest } from "../context";
 import useCreateInvoice from "@/hooks/data/use-create-invoice";
 import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 export default function DescriptionInput() {
   const {
@@ -21,6 +31,9 @@ export default function DescriptionInput() {
   const [loadingRate, setLoadingRate] = useState(true);
   const createInvoiceMutation = useCreateInvoice();
 
+  const requestCurrency = (requestData.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[requestCurrency];
+
   // Fetch exchange rate on component mount (use .selling_rate for invoice/onramp)
   useEffect(() => {
     const fetchExchangeRate = async () => {
@@ -32,17 +45,33 @@ export default function DescriptionInput() {
 
         rift.setBearerToken(authToken);
 
+        // For USD, no need to fetch exchange rate
+        if (requestCurrency === "USD") {
+          setSellingRate(1);
+          setWithdrawalRate(1);
+          setLoadingRate(false);
+          return;
+        }
+
         const response = await rift.offramp.previewExchangeRate({
-          currency: "KES" as any,
+          currency: requestCurrency as any,
         });
 
         setSellingRate(response.selling_rate); // Use .selling_rate for invoice/onramp
         setWithdrawalRate(response.rate); // Use .rate to show how much they'll receive
       } catch (error) {
         console.error("Error fetching exchange rate:", error);
-        // Fallback to approximate rate if API fails
-        setSellingRate(136); // Approximate 136 KES = 1 USD
-        setWithdrawalRate(136);
+        // Fallback to approximate rates if API fails
+        const fallbackRates: Record<SupportedCurrency, number> = {
+          KES: 136,
+          ETB: 62.5,
+          UGX: 3700,
+          GHS: 15.8,
+          NGN: 1580,
+          USD: 1,
+        };
+        setSellingRate(fallbackRates[requestCurrency]);
+        setWithdrawalRate(fallbackRates[requestCurrency]);
         toast.warning("Using approximate exchange rate");
       } finally {
         setLoadingRate(false);
@@ -50,7 +79,7 @@ export default function DescriptionInput() {
     };
 
     fetchExchangeRate();
-  }, []);
+  }, [requestCurrency]);
 
   const handleBack = () => {
     setCurrentStep("amount");
@@ -68,27 +97,32 @@ export default function DescriptionInput() {
     }
 
     try {
-      // Convert KES amount to USD using the selling rate
-      const kesAmount = requestData.amount || 0;
-      const usdAmount = kesAmount / sellingRate;
+      // Convert local currency amount to USD using the selling rate
+      // Round to 6 decimal places (USDC precision)
+      const localAmount = requestData.amount || 0;
+      const usdAmount = requestCurrency === "USD" 
+        ? localAmount 
+        : Math.round((localAmount / sellingRate) * 1e6) / 1e6;
       const receiveAmount = usdAmount * withdrawalRate;
 
       const invoiceRequest = {
-        ...requestData,
-        amount: usdAmount, // Send USD amount to API
+        chain: requestData.chain,
+        token: requestData.token,
+        amount: usdAmount, // Send USD amount to API (rounded to 6 decimals)
         description: description.trim(),
       } as any;
 
       const response = await createInvoiceMutation.mutateAsync(invoiceRequest);
 
-      // Store both KES and USD amounts for display purposes
-      const invoiceWithKes = {
+      // Store both local currency and USD amounts for display purposes
+      const invoiceWithLocalAmount = {
         ...response,
-        kesAmount: kesAmount, // Store original KES amount for display
+        localAmount: localAmount, // Store original local currency amount for display
+        currency: requestCurrency, // Store the currency code
         receiveAmount: receiveAmount, // Amount user will actually receive
       };
 
-      setCreatedInvoice(invoiceWithKes);
+      setCreatedInvoice(invoiceWithLocalAmount);
       setCurrentStep("sharing");
       toast.success("Payment request created successfully!");
     } catch (error) {
@@ -137,7 +171,7 @@ export default function DescriptionInput() {
               {requestType === "topup" ? "Adding to account" : "Requesting"}
             </p>
             <p className="text-2xl font-bold">
-              KSh {(requestData.amount || 0).toLocaleString()}
+              {currencySymbol} {(requestData.amount || 0).toLocaleString()} ({requestCurrency})
             </p>
             {sellingRate && withdrawalRate && (
               <div className="mt-3 pt-3 border-t border-surface">
@@ -145,11 +179,11 @@ export default function DescriptionInput() {
                   You will receive
                 </p>
                 <p className="text-lg font-semibold text-green-600">
-                  KSh{" "}
-                  {(
-                    ((requestData.amount || 0) / sellingRate) *
-                    withdrawalRate
-                  ).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  {currencySymbol}{" "}
+                  {requestCurrency === "USD" 
+                    ? (requestData.amount || 0).toFixed(2)
+                    : (((requestData.amount || 0) / sellingRate) * withdrawalRate).toLocaleString(undefined, { maximumFractionDigits: 2 })
+                  } ({requestCurrency})
                 </p>
                 <p className="text-xs text-text-subtle mt-1">in your wallet</p>
               </div>

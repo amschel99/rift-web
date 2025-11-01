@@ -1,23 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
 import rift from "@/lib/rift";
 
+export type SupportedCurrency = "KES" | "NGN" | "ETB" | "UGX" | "GHS" | "USD";
+
 export interface BaseUSDCBalance {
   usdcAmount: number;
-  kesAmount: number;
+  localAmount: number;
   exchangeRate: number;
-  currency: "KES";
+  currency: SupportedCurrency;
 }
 
-async function getBaseUSDCBalance(): Promise<BaseUSDCBalance> {
+interface UseBaseUSDCBalanceParams {
+  currency?: SupportedCurrency;
+}
+
+async function getBaseUSDCBalance(currency: SupportedCurrency = "USD"): Promise<BaseUSDCBalance> {
   try {
     // Ensure rift has the auth token
     const authToken = localStorage.getItem("token");
     if (!authToken) {
       return {
         usdcAmount: 0,
-        kesAmount: 0,
-        exchangeRate: 0,
-        currency: "KES",
+        localAmount: 0,
+        exchangeRate: currency === "USD" ? 1 : 0,
+        currency,
       };
     }
 
@@ -36,40 +42,52 @@ async function getBaseUSDCBalance(): Promise<BaseUSDCBalance> {
     if (usdcAmount === 0) {
       return {
         usdcAmount: 0,
-        kesAmount: 0,
-        exchangeRate: 0,
-        currency: "KES",
+        localAmount: 0,
+        exchangeRate: currency === "USD" ? 1 : 0,
+        currency,
       };
     }
 
-    //use rift sdk to get exchange rate
+    // For USD, no conversion needed (USDC = USD)
+    if (currency === "USD") {
+      return {
+        usdcAmount,
+        localAmount: usdcAmount,
+        exchangeRate: 1,
+        currency: "USD",
+      };
+    }
+
+    // Use rift sdk to get exchange rate for other currencies
     const exchangeRateResponse = await rift.offramp.previewExchangeRate({
-      currency: "KES" as any,
+      currency: currency as any,
     });
     const exchangeRate = exchangeRateResponse.rate;
-    const kesAmount = usdcAmount * exchangeRate;
+    const localAmount = usdcAmount * exchangeRate;
 
     return {
       usdcAmount,
-      kesAmount,
+      localAmount,
       exchangeRate,
-      currency: "KES",
+      currency,
     };
   } catch (error) {
-    console.error("Failed to get Base USDC balance:", error);
+    console.error(`Failed to get Base USDC balance for ${currency}:`, error);
     return {
       usdcAmount: 0,
-      kesAmount: 0,
-      exchangeRate: 0,
-      currency: "KES",
+      localAmount: 0,
+      exchangeRate: currency === "USD" ? 1 : 0,
+      currency,
     };
   }
 }
 
-export default function useBaseUSDCBalance() {
+export default function useBaseUSDCBalance(params: UseBaseUSDCBalanceParams = {}) {
+  const { currency = "USD" } = params;
+
   const query = useQuery({
-    queryKey: ["base-usdc-balance"],
-    queryFn: getBaseUSDCBalance,
+    queryKey: ["base-usdc-balance", currency],
+    queryFn: () => getBaseUSDCBalance(currency),
     refetchInterval: 1000, // Refetch every 1 second for real-time updates
     staleTime: 500, // Consider data stale after 500ms
     refetchIntervalInBackground: true, // Continue refetching even when tab is not active

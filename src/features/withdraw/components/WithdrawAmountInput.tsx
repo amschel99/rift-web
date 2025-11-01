@@ -5,26 +5,56 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useWithdraw } from "../context";
 import useUser from "@/hooks/data/use-user";
-import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
+import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
+
+// Currency symbols map
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 export default function WithdrawAmountInput() {
   const navigate = useNavigate();
   const { updateWithdrawData, setCurrentStep } = useWithdraw();
   const { data: user } = useUser();
-  const { data: balanceData, isLoading: balanceLoading } = useBaseUSDCBalance();
-  const [kesAmount, setKesAmount] = useState("");
+  
+  // Get payment account currency
+  const paymentAccountCurrency: SupportedCurrency = (() => {
+    const paymentAccount = user?.paymentAccount || user?.payment_account;
+    if (paymentAccount) {
+      try {
+        const account = JSON.parse(paymentAccount);
+        return account.currency || "KES";
+      } catch {
+        return "KES";
+      }
+    }
+    return "KES";
+  })();
+
+  const { data: balanceData, isLoading: balanceLoading } = useBaseUSDCBalance({
+    currency: paymentAccountCurrency,
+  });
+  
+  const [localAmount, setLocalAmount] = useState("");
   const [buyingRate, setBuyingRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
 
   // Check if user has payment account configured
   const hasPaymentAccount = !!(user?.paymentAccount || user?.payment_account);
 
-  // Get KES balance directly from useBaseUSDCBalance (same as homepage)
-  const kesBalance = balanceData?.kesAmount || 0;
+  // Get balance in local currency
+  const localBalance = balanceData?.localAmount || 0;
+  const currencySymbol = CURRENCY_SYMBOLS[paymentAccountCurrency];
+  const currencyCode = paymentAccountCurrency;
 
-  // Fetch exchange rate to get buying_rate for minimum withdrawal calculation
+  // Fetch exchange rate
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
@@ -36,15 +66,22 @@ export default function WithdrawAmountInput() {
         rift.setBearerToken(authToken);
 
         const response = await rift.offramp.previewExchangeRate({
-          currency: "KES" as any,
+          currency: paymentAccountCurrency as any,
         });
 
-        // Minimum withdrawal is 1 USDC × buying_rate
         setBuyingRate((response as any).buying_rate || response.rate);
       } catch (error) {
         console.error("Error fetching exchange rate:", error);
-        // Fallback
-        setBuyingRate(136);
+        // Fallback rates by currency
+        const fallbackRates: Record<SupportedCurrency, number> = {
+          KES: 136,
+          NGN: 1650,
+          ETB: 125,
+          UGX: 3850,
+          GHS: 16,
+          USD: 1,
+        };
+        setBuyingRate(fallbackRates[paymentAccountCurrency]);
         toast.warning("Using approximate exchange rate");
       } finally {
         setLoadingRate(false);
@@ -52,10 +89,10 @@ export default function WithdrawAmountInput() {
     };
 
     fetchExchangeRate();
-  }, []);
+  }, [paymentAccountCurrency]);
 
-  // Calculate minimum withdrawal: 1 USDC × buying_rate
-  const minWithdrawalKES = buyingRate ? Math.ceil(1 * buyingRate) : 30;
+  // Calculate minimum withdrawal: 0.3 USDC × buying_rate
+  const minWithdrawalLocal = buyingRate ? Math.round(0.3 * buyingRate) : 10;
 
   const handleAmountChange = (value: string) => {
     const numericValue = parseFloat(value);
@@ -63,40 +100,40 @@ export default function WithdrawAmountInput() {
     // Allow empty input or valid numbers
     if (value === "" || !isNaN(numericValue)) {
       // If there's a balance limit, don't allow typing beyond available amount
-      if (kesBalance && numericValue > kesBalance) {
+      if (localBalance && numericValue > localBalance) {
         toast.error(
-          `Maximum withdrawal amount is KSh ${kesBalance.toLocaleString()}`
+          `Maximum withdrawal amount is ${currencySymbol} ${localBalance.toLocaleString()}`
         );
         return;
       }
-      setKesAmount(value);
+      setLocalAmount(value);
     }
   };
 
   const handleNext = () => {
-    const amount = parseFloat(kesAmount);
+    const amount = parseFloat(localAmount);
 
     if (!amount || amount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
-    if (amount < minWithdrawalKES) {
+    if (amount < minWithdrawalLocal) {
       toast.error(
-        `Minimum withdrawal amount is KSh ${minWithdrawalKES.toLocaleString()}`
+        `Minimum withdrawal is ${currencySymbol} ${minWithdrawalLocal.toLocaleString()} (0.3 USDC)`
       );
       return;
     }
 
-    // Check if user has sufficient KES balance
-    if (kesBalance && amount > kesBalance) {
+    // Check if user has sufficient balance
+    if (localBalance && amount > localBalance) {
       toast.error(
-        `Insufficient balance. You can withdraw up to KSh ${kesBalance.toLocaleString()}.`
+        `Insufficient balance. You can withdraw up to ${currencySymbol} ${localBalance.toLocaleString()}.`
       );
       return;
     }
 
-    updateWithdrawData({ amount });
+    updateWithdrawData({ amount, currency: currencyCode });
     setCurrentStep("confirmation");
   };
 
@@ -105,7 +142,7 @@ export default function WithdrawAmountInput() {
     toast.info("Please setup your withdrawal account in profile settings");
   };
 
-  const isValidAmount = kesAmount && parseFloat(kesAmount) >= minWithdrawalKES;
+  const isValidAmount = localAmount && parseFloat(localAmount) >= minWithdrawalLocal;
 
   if (!hasPaymentAccount) {
     return (
@@ -158,15 +195,38 @@ export default function WithdrawAmountInput() {
       <div className="text-center mb-8">
         <h2 className="text-2xl font-medium mb-2">Enter Amount</h2>
         <p className="text-text-subtle">How much do you want to withdraw?</p>
+        <p className="text-xs text-text-subtle mt-2">
+          Withdrawing in {currencyCode} to your linked account
+        </p>
       </div>
 
+      {/* Withdrawal Account Info */}
+      {hasPaymentAccount && (
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
+          <p className="text-xs text-blue-700 dark:text-blue-300">
+            💳 Linked Account: {(() => {
+              const paymentAccount = user?.paymentAccount || user?.payment_account;
+              if (paymentAccount) {
+                try {
+                  const account = JSON.parse(paymentAccount);
+                  return `${account.institution} (${account.currency})`;
+                } catch {
+                  return "Account configured";
+                }
+              }
+              return "";
+            })()}
+          </p>
+        </div>
+      )}
+
       {/* Balance Display */}
-      {!balanceLoading && kesBalance > 0 && (
+      {!balanceLoading && localBalance > 0 && (
         <div className="bg-surface-subtle rounded-lg p-4 mb-6">
           <div className="text-center">
             <p className="text-text-subtle text-sm">Available Balance</p>
             <p className="text-xl font-bold">
-              KSh {kesBalance.toLocaleString()}
+              {currencySymbol} {localBalance.toLocaleString()}
             </p>
           </div>
         </div>
@@ -184,56 +244,48 @@ export default function WithdrawAmountInput() {
       <div className="w-full max-w-sm mx-auto">
         <div className="text-center mb-4">
           <div className="flex items-center justify-center mb-2">
-            <span className="text-lg font-medium mr-2">KSh</span>
+            <span className="text-lg font-medium mr-2">{currencySymbol}</span>
             <input
               type="number"
-              value={kesAmount}
+              value={localAmount}
               onChange={(e) => handleAmountChange(e.target.value)}
               placeholder="0"
               className="text-4xl font-bold bg-transparent border-none outline-none text-center w-full"
               autoFocus
-              max={kesBalance || undefined}
+              max={localBalance || undefined}
             />
           </div>
         </div>
 
         {/* Quick Amount Buttons */}
         <div className="grid grid-cols-3 gap-2 mb-8">
-          {[minWithdrawalKES, 100, 500, 1000, 2000, 5000]
+          {[minWithdrawalLocal, 100, 500, 1000, 2000, 5000]
             .filter((amount, index, arr) => arr.indexOf(amount) === index) // Remove duplicates
-            .filter((amount) => !kesBalance || amount <= kesBalance)
+            .filter((amount) => !localBalance || amount <= localBalance)
             .sort((a, b) => a - b)
             .map((amount) => (
               <button
                 key={amount}
-                onClick={() => setKesAmount(amount.toString())}
+                onClick={() => setLocalAmount(amount.toString())}
                 className="p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors text-sm font-medium"
               >
-                KSh {amount.toLocaleString()}
+                {currencySymbol} {amount.toLocaleString()}
               </button>
             ))}
 
           {/* Add "Max" button if balance is available and not already in the list */}
-          {kesBalance &&
-            kesBalance > minWithdrawalKES &&
-            ![minWithdrawalKES, 100, 500, 1000, 2000, 5000].includes(
-              kesBalance
+          {localBalance &&
+            localBalance > minWithdrawalLocal &&
+            ![minWithdrawalLocal, 100, 500, 1000, 2000, 5000].includes(
+              localBalance
             ) && (
               <button
-                onClick={() => setKesAmount(kesBalance.toString())}
+                onClick={() => setLocalAmount(localBalance.toString())}
                 className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-lg hover:bg-accent-primary/20 transition-colors text-sm font-medium text-accent-primary"
               >
-                Max: KSh {kesBalance.toLocaleString()}
+                Max: {currencySymbol} {localBalance.toLocaleString()}
               </button>
             )}
-        </div>
-
-        {/* Minimum Amount Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-6">
-          <p className="text-sm text-blue-700 dark:text-blue-300">
-            ℹ️ Minimum withdrawal amount is KSh{" "}
-            {minWithdrawalKES.toLocaleString()} (1 USDC)
-          </p>
         </div>
       </div>
 

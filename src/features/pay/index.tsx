@@ -1,4 +1,5 @@
 import { PayProvider, usePay } from "./context";
+import CountrySelector from "./components/CountrySelector";
 import PaymentTypeSelector from "./components/PaymentTypeSelector";
 import AmountInput from "./components/AmountInput";
 import RecipientInput from "./components/RecipientInput";
@@ -9,6 +10,8 @@ function PayContainer() {
 
   const renderCurrentStep = () => {
     switch (currentStep) {
+      case "country":
+        return <CountrySelector />;
       case "type":
         return <PaymentTypeSelector />;
       case "amount":
@@ -18,7 +21,7 @@ function PayContainer() {
       case "confirmation":
         return <PaymentConfirmation />;
       default:
-        return <PaymentTypeSelector />;
+        return <CountrySelector />;
     }
   };
 

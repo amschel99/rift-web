@@ -8,6 +8,16 @@ import usePayment from "@/hooks/data/use-payment";
 import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
 import ActionButton from "@/components/ui/action-button";
 import rift from "@/lib/rift";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+
+const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
+  KES: "KSh",
+  NGN: "₦",
+  ETB: "Br",
+  UGX: "USh",
+  GHS: "₵",
+  USD: "$",
+};
 
 export default function PaymentConfirmation() {
   const navigate = useNavigate();
@@ -17,9 +27,12 @@ export default function PaymentConfirmation() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const paymentMutation = usePayment();
 
-  // Get user's balance
-  const { data: balanceData } = useBaseUSDCBalance();
-  const kesBalance = balanceData?.kesAmount || 0;
+  const currency = (paymentData.currency || "KES") as SupportedCurrency;
+  const currencySymbol = CURRENCY_SYMBOLS[currency];
+
+  // Get user's balance in the payment currency
+  const { data: balanceData } = useBaseUSDCBalance({ currency });
+  const localBalance = balanceData?.localAmount || 0;
 
   // Fetch exchange rate on component mount (use .rate for offramp/payment)
   useEffect(() => {
@@ -32,15 +45,29 @@ export default function PaymentConfirmation() {
 
         rift.setBearerToken(authToken);
 
+        if (currency === "USD") {
+          setExchangeRate(1);
+          setLoadingRate(false);
+          return;
+        }
+
         const response = await rift.offramp.previewExchangeRate({
-          currency: "KES" as any,
+          currency: currency as any,
         });
 
         setExchangeRate(response.rate); // Use .rate for offramp
       } catch (error) {
         console.error("Error fetching exchange rate:", error);
-        // Fallback to approximate rate if API fails
-        setExchangeRate(136); // Approximate 136 KES = 1 USD
+        // Fallback to approximate rates if API fails
+        const fallbackRates: Record<SupportedCurrency, number> = {
+          KES: 136,
+          ETB: 62.5,
+          UGX: 3700,
+          GHS: 15.8,
+          NGN: 1580,
+          USD: 1,
+        };
+        setExchangeRate(fallbackRates[currency]);
         toast.warning("Using approximate exchange rate");
       } finally {
         setLoadingRate(false);
@@ -48,7 +75,7 @@ export default function PaymentConfirmation() {
     };
 
     fetchExchangeRate();
-  }, []);
+  }, [currency]);
 
   const handleBack = () => {
     setCurrentStep("recipient");
@@ -62,17 +89,20 @@ export default function PaymentConfirmation() {
 
     // Check if user has sufficient balance
     const paymentAmount = paymentData.amount;
-    if (paymentAmount > kesBalance) {
+    if (paymentAmount > localBalance) {
       toast.error(
-        `Insufficient balance. You can pay up to KSh ${kesBalance.toLocaleString()}.`
+        `Insufficient balance. You can send up to ${currencySymbol} ${localBalance.toLocaleString()} (${currency}).`
       );
       return;
     }
 
     try {
-      // Convert KES amount to USD using the fetched exchange rate
-      const kesAmount = paymentData.amount;
-      const usdAmount = kesAmount / exchangeRate;
+      // Convert local currency amount to USD using the fetched exchange rate
+      // Round to 6 decimal places (USDC precision)
+      const localAmount = paymentData.amount;
+      const usdAmount = currency === "USD" 
+        ? localAmount 
+        : Math.round((localAmount / exchangeRate) * 1e6) / 1e6;
 
       // Create recipient JSON string
       const recipientString = JSON.stringify(paymentData.recipient);
@@ -80,7 +110,7 @@ export default function PaymentConfirmation() {
       const paymentRequest = {
         token: "USDC" as const,
         amount: usdAmount, // Send USD amount to API
-        currency: "KES" as const,
+        currency: currency as any,
         chain: "base" as const,
         recipient: recipientString,
       };
@@ -104,15 +134,27 @@ export default function PaymentConfirmation() {
   };
 
   const getPaymentTypeLabel = () => {
-    switch (paymentData.type) {
-      case "MOBILE":
-        return "Send Money";
-      case "PAYBILL":
-        return "Paybill Payment";
-      case "BUY_GOODS":
-        return "Buy Goods Payment";
-      default:
-        return "Payment";
+    if (currency === "KES") {
+      switch (paymentData.type) {
+        case "MOBILE":
+          return "Send Money";
+        case "PAYBILL":
+          return "Paybill Payment";
+        case "BUY_GOODS":
+          return "Buy Goods Payment";
+        default:
+          return "Payment";
+      }
+    } else {
+      const countryNames: Record<SupportedCurrency, string> = {
+        KES: "Kenya",
+        ETB: "Ethiopia",
+        UGX: "Uganda",
+        GHS: "Ghana",
+        NGN: "Nigeria",
+        USD: "International",
+      };
+      return `Send to ${countryNames[currency]}`;
     }
   };
 
@@ -122,7 +164,7 @@ export default function PaymentConfirmation() {
     const { accountIdentifier, accountNumber, accountName, type } =
       paymentData.recipient;
 
-    if (type === "PAYBILL") {
+    if (currency === "KES" && type === "PAYBILL") {
       return `${accountIdentifier} - ${accountNumber}${
         accountName ? ` (${accountName})` : ""
       }`;
@@ -151,9 +193,9 @@ export default function PaymentConfirmation() {
 
         <div className="bg-surface-subtle rounded-lg p-4 w-full max-w-sm">
           <div className="text-center">
-            <p className="text-sm text-text-subtle">Amount Paid</p>
+            <p className="text-sm text-text-subtle">Amount Sent</p>
             <p className="text-xl font-bold">
-              KSh {(paymentData.amount || 0).toLocaleString()}
+              {currencySymbol} {(paymentData.amount || 0).toLocaleString()} ({currency})
             </p>
             <p className="text-sm text-text-subtle mt-1">
               To: {getRecipientDisplay()}
@@ -201,20 +243,23 @@ export default function PaymentConfirmation() {
           <div className="flex justify-between items-center">
             <span className="text-text-subtle">Amount</span>
             <span className="font-bold text-lg">
-              KSh {(paymentData.amount || 0).toLocaleString()}
+              {currencySymbol} {(paymentData.amount || 0).toLocaleString()} ({currency})
             </span>
           </div>
 
           {/* Recipient */}
           <div className="flex justify-between items-start">
             <span className="text-text-subtle">
-              {paymentData.type === "MOBILE" && "To"}
-              {paymentData.type === "PAYBILL" && "Paybill"}
-              {paymentData.type === "BUY_GOODS" && "Till"}
+              {currency === "KES" && paymentData.type === "MOBILE" && "To"}
+              {currency === "KES" && paymentData.type === "PAYBILL" && "Paybill"}
+              {currency === "KES" && paymentData.type === "BUY_GOODS" && "Till"}
+              {currency !== "KES" && "To"}
             </span>
             <div className="text-right">
               <div className="font-medium">{getRecipientDisplay()}</div>
-              <div className="text-sm text-text-subtle">via Safaricom</div>
+              <div className="text-sm text-text-subtle">
+                via {paymentData.recipient?.institution}
+              </div>
             </div>
           </div>
 
@@ -223,7 +268,7 @@ export default function PaymentConfirmation() {
             <div className="flex justify-between items-center">
               <span className="text-text-subtle text-sm">Your Balance</span>
               <span className="text-sm font-medium">
-                KSh {kesBalance.toLocaleString()}
+                {currencySymbol} {localBalance.toLocaleString()} ({currency})
               </span>
             </div>
           </div>
@@ -231,12 +276,12 @@ export default function PaymentConfirmation() {
       </div>
 
       {/* Insufficient Balance Warning */}
-      {paymentData.amount && paymentData.amount > kesBalance && (
+      {paymentData.amount && paymentData.amount > localBalance && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
           <p className="text-sm text-red-700 dark:text-red-300">
-            ⚠️ Insufficient balance. You need KSh{" "}
-            {paymentData.amount.toLocaleString()} but only have KSh{" "}
-            {kesBalance.toLocaleString()} available.
+            ⚠️ Insufficient balance. You need {currencySymbol}{" "}
+            {paymentData.amount.toLocaleString()} but only have {currencySymbol}{" "}
+            {localBalance.toLocaleString()} available.
           </p>
         </div>
       )}
@@ -254,16 +299,16 @@ export default function PaymentConfirmation() {
           onClick={handleConfirmPayment}
           disabled={
             loadingRate ||
-            !!(paymentData.amount && paymentData.amount > kesBalance)
+            !!(paymentData.amount && paymentData.amount > localBalance)
           }
           loading={paymentMutation.isPending || loadingRate}
           className="w-full"
         >
           {loadingRate
             ? "Loading..."
-            : paymentData.amount && paymentData.amount > kesBalance
+            : paymentData.amount && paymentData.amount > localBalance
             ? "Insufficient Balance"
-            : "Confirm & Pay"}
+            : "Confirm & Send"}
         </ActionButton>
       </div>
     </motion.div>

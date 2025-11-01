@@ -1,21 +1,32 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 
-export type PaymentType = "MOBILE" | "PAYBILL" | "BUY_GOODS";
+export type PaymentType = "MOBILE" | "PAYBILL" | "BUY_GOODS" | "PHONE_NUMBER";
 
-export type PayStep = "type" | "amount" | "recipient" | "confirmation";
+export type PayStep = "country" | "type" | "amount" | "recipient" | "confirmation";
+
+// Institution options per currency
+export type KenyaInstitution = "Safaricom";
+export type EthiopiaInstitution = "Telebirr" | "CBE Birr";
+export type UgandaInstitution = "MTN" | "Airtel Money";
+export type GhanaInstitution = "MTN" | "AirtelTigo" | "Airtel Money";
+export type NigeriaInstitution = string; // TBD
+
+export type Institution = KenyaInstitution | EthiopiaInstitution | UgandaInstitution | GhanaInstitution | NigeriaInstitution;
 
 export interface RecipientData {
-  accountIdentifier: string; // Mobile number for MOBILE, Paybill number for PAYBILL, Till number for BUY_GOODS
+  accountIdentifier: string; // Mobile number or Paybill/Till number
   accountNumber?: string; // Only for PAYBILL
   accountName?: string; // Optional display name
-  institution: "Safaricom";
-  type: PaymentType;
-  currency: "KES";
+  institution: Institution;
+  type?: PaymentType; // Only for Kenya (MOBILE, PAYBILL, BUY_GOODS)
+  currency: SupportedCurrency;
 }
 
 export interface PaymentData {
+  currency?: SupportedCurrency;
   type?: PaymentType;
-  amount?: number; // KES amount entered by user
+  amount?: number; // Local currency amount entered by user
   recipient?: RecipientData;
 }
 
@@ -31,7 +42,7 @@ const PayContext = createContext<PayContextType | undefined>(undefined);
 
 export const PayProvider = ({ children }: { children: ReactNode }) => {
   const [paymentData, setPaymentData] = useState<PaymentData>({});
-  const [currentStep, setCurrentStep] = useState<PayStep>("type");
+  const [currentStep, setCurrentStep] = useState<PayStep>("country");
 
   const updatePaymentData = (data: Partial<PaymentData>) => {
     setPaymentData((prev) => ({ ...prev, ...data }));
@@ -39,7 +50,7 @@ export const PayProvider = ({ children }: { children: ReactNode }) => {
 
   const resetPayment = () => {
     setPaymentData({});
-    setCurrentStep("type");
+    setCurrentStep("country");
   };
 
   return (

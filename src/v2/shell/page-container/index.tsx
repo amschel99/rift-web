@@ -25,6 +25,7 @@ import PredictionMarketDetails from "@/features/predictionmarkets/MarketDetails"
 import Request from "@/features/request";
 import Pay from "@/features/pay";
 import Withdraw from "@/features/withdraw";
+import Utilities from "@/features/utilities";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -126,6 +127,7 @@ export default function PageContainer() {
               <Route path="/app/request" element={<Request />} />
               <Route path="/app/pay" element={<Pay />} />
               <Route path="/app/withdraw" element={<Withdraw />} />
+              <Route path="/app/utilities" element={<Utilities />} />
       <Route path="/app/markets" element={<PredictionMarkets />} />
       <Route path="/app/markets/:id" element={<PredictionMarketDetails />} />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
