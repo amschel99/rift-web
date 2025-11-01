@@ -105,11 +105,52 @@ export default function Confirmation() {
 
       const txCode = result.order.transactionCode;
       setTransactionCode(txCode);
-      setPollingStatus("Processing airtime purchase...");
+      
+      // Check initial order status
+      const initialStatus = result.order.status;
+      console.log("Initial order status:", initialStatus);
 
-      // Poll status every 3 seconds
+      // For utilities, "initiated" or "pending" means it will be settled
+      if (initialStatus === "initiated" || initialStatus === "pending") {
+        setProcessing(false);
+        setPurchaseSuccess(true);
+        setPollingStatus("Airtime purchase initiated! It will be settled shortly.");
+        toast.success("✅ Airtime purchase initiated successfully!");
+
+        // Reset after 3 seconds and navigate home
+        setTimeout(() => {
+          resetUtility();
+          navigate("/app");
+        }, 3000);
+        return;
+      }
+
+      // If status is already completed (unlikely for utilities)
+      if (initialStatus === "completed") {
+        setProcessing(false);
+        setPurchaseSuccess(true);
+        setPollingStatus("Airtime sent successfully!");
+        toast.success("✅ Airtime sent successfully!");
+
+        setTimeout(() => {
+          resetUtility();
+          navigate("/app");
+        }, 3000);
+        return;
+      }
+
+      // If status is failed immediately
+      if (initialStatus === "failed") {
+        setProcessing(false);
+        setPurchaseError("Airtime purchase failed. Please try again.");
+        toast.error("Airtime purchase failed");
+        return;
+      }
+
+      // Fallback: Poll status if needed (shouldn't reach here normally)
+      setPollingStatus("Processing airtime purchase...");
       let attempts = 0;
-      const maxAttempts = 20; // 60 seconds total
+      const maxAttempts = 10; // 30 seconds total
 
       const pollInterval = setInterval(async () => {
         attempts++;
@@ -122,29 +163,29 @@ export default function Confirmation() {
 
           console.log(`[Attempt ${attempts}] Status:`, status.status);
 
-          if (status.status === "completed") {
+          if (status.status === "completed" || status.status === "initiated" || status.status === "pending") {
             clearInterval(pollInterval);
+            setProcessing(false);
             setPurchaseSuccess(true);
-            setPollingStatus("Airtime sent successfully!");
-            toast.success("✅ Airtime sent successfully!");
+            setPollingStatus("Airtime purchase initiated successfully!");
+            toast.success("✅ Airtime purchase initiated!");
 
-            // Reset after 3 seconds and navigate home
             setTimeout(() => {
               resetUtility();
               navigate("/app");
             }, 3000);
           } else if (status.status === "failed") {
             clearInterval(pollInterval);
+            setProcessing(false);
             setPurchaseError("Airtime purchase failed. Please try again.");
             toast.error("Airtime purchase failed");
           } else if (attempts >= maxAttempts) {
             clearInterval(pollInterval);
-            setPurchaseError(
-              "Transaction is taking longer than expected. Check your transaction history."
-            );
-            toast.warning("Transaction pending. Check history.");
+            setProcessing(false);
+            setPurchaseSuccess(true);
+            setPollingStatus("Airtime purchase submitted successfully!");
+            toast.success("✅ Airtime purchase submitted!");
             
-            // Navigate back after delay
             setTimeout(() => {
               resetUtility();
               navigate("/app");
@@ -187,10 +228,10 @@ export default function Confirmation() {
           <FiCheck className="w-8 h-8 text-white" />
         </div>
 
-        <h2 className="text-2xl font-bold mb-2">Airtime Sent!</h2>
+        <h2 className="text-2xl font-bold mb-2">Airtime Purchase Initiated!</h2>
         <p className="text-text-subtle text-center mb-4">
-          KSh {utilityData.amount?.toLocaleString()} airtime has been sent to{" "}
-          {utilityData.phoneNumber}
+          KSh {utilityData.amount?.toLocaleString()} airtime will be sent to{" "}
+          {utilityData.phoneNumber} shortly
         </p>
 
         <div className="bg-surface-subtle rounded-lg p-4 w-full max-w-sm">
