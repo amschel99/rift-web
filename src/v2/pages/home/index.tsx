@@ -359,9 +359,9 @@ export default function Home() {
         description={`${(ONRAMP_ORDERS?.length || 0) + (DEPOSITS?.length || 0)} deposits`}
       >
         <div className="space-y-6">
-          {/* M-Pesa Deposits Section */}
+          {/* Mobile Money Deposits Section */}
           <div>
-            <h3 className="text-sm font-medium text-text-default mb-3">M-Pesa Deposits</h3>
+            <h3 className="text-sm font-medium text-text-default mb-3">Mobile Money Deposits</h3>
             {ONRAMP_ORDERS && ONRAMP_ORDERS.length > 0 ? (
               <div className="space-y-3">
                 {ONRAMP_ORDERS.map((order) => (
@@ -370,7 +370,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="text-center py-8 text-text-subtle">
-                <p className="text-sm">No M-Pesa deposits found</p>
+                <p className="text-sm">No mobile money deposits found</p>
               </div>
             )}
           </div>
@@ -396,7 +396,7 @@ export default function Home() {
       <ViewAllModal
         isOpen={showAllWithdrawals}
         onClose={() => setShowAllWithdrawals(false)}
-        title="All M-Pesa Withdrawals"
+        title="All Mobile Money Withdrawals"
         description={`${WITHDRAWAL_ORDERS?.length || 0} withdrawals`}
       >
         {WITHDRAWAL_ORDERS && WITHDRAWAL_ORDERS.length > 0 ? (
@@ -407,7 +407,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-12 text-text-subtle">
-            <p className="text-sm">No M-Pesa withdrawals found</p>
+            <p className="text-sm">No mobile money withdrawals found</p>
           </div>
         )}
       </ViewAllModal>
