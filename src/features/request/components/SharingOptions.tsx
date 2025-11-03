@@ -662,9 +662,9 @@ export default function SharingOptions() {
                   <p className="text-sm text-green-800">
                     <strong>M-Pesa Prompt:</strong> The owner of the M-Pesa
                     number will receive a payment request directly on their
-                    phone to pay KSh{" "}
+                    phone to pay {currencySymbol}{" "}
                     {(
-                      createdInvoice.kesAmount || createdInvoice.amount
+                      createdInvoice?.localAmount || requestData.amount || 0
                     ).toLocaleString()}
                     .
                   </p>
