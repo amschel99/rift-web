@@ -36,8 +36,8 @@ importers:
         specifier: ^1.2.2
         version: 1.2.3(@types/react@18.3.23)(react@18.3.1)
       '@rift-finance/wallet':
-        specifier: ^1.4.13
-        version: 1.4.13(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.15
+        version: 1.4.15(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@tanstack/react-query':
         specifier: ^5.65.1
         version: 5.80.6(react@18.3.1)
@@ -1370,8 +1370,8 @@ packages:
   '@radix-ui/rect@1.1.1':
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
 
-  '@rift-finance/wallet@1.4.13':
-    resolution: {integrity: sha512-95UFM0acR5OzOSWNeY5gupf7HVhF20krPhmMp3Vnhypv0wFK3kv0+i4HdFB4Lcn8Z1wHve+LMbT49J3yD4iC4Q==}
+  '@rift-finance/wallet@1.4.15':
+    resolution: {integrity: sha512-xgoDMTms8wJEvq9gO2i8GQTttIVSK8gUcY3N2+2heYeMJwD4pg+rO6nUDQGhZTTQYBhEoNOEeyVPKG0qwP3dxw==}
 
   '@rolldown/pluginutils@1.0.0-beta.9':
     resolution: {integrity: sha512-e9MeMtVWo186sgvFFJOPGy7/d2j2mZhLJIdVW0C/xDluuOvymEATqz6zKsP0ZmXGzQtqlyjz5sC1sYQUoJG98w==}
@@ -5166,7 +5166,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@rift-finance/wallet@1.4.13(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@rift-finance/wallet@1.4.15(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       socket.io-client: 4.8.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
