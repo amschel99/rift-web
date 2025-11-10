@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["rift.png"],
+      includeAssets: ["rift.png", "hero.png", "icon.png", "splash.png", "s1.png", "s2.png", "s3.png"],
       manifest: {
         name: "Rift Payment Solutions",
         short_name: "Rift",

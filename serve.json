@@ -1,10 +1,7 @@
 {
-  "github": {
-    "enabled": true
-  },
   "headers": [
     {
-      "source": "/(.*).png",
+      "source": "**/*.png",
       "headers": [
         {
           "key": "Content-Type",
@@ -17,7 +14,7 @@
       ]
     },
     {
-      "source": "/(.*).jpg",
+      "source": "**/*.jpg",
       "headers": [
         {
           "key": "Content-Type",
@@ -30,7 +27,16 @@
       ]
     },
     {
-      "source": "/.well-known/farcaster.json",
+      "source": "**/*.svg",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "source": ".well-known/farcaster.json",
       "headers": [
         {
           "key": "Content-Type",
@@ -42,5 +48,12 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "**",
+      "destination": "/index.html"
+    }
   ]
 }
+

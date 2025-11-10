@@ -28,6 +28,10 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 RUN pnpm run build
+
+# Copy serve.json to dist folder for proper header configuration
+RUN cp serve.json dist/serve.json
+
 RUN npm install -g serve
 
 EXPOSE 8088

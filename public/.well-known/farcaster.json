@@ -1,36 +1,36 @@
 {
   
-    "accountAssociation": {
-      "header": "eyJmaWQiOjEzODk4OTMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg2ZTIzRENhOTk1Q0U0M2Y3OTJCNTNDNzNmQzdkRDA5QTkyQTVBMDAzIn0",
-      "payload": "eyJkb21haW4iOiJ3YWxsZXQucmlmdGZpLnh5eiJ9",
-      "signature": "fqnahawDnJLsY+yNZL1sBhayEVm3kPl1y0Vo3aZgLyFwt41HPLWO2THmGLAxBft6bzyViVglPFyCoL7XmdfUFBw="
-    },
-  
-  "baseBuilder": {
-    "ownerAddress": "0xD8f0d0C8b6b4bD2C1BB450C3642fC251AecAD81a" 
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEzODk4OTMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg2ZTIzRENhOTk1Q0U0M2Y3OTJCNTNDNzNmQzdkRDA5QTkyQTVBMDAzIn0",
+    "payload": "eyJkb21haW4iOiJ3YWxsZXQucmlmdGZpLnh5eiJ9",
+    "signature": "fqnahawDnJLsY+yNZL1sBhayEVm3kPl1y0Vo3aZgLyFwt41HPLWO2THmGLAxBft6bzyViVglPFyCoL7XmdfUFBw="
   },
-  "miniapp": {
-    "version": "1",
-    "name": "Rift Wallet",
-    "homeUrl": "https://wallet.riftfi.xyz",
-    "iconUrl": "https://wallet.riftfi.xyz/rift.png",
-    "splashImageUrl": "https://wallet.riftfi.xyz/rift.png",
-    "splashBackgroundColor": "#2E8C96",
-    "webhookUrl": "https://wallet.riftfi.xyz/farcaster/webhook",
-    "subtitle": "Send, spend, invest, earn",
-    "description": "Send money aywhere across Africa. Earn high and stable yields powered by top ecommerce businesses.",
-    "screenshotUrls": [
-      "https://wallet.riftfi.xyz/s1.png",
-      "https://wallet.riftfi.xyz/s2.png",
-      "https://wallet.riftfi.xyz/s3.png"
-    ],
-    "primaryCategory": "finance",
-    "tags": ["finance"],
-    "heroImageUrl": "https://wallet.riftfi.xyz/hero.png",
-    "tagline": "Save instantly",
-    "ogTitle": "Rift Wallet",
-    "ogDescription": "Send money aywhere across Africa. Earn high and stable yields powered by top ecommerce businesses.",
-    "ogImageUrl": "https://wallet.riftfi.xyz/rift.png",
-    "noindex": false
-  }
+
+"baseBuilder": {
+  "ownerAddress": "0xD8f0d0C8b6b4bD2C1BB450C3642fC251AecAD81a" 
+},
+"miniapp": {
+  "version": "1",
+  "name": "Rift Wallet",
+  "homeUrl": "https://wallet.riftfi.xyz",
+  "iconUrl": "https://wallet.riftfi.xyz/rift.png",
+  "splashImageUrl": "https://wallet.riftfi.xyz/rift.png",
+  "splashBackgroundColor": "#2E8C96",
+  "webhookUrl": "https://wallet.riftfi.xyz/farcaster/webhook",
+  "subtitle": "Send, spend, invest, earn",
+  "description": "Send money aywhere across Africa. Earn high and stable yields powered by top ecommerce businesses.",
+  "screenshotUrls": [
+    "https://wallet.riftfi.xyz/s1.png",
+    "https://wallet.riftfi.xyz/s2.png",
+    "https://wallet.riftfi.xyz/s3.png"
+  ],
+  "primaryCategory": "finance",
+  "tags": ["finance"],
+  "heroImageUrl": "https://wallet.riftfi.xyz/hero.png",
+  "tagline": "Save instantly",
+  "ogTitle": "Rift Wallet",
+  "ogDescription": "Send money aywhere across Africa. Earn high and stable yields powered by top ecommerce businesses.",
+  "ogImageUrl": "https://wallet.riftfi.xyz/hero.png",
+  "noindex": false
+}
 }
