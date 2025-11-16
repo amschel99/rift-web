@@ -117,27 +117,6 @@ export default function Loyalty() {
             </p>
           </div>
 
-          {/* Point Info - Show once */}
-          {pointValue && (
-            <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-text-subtle mb-1">Point Value</p>
-                  <p className="text-xl font-bold text-text-default">
-                    ${pointValue.pointValue.toFixed(2)} per point
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-text-subtle mb-1">Total Supply</p>
-                  <p className="text-lg font-bold text-text-default">
-                    {formatNumberWithCommas(pointValue.totalSupply)}
-                  </p>
-                  <p className="text-xs text-text-subtle mt-1">points issued</p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Stats Grid - Optional stats */}
           {(stats.currentStreak > 0 || stats.longestStreak > 0 || stats.transactionCount > 0 || stats.lastActivityDate) && (
             <div className="grid grid-cols-2 gap-4">
