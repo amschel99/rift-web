@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { toast } from "sonner";
-import { IoWalletOutline, IoPersonOutline } from "react-icons/io5";
+import { IoWalletOutline, IoPersonOutline, IoTrophyOutline } from "react-icons/io5";
 import { HiMiniUser } from "react-icons/hi2";
 import { IoIosPower } from "react-icons/io";
 import { FaArrowsRotate } from "react-icons/fa6";
@@ -12,6 +12,8 @@ import { usePlatformDetection } from "@/utils/platform";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import useUser from "@/hooks/data/use-user";
 import useUpdateUser from "@/hooks/data/use-update-user";
+import useLoyaltyStats from "@/hooks/data/use-loyalty-stats";
+import usePointValue from "@/hooks/data/use-point-value";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ActionButton from "@/components/ui/action-button";
 import PaymentAccountSetup from "@/components/ui/payment-account-setup";
@@ -24,6 +26,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
+import { formatNumberWithCommas } from "@/lib/utils";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -40,6 +43,16 @@ export default function Profile() {
   const { recoveryMethodsQuery } = useWalletRecovery({
     externalId: userQuery?.data?.externalId,
   });
+
+  // Fetch loyalty stats and point value
+  const { data: loyaltyStats } = useLoyaltyStats();
+  const { data: pointValue } = usePointValue();
+  
+  // Debug logging
+  useEffect(() => {
+    console.log("👤 [Profile] Loyalty stats:", loyaltyStats);
+    console.log("👤 [Profile] Should show rewards section:", !!loyaltyStats);
+  }, [loyaltyStats]);
 
   // Initialize display name from user data (handle both camelCase and snake_case)
   const userDisplayName = user?.displayName || user?.display_name;
@@ -166,6 +179,30 @@ export default function Profile() {
           </ActionButton>
         )}
       </div>
+
+      {/* Rift Points Section */}
+      {loyaltyStats && loyaltyStats.totalPoints !== undefined && (
+        <>
+          <p className="mt-6 text-sm text-muted-foreground">Rewards</p>
+          <div className="w-full bg-accent/10 border-1 border-surface-subtle mt-2 rounded-lg">
+            <ActionButton
+              onClick={() => navigate("/app/profile/loyalty")}
+              className="w-full bg-transparent p-3 py-4 rounded-none"
+            >
+              <span className="w-full flex flex-row items-center justify-between">
+                <div className="text-left">
+                  <span className="text-text-default block font-medium">Rift Points</span>
+                  <span className="text-xs text-text-subtle/70">
+                    {formatNumberWithCommas(loyaltyStats.totalPoints)} points
+                    {pointValue && ` • $${(loyaltyStats.totalPoints * pointValue.pointValue).toFixed(2)} USD`}
+                  </span>
+                </div>
+                <IoTrophyOutline className="text-accent-primary text-xl" />
+              </span>
+            </ActionButton>
+          </div>
+        </>
+      )}
 
       {/* Withdrawal Settings Section */}
       <p className="mt-6 text-sm text-muted-foreground">Withdrawal Settings</p>

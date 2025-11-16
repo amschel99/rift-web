@@ -1,10 +1,12 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
-import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline, IoEyeOutline, IoEyeOffOutline, IoAddCircleOutline, IoPhonePortraitOutline } from "react-icons/io5";
+import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline, IoEyeOutline, IoEyeOffOutline, IoAddCircleOutline, IoPhonePortraitOutline, IoTrophyOutline } from "react-icons/io5";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 import useCountryDetection from "@/hooks/data/use-country-detection";
+import useLoyaltyStats from "@/hooks/data/use-loyalty-stats";
+import usePointValue from "@/hooks/data/use-point-value";
 import useAnalaytics from "@/hooks/use-analytics";
 import useOnrampOrders from "@/hooks/data/use-onramp-orders";
 import useWithdrawalOrders from "@/hooks/data/use-withdrawal-orders";
@@ -76,6 +78,17 @@ export default function Home() {
   const { data: BASE_USDC_BALANCE, isLoading: BASE_USDC_LOADING } = useBaseUSDCBalance({
     currency: selectedCurrency.code as SupportedCurrency,
   });
+
+  // Fetch loyalty stats and point value
+  const { data: loyaltyStats, isLoading: loyaltyLoading } = useLoyaltyStats();
+  const { data: pointValue } = usePointValue();
+  
+  // Debug logging
+  useEffect(() => {
+    console.log("🏠 [Home] Loyalty stats:", loyaltyStats);
+    console.log("🏠 [Home] Loyalty loading:", loyaltyLoading);
+    console.log("🏠 [Home] Should show badge:", !!(loyaltyStats && !loyaltyLoading));
+  }, [loyaltyStats, loyaltyLoading]);
 
   // Advanced mode state
   const { isAdvanced, setIsAdvanced } = useAdvancedMode();
@@ -216,6 +229,17 @@ export default function Home() {
               )}
             </button>
           </div>
+
+          {/* Rift Points - Next to Balance */}
+          {loyaltyStats && !loyaltyLoading && loyaltyStats.totalPoints !== undefined && (
+            <button
+              onClick={() => navigate("/app/profile/loyalty")}
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+            >
+              <IoTrophyOutline className="w-4 h-4" />
+              <span>{formatNumberWithCommas(loyaltyStats.totalPoints)} Rift Points</span>
+            </button>
+          )}
           
           {/* Top Up Button - Integrated with balance */}
           <div className="mt-4">

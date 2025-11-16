@@ -1,0 +1,964 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Rift Loyalty Rewards API",
+      "description": "A flat-rate loyalty rewards system that automatically awards points for transactions. Each point has a fixed value of $0.05 USD. Users earn different amounts of points based on transaction type: Offramp/Onramp (20% cashback), Airtime (10% cashback), Blockchain (5% cashback). Simple, transparent, and predictable rewards for all users.",
+      "version": "1.0.0",
+      "contact": {
+        "name": "Rift API Support",
+        "url": "https://riftfi.xyz",
+        "email": "support@riftfi.xyz"
+      }
+    },
+    "servers": [
+      {
+        "url": "https://payment.riftfi.xyz",
+        "description": "Production server"
+      },
+      {
+        "url": "http://localhost:3000",
+        "description": "Development server"
+      }
+    ],
+    "tags": [
+      {
+        "name": "User Stats",
+        "description": "User loyalty balance and statistics"
+      },
+      {
+        "name": "Activity",
+        "description": "User earning history and leaderboard"
+      },
+      {
+        "name": "System",
+        "description": "System metrics and configuration (admin)"
+      },
+      {
+        "name": "Redemption",
+        "description": "Point redemption and cash-out"
+      }
+    ],
+    "paths": {
+      "/api/loyalty/stats": {
+        "get": {
+          "tags": ["User Stats"],
+          "summary": "Get my loyalty stats",
+          "description": "Returns authenticated user's loyalty balance, tier, multipliers, and statistics. Points are automatically awarded after each transaction.",
+          "operationId": "getMyLoyaltyStats",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Loyalty stats retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoyaltyStatsResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "userId": "user-abc123",
+                      "totalPoints": 1250,
+                      "currentPointValue": 0.008,
+                      "totalValueUsd": 10.0,
+                      "tier": "EARLY_ADOPTER",
+                      "currentStreak": 5,
+                      "longestStreak": 12,
+                      "transactionCount": 25,
+                      "lastActivityDate": "2025-11-16T10:30:00.000Z",
+                      "multiplier": 3.0
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/Unauthorized"
+            },
+            "500": {
+              "$ref": "#/components/responses/InternalError"
+            }
+          }
+        }
+      },
+      "/api/loyalty/history": {
+        "get": {
+          "tags": ["Activity"],
+          "summary": "Get my activity history",
+          "description": "Returns authenticated user's complete earning history with transaction details. Shows all points earned from offramps, onramps, payments, and blockchain transactions.",
+          "operationId": "getMyLoyaltyHistory",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Activity history retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoyaltyHistoryResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "activities": [
+                        {
+                          "id": "act-123",
+                          "type": "OFFRAMP",
+                          "pointsEarned": 60,
+                          "transactionValue": 1000,
+                          "transactionId": "tx-abc",
+                          "createdAt": "2025-11-16T10:30:00.000Z",
+                          "metadata": {
+                            "currency": "KES",
+                            "isUtility": false
+                          }
+                        },
+                        {
+                          "id": "act-124",
+                          "type": "ONRAMP",
+                          "pointsEarned": 40,
+                          "transactionValue": 500,
+                          "transactionId": "tx-def",
+                          "createdAt": "2025-11-16T09:15:00.000Z",
+                          "metadata": {
+                            "currency": "KES"
+                          }
+                        },
+                        {
+                          "id": "act-125",
+                          "type": "BLOCKCHAIN_TXN",
+                          "pointsEarned": 15,
+                          "transactionValue": 50,
+                          "transactionId": "0x123abc...",
+                          "createdAt": "2025-11-16T08:00:00.000Z",
+                          "metadata": {
+                            "chain": "BASE",
+                            "token": "USDC"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/Unauthorized"
+            }
+          }
+        }
+      },
+      "/api/loyalty/leaderboard": {
+        "get": {
+          "tags": ["Activity"],
+          "summary": "Get loyalty leaderboard",
+          "description": "Returns top users ranked by total points earned (highest to lowest). Privacy-focused: only shows user IDs, no personal information. Public endpoint - requires API key only.",
+          "operationId": "getLoyaltyLeaderboard",
+          "parameters": [
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "Number of top users to return (default: 100)",
+              "schema": {
+                "type": "integer",
+                "default": 100,
+                "minimum": 1,
+                "maximum": 500
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Leaderboard retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LeaderboardResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "leaderboard": [
+                        {
+                          "rank": 1,
+                          "userId": "8017b8a5-ac04-4d13-b216-571fef890fff",
+                          "totalPoints": 5000,
+                          "totalVolume": 1250.00,
+                          "tier": "PLATINUM"
+                        },
+                        {
+                          "rank": 2,
+                          "userId": "101dd3b9-8144-46e7-8c6e-08b832f34dfd",
+                          "totalPoints": 3500,
+                          "totalVolume": 875.00,
+                          "tier": "GOLD"
+                        },
+                        {
+                          "rank": 3,
+                          "userId": "a5f2c8e1-9b3d-4e7f-8a2c-1d4e5f6a7b8c",
+                          "totalPoints": 2800,
+                          "totalVolume": 700.00,
+                          "tier": "SILVER"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/loyalty/point-value": {
+        "get": {
+          "tags": ["System"],
+          "summary": "Get current point value",
+          "description": "Returns the current USD value per loyalty point. Value decreases as more points are issued (bonding curve). Public endpoint.",
+          "operationId": "getCurrentPointValue",
+          "responses": {
+            "200": {
+              "description": "Point value retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/PointValueResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "currentPointValue": 0.008,
+                      "totalPointsIssued": 125000,
+                      "formula": "bonding curve",
+                      "description": "Point value decreases as supply increases"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/loyalty/metrics": {
+        "get": {
+          "tags": ["System"],
+          "summary": "Get loyalty system metrics",
+          "description": "Returns overall system statistics including budget utilization, total commitment, and user engagement. Admin endpoint - requires authentication.",
+          "operationId": "getLoyaltyMetrics",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Metrics retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/MetricsResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "totalPointsIssued": 125000,
+                      "currentPointValue": 0.008,
+                      "totalCommitment": 1000.0,
+                      "budgetRemaining": 4000.0,
+                      "utilizationRate": 20.0,
+                      "totalUsers": 250,
+                      "avgPointsPerUser": 500,
+                      "activeUsers": 180,
+                      "lastUpdated": "2025-11-16T12:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/Unauthorized"
+            }
+          }
+        }
+      },
+      "/api/loyalty/config": {
+        "get": {
+          "tags": ["System"],
+          "summary": "Get loyalty configuration",
+          "description": "Returns current loyalty system configuration including earning rates, bonding curve parameters, and multipliers. Admin endpoint.",
+          "operationId": "getLoyaltyConfig",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Configuration retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ConfigResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "config": {
+                        "TOTAL_BUDGET": 500,
+                        "CURVE_SCALE_FACTOR": 50000,
+                        "CURVE_DECAY_EXPONENT": 2.0,
+                        "BASE_RATES": {
+                          "OFFRAMP": 1,
+                          "ONRAMP": 1,
+                          "AIRTIME": 2,
+                          "BLOCKCHAIN_TXN": 0.5,
+                          "PAYMENT": 1
+                        },
+                        "STREAK_BONUS": {
+                          "MAX_BONUS": 2.0,
+                          "DAYS_FOR_MAX": 30
+                        },
+                        "TIER_MULTIPLIERS": {
+                          "EARLY_ADOPTER": 3.0,
+                          "BRONZE": 1.0,
+                          "SILVER": 1.2,
+                          "GOLD": 1.5,
+                          "PLATINUM": 2.0
+                        }
+                      },
+                      "note": "To update config, modify environment variables and restart server"
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/Unauthorized"
+            }
+          }
+        }
+      },
+      "/api/loyalty/redeem": {
+        "post": {
+          "tags": ["Redemption"],
+          "summary": "Redeem loyalty points",
+          "description": "Cash out loyalty points for fiat money. Points are converted to USD based on current point value and sent to specified account.",
+          "operationId": "redeemPoints",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedemptionRequest"
+                },
+                "examples": {
+                  "mpesa": {
+                    "summary": "M-Pesa cash out",
+                    "value": {
+                      "points": 1000,
+                      "redemptionType": "CASH_OUT",
+                      "details": {
+                        "accountNumber": "0712345678",
+                        "network": "Safaricom"
+                      }
+                    }
+                  },
+                  "bank": {
+                    "summary": "Bank transfer",
+                    "value": {
+                      "points": 5000,
+                      "redemptionType": "BANK_TRANSFER",
+                      "details": {
+                        "accountNumber": "1234567890",
+                        "bankName": "KCB",
+                        "accountName": "John Doe"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Redemption initiated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/RedemptionResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "redemption": {
+                        "id": "redeem-123",
+                        "accountId": "acc-abc",
+                        "pointsRedeemed": 1000,
+                        "redemptionValue": 8.0,
+                        "redemptionType": "CASH_OUT",
+                        "status": "pending",
+                        "details": {
+                          "accountNumber": "0712345678",
+                          "network": "Safaricom"
+                        },
+                        "createdAt": "2025-11-16T11:00:00.000Z",
+                        "estimatedCompletion": "2025-11-16T11:15:00.000Z"
+                      },
+                      "newBalance": 250,
+                      "message": "Redemption initiated. You will receive KES 1,000 at 0712345678 within 15 minutes."
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request or insufficient points",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  },
+                  "examples": {
+                    "insufficient": {
+                      "summary": "Insufficient points",
+                      "value": {
+                        "success": false,
+                        "error": "Insufficient points",
+                        "message": "You have 250 points but requested to redeem 1000 points"
+                      }
+                    },
+                    "minimum": {
+                      "summary": "Below minimum",
+                      "value": {
+                        "success": false,
+                        "error": "Minimum redemption not met",
+                        "message": "Minimum redemption is 100 points ($0.80)"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/Unauthorized"
+            }
+          }
+        }
+      },
+      "/api/loyalty/redemptions": {
+        "get": {
+          "tags": ["Redemption"],
+          "summary": "Get my redemption history",
+          "description": "Returns authenticated user's complete redemption history including pending, completed, and failed redemptions.",
+          "operationId": "getMyRedemptions",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Redemption history retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/RedemptionHistoryResponse"
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "redemptions": [
+                        {
+                          "id": "redeem-123",
+                          "pointsRedeemed": 1000,
+                          "redemptionValue": 8.0,
+                          "redemptionType": "CASH_OUT",
+                          "status": "completed",
+                          "details": {
+                            "accountNumber": "0712345678",
+                            "network": "Safaricom"
+                          },
+                          "createdAt": "2025-11-16T11:00:00.000Z",
+                          "completedAt": "2025-11-16T11:15:00.000Z",
+                          "transactionId": "MPESA-ABC123"
+                        },
+                        {
+                          "id": "redeem-124",
+                          "pointsRedeemed": 500,
+                          "redemptionValue": 4.0,
+                          "redemptionType": "CASH_OUT",
+                          "status": "pending",
+                          "details": {
+                            "accountNumber": "0712345678",
+                            "network": "Safaricom"
+                          },
+                          "createdAt": "2025-11-16T10:00:00.000Z"
+                        }
+                      ],
+                      "totalRedeemed": 1500,
+                      "totalValueUsd": 12.0
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/Unauthorized"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT",
+          "description": "JWT token obtained from authentication endpoint"
+        }
+      },
+      "schemas": {
+        "LoyaltyStatsResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": true
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string",
+                  "description": "User's unique identifier"
+                },
+                "totalPoints": {
+                  "type": "number",
+                  "description": "Total loyalty points balance"
+                },
+                "currentPointValue": {
+                  "type": "number",
+                  "description": "Current USD value per point"
+                },
+                "totalValueUsd": {
+                  "type": "number",
+                  "description": "Total value of points in USD"
+                },
+                "tier": {
+                  "type": "string",
+                  "enum": ["EARLY_ADOPTER", "BRONZE", "SILVER", "GOLD", "PLATINUM"],
+                  "description": "User's loyalty tier"
+                },
+                "currentStreak": {
+                  "type": "integer",
+                  "description": "Consecutive days with transactions"
+                },
+                "longestStreak": {
+                  "type": "integer",
+                  "description": "Longest consecutive day streak"
+                },
+                "transactionCount": {
+                  "type": "integer",
+                  "description": "Total number of transactions"
+                },
+                "lastActivityDate": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Last transaction date"
+                },
+                "multiplier": {
+                  "type": "number",
+                  "description": "Current earning multiplier (tier + streak bonuses)"
+                }
+              }
+            }
+          }
+        },
+        "LoyaltyHistoryResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "activities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoyaltyActivity"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "LoyaltyActivity": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Activity unique identifier"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["OFFRAMP", "ONRAMP", "PAYMENT", "BLOCKCHAIN_TXN", "AIRTIME"],
+              "description": "Type of activity that earned points"
+            },
+            "pointsEarned": {
+              "type": "number",
+              "description": "Points earned from this activity"
+            },
+            "transactionValue": {
+              "type": "number",
+              "description": "USD value of the transaction"
+            },
+            "transactionId": {
+              "type": "string",
+              "description": "Associated transaction ID"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "metadata": {
+              "type": "object",
+              "description": "Additional activity details (currency, chain, token, etc.)"
+            }
+          }
+        },
+        "LeaderboardResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "leaderboard": {
+                  "type": "array",
+                  "description": "Array of users ranked by total points (highest to lowest)",
+                  "items": {
+                    "$ref": "#/components/schemas/LeaderboardEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "LeaderboardEntry": {
+          "type": "object",
+          "description": "Privacy-focused leaderboard entry showing only user ID and stats",
+          "properties": {
+            "rank": {
+              "type": "integer",
+              "description": "User's position on leaderboard (1 = highest points)"
+            },
+            "userId": {
+              "type": "string",
+              "description": "User's unique identifier"
+            },
+            "totalPoints": {
+              "type": "number",
+              "description": "Total loyalty points earned (all time)"
+            },
+            "totalVolume": {
+              "type": "number",
+              "description": "Total USD transaction volume (all time)"
+            },
+            "tier": {
+              "type": "string",
+              "description": "Current tier: BRONZE, SILVER, GOLD, PLATINUM, or DIAMOND",
+              "enum": ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"]
+            }
+          },
+          "required": ["rank", "userId", "totalPoints", "totalVolume", "tier"]
+        },
+        "PointValueResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "currentPointValue": {
+                  "type": "number",
+                  "description": "Current USD value per point"
+                },
+                "totalPointsIssued": {
+                  "type": "number",
+                  "description": "Total points issued across all users"
+                },
+                "formula": {
+                  "type": "string",
+                  "description": "Pricing mechanism"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "MetricsResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "totalPointsIssued": {
+                  "type": "number"
+                },
+                "currentPointValue": {
+                  "type": "number"
+                },
+                "totalCommitment": {
+                  "type": "number",
+                  "description": "Total USD committed (points × value)"
+                },
+                "budgetRemaining": {
+                  "type": "number",
+                  "description": "Remaining budget in USD"
+                },
+                "utilizationRate": {
+                  "type": "number",
+                  "description": "Percentage of budget used"
+                },
+                "totalUsers": {
+                  "type": "integer"
+                },
+                "avgPointsPerUser": {
+                  "type": "number"
+                },
+                "activeUsers": {
+                  "type": "integer",
+                  "description": "Users with activity in last 30 days"
+                },
+                "lastUpdated": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        },
+        "ConfigResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "config": {
+                  "type": "object",
+                  "description": "Current loyalty configuration"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "RedemptionRequest": {
+          "type": "object",
+          "required": ["points", "redemptionType", "details"],
+          "properties": {
+            "points": {
+              "type": "number",
+              "minimum": 100,
+              "description": "Number of points to redeem (minimum 100)"
+            },
+            "redemptionType": {
+              "type": "string",
+              "enum": ["CASH_OUT", "BANK_TRANSFER"],
+              "description": "Type of redemption"
+            },
+            "details": {
+              "type": "object",
+              "description": "Redemption details (varies by type)",
+              "properties": {
+                "accountNumber": {
+                  "type": "string",
+                  "description": "Phone number for CASH_OUT or account number for BANK_TRANSFER"
+                },
+                "network": {
+                  "type": "string",
+                  "description": "Mobile network (for CASH_OUT)"
+                },
+                "bankName": {
+                  "type": "string",
+                  "description": "Bank name (for BANK_TRANSFER)"
+                },
+                "accountName": {
+                  "type": "string",
+                  "description": "Account holder name (for BANK_TRANSFER)"
+                }
+              }
+            }
+          }
+        },
+        "RedemptionResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "redemption": {
+                  "$ref": "#/components/schemas/Redemption"
+                },
+                "newBalance": {
+                  "type": "number",
+                  "description": "Remaining points after redemption"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Redemption": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "accountId": {
+              "type": "string"
+            },
+            "pointsRedeemed": {
+              "type": "number"
+            },
+            "redemptionValue": {
+              "type": "number",
+              "description": "USD value of redeemed points"
+            },
+            "redemptionType": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "processing", "completed", "failed"]
+            },
+            "details": {
+              "type": "object"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "completedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "transactionId": {
+              "type": "string",
+              "description": "External transaction ID (e.g., M-Pesa code)"
+            }
+          }
+        },
+        "RedemptionHistoryResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "redemptions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Redemption"
+                  }
+                },
+                "totalRedeemed": {
+                  "type": "number",
+                  "description": "Total points redeemed all-time"
+                },
+                "totalValueUsd": {
+                  "type": "number",
+                  "description": "Total USD value redeemed all-time"
+                }
+              }
+            }
+          }
+        },
+        "ErrorResponse": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": false
+            },
+            "error": {
+              "type": "string",
+              "description": "Error message"
+            },
+            "message": {
+              "type": "string",
+              "description": "Detailed error description"
+            }
+          }
+        }
+      },
+      "responses": {
+        "Unauthorized": {
+          "description": "Authentication required or invalid token",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              "example": {
+                "success": false,
+                "error": "Unauthorized",
+                "message": "Valid JWT token required"
+              }
+            }
+          }
+        },
+        "InternalError": {
+          "description": "Internal server error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              "example": {
+                "success": false,
+                "error": "Internal server error",
+                "message": "An unexpected error occurred"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  
