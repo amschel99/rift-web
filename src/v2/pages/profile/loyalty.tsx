@@ -14,6 +14,27 @@ const getTierLabel = (tier: string) => {
   return tier.replace(/_/g, " ");
 };
 
+const getRankBadge = (rank: number) => {
+  switch (rank) {
+    case 1:
+      return "🥇";
+    case 2:
+      return "🥈";
+    case 3:
+      return "🥉";
+    default:
+      return `#${rank}`;
+  }
+};
+
+const getRankStyle = (rank: number) => {
+  // Top 3 get special styling with app colors
+  if (rank <= 3) {
+    return "bg-gradient-to-br from-accent-primary to-accent-secondary shadow-lg border-2 border-accent-primary";
+  }
+  return "bg-surface-alt border border-surface-subtle";
+};
+
 const getActivityIcon = (type: string) => {
   switch (type) {
     case "OFFRAMP":
@@ -99,35 +120,35 @@ export default function Loyalty() {
           </div>
         </div>
       ) : stats ? (
-        <div className="space-y-4 mb-6">
-          {/* Main Points Card */}
-          <div className="bg-gradient-to-br from-accent-primary to-accent-secondary p-6 rounded-xl shadow-lg">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="space-y-6 mb-8">
+          {/* Main Points Card - Enhanced */}
+          <div className="bg-gradient-to-br from-accent-primary to-accent-secondary p-6 rounded-2xl shadow-xl">
+            <div className="flex items-center gap-2 mb-3">
               <IoTrophyOutline className="w-6 h-6 text-white" />
               <span className="text-white/90 text-sm font-medium">
                 {getTierLabel(stats.tier)}
               </span>
             </div>
-            <h2 className="text-4xl font-bold text-white mb-2">
+            <h2 className="text-5xl font-bold text-white mb-2">
               {formatNumberWithCommas(stats.totalPoints)}
             </h2>
-            <p className="text-white/80 text-sm">
+            <p className="text-white/90 text-base font-medium">
               Rift Points
               {pointValue && ` • $${(stats.totalPoints * pointValue.pointValue).toFixed(2)} USD`}
             </p>
           </div>
 
-          {/* Stats Grid - Optional stats */}
+          {/* Stats Grid - Enhanced with better spacing */}
           {(stats.currentStreak > 0 || stats.longestStreak > 0 || stats.transactionCount > 0 || stats.lastActivityDate) && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {/* Current Streak - Only show if > 0 */}
               {stats.currentStreak > 0 && (
-                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4">
+                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4 hover:border-accent-primary/50 transition-all">
                   <div className="flex items-center gap-2 mb-2">
                     <IoFlameOutline className="w-5 h-5 text-accent-primary" />
-                    <span className="text-text-subtle text-xs">Current Streak</span>
+                    <span className="text-text-subtle text-xs font-medium">Current Streak</span>
                   </div>
-                  <p className="text-2xl font-bold text-text-default">
+                  <p className="text-3xl font-bold text-text-default">
                     {stats.currentStreak}
                   </p>
                   <p className="text-text-subtle text-xs mt-1">
@@ -138,12 +159,12 @@ export default function Loyalty() {
 
               {/* Longest Streak - Only show if > 0 */}
               {stats.longestStreak > 0 && (
-                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4">
+                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4 hover:border-accent-primary/50 transition-all">
                   <div className="flex items-center gap-2 mb-2">
                     <IoStarOutline className="w-5 h-5 text-accent-primary" />
-                    <span className="text-text-subtle text-xs">Best Streak</span>
+                    <span className="text-text-subtle text-xs font-medium">Best Streak</span>
                   </div>
-                  <p className="text-2xl font-bold text-text-default">
+                  <p className="text-3xl font-bold text-text-default">
                     {stats.longestStreak}
                   </p>
                   <p className="text-text-subtle text-xs mt-1">
@@ -154,12 +175,12 @@ export default function Loyalty() {
 
               {/* Transaction Count */}
               {stats.transactionCount > 0 && (
-                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4">
+                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4 hover:border-accent-primary/50 transition-all">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">📊</span>
-                    <span className="text-text-subtle text-xs">Transactions</span>
+                    <span className="text-text-subtle text-xs font-medium">Transactions</span>
                   </div>
-                  <p className="text-2xl font-bold text-text-default">
+                  <p className="text-3xl font-bold text-text-default">
                     {stats.transactionCount}
                   </p>
                   <p className="text-text-subtle text-xs mt-1">
@@ -170,12 +191,12 @@ export default function Loyalty() {
 
               {/* Last Activity - Only show if valid date */}
               {stats.lastActivityDate && formatDate(stats.lastActivityDate) !== "Invalid Date" && (
-                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4">
+                <div className="bg-surface-alt border border-surface-subtle rounded-xl p-4 hover:border-accent-primary/50 transition-all">
                   <div className="flex items-center gap-2 mb-2">
                     <IoTimeOutline className="w-5 h-5 text-accent-primary" />
-                    <span className="text-text-subtle text-xs">Last Activity</span>
+                    <span className="text-text-subtle text-xs font-medium">Last Activity</span>
                   </div>
-                  <p className="text-sm font-medium text-text-default">
+                  <p className="text-base font-semibold text-text-default">
                     {formatDate(stats.lastActivityDate)}
                   </p>
                   <p className="text-text-subtle text-xs mt-1">
@@ -196,11 +217,16 @@ export default function Loyalty() {
         </div>
       )}
 
-      {/* History Section */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-text-default mb-4">
-          Earning History
-        </h2>
+      {/* History Section - Enhanced */}
+      <div className="mt-10">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-text-default">
+            💰 Earning History
+          </h2>
+          <p className="text-xs text-text-subtle mt-1">
+            Your recent points activity
+          </p>
+        </div>
 
         {historyLoading ? (
           <div className="space-y-3">
@@ -213,17 +239,17 @@ export default function Loyalty() {
             {history.map((activity: LoyaltyActivity) => (
               <div
                 key={activity.id}
-                className="bg-surface-alt border border-surface-subtle rounded-lg p-4 hover:border-accent-primary/50 transition-colors"
+                className="bg-surface-alt border border-surface-subtle rounded-xl p-4 hover:border-accent-primary/30 transition-all shadow-sm"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1">
                     <span className="text-2xl">{getActivityIcon(activity.type)}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text-default">
+                      <p className="text-sm font-semibold text-text-default">
                         {getActivityLabel(activity.type)}
                       </p>
                       <p className="text-xs text-text-subtle mt-1">
-                        ${activity.transactionValue.toFixed(2)} transaction
+                        ${activity.transactionValue.toFixed(2)} USD
                         {activity.metadata?.currency && ` • ${activity.metadata.currency}`}
                       </p>
                       <p className="text-xs text-text-subtle/70 mt-1">
@@ -232,7 +258,7 @@ export default function Loyalty() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-accent-primary">
+                    <p className="text-base font-bold text-accent-primary">
                       +{formatNumberWithCommas(activity.pointsEarned)}
                     </p>
                     <p className="text-xs text-text-subtle">points</p>
@@ -242,74 +268,101 @@ export default function Loyalty() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-surface-alt border border-surface-subtle rounded-lg">
-            <p className="text-text-subtle">No earning history yet</p>
-            <p className="text-text-subtle text-sm mt-2">
-              Complete transactions to start earning points!
-            </p>
+          <div className="text-center py-12 bg-surface-alt border border-surface-subtle rounded-xl">
+            <span className="text-4xl mb-3 block">📊</span>
+            <p className="text-sm text-text-subtle">No earning history yet</p>
+            <p className="text-xs text-text-subtle mt-1">Start transacting to earn points!</p>
           </div>
         )}
       </div>
 
-      {/* Leaderboard Section */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-text-default mb-4">
-          Leaderboard
-        </h2>
+      {/* Leaderboard Section - Enhanced with podium styling */}
+      <div className="mt-10">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-text-default">
+            🏆 Global Leaderboard
+          </h2>
+          <p className="text-xs text-text-subtle mt-1">
+            Top users ranked by total points earned
+          </p>
+        </div>
 
         {leaderboardLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-16 w-full rounded-lg" />
+              <Skeleton key={i} className="h-20 w-full rounded-lg" />
             ))}
           </div>
         ) : leaderboard && leaderboard.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {leaderboard.map((entry) => (
               <div
                 key={entry.userId}
-                className="bg-surface-alt border border-surface-subtle rounded-lg p-4 flex items-center justify-between hover:border-accent-primary/50 transition-colors"
+                className={`${getRankStyle(entry.rank)} rounded-xl p-4 flex items-center justify-between hover:scale-[1.02] transition-all`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/20 font-bold text-accent-primary">
-                    #{entry.rank}
+                  <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg ${
+                    entry.rank <= 3 
+                      ? 'bg-white/20 text-white' 
+                      : 'bg-accent/20 text-accent-primary'
+                  }`}>
+                    {getRankBadge(entry.rank)}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-text-default">
-                      {entry.userId.substring(0, 8)}...
+                    <p className={`text-sm font-semibold ${entry.rank <= 3 ? 'text-white' : 'text-text-default'}`}>
+                      User {entry.userId.substring(0, 8)}...
                     </p>
-                    <p className="text-xs text-text-subtle">
-                      {getTierLabel(entry.tier)} • ${formatNumberWithCommas(entry.totalVolume)}
+                    <p className={`text-xs ${entry.rank <= 3 ? 'text-white/80' : 'text-text-subtle'}`}>
+                      {getTierLabel(entry.tier)} • ${formatNumberWithCommas(entry.totalVolume)} volume
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-accent-primary">
+                  <p className={`text-lg font-bold ${entry.rank <= 3 ? 'text-white' : 'text-accent-primary'}`}>
                     {formatNumberWithCommas(entry.totalPoints)}
                   </p>
-                  <p className="text-xs text-text-subtle">points</p>
+                  <p className={`text-xs ${entry.rank <= 3 ? 'text-white/70' : 'text-text-subtle'}`}>
+                    points
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 bg-surface-alt border border-surface-subtle rounded-lg">
-            <p className="text-text-subtle text-sm">No leaderboard data yet</p>
+          <div className="text-center py-12 bg-surface-alt border border-surface-subtle rounded-xl">
+            <span className="text-4xl mb-3 block">🏆</span>
+            <p className="text-sm text-text-subtle">No leaderboard data yet</p>
+            <p className="text-xs text-text-subtle mt-1">Be the first to climb the ranks!</p>
           </div>
         )}
       </div>
 
-      {/* Info Card - Updated messaging */}
-      <div className="mt-8 mb-6 bg-surface-alt border border-surface-subtle rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-text-default mb-2">
-          How Rift Points Work
+      {/* Info Card - Enhanced with better spacing */}
+      <div className="mt-10 mb-6 bg-gradient-to-br from-surface-alt to-surface-subtle border border-surface-subtle rounded-2xl p-6 shadow-sm">
+        <h3 className="text-base font-bold text-text-default mb-3 flex items-center gap-2">
+          <span>💡</span> How Rift Points Work
         </h3>
-        <ul className="text-xs text-text-subtle space-y-2">
-          <li>• Earn ${pointValue?.pointValue.toFixed(2) || '0.05'} in points per $1 spent (5% cashback)</li>
-          <li>• Use points to pay for transactions within the app</li>
-          <li>• Access exclusive yield-generating products (coming soon!)</li>
-          <li>• Redeem points for cash at any time</li>
-          <li>• Higher tiers get bigger multipliers for more points</li>
+        <ul className="text-sm text-text-subtle space-y-3">
+          <li className="flex items-start gap-2">
+            <span className="text-accent-primary mt-0.5">✓</span>
+            <span>Earn <span className="font-semibold text-text-default">${pointValue?.pointValue.toFixed(2) || '0.05'} per $1 spent</span> (5% cashback on all transactions)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-accent-primary mt-0.5">✓</span>
+            <span>Use points to <span className="font-semibold text-text-default">pay for transactions</span> within the app</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-accent-primary mt-0.5">✓</span>
+            <span>Access exclusive <span className="font-semibold text-text-default">yield-generating products</span> (coming soon!)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-accent-primary mt-0.5">✓</span>
+            <span><span className="font-semibold text-text-default">Redeem for cash</span> anytime you want</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-accent-primary mt-0.5">✓</span>
+            <span>Higher tiers = <span className="font-semibold text-text-default">bigger multipliers</span> for more points</span>
+          </li>
         </ul>
       </div>
     </motion.div>
