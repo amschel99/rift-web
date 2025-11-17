@@ -1,7 +1,7 @@
 import React from 'react';
 
 // 🚨 TOGGLE THIS TO ENABLE/DISABLE MAINTENANCE MODE
-const MAINTENANCE_MODE = false; // Set to false to disable
+const MAINTENANCE_MODE = true; // Set to true to enable
 
 const MaintenanceMode: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (!MAINTENANCE_MODE) {
@@ -9,11 +9,11 @@ const MaintenanceMode: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-app-background flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
         {/* Logo/Icon */}
         <div className="mb-8">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-accent-primary to-accent-secondary rounded-full flex items-center justify-center shadow-lg">
             <svg 
               className="w-10 h-10 text-white" 
               fill="none" 
@@ -37,26 +37,26 @@ const MaintenanceMode: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </div>
 
         {/* Main Message */}
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        <h1 className="text-3xl font-bold text-text-default mb-4">
           System Maintenance
         </h1>
         
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+        <p className="text-lg text-text-default mb-6">
           We're currently performing system maintenance to improve your experience.
         </p>
         
-        <p className="text-base text-gray-500 dark:text-gray-400 mb-8">
+        <p className="text-base text-text-subtle mb-8">
           We'll be back soon! Thank you for your patience.
         </p>
 
         {/* Status Indicator */}
-        <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+        <div className="flex items-center justify-center space-x-2 text-sm text-text-subtle bg-surface-alt rounded-full px-4 py-2 inline-flex mx-auto">
+          <div className="w-2 h-2 bg-accent-primary rounded-full animate-pulse"></div>
           <span>Maintenance in progress...</span>
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-xs text-gray-400 dark:text-gray-500">
+        <div className="mt-12 text-xs text-text-subtle">
           <p>Need urgent support? Contact us at support@riftfi.xyz</p>
         </div>
       </div>
