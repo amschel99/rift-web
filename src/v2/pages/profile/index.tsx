@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { toast } from "sonner";
-import { IoWalletOutline, IoPersonOutline, IoTrophyOutline } from "react-icons/io5";
+import {
+  IoWalletOutline,
+  IoPersonOutline,
+  IoTrophyOutline,
+  IoNotificationsOutline,
+} from "react-icons/io5";
 import { HiMiniUser } from "react-icons/hi2";
 import { IoIosPower } from "react-icons/io";
 import { FaArrowsRotate } from "react-icons/fa6";
@@ -17,6 +22,7 @@ import usePointValue from "@/hooks/data/use-point-value";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import ActionButton from "@/components/ui/action-button";
 import PaymentAccountSetup from "@/components/ui/payment-account-setup";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import {
   Drawer,
@@ -32,14 +38,16 @@ export default function Profile() {
   const navigate = useNavigate();
   const { onOpen, onClose, isOpen } = useDisclosure();
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] =
+    useState(false);
   const [displayName, setDisplayName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
-  
+
   const { isTelegram, telegramUser } = usePlatformDetection();
   const { userQuery } = useWalletAuth();
   const { data: user, isLoading: userLoading } = useUser();
   const updateUserMutation = useUpdateUser();
-  
+
   const { recoveryMethodsQuery } = useWalletRecovery({
     externalId: userQuery?.data?.externalId,
   });
@@ -47,7 +55,7 @@ export default function Profile() {
   // Fetch loyalty stats and point value
   const { data: loyaltyStats } = useLoyaltyStats();
   const { data: pointValue } = usePointValue();
-  
+
   // Debug logging
   useEffect(() => {
     console.log("👤 [Profile] Loyalty stats:", loyaltyStats);
@@ -132,7 +140,6 @@ export default function Profile() {
         )}
       </div>
 
-
       {/* Display Name Section */}
       <p className="mt-6 text-sm text-muted-foreground">Display Name</p>
       <div className="w-full bg-accent/10 mt-2 rounded-lg border-1 border-surface-subtle">
@@ -191,10 +198,15 @@ export default function Profile() {
             >
               <span className="w-full flex flex-row items-center justify-between">
                 <div className="text-left">
-                  <span className="text-text-default block font-medium">Rift Points</span>
+                  <span className="text-text-default block font-medium">
+                    Rift Points
+                  </span>
                   <span className="text-xs text-text-subtle/70">
                     {formatNumberWithCommas(loyaltyStats.totalPoints)} points
-                    {pointValue && ` • $${(loyaltyStats.totalPoints * pointValue.pointValue).toFixed(2)} USD`}
+                    {pointValue &&
+                      ` • $${(
+                        loyaltyStats.totalPoints * pointValue.pointValue
+                      ).toFixed(2)} USD`}
                   </span>
                 </div>
                 <IoTrophyOutline className="text-accent-primary text-xl" />
@@ -216,22 +228,35 @@ export default function Profile() {
             <div className="text-left">
               <span className="text-text-subtle block">Withdrawal Account</span>
               {(() => {
-                const paymentAccount = user?.paymentAccount || user?.payment_account;
+                const paymentAccount =
+                  user?.paymentAccount || user?.payment_account;
                 if (paymentAccount) {
                   try {
                     const account = JSON.parse(paymentAccount);
                     return (
                       <span className="text-xs text-text-subtle/70">
-                        {account.institution} {account.type ? `(${account.type})` : ''}: {account.accountIdentifier}
-                        {account.accountNumber ? ` - ${account.accountNumber}` : ''}
-                        {account.accountName ? ` - ${account.accountName}` : ''}
+                        {account.institution}{" "}
+                        {account.type ? `(${account.type})` : ""}:{" "}
+                        {account.accountIdentifier}
+                        {account.accountNumber
+                          ? ` - ${account.accountNumber}`
+                          : ""}
+                        {account.accountName ? ` - ${account.accountName}` : ""}
                       </span>
                     );
                   } catch {
-                    return <span className="text-xs text-text-subtle/70">Account configured</span>;
+                    return (
+                      <span className="text-xs text-text-subtle/70">
+                        Account configured
+                      </span>
+                    );
                   }
                 } else {
-                  return <span className="text-xs text-text-subtle/70">Not configured</span>;
+                  return (
+                    <span className="text-xs text-text-subtle/70">
+                      Not configured
+                    </span>
+                  );
                 }
               })()}
             </div>
@@ -240,6 +265,18 @@ export default function Profile() {
         </ActionButton>
       </div>
 
+      <p className="mt-6 text-sm text-muted-foreground">Notifications</p>
+      <div className="w-full bg-accent/10 border-1 border-surface-subtle mt-2 rounded-lg">
+        <ActionButton
+          onClick={() => setShowNotificationSettings(true)}
+          className="w-full bg-transparent p-3 py-4 rounded-none"
+        >
+          <span className="w-full flex flex-row items-center justify-between">
+            <span className="text-text-subtle">Push Notifications</span>
+            <IoNotificationsOutline className="text-text-subtle text-xl" />
+          </span>
+        </ActionButton>
+      </div>
 
       <p className="mt-6 text-sm text-muted-foreground">Security</p>
       <div className="w-full bg-accent/10 border-1 border-surface-subtle mt-2 rounded-lg">
@@ -332,6 +369,31 @@ export default function Profile() {
         onSave={handleUpdatePaymentAccount}
         currentPaymentAccount={user?.paymentAccount || user?.payment_account}
       />
+
+      {/* Notification Settings Drawer */}
+      <Drawer
+        modal
+        open={showNotificationSettings}
+        onClose={() => setShowNotificationSettings(false)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowNotificationSettings(false);
+          }
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader className="hidden">
+            <DrawerTitle>Push Notifications</DrawerTitle>
+            <DrawerDescription>
+              Manage your push notification settings
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="w-full h-full p-4 pb-8">
+            <NotificationSettings />
+          </div>
+        </DrawerContent>
+      </Drawer>
     </motion.div>
   );
 }

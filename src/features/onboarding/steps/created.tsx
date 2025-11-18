@@ -1,24 +1,51 @@
 import { useNavigate } from "react-router";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { SlCheck } from "react-icons/sl";
 import { CgSpinner } from "react-icons/cg";
 import { FiChevronRight } from "react-icons/fi";
+import { IoNotificationsOutline } from "react-icons/io5";
 import useAnalaytics from "@/hooks/use-analytics";
 import { useFlow } from "../context";
+import { useNotifications } from "@/contexts/NotificationContext";
 import ActionButton from "@/components/ui/action-button";
+import { toast } from "sonner";
 
 export default function Created() {
   const { signInMutation, signUpMutation } = useFlow();
   const loading = signInMutation?.isPending || signUpMutation?.isPending;
   const error = signInMutation?.error || signUpMutation?.error;
   const { logEvent } = useAnalaytics();
+  const { enableNotifications, isLoading: notifLoading } = useNotifications();
+  const [notificationAsked, setNotificationAsked] = useState(false);
 
   const navigate = useNavigate();
 
   const handleOpenWallet = () => {
     logEvent("WALLET_CREATED");
-
     navigate("/app");
+  };
+
+  const handleEnableNotifications = async () => {
+    setNotificationAsked(true);
+    const result = await enableNotifications();
+
+    if (result.success) {
+      toast.success("🔔 Notifications enabled!", {
+        description: "You'll receive updates about your transactions",
+      });
+      logEvent("NOTIFICATIONS_ENABLED_ONBOARDING");
+    } else {
+      toast.error("Couldn't enable notifications", {
+        description:
+          result.error || "You can enable them later in Profile settings",
+      });
+    }
+  };
+
+  const handleSkipNotifications = () => {
+    setNotificationAsked(true);
+    logEvent("NOTIFICATIONS_SKIPPED_ONBOARDING");
   };
 
   return (
@@ -37,8 +64,42 @@ export default function Created() {
         )}
       </div>
 
-      <div className="flex flex-row items-center justify-center w-full">
-        {!loading && !error && (
+      <div className="flex flex-col items-center justify-center w-full gap-3">
+        {!loading && !error && !notificationAsked && (
+          <>
+            <div className="w-full bg-blue-50 dark:bg-blue-950 rounded-lg p-4 mb-2">
+              <div className="flex items-start gap-3">
+                <IoNotificationsOutline className="text-blue-600 dark:text-blue-400 text-2xl flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                    Stay updated with notifications
+                  </p>
+                  <p className="text-xs text-blue-800 dark:text-blue-200">
+                    Get instant alerts for transactions, payments, and important
+                    account activities
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <ActionButton
+              onClick={handleEnableNotifications}
+              disabled={notifLoading}
+              className="p-[0.625rem] rounded-[0.75rem] gap-1 w-full"
+            >
+              {notifLoading ? "Enabling..." : "Enable Notifications"}
+            </ActionButton>
+
+            <button
+              onClick={handleSkipNotifications}
+              className="text-sm text-muted-foreground hover:text-text-default transition-colors"
+            >
+              Skip for now
+            </button>
+          </>
+        )}
+
+        {!loading && !error && notificationAsked && (
           <ActionButton
             onClick={handleOpenWallet}
             variant="success"

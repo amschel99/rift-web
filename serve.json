@@ -1,6 +1,23 @@
 {
   "headers": [
     {
+      "source": "webpushr-sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "**/*.png",
       "headers": [
         {
@@ -50,6 +67,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "webpushr-sw.js",
+      "destination": "/webpushr-sw.js"
+    },
     {
       "source": "**",
       "destination": "/index.html"

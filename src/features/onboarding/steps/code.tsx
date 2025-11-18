@@ -57,9 +57,9 @@ export default function Code(props: Props) {
       if (flowType == "login") {
         try {
           const loginParams = {
-                  otpCode: values.code,
-                  phoneNumber: stored.identifier!?.replace("-", ""),
-                };
+            otpCode: values.code,
+            phoneNumber: stored.identifier!?.replace("-", ""),
+          };
 
           await flow.signInMutation.mutateAsync(loginParams);
           navigate("/app");
@@ -74,15 +74,31 @@ export default function Code(props: Props) {
       }
 
       try {
+        console.log("🔍 [Code] Starting signup flow...");
+        console.log("🔍 [Code] Stored data:", stored);
+        console.log("🔍 [Code] isTelegram:", isTelegram);
+        console.log("🔍 [Code] telegramUser:", telegramUser);
+
+        // Only check for telegram user if we're actually in telegram platform
+        // Don't block browser/web signups
         if (isTelegram && !telegramUser?.id) {
-          throw new Error("No telegram user id found");
+          console.warn(
+            "⚠️ [Code] Telegram mode but no telegram user id - might be browser mode"
+          );
+          // Don't throw - allow signup to proceed for browser mode
         }
 
         try {
-          const signupParams = { phoneNumber: stored.identifier!?.replace("-", "") };
+          const signupParams = {
+            phoneNumber: stored.identifier!?.replace("-", ""),
+          };
+          console.log("📝 [Code] Signup params:", signupParams);
 
           await flow.signUpMutation.mutateAsync(signupParams);
+          console.log("✅ [Code] Signup successful");
         } catch (signupError: any) {
+          console.log("⚠️ [Code] Signup error:", signupError);
+
           const is409Error =
             signupError?.status === 409 ||
             signupError?.response?.status === 409 ||
@@ -90,9 +106,10 @@ export default function Code(props: Props) {
             signupError?.message?.toLowerCase()?.includes("already exists");
 
           if (is409Error) {
-            console.log("User already exists, proceeding with login");
+            console.log("ℹ️ [Code] User already exists, proceeding with login");
             flow.signUpMutation.reset();
           } else {
+            console.error("❌ [Code] Signup failed with error:", signupError);
             throw signupError;
           }
         }
@@ -101,11 +118,14 @@ export default function Code(props: Props) {
           otpCode: values.code,
           phoneNumber: stored.identifier!?.replace("-", ""),
         };
+        console.log("🔑 [Code] Login params:", loginParams);
 
         await flow.signInMutation.mutateAsync(loginParams);
+        console.log("✅ [Code] Login successful");
 
         flow.goToNext();
       } catch (e) {
+        console.error("❌ [Code] Final error:", e);
         toast.custom(() => <RenderErrorToast />, {
           duration: 2000,
           position: "top-center",

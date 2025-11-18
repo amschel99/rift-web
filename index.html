@@ -11,7 +11,10 @@
 
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#2E8C96" />
-    <meta name="description" content="Send money aywhere across Africa. Earn high and stable yields powered by top ecommerce businesses." />
+    <meta
+      name="description"
+      content="Send money aywhere across Africa. Earn high and stable yields powered by top ecommerce businesses."
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
@@ -24,10 +27,41 @@
     <link rel="icon" type="image/png" href="/rift.png" />
     <link rel="apple-touch-icon" href="/rift.png" />
 
+    <!-- Webpushr Push Notification Script -->
+
+    <!-- start webpushr code -->
+    <script>
+      (function (w, d, s, id) {
+        if (typeof w.webpushr !== "undefined") return;
+        w.webpushr =
+          w.webpushr ||
+          function () {
+            (w.webpushr.q = w.webpushr.q || []).push(arguments);
+          };
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        js = d.createElement(s);
+        js.id = id;
+        js.async = 1;
+        js.src = "https://cdn.webpushr.com/app.min.js";
+        fjs.parentNode.appendChild(js);
+      })(window, document, "script", "webpushr-jssdk");
+      webpushr("setup", {
+        key: "BIeDDgzKtV-a9RgiYmRJZVWZUeQ5rb3Qq4R5fcjpCnx5B6TatEUYLItCu8P7hGLwcyksit8ZPRz3tO4VoYBMkw8",
+      });
+    </script>
+    <!-- end webpushr code -->
+
     <!-- Farcaster Mini App Embed Meta Tags (for sharing in social feeds) -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://wallet.riftfi.xyz/hero.png","button":{"title":"💰 Open Wallet","action":{"type":"launch_miniapp","name":"Rift Wallet","url":"https://wallet.riftfi.xyz","splashImageUrl":"https://wallet.riftfi.xyz/rift.png","splashBackgroundColor":"#2E8C96"}}}' />
+    <meta
+      name="fc:miniapp"
+      content='{"version":"1","imageUrl":"https://wallet.riftfi.xyz/hero.png","button":{"title":"💰 Open Wallet","action":{"type":"launch_miniapp","name":"Rift Wallet","url":"https://wallet.riftfi.xyz","splashImageUrl":"https://wallet.riftfi.xyz/rift.png","splashBackgroundColor":"#2E8C96"}}}'
+    />
     <!-- For backward compatibility -->
-    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://wallet.riftfi.xyz/hero.png","button":{"title":"💰 Open Wallet","action":{"type":"launch_frame","name":"Rift Wallet","url":"https://wallet.riftfi.xyz","splashImageUrl":"https://wallet.riftfi.xyz/rift.png","splashBackgroundColor":"#2E8C96"}}}' />
+    <meta
+      name="fc:frame"
+      content='{"version":"1","imageUrl":"https://wallet.riftfi.xyz/hero.png","button":{"title":"💰 Open Wallet","action":{"type":"launch_frame","name":"Rift Wallet","url":"https://wallet.riftfi.xyz","splashImageUrl":"https://wallet.riftfi.xyz/rift.png","splashBackgroundColor":"#2E8C96"}}}'
+    />
 
     <title>Rift - Payment Solutions</title>
   </head>

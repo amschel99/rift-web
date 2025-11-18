@@ -11,6 +11,7 @@ import { PWAInstallPrompt } from "./components/pwa-install-prompt.tsx";
 import { WalletConnectSocketProvider } from "./hooks/walletconnect/use-walletconnect-socket.tsx";
 import { WalletConnectUserProvider } from "./components/walletconnect/WalletConnectUserProvider.tsx";
 import MaintenanceMode from "./components/MaintenanceMode.tsx";
+import { NotificationProvider } from "./contexts/NotificationContext.tsx";
 import rift from "./lib/rift.ts";
 import "./styles/index.scss";
 import "./styles/tailwind.css";
@@ -47,9 +48,11 @@ createRoot(document.getElementById("root")!).render(
     <MaintenanceMode>
       <QueryClientProvider client={queryclient}>
         <BrowserRouter>
-          <WalletConnectUserProvider>
-            <AppShell />
-          </WalletConnectUserProvider>
+          <NotificationProvider>
+            <WalletConnectUserProvider>
+              <AppShell />
+            </WalletConnectUserProvider>
+          </NotificationProvider>
         </BrowserRouter>
 
         <Toaster />
