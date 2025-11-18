@@ -4,6 +4,7 @@ import rift from "@/lib/rift";
 declare global {
   interface Window {
     webpushr?: (command: string, ...args: any[]) => void;
+    _webpushrScriptReady?: () => void;
   }
 }
 
@@ -56,50 +57,38 @@ export class NotificationService {
         return;
       }
 
-      // Check if webpushr is a function and callable
-      if (typeof window.webpushr === "function") {
-        // Test if it's actually working by checking if queue exists
-        try {
-          // Webpushr stores commands in a queue before initialization
-          const webpushrObj = window.webpushr as any;
-          if (webpushrObj.q || webpushrObj._isReady) {
-            this.isWebpushrReady = true;
-            console.log("✅ [Notifications] Webpushr is ready");
-            resolve();
-            return;
-          }
-        } catch (e) {
-          console.warn("Webpushr function exists but may not be ready");
-        }
-      }
-
-      // Listen for webpushr-ready event
-      const handleReady = () => {
+      // Set up the ready callback that Webpushr will call
+      const originalCallback = window._webpushrScriptReady;
+      window._webpushrScriptReady = () => {
+        console.log("✅ [Notifications] Webpushr script ready callback fired");
         this.isWebpushrReady = true;
-        console.log("✅ [Notifications] Webpushr ready event fired");
+
+        // Call original callback if it existed
+        if (originalCallback) {
+          originalCallback();
+        }
+
         resolve();
       };
 
-      window.addEventListener("webpushr-ready", handleReady, { once: true });
-
-      // Also check periodically in case event was missed
-      let checkCount = 0;
-      const checkInterval = setInterval(() => {
-        checkCount++;
-        if (typeof window.webpushr === "function") {
+      // If webpushr is already loaded, resolve immediately
+      if (typeof window.webpushr === "function") {
+        const webpushrObj = window.webpushr as any;
+        if (webpushrObj.q || webpushrObj._isReady) {
           this.isWebpushrReady = true;
-          clearInterval(checkInterval);
-          console.log("✅ [Notifications] Webpushr detected via polling");
+          console.log("✅ [Notifications] Webpushr already ready");
           resolve();
-        } else if (checkCount >= 20) {
-          // 10 seconds timeout (20 * 500ms)
-          clearInterval(checkInterval);
-          console.warn(
-            "⚠️ [Notifications] Webpushr initialization timeout - notifications may not work"
-          );
-          resolve();
+          return;
         }
-      }, 500);
+      }
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        if (!this.isWebpushrReady) {
+          console.warn("⚠️ [Notifications] Webpushr initialization timeout");
+        }
+        resolve();
+      }, 10000);
     });
   }
 
@@ -167,7 +156,7 @@ export class NotificationService {
         return { success: true };
       }
 
-      // Request permission through Webpushr
+      // Request permission and subscribe
       const permissionResult = await this.requestPermission();
 
       if (permissionResult.denied) {
@@ -186,6 +175,9 @@ export class NotificationService {
           error: "Notification permission was not granted. Please try again.",
         };
       }
+
+      // Wait a bit for Webpushr to process the subscription
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Get subscriber ID from Webpushr
       const subscriberId = await this.getWebpushrSubscriberId();
@@ -241,59 +233,42 @@ export class NotificationService {
       return { granted: false, denied: true };
     }
 
-    if (currentPermission === "granted") {
-      console.log("✅ [Notifications] Permission already granted");
-      return { granted: true, denied: false };
+    // Use Webpushr's subscribe method which handles everything
+    console.log("🔔 [Notifications] Subscribing via Webpushr...");
+
+    if (!window.webpushr || typeof window.webpushr !== "function") {
+      console.error("❌ [Notifications] Webpushr not available");
+      return { granted: false, denied: false };
     }
 
-    // Permission is "default" - need to request it
-    console.log("🔔 [Notifications] Requesting permission via native API...");
-
     try {
-      // Use native Notification API to request permission
-      // This is more reliable than Webpushr's wrapper
-      const permission = await Notification.requestPermission();
-      console.log("🔔 [Notifications] Permission result:", permission);
+      // Let Webpushr handle permission request and subscription
+      const result = await new Promise<{ granted: boolean; denied: boolean }>(
+        (resolve) => {
+          window.webpushr!("subscribe", (status: string) => {
+            console.log(
+              "🔔 [Notifications] Webpushr subscribe result:",
+              status
+            );
 
-      // After getting permission, subscribe via Webpushr if granted
-      if (
-        permission === "granted" &&
-        window.webpushr &&
-        typeof window.webpushr === "function"
-      ) {
-        try {
-          // Register with Webpushr service
-          await new Promise<void>((subscribeResolve) => {
-            window.webpushr!("subscribe", () => {
-              console.log(
-                "✅ [Notifications] Webpushr subscription registered"
-              );
-              subscribeResolve();
+            const finalPermission = Notification.permission;
+            resolve({
+              granted: finalPermission === "granted",
+              denied: finalPermission === "denied",
             });
-            // Don't wait forever for callback
-            setTimeout(subscribeResolve, 3000);
           });
-        } catch (error) {
-          console.warn(
-            "⚠️ [Notifications] Webpushr subscribe failed, but permission granted:",
-            error
-          );
-          // Continue anyway - we have browser permission
         }
-      }
+      );
 
-      return {
-        granted: permission === "granted",
-        denied: permission === "denied",
-      };
+      return result;
     } catch (error) {
-      console.error("❌ [Notifications] Error requesting permission:", error);
+      console.error("❌ [Notifications] Error during subscription:", error);
       return { granted: false, denied: false };
     }
   }
 
   /**
-   * Get the Webpushr subscriber ID
+   * Get the Webpushr subscriber ID with retry logic
    */
   private getWebpushrSubscriberId(): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -302,25 +277,41 @@ export class NotificationService {
         return;
       }
 
-      try {
-        window.webpushr("fetch_id", (sid: string) => {
-          console.log(
-            "🆔 [Notifications] Subscriber ID fetched:",
-            sid ? "✓" : "✗"
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      const tryFetchId = () => {
+        attempts++;
+
+        try {
+          window.webpushr!("fetch_id", (sid: string) => {
+            console.log(
+              "🆔 [Notifications] Subscriber ID fetched:",
+              sid ? "✓" : "✗"
+            );
+            if (sid) {
+              resolve(sid);
+            } else if (attempts < maxAttempts) {
+              console.log(
+                `⏳ [Notifications] No ID yet, retrying (${attempts}/${maxAttempts})...`
+              );
+              setTimeout(tryFetchId, 1000);
+            } else {
+              reject(
+                new Error("No subscriber ID available after multiple attempts")
+              );
+            }
+          });
+        } catch (error) {
+          console.error(
+            "❌ [Notifications] Error fetching subscriber ID:",
+            error
           );
-          if (sid) {
-            resolve(sid);
-          } else {
-            reject(new Error("No subscriber ID available"));
-          }
-        });
-      } catch (error) {
-        console.error(
-          "❌ [Notifications] Error fetching subscriber ID:",
-          error
-        );
-        reject(error);
-      }
+          reject(error);
+        }
+      };
+
+      tryFetchId();
     });
   }
 
