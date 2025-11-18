@@ -18,27 +18,34 @@ export function detectPlatformSync(): PlatformType {
   // Check for Farcaster first (highest priority)
   if (typeof window !== "undefined") {
     // Farcaster detection: check for miniapp context or URL parameters
-    const isFarcasterFrame = window.location.href.includes('farcaster.xyz') || 
-                             window.location.href.includes('warpcast.com') ||
-                             window.parent !== window; // Running in iframe (common for miniapps)
-    
+    const isFarcasterFrame =
+      window.location.href.includes("farcaster.xyz") ||
+      window.location.href.includes("warpcast.com") ||
+      window.parent !== window; // Running in iframe (common for miniapps)
+
     if (isFarcasterFrame || window.farcaster?.isConnected) {
       return "farcaster";
     }
+
+    // Check for actual Telegram WebApp presence first
+    if (window.Telegram?.WebApp) {
+      return "telegram";
+    }
   }
 
+  // Environment-based detection (fallback)
   if (import.meta.env.MODE === "development") {
     const testBrowserMode = import.meta.env.VITE_TEST_BROWSER_MODE === "true";
-    return testBrowserMode ? "browser" : "telegram";
+    return testBrowserMode ? "browser" : "browser"; // Default to browser in dev
   }
 
   if (import.meta.env.MODE === "production") {
     const prodBrowserMode = import.meta.env.VITE_PROD_BROWSER_MODE === "true";
-    return prodBrowserMode ? "browser" : "telegram";
-  }
-
-  if (typeof window !== "undefined" && window.Telegram?.WebApp) {
-    return "telegram";
+    // Check for Telegram WebApp object first before defaulting
+    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+      return "telegram";
+    }
+    return prodBrowserMode ? "browser" : "browser"; // Default to browser in prod
   }
 
   return "browser";
@@ -55,7 +62,14 @@ export function usePlatformDetection() {
   let telegramUser = null;
   let farcasterUser = null;
 
-  if (platform === "telegram") {
+  // Only call Telegram hooks if we're actually in Telegram
+  // Check for window.Telegram.WebApp to be sure
+  const isActuallyInTelegram =
+    platform === "telegram" &&
+    typeof window !== "undefined" &&
+    window.Telegram?.WebApp;
+
+  if (isActuallyInTelegram) {
     try {
       const launchParams = useLaunchParams();
       initData = launchParams.initData;
@@ -77,7 +91,7 @@ export function usePlatformDetection() {
     initData,
     telegramUser,
     farcasterUser,
-    isTelegram: platform === "telegram",
+    isTelegram: isActuallyInTelegram, // Use actual detection, not just platform string
     isBrowser: platform === "browser",
     isFarcaster: platform === "farcaster",
   };

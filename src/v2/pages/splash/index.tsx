@@ -72,26 +72,48 @@ export default function Splash() {
 
   useEffect(() => {
     if (isTelegram) {
-      if (miniApp.mount.isAvailable()) {
-        miniApp.mount();
-        miniApp.setHeaderColor(colors.surface);
-        miniApp.setBottomBarColor(colors.surface);
-        miniApp.setBackgroundColor(colors.surface);
+      try {
+        if (miniApp.mount.isAvailable()) {
+          miniApp.mount();
+          miniApp.setHeaderColor(colors.surface);
+          miniApp.setBottomBarColor(colors.surface);
+          miniApp.setBackgroundColor(colors.surface);
 
-        mountClosingBehavior();
+          mountClosingBehavior();
+        }
+
+        if (isSwipeBehaviorSupported()) {
+          mountSwipeBehavior();
+        }
+
+        // Wrap these in try-catch as they fail outside Telegram context
+        try {
+          enableClosingConfirmation();
+        } catch (error) {
+          console.log("Not in Telegram Mini App context - skipping closing confirmation");
+        }
+
+        try {
+          disableVerticalSwipes();
+        } catch (error) {
+          console.log("Not in Telegram Mini App context - skipping swipe disable");
+        }
+
+        return () => {
+          try {
+            unmountClosingBehavior();
+          } catch (error) {
+            console.log("Error unmounting closing behavior");
+          }
+          try {
+            unmountSwipeBehavior();
+          } catch (error) {
+            console.log("Error unmounting swipe behavior");
+          }
+        };
+      } catch (error) {
+        console.warn("Telegram SDK error:", error);
       }
-
-      if (isSwipeBehaviorSupported()) {
-        mountSwipeBehavior();
-      }
-
-      enableClosingConfirmation();
-      disableVerticalSwipes();
-
-      return () => {
-        unmountClosingBehavior();
-        unmountSwipeBehavior();
-      };
     }
   }, [isTelegram]);
 

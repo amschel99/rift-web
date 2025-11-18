@@ -2,7 +2,34 @@
   "github": {
     "enabled": true
   },
+  "routes": [
+    {
+      "src": "/webpushr-sw.js",
+      "dest": "/webpushr-sw.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "headers": [
+    {
+      "source": "/webpushr-sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
     {
       "source": "/(.*).png",
       "headers": [

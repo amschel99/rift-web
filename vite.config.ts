@@ -11,11 +11,21 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["rift.png", "hero.png", "icon.png", "splash.png", "s1.png", "s2.png", "s3.png"],
+      includeAssets: [
+        "rift.png",
+        "hero.png",
+        "icon.png",
+        "splash.png",
+        "s1.png",
+        "s2.png",
+        "s3.png",
+        "webpushr-sw.js",
+      ],
       manifest: {
         name: "Rift Payment Solutions",
         short_name: "Rift",
-        description: "Accept USDC and M-Pesa payments. Convert crypto to KES. Payment solutions for freelancers, businesses and individuals.",
+        description:
+          "Accept USDC and M-Pesa payments. Convert crypto to KES. Payment solutions for freelancers, businesses and individuals.",
         theme_color: "#2E8C96",
         background_color: "#E9F1F4",
         display: "standalone",
