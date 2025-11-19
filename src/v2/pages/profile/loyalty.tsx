@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { IoArrowBack, IoTrophyOutline } from "react-icons/io5";
+import { ExternalLink } from "lucide-react";
 import useLoyaltyStats from "@/hooks/data/use-loyalty-stats";
 import useLoyaltyHistory, { LoyaltyActivity } from "@/hooks/data/use-loyalty-history";
 import usePointValue from "@/hooks/data/use-point-value";
@@ -73,10 +75,11 @@ const formatDate = (dateString: string) => {
 
 export default function Loyalty() {
   const navigate = useNavigate();
+  const [showAllLeaderboard, setShowAllLeaderboard] = useState(false);
   const { data: stats, isLoading: statsLoading } = useLoyaltyStats();
   const { data: history, isLoading: historyLoading } = useLoyaltyHistory();
   const { data: pointValue } = usePointValue();
-  const { data: leaderboard, isLoading: leaderboardLoading } = useLeaderboard(10);
+  const { data: leaderboard, isLoading: leaderboardLoading } = useLeaderboard(50);
 
   return (
     <motion.div
@@ -177,7 +180,7 @@ export default function Loyalty() {
           </div>
         ) : leaderboard && leaderboard.length > 0 ? (
           <div className="space-y-2">
-            {leaderboard.slice(0, 5).map((entry) => (
+            {(showAllLeaderboard ? leaderboard : leaderboard.slice(0, 5)).map((entry) => (
               <div
                 key={entry.userId}
                 className={`rounded-lg p-3 flex items-center justify-between ${
@@ -204,6 +207,15 @@ export default function Loyalty() {
                 </p>
               </div>
             ))}
+            {leaderboard.length > 5 && !showAllLeaderboard && (
+              <button
+                onClick={() => setShowAllLeaderboard(true)}
+                className="w-full flex items-center justify-center gap-2 py-2 text-xs text-accent-primary hover:text-accent-secondary font-medium transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" />
+                View All {leaderboard.length} Users
+              </button>
+            )}
           </div>
         ) : (
           <div className="text-center py-8 bg-surface-alt rounded-lg">
