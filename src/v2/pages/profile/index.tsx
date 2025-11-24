@@ -7,12 +7,15 @@ import {
   IoPersonOutline,
   IoTrophyOutline,
   IoNotificationsOutline,
+  IoChevronForward,
+  IoShieldCheckmarkOutline,
+  IoLogOutOutline,
 } from "react-icons/io5";
 import { HiMiniUser } from "react-icons/hi2";
-import { IoIosPower } from "react-icons/io";
 import { FaArrowsRotate } from "react-icons/fa6";
 import { MdAlternateEmail } from "react-icons/md";
 import { HiPhone } from "react-icons/hi";
+import { Pencil, Check, X } from "lucide-react";
 import { usePlatformDetection } from "@/utils/platform";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import useUser from "@/hooks/data/use-user";
@@ -124,186 +127,188 @@ export default function Profile() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="w-full h-full overflow-y-auto mb-18 p-4"
+      className="w-full h-full overflow-y-auto mb-18"
     >
-      <div className="flex flex-row items-center justify-center mt-20">
-        {isTelegram ? (
-          <Avatar className="size-24 border-1 border-accent-primary p-[0.25rem]">
-            <AvatarImage
-              className="rounded-full"
-              src={telegramUser?.photoUrl}
-              alt={telegramUser?.username}
-            />
-            <AvatarFallback>{telegramUser?.username}</AvatarFallback>
-          </Avatar>
-        ) : (
-          <div className="flex flex-row items-center justify-center border-1 border-accent-primary/10 p-[0.25rem] rounded-full w-30 h-30">
-            <HiMiniUser className="text-6xl text-accent-primary" />
-          </div>
-        )}
-      </div>
-
-      {/* Display Name Section */}
-      <p className="mt-6 text-sm text-muted-foreground">Display Name</p>
-      <div className="w-full bg-accent/10 mt-2 rounded-lg border-1 border-surface-subtle">
-        {isEditingName ? (
-          <div className="p-3 space-y-3">
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Enter display name"
-              className="w-full p-2 bg-surface-subtle border border-surface rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              autoFocus
-            />
-            <div className="flex gap-2">
-              <ActionButton
-                onClick={handleUpdateDisplayName}
-                disabled={updateUserMutation.isPending}
-                className="flex-1"
-              >
-                {updateUserMutation.isPending ? "Saving..." : "Save"}
-              </ActionButton>
-              <ActionButton
-                onClick={() => {
-                  setIsEditingName(false);
-                  setDisplayName(userDisplayName || "");
-                }}
-                className="flex-1 bg-surface-subtle text-text-subtle"
-              >
-                Cancel
-              </ActionButton>
+      {/* Profile Header - Compact */}
+      <div className="px-4 pt-6 pb-4">
+        <div className="flex items-center gap-4">
+          {isTelegram ? (
+            <Avatar className="w-16 h-16 min-w-16 min-h-16 border-2 border-accent-primary/20">
+              <AvatarImage
+                className="rounded-full"
+                src={telegramUser?.photoUrl}
+                alt={telegramUser?.username}
+              />
+              <AvatarFallback className="bg-accent-primary/10 text-accent-primary text-xl">
+                {telegramUser?.username?.charAt(0)?.toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <div className="w-16 h-16 min-w-16 min-h-16 rounded-full bg-accent-primary/10 border-2 border-accent-primary/20 flex items-center justify-center flex-shrink-0">
+              <HiMiniUser className="text-3xl text-accent-primary" />
             </div>
+          )}
+          
+          {/* Editable Display Name */}
+          <div className="flex-1 min-w-0">
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Your name"
+                  className="flex-1 min-w-0 bg-surface-subtle text-text-default text-lg font-semibold placeholder:text-text-subtle outline-none px-3 py-1.5 rounded-lg border border-surface"
+                  autoFocus
+                />
+                <button
+                  onClick={handleUpdateDisplayName}
+                  disabled={updateUserMutation.isPending}
+                  className="p-2 bg-accent-primary text-white rounded-lg hover:bg-accent-secondary transition-colors flex-shrink-0"
+                >
+                  <Check className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditingName(false);
+                    setDisplayName(userDisplayName || "");
+                  }}
+                  className="p-2 bg-surface-subtle rounded-lg hover:bg-surface transition-colors flex-shrink-0"
+                >
+                  <X className="w-4 h-4 text-text-subtle" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditingName(true)}
+                className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+              >
+                <span className="text-xl font-semibold text-text-default">
+                  {userDisplayName || "Set your name"}
+                </span>
+                <Pencil className="w-3.5 h-3.5 text-text-subtle" />
+              </button>
+            )}
+            <p className="text-sm text-text-subtle mt-0.5">Profile Settings</p>
           </div>
-        ) : (
-          <ActionButton
-            onClick={() => setIsEditingName(true)}
-            className="w-full bg-transparent p-3 py-4 rounded-none"
-          >
-            <span className="w-full flex flex-row items-center justify-between">
-              <span className="text-text-subtle">
-                {userDisplayName || "Set display name"}
-              </span>
-              <IoPersonOutline className="text-text-subtle text-xl" />
-            </span>
-          </ActionButton>
-        )}
+        </div>
       </div>
 
-      {/* Rift Points Section */}
-      {loyaltyStats && loyaltyStats.totalPoints !== undefined && (
-        <>
-          <p className="mt-6 text-sm text-muted-foreground">Rewards</p>
-          <div className="w-full bg-accent/10 border-1 border-surface-subtle mt-2 rounded-lg">
-            <ActionButton
-              onClick={() => navigate("/app/profile/loyalty")}
-              className="w-full bg-transparent p-3 py-4 rounded-none"
+      {/* Content */}
+      <div className="px-4 pb-6 space-y-4">
+        {/* Rift Points Card */}
+        {loyaltyStats && loyaltyStats.totalPoints !== undefined && (
+          <button
+            onClick={() => navigate("/app/profile/loyalty")}
+            className="w-full bg-app-background rounded-xl p-4 shadow-lg border border-surface-subtle flex items-center justify-between hover:shadow-xl transition-shadow"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center">
+                <IoTrophyOutline className="text-white text-lg" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-text-default">Rift Points</p>
+                <p className="text-xs text-text-subtle">
+                  {formatNumberWithCommas(loyaltyStats.totalPoints)} points
+                  {pointValue && ` • $${(loyaltyStats.totalPoints * pointValue.pointValue).toFixed(2)}`}
+                </p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
+        )}
+
+        {/* Settings Sections */}
+        <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
+          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">Account</p>
+          
+          {/* Withdrawal Account */}
+          <button
+            onClick={() => setShowPaymentSetup(true)}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors border-b border-surface-subtle"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <IoWalletOutline className="text-blue-500 text-lg" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">Withdrawal Account</p>
+                <p className="text-xs text-text-subtle">
+                  {(() => {
+                    const paymentAccount = user?.paymentAccount || user?.payment_account;
+                    if (paymentAccount) {
+                      try {
+                        const account = JSON.parse(paymentAccount);
+                        return `${account.institution} • ${account.accountIdentifier}`;
+                      } catch {
+                        return "Configured";
+                      }
+                    }
+                    return "Not configured";
+                  })()}
+                </p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
+
+          {/* Push Notifications */}
+          <button
+            onClick={() => setShowNotificationSettings(true)}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <IoNotificationsOutline className="text-purple-500 text-lg" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">Push Notifications</p>
+                <p className="text-xs text-text-subtle">Manage alerts</p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
+        </div>
+
+        {/* Security Section */}
+        <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
+          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">Security</p>
+          
+          {userQuery?.data?.externalId && (
+            <button
+              onClick={onAddRecovery}
+              className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors border-b border-surface-subtle"
             >
-              <span className="w-full flex flex-row items-center justify-between">
-                <div className="text-left">
-                  <span className="text-text-default block font-medium">
-                    Rift Points
-                  </span>
-                  <span className="text-xs text-text-subtle/70">
-                    {formatNumberWithCommas(loyaltyStats.totalPoints)} points
-                    {pointValue &&
-                      ` • $${(
-                        loyaltyStats.totalPoints * pointValue.pointValue
-                      ).toFixed(2)} USD`}
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <IoShieldCheckmarkOutline className="text-green-500 text-lg" />
                 </div>
-                <IoTrophyOutline className="text-accent-primary text-xl" />
-              </span>
-            </ActionButton>
-          </div>
-        </>
-      )}
+                <div className="text-left">
+                  <p className="text-sm font-medium text-text-default">Account Recovery</p>
+                  <p className="text-xs text-text-subtle">Backup your account</p>
+                </div>
+              </div>
+              <IoChevronForward className="text-text-subtle" />
+            </button>
+          )}
 
-      {/* Withdrawal Settings Section */}
-      <p className="mt-6 text-sm text-muted-foreground">Withdrawal Settings</p>
-      <div className="space-y-3 mt-2">
-        {/* Payment Account Setup */}
-        <ActionButton
-          onClick={() => setShowPaymentSetup(true)}
-          className="w-full bg-accent/10 border-1 border-surface-subtle p-3 py-4"
-        >
-          <span className="w-full flex flex-row items-center justify-between">
-            <div className="text-left">
-              <span className="text-text-subtle block">Withdrawal Account</span>
-              {(() => {
-                const paymentAccount =
-                  user?.paymentAccount || user?.payment_account;
-                if (paymentAccount) {
-                  try {
-                    const account = JSON.parse(paymentAccount);
-                    return (
-                      <span className="text-xs text-text-subtle/70">
-                        {account.institution}{" "}
-                        {account.type ? `(${account.type})` : ""}:{" "}
-                        {account.accountIdentifier}
-                        {account.accountNumber
-                          ? ` - ${account.accountNumber}`
-                          : ""}
-                        {account.accountName ? ` - ${account.accountName}` : ""}
-                      </span>
-                    );
-                  } catch {
-                    return (
-                      <span className="text-xs text-text-subtle/70">
-                        Account configured
-                      </span>
-                    );
-                  }
-                } else {
-                  return (
-                    <span className="text-xs text-text-subtle/70">
-                      Not configured
-                    </span>
-                  );
-                }
-              })()}
-            </div>
-            <IoWalletOutline className="text-text-subtle text-xl" />
-          </span>
-        </ActionButton>
-      </div>
-
-      <p className="mt-6 text-sm text-muted-foreground">Notifications</p>
-      <div className="w-full bg-accent/10 border-1 border-surface-subtle mt-2 rounded-lg">
-        <ActionButton
-          onClick={() => setShowNotificationSettings(true)}
-          className="w-full bg-transparent p-3 py-4 rounded-none"
-        >
-          <span className="w-full flex flex-row items-center justify-between">
-            <span className="text-text-subtle">Push Notifications</span>
-            <IoNotificationsOutline className="text-text-subtle text-xl" />
-          </span>
-        </ActionButton>
-      </div>
-
-      <p className="mt-6 text-sm text-muted-foreground">Security</p>
-      <div className="w-full bg-accent/10 border-1 border-surface-subtle mt-2 rounded-lg">
-        {userQuery?.data?.externalId && (
-          <ActionButton
-            onClick={onAddRecovery}
-            className="w-full bg-transparent p-3 py-4 rounded-none border-b-1 border-surface-subtle"
+          <button
+            onClick={onLogOut}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
           >
-            <span className="w-full flex flex-row items-center justify-between">
-              <span className="text-text-subtle">Account Recovery</span>
-              <FaArrowsRotate className="text-text-subtle text-xl" />
-            </span>
-          </ActionButton>
-        )}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center">
+                <IoLogOutOutline className="text-red-500 text-lg" />
+              </div>
+              <p className="text-sm font-medium text-red-500">Log Out</p>
+            </div>
+          </button>
+        </div>
 
-        <ActionButton
-          onClick={onLogOut}
-          className="w-full bg-transparent p-3 py-4 rounded-none"
-        >
-          <span className="w-full flex flex-row items-center justify-between">
-            <span className="text-text-subtle">Log Out</span>
-            <IoIosPower className="text-danger text-2xl" />
-          </span>
-        </ActionButton>
+        {/* App Version */}
+        <p className="text-center text-xs text-text-subtle/50 pt-2">
+          Rift Wallet v1.0
+        </p>
       </div>
 
       <Drawer
