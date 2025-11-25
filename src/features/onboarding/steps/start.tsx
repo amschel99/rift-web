@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { motion } from "motion/react";
 import { HiPhone } from "react-icons/hi";
 import { User, Globe, Send, TrendingUp, Shield, Sparkles } from "lucide-react";
@@ -51,6 +53,7 @@ const ConnectionLine = ({ delay }: { delay: number }) => (
 
 export default function Start() {
   const flow = useFlow();
+  const [searchParams] = useSearchParams();
 
   const {
     isOpen: isSignupOpen,
@@ -62,6 +65,15 @@ export default function Start() {
     onOpen: onLoginOpen,
     onClose: onLoginClose,
   } = useDisclosure();
+
+  // Extract referrer from URL params and store it for signup
+  useEffect(() => {
+    const referrer = searchParams.get("referrer");
+    if (referrer) {
+      localStorage.setItem("pending_referrer", referrer);
+      console.log("📎 Referrer code stored:", referrer);
+    }
+  }, [searchParams]);
 
   const handleSignupWithMethod = (
     method: "phone" | "username-password"
