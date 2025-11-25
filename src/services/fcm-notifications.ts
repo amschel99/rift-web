@@ -169,7 +169,23 @@ export class FCMNotificationService {
         };
       }
 
-      const token = await getToken(this.messaging, { vapidKey });
+      // Ensure service worker is registered
+      let token: string;
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        token = await getToken(this.messaging, {
+          vapidKey,
+          serviceWorkerRegistration: registration,
+        });
+      } catch (tokenError: any) {
+        console.error("❌ [FCM] Error getting token:", tokenError);
+        return {
+          success: false,
+          error:
+            tokenError?.message ||
+            "Failed to get notification token. Please try again.",
+        };
+      }
 
       if (!token) {
         return {
