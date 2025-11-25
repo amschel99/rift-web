@@ -23,7 +23,7 @@ There's a difference between a reusable component that'll be used as a utility f
 ### 4. I want to add a utility component
 
 Grab it from shadcn/ui.
-Once you have it customize it to fit our theme.
+Once you have it customize it to fit our theme
 
 ### 5. Branching
 

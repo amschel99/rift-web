@@ -1,5 +1,6 @@
 import { initializeApp, FirebaseApp } from "firebase/app";
 import { getMessaging, Messaging, isSupported } from "firebase/messaging";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Firebase configuration
 // Get these from your Firebase Console: Project Settings > General > Your apps > Web app
@@ -38,6 +39,20 @@ export const initializeFirebase = async (): Promise<FirebaseApp | null> => {
     if (!app) {
       app = initializeApp(firebaseConfig);
       console.log("✅ [Firebase] App initialized");
+      
+      // Initialize App Check if site key is provided
+      const appCheckKey = import.meta.env.VITE_FIREBASE_APP_CHECK_KEY;
+      if (appCheckKey && typeof window !== "undefined") {
+        try {
+          initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider(appCheckKey),
+            isTokenAutoRefreshEnabled: true,
+          });
+          console.log("✅ [Firebase] App Check initialized");
+        } catch (error) {
+          console.warn("⚠️ [Firebase] App Check initialization failed:", error);
+        }
+      }
     }
 
     return app;

@@ -19,7 +19,7 @@ export default defineConfig({
         "s1.png",
         "s2.png",
         "s3.png",
-        "webpushr-sw.js",
+        "firebase-messaging-sw.js",
       ],
       manifest: {
         name: "Rift Payment Solutions",
