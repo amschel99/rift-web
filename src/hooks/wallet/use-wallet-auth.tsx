@@ -5,6 +5,7 @@ import { LoginResponse, SignupResponse } from "@rift-finance/wallet";
 import { useMutation, useQuery } from "@tanstack/react-query";
 // import { authenticateUser, analyticsLog } from "@/analytics/events";
 
+
 const TEST = import.meta.env.VITE_TEST == "true";
 const ERROR_OUT = import.meta.env.VITE_ERROR_OUT == "true";
 export interface sendOTP {

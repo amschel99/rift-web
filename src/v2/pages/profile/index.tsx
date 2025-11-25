@@ -10,12 +10,16 @@ import {
   IoChevronForward,
   IoShieldCheckmarkOutline,
   IoLogOutOutline,
+  IoShareSocialOutline,
+  IoCopyOutline,
+  IoLogoWhatsapp,
 } from "react-icons/io5";
+import { FaTelegram } from "react-icons/fa";
 import { HiMiniUser } from "react-icons/hi2";
 import { FaArrowsRotate } from "react-icons/fa6";
 import { MdAlternateEmail } from "react-icons/md";
 import { HiPhone } from "react-icons/hi";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, Gift } from "lucide-react";
 import { usePlatformDetection } from "@/utils/platform";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import useUser from "@/hooks/data/use-user";
@@ -36,6 +40,7 @@ import {
 } from "@/components/ui/drawer";
 import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
 import { formatNumberWithCommas } from "@/lib/utils";
+import { generateReferralCode, getReferralLink } from "@/utils/referral";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -43,8 +48,10 @@ export default function Profile() {
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] =
     useState(false);
+  const [showReferralDrawer, setShowReferralDrawer] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
 
   const { isTelegram, telegramUser } = usePlatformDetection();
   const { userQuery } = useWalletAuth();
@@ -70,6 +77,58 @@ export default function Profile() {
   if (userDisplayName && !displayName) {
     setDisplayName(userDisplayName);
   }
+
+  // Initialize or load referral code
+  useEffect(() => {
+    const storedCode = localStorage.getItem("referral_code");
+    if (storedCode) {
+      setReferralCode(storedCode);
+    } else {
+      const newCode = generateReferralCode();
+      localStorage.setItem("referral_code", newCode);
+      setReferralCode(newCode);
+    }
+  }, []);
+
+  const referralLink = getReferralLink(referralCode);
+
+  const handleCopyReferralLink = async () => {
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      toast.success("Referral link copied!");
+    } catch (error) {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = encodeURIComponent(`Join me on Rift - your global USD account for payments, transfers & wealth building!\n\n${referralLink}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+
+  const handleShareTelegram = () => {
+    const text = encodeURIComponent(`Join me on Rift - your global USD account for payments, transfers & wealth building!`);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${text}`, "_blank");
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join Rift",
+          text: "Join me on Rift - your global USD account for payments, transfers & wealth building!",
+          url: referralLink,
+        });
+      } catch (error) {
+        // User cancelled or error
+        if ((error as Error).name !== "AbortError") {
+          handleCopyReferralLink();
+        }
+      }
+    } else {
+      handleCopyReferralLink();
+    }
+  };
 
   const handleUpdatePaymentAccount = async (paymentAccount: string) => {
     try {
@@ -124,10 +183,10 @@ export default function Profile() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="w-full h-full overflow-y-auto mb-18"
+      className="w-full h-full overflow-y-auto"
     >
       {/* Profile Header - Compact */}
-      <div className="px-4 pt-6 pb-4">
+      <div className="px-4 pt-24 pb-4">
         <div className="flex items-center gap-4">
           {isTelegram ? (
             <Avatar className="w-16 h-16 min-w-16 min-h-16 border-2 border-accent-primary/20">
@@ -252,7 +311,7 @@ export default function Profile() {
           {/* Push Notifications */}
           <button
             onClick={() => setShowNotificationSettings(true)}
-            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors border-b border-surface-subtle"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
@@ -261,6 +320,23 @@ export default function Profile() {
               <div className="text-left">
                 <p className="text-sm font-medium text-text-default">Push Notifications</p>
                 <p className="text-xs text-text-subtle">Manage alerts</p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
+
+          {/* Invite Friends */}
+          <button
+            onClick={() => setShowReferralDrawer(true)}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-accent-primary/10 flex items-center justify-center">
+                <Gift className="text-accent-primary w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">Invite Friends</p>
+                <p className="text-xs text-text-subtle">Share your referral link</p>
               </div>
             </div>
             <IoChevronForward className="text-text-subtle" />
@@ -396,6 +472,92 @@ export default function Profile() {
 
           <div className="w-full h-full p-4 pb-8 overflow-y-auto">
             <NotificationSettings />
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Referral Drawer */}
+      <Drawer
+        modal
+        open={showReferralDrawer}
+        onClose={() => setShowReferralDrawer(false)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowReferralDrawer(false);
+          }
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Invite Friends</DrawerTitle>
+            <DrawerDescription>
+              Share your referral link and earn rewards
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="w-full p-4 pb-8 space-y-4">
+            {/* Referral Code Display */}
+            <div className="bg-surface-subtle rounded-xl p-4 text-center">
+              <p className="text-xs text-text-subtle mb-1">Your Referral Code</p>
+              <p className="text-2xl font-bold text-accent-primary tracking-widest">{referralCode}</p>
+            </div>
+
+            {/* Referral Link */}
+            <div 
+              onClick={handleCopyReferralLink}
+              className="flex items-center gap-2 p-3 bg-surface-subtle rounded-xl cursor-pointer hover:bg-surface transition-colors"
+            >
+              <p className="flex-1 text-sm text-text-subtle truncate">{referralLink}</p>
+              <div className="p-2 bg-accent-primary/10 rounded-lg">
+                <IoCopyOutline className="text-accent-primary" />
+              </div>
+            </div>
+
+            {/* Share Options */}
+            <div className="space-y-2">
+              <p className="text-xs text-text-subtle font-medium">Share via</p>
+              
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={handleCopyReferralLink}
+                  className="flex flex-col items-center gap-2 p-3 bg-surface-subtle rounded-xl hover:bg-surface transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gray-500/10 flex items-center justify-center">
+                    <IoCopyOutline className="text-gray-500 text-lg" />
+                  </div>
+                  <span className="text-xs text-text-subtle">Copy</span>
+                </button>
+
+                <button
+                  onClick={handleShareWhatsApp}
+                  className="flex flex-col items-center gap-2 p-3 bg-surface-subtle rounded-xl hover:bg-surface transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                    <IoLogoWhatsapp className="text-green-500 text-lg" />
+                  </div>
+                  <span className="text-xs text-text-subtle">WhatsApp</span>
+                </button>
+
+                <button
+                  onClick={handleShareTelegram}
+                  className="flex flex-col items-center gap-2 p-3 bg-surface-subtle rounded-xl hover:bg-surface transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <FaTelegram className="text-blue-500 text-lg" />
+                  </div>
+                  <span className="text-xs text-text-subtle">Telegram</span>
+                </button>
+              </div>
+
+              {/* Native Share Button */}
+              <ActionButton
+                onClick={handleNativeShare}
+                className="w-full py-3 mt-2"
+              >
+                <IoShareSocialOutline className="text-lg mr-2" />
+                Share Link
+              </ActionButton>
+            </div>
           </div>
         </DrawerContent>
       </Drawer>

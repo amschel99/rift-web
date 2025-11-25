@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { SlCheck } from "react-icons/sl";
 import { CgSpinner } from "react-icons/cg";
@@ -10,6 +10,7 @@ import { useFlow } from "../context";
 import { useNotifications } from "@/contexts/NotificationContext";
 import ActionButton from "@/components/ui/action-button";
 import { toast } from "sonner";
+import rift from "@/lib/rift";
 
 export default function Created() {
   const { signInMutation, signUpMutation } = useFlow();
@@ -20,6 +21,30 @@ export default function Created() {
   const [notificationAsked, setNotificationAsked] = useState(false);
 
   const navigate = useNavigate();
+
+  // After successful signup, update user with referrer in background
+  useEffect(() => {
+    const updateReferrer = async () => {
+      const pendingReferrer = localStorage.getItem("pending_referrer");
+      const token = localStorage.getItem("token");
+      
+      // Only process if we have a pending referrer, auth token, and signup was successful
+      if (pendingReferrer && token && !loading && !error && signUpMutation?.isSuccess) {
+        try {
+          console.log("📎 Updating user with referrer:", pendingReferrer);
+          rift.setBearerToken(token);
+          await rift.auth.updateUser({ referrer: pendingReferrer });
+          localStorage.removeItem("pending_referrer");
+          console.log("✅ Referrer updated successfully");
+        } catch (err) {
+          console.error("❌ Failed to update referrer:", err);
+          // Don't show error to user, just log it
+        }
+      }
+    };
+
+    updateReferrer();
+  }, [loading, error, signUpMutation?.isSuccess]);
 
   const handleOpenWallet = () => {
     logEvent("WALLET_CREATED");
