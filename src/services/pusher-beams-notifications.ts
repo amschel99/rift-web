@@ -187,11 +187,18 @@ class PusherBeamsNotificationServiceImpl
         console.log(`📝 [Pusher Beams] Authenticating user: ${userId}`);
 
         // Create token provider for authenticated users
+        const apiKey = import.meta.env.VITE_SDK_API_KEY;
+        
+        if (!apiKey) {
+          throw new Error("API key not configured");
+        }
+
         const tokenProvider = new PusherPushNotifications.TokenProvider({
           url: `${
             import.meta.env.VITE_API_URL || "http://localhost:8000"
           }/notifications/pusher-beams-auth`,
           headers: {
+            "x-api-key": apiKey,
             Authorization: `Bearer ${authToken}`,
           },
         });
