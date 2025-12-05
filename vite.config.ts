@@ -10,7 +10,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: "autoUpdate",
+      injectRegister: null, // Disable auto service worker registration
+      registerType: undefined,
       includeAssets: [
         "rift.png",
         "hero.png",
@@ -19,7 +20,7 @@ export default defineConfig({
         "s1.png",
         "s2.png",
         "s3.png",
-        "firebase-messaging-sw.js",
+        "service-worker.js",
       ],
       manifest: {
         name: "Rift Payment Solutions",
