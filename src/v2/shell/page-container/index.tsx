@@ -11,6 +11,8 @@ import Splash from "@/v2/pages/splash";
 import Profile from "@/v2/pages/profile";
 import Loyalty from "@/v2/pages/profile/loyalty";
 import Recovery from "@/v2/pages/profile/recovery";
+import Invest from "@/v2/pages/invest";
+import SailVault from "@/v2/pages/invest/sail-vault";
 import Agent from "@/features/agent";
 import TokenInfo from "@/features/token";
 import ReceiveFromAddress from "@/features/receive/address";
@@ -52,7 +54,7 @@ export default function PageContainer() {
 
   const RenderScreenWithShell = useCallback(
     (props: {
-      screen: "home" | "profile";
+      screen: "home" | "invest" | "profile";
     }) => {
       const { screen } = props;
       switch (screen) {
@@ -60,6 +62,13 @@ export default function PageContainer() {
           return (
             <AuthenticatedShell>
               <Home />
+            </AuthenticatedShell>
+          );
+        }
+        case "invest": {
+          return (
+            <AuthenticatedShell>
+              <Invest />
             </AuthenticatedShell>
           );
         }
@@ -90,6 +99,10 @@ export default function PageContainer() {
       <Route
         path="/app/profile"
         element={<RenderScreenWithShell screen="profile" />}
+      />
+      <Route
+        path="/app/invest"
+        element={<RenderScreenWithShell screen="invest" />}
       />
       <Route path="/app/swap" element={
         <AuthenticatedShell>
@@ -137,6 +150,11 @@ export default function PageContainer() {
         </AuthenticatedShell>
       } />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
+      <Route path="/app/invest/sail-vault" element={
+        <AuthenticatedShell>
+          <SailVault />
+        </AuthenticatedShell>
+      } />
     </Routes>
   );
 }
