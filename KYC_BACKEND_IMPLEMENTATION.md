@@ -4,10 +4,11 @@ This document outlines the backend implementation requirements for the Smile ID 
 
 ## Overview
 
-The backend needs to provide two main endpoints:
+The backend needs to provide three main endpoints:
 
-1. **Web Token Generation** - Creates a session token for the frontend to initialize Smile ID
-2. **Callback Handler** - Receives verification results from Smile ID
+1. **Web Token Generation** - Creates a session token for the frontend to initialize Smile ID (optional with web component approach)
+2. **Image Verification** - Receives captured images from frontend and submits to Smile ID
+3. **Callback Handler** - Receives verification results from Smile ID
 
 ## Prerequisites
 
@@ -48,7 +49,192 @@ SMILE_ID_SIGNATURE_SECRET=your_signature_secret_here
 
 ## Required Endpoints
 
-### 1. POST /api/kyc/token
+### 1. POST /api/kyc/verify (Primary Endpoint)
+
+This endpoint receives captured images from the `smart-camera-web` component and submits them to Smile ID for verification.
+
+#### Request
+
+**Headers:**
+
+```
+Authorization: Bearer <user_jwt_token>
+Content-Type: application/json
+x-api-key: <your_sdk_api_key>
+```
+
+**Body:**
+
+```json
+{
+  "images": [
+    { "image": "base64_encoded_selfie", "image_type_id": 0 },
+    { "image": "base64_encoded_id_front", "image_type_id": 1 },
+    { "image": "base64_encoded_id_back", "image_type_id": 2 }
+  ],
+  "partner_params": {
+    "user_id": "user-123",
+    "job_id": "job-timestamp",
+    "job_type": 1,
+    "country_code": "KE",
+    "id_type": "NATIONAL_ID",
+    "id_number": "12345678",
+    "identifier": "user@example.com",
+    "libraryVersion": "11.0.3"
+  },
+  "country_code": "KE",
+  "id_type": "NATIONAL_ID",
+  "id_number": "12345678",
+  "user_id": "user-123",
+  "email": "user@example.com",
+  "phone_number": "+254712345678"
+}
+```
+
+**Supported ID Types by Country:**
+
+| Country           | ID Types                                      |
+| ----------------- | --------------------------------------------- |
+| Nigeria (NG)      | BVN, NIN, DRIVERS_LICENSE, VOTER_ID, PASSPORT |
+| Kenya (KE)        | NATIONAL_ID, PASSPORT, ALIEN_CARD             |
+| South Africa (ZA) | NATIONAL_ID, PASSPORT, DRIVERS_LICENSE        |
+| Ghana (GH)        | SSNIT, VOTER_ID, PASSPORT, DRIVERS_LICENSE    |
+
+````
+
+#### Response
+
+**Success (200):**
+
+```json
+{
+  "success": true,
+  "SmileJobID": "0000056574",
+  "ResultCode": "1210",
+  "ResultText": "Enroll User",
+  "Actions": {
+    "Liveness_Check": "Passed",
+    "Selfie_To_ID_Card_Compare": "Passed"
+  }
+}
+````
+
+**Error (400/500):**
+
+```json
+{
+  "success": false,
+  "message": "Verification failed",
+  "error": "Error details"
+}
+```
+
+#### Implementation Example (TypeScript + Express)
+
+```typescript
+import express from "express";
+import { WebApi } from "smile-identity-core";
+import { v4 as uuid } from "uuid";
+
+const router = express.Router();
+
+router.post("/api/kyc/verify", authenticateUser, async (req, res) => {
+  try {
+    const {
+      images,
+      partner_params,
+      country_code,
+      id_type,
+      id_number,
+      user_id,
+      email,
+      phone_number,
+    } = req.body;
+    const user = req.user;
+
+    // Validate required fields
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No images provided",
+      });
+    }
+
+    // Initialize Smile ID WebAPI
+    const connection = new WebApi(
+      process.env.SMILE_ID_PARTNER_ID!,
+      process.env.SMILE_ID_CALLBACK_URL!,
+      process.env.SMILE_ID_API_KEY!,
+      process.env.SMILE_ID_ENVIRONMENT === "live" ? 1 : 0
+    );
+
+    // Prepare partner params
+    const jobId = partner_params?.job_id || `job-${uuid()}`;
+    const userId = partner_params?.user_id || user.id || `user-${uuid()}`;
+
+    const submissionParams = {
+      user_id: userId,
+      job_id: jobId,
+      job_type: partner_params?.job_type || 1, // 1 = biometric_kyc
+      country: country_code,
+      id_type: id_type || partner_params?.id_type,
+      id_number: id_number || partner_params?.id_number,
+      identifier: email || phone_number || user.email,
+    };
+
+    // Submit images to Smile ID
+    const options = {
+      return_job_status: true, // Wait for result
+    };
+
+    const result = await connection.submit_job(
+      submissionParams,
+      images,
+      {}, // id_info - empty for biometric verification
+      options
+    );
+
+    // Store KYC session in database
+    await storeKYCSession({
+      userId: user.id,
+      jobId,
+      smileJobId: result.SmileJobID,
+      country: country_code,
+      status: result.ResultCode === "1210" ? "verified" : "pending",
+      rawResult: result,
+      createdAt: new Date(),
+    });
+
+    // Update user verification status if successful
+    if (result.ResultCode === "1210") {
+      await updateUserVerificationStatus(user.id, true);
+    }
+
+    console.log("✅ KYC Verification submitted:", {
+      userId,
+      jobId,
+      smileJobId: result.SmileJobID,
+      resultCode: result.ResultCode,
+    });
+
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error: any) {
+    console.error("❌ KYC Verification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Verification failed",
+      error: error.message,
+    });
+  }
+});
+
+export default router;
+```
+
+### 2. POST /api/kyc/token (Alternative - for hosted SDK)
 
 This endpoint generates a web token for the frontend to initialize Smile ID.
 
@@ -176,7 +362,7 @@ router.post("/api/kyc/token", authenticateUser, async (req, res) => {
 export default router;
 ```
 
-### 2. POST /api/kyc/callback
+### 3. POST /api/kyc/callback
 
 This endpoint receives verification results from Smile ID after the user completes the KYC process.
 
