@@ -60,7 +60,11 @@ export default function Profile() {
   const { userQuery } = useWalletAuth();
   const { data: user, isLoading: userLoading } = useUser();
   const updateUserMutation = useUpdateUser();
-  const { isKYCVerified, isLoading: kycLoading } = useKYCStatus();
+  const {
+    isKYCVerified,
+    isUnderReview,
+    isLoading: kycLoading,
+  } = useKYCStatus();
 
   const { recoveryMethodsQuery } = useWalletRecovery({
     externalId: userQuery?.data?.externalId,
@@ -379,10 +383,10 @@ export default function Profile() {
           </p>
 
           <button
-            onClick={() => !isKYCVerified && navigate("/kyc")}
-            disabled={isKYCVerified}
+            onClick={() => !isKYCVerified && !isUnderReview && navigate("/kyc")}
+            disabled={isKYCVerified || isUnderReview}
             className={`w-full px-4 py-3.5 flex items-center justify-between transition-colors ${
-              isKYCVerified
+              isKYCVerified || isUnderReview
                 ? "cursor-default"
                 : "hover:bg-surface-subtle/50 cursor-pointer"
             }`}
@@ -390,13 +394,19 @@ export default function Profile() {
             <div className="flex items-center gap-3">
               <div
                 className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                  isKYCVerified ? "bg-green-500/10" : "bg-amber-500/10"
+                  isKYCVerified
+                    ? "bg-green-500/10"
+                    : isUnderReview
+                    ? "bg-blue-500/10"
+                    : "bg-amber-500/10"
                 }`}
               >
                 {kycLoading ? (
                   <div className="w-4 h-4 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
                 ) : isKYCVerified ? (
                   <IoCheckmarkCircle className="text-green-500 text-lg" />
+                ) : isUnderReview ? (
+                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <IoWarning className="text-amber-500 text-lg" />
                 )}
@@ -409,6 +419,8 @@ export default function Profile() {
                   className={`text-xs ${
                     isKYCVerified
                       ? "text-green-600 dark:text-green-400"
+                      : isUnderReview
+                      ? "text-blue-600 dark:text-blue-400"
                       : "text-amber-600 dark:text-amber-400"
                   }`}
                 >
@@ -416,11 +428,13 @@ export default function Profile() {
                     ? "Checking..."
                     : isKYCVerified
                     ? "Verified ✓"
+                    : isUnderReview
+                    ? "Under Review - We'll notify you"
                     : "Not verified - Tap to verify"}
                 </p>
               </div>
             </div>
-            {!isKYCVerified && !kycLoading && (
+            {!isKYCVerified && !isUnderReview && !kycLoading && (
               <IoChevronForward className="text-text-subtle" />
             )}
           </button>
