@@ -3,12 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 interface KYCStatusResponse {
   success: boolean;
   kycVerified: boolean;
+  status?: "verified" | "under_review" | "not_started";
+  underReview?: boolean;
+  jobId?: string | null;
 }
 
 async function fetchKYCStatus(): Promise<KYCStatusResponse> {
   const authToken = localStorage.getItem("token");
   const apiKey = import.meta.env.VITE_SDK_API_KEY;
-  const apiUrl =import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   console.log("🔍 [KYC Status] Fetching KYC status...");
   console.log("🔍 [KYC Status] API URL:", apiUrl);
@@ -23,7 +26,7 @@ async function fetchKYCStatus(): Promise<KYCStatusResponse> {
   try {
     const fullUrl = `${apiUrl}/api/kyc/verified`;
     console.log("🔍 [KYC Status] Full URL:", fullUrl);
-    
+
     const response = await fetch(fullUrl, {
       method: "GET",
       mode: "cors",
@@ -36,25 +39,37 @@ async function fetchKYCStatus(): Promise<KYCStatusResponse> {
     });
 
     console.log("🔍 [KYC Status] Response status:", response.status);
-    console.log("🔍 [KYC Status] Response headers:", Object.fromEntries(response.headers.entries()));
-    
+    console.log(
+      "🔍 [KYC Status] Response headers:",
+      Object.fromEntries(response.headers.entries())
+    );
+
     // Log raw text first to debug HTML responses
     const text = await response.text();
-    console.log("🔍 [KYC Status] Raw response (first 200 chars):", text.substring(0, 200));
-    
+    console.log(
+      "🔍 [KYC Status] Raw response (first 200 chars):",
+      text.substring(0, 200)
+    );
+
     // Parse as JSON
     let data;
     try {
       data = JSON.parse(text);
     } catch (parseError) {
-      console.error("🔍 [KYC Status] JSON parse error - response is not JSON:", parseError);
+      console.error(
+        "🔍 [KYC Status] JSON parse error - response is not JSON:",
+        parseError
+      );
       console.error("🔍 [KYC Status] Full response text:", text);
       return { success: false, kycVerified: false };
     }
 
     if (!response.ok) {
       // If endpoint fails, assume not verified for safety
-      console.error("🔍 [KYC Status] Failed to fetch KYC status:", response.status);
+      console.error(
+        "🔍 [KYC Status] Failed to fetch KYC status:",
+        response.status
+      );
       return { success: false, kycVerified: false };
     }
 
@@ -79,11 +94,19 @@ export default function useKYCStatus() {
     enabled: hasAuthToken, // Only fetch if authenticated
   });
 
-  console.log("🔍 [KYC Status Hook] hasAuthToken:", hasAuthToken, "queryStatus:", query.status);
+  console.log(
+    "🔍 [KYC Status Hook] hasAuthToken:",
+    hasAuthToken,
+    "queryStatus:",
+    query.status
+  );
 
   return {
     ...query,
     isKYCVerified: query.data?.kycVerified ?? false,
+    isUnderReview: query.data?.underReview ?? false,
+    status: query.data?.status ?? "not_started",
+    jobId: query.data?.jobId ?? null,
     isLoading: query.isLoading,
     isError: query.isError,
   };
