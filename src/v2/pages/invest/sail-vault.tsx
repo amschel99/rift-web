@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import useKYCGuard from "@/hooks/use-kyc-guard";
+import KYCRequiredModal from "@/components/kyc/KYCRequiredModal";
 import {
   FiArrowLeft,
   FiChevronDown,
@@ -29,7 +31,9 @@ import {
   useVaultCancelClaim,
 } from "@/hooks/data/use-vault";
 import useRoyalties from "@/hooks/data/use-royalties";
-import useCountryDetection, { SupportedCurrency } from "@/hooks/data/use-country-detection";
+import useCountryDetection, {
+  SupportedCurrency,
+} from "@/hooks/data/use-country-detection";
 import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
 import rift from "@/lib/rift";
 
@@ -52,14 +56,19 @@ const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
 };
 
 // Calculate countdown to next 29th
-function getCountdownTo29th(): { days: number; hours: number; minutes: number; seconds: number } {
+function getCountdownTo29th(): {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+} {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
   const currentDay = now.getDate();
-  
+
   let targetDate: Date;
-  
+
   // If we're past the 29th this month, target next month
   if (currentDay >= 29) {
     // Next month's 29th
@@ -70,18 +79,18 @@ function getCountdownTo29th(): { days: number; hours: number; minutes: number; s
     // This month's 29th
     targetDate = new Date(currentYear, currentMonth, 29, 0, 0, 0);
   }
-  
+
   const diff = targetDate.getTime() - now.getTime();
-  
+
   if (diff <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0 };
   }
-  
+
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-  
+
   return { days, hours, minutes, seconds };
 }
 
@@ -100,7 +109,7 @@ export default function SailVault() {
 
   // Detect user's country/currency
   const { data: countryInfo } = useCountryDetection();
-  
+
   // Get user's preferred currency from localStorage or detected country
   const userCurrency = useMemo((): SupportedCurrency => {
     const stored = localStorage.getItem("selected_currency");
@@ -126,7 +135,9 @@ export default function SailVault() {
   const { data: royaltiesData, isLoading: royaltiesLoading } = useRoyalties();
 
   // User's wallet balance (for deposit validation)
-  const { data: walletBalance } = useBaseUSDCBalance({ currency: userCurrency });
+  const { data: walletBalance } = useBaseUSDCBalance({
+    currency: userCurrency,
+  });
 
   // Mutations
   const depositMutation = useVaultDeposit();
@@ -200,8 +211,19 @@ export default function SailVault() {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
+  // KYC Guard
+  const { checkKYC, showKYCModal, closeKYCModal, featureName } = useKYCGuard();
+
   // Open action drawer
   const openActionDrawer = (mode: ActionMode) => {
+    // Check KYC for all vault actions
+    const featureNames: Record<string, string> = {
+      deposit: "vault deposits",
+      withdraw: "vault withdrawals",
+      claim: "dividend collection",
+    };
+    if (mode && !checkKYC(featureNames[mode] || "this feature")) return;
+
     setActionMode(mode);
     setActionStep(mode === "claim" ? "confirm" : "input");
     setLocalAmount("");
@@ -229,11 +251,15 @@ export default function SailVault() {
     try {
       if (actionMode === "deposit") {
         const usdAmount = getUsdAmount(localAmount);
-        console.log(`💰 Depositing: ${localAmount} ${userCurrency} = ${usdAmount} USD`);
+        console.log(
+          `💰 Depositing: ${localAmount} ${userCurrency} = ${usdAmount} USD`
+        );
         await depositMutation.mutateAsync(usdAmount);
       } else if (actionMode === "withdraw") {
         const usdAmount = getUsdAmount(localAmount);
-        console.log(`💰 Withdrawing: ${localAmount} ${userCurrency} = ${usdAmount} USD`);
+        console.log(
+          `💰 Withdrawing: ${localAmount} ${userCurrency} = ${usdAmount} USD`
+        );
         await withdrawMutation.mutateAsync(usdAmount);
       } else if (actionMode === "claim") {
         await claimMutation.mutateAsync();
@@ -274,7 +300,10 @@ export default function SailVault() {
     const usd = typeof usdValue === "string" ? parseFloat(usdValue) : usdValue;
     if (isNaN(usd)) return `${currencySymbol}0`;
     const local = usd * exchangeRate;
-    return `${currencySymbol}${local.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    return `${currencySymbol}${local.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })}`;
   };
 
   // Format USD
@@ -322,7 +351,9 @@ export default function SailVault() {
   const totalValue = balance + rewards;
 
   // Convert royalties to local currency
-  const totalRoyaltiesLocal = royaltiesData ? royaltiesData.totalRoyalties * exchangeRate : 0;
+  const totalRoyaltiesLocal = royaltiesData
+    ? royaltiesData.totalRoyalties * exchangeRate
+    : 0;
 
   return (
     <motion.div
@@ -332,23 +363,35 @@ export default function SailVault() {
       className="flex flex-col min-h-screen bg-app-background"
     >
       {/* Header */}
-      <div className={`flex items-center justify-between px-4 py-4 border-b ${
-        viewMode === "metrics" 
-          ? "bg-[#0a0e1a] border-gray-800" 
-          : "border-surface-subtle"
-      }`}>
+      <div
+        className={`flex items-center justify-between px-4 py-4 border-b ${
+          viewMode === "metrics"
+            ? "bg-[#0a0e1a] border-gray-800"
+            : "border-surface-subtle"
+        }`}
+      >
         <button
-          onClick={() => viewMode === "metrics" ? setViewMode("main") : navigate(-1)}
+          onClick={() =>
+            viewMode === "metrics" ? setViewMode("main") : navigate(-1)
+          }
           className={`p-2 -ml-2 rounded-full transition-colors ${
-            viewMode === "metrics" 
-              ? "hover:bg-gray-800" 
+            viewMode === "metrics"
+              ? "hover:bg-gray-800"
               : "hover:bg-surface-subtle"
           }`}
         >
-          <FiArrowLeft className={`w-5 h-5 ${viewMode === "metrics" ? "text-white" : "text-text-default"}`} />
+          <FiArrowLeft
+            className={`w-5 h-5 ${
+              viewMode === "metrics" ? "text-white" : "text-text-default"
+            }`}
+          />
         </button>
         <div className="flex items-center gap-2">
-          <h1 className={`text-lg font-semibold ${viewMode === "metrics" ? "text-white" : "text-text-default"}`}>
+          <h1
+            className={`text-lg font-semibold ${
+              viewMode === "metrics" ? "text-white" : "text-text-default"
+            }`}
+          >
             {viewMode === "metrics" ? "Live Shop Sales" : "Sail Vault"}
           </h1>
           {viewMode === "main" && (
@@ -390,7 +433,7 @@ export default function SailVault() {
             <iframe
               src="https://scan.liquidroyalty.com"
               className="border-0 h-full"
-              style={{ width: 'calc(100% + 20px)' }}
+              style={{ width: "calc(100% + 20px)" }}
               onLoad={() => setIframeLoading(false)}
               title="Live Shop Sales"
               sandbox="allow-scripts allow-same-origin"
@@ -401,321 +444,368 @@ export default function SailVault() {
 
       {/* Main View */}
       {viewMode === "main" && (
-      <div className="flex-1 p-4 overflow-y-auto">
-        {/* Logo & Total Value */}
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-black flex items-center justify-center shadow-lg">
-            <img
-              src="https://www.liquidroyalty.com/sailr_logo.svg"
-              alt="Sail Vault"
-              className="w-14 h-14 object-contain"
-            />
-          </div>
-          {vaultLoading || loadingRate ? (
-            <div className="flex items-center justify-center gap-2">
-              <CgSpinner className="animate-spin text-accent-primary" />
-              <span className="text-text-subtle">Loading...</span>
+        <div className="flex-1 p-4 overflow-y-auto">
+          {/* Logo & Total Value */}
+          <div className="text-center mb-6">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-black flex items-center justify-center shadow-lg">
+              <img
+                src="https://www.liquidroyalty.com/sailr_logo.svg"
+                alt="Sail Vault"
+                className="w-14 h-14 object-contain"
+              />
             </div>
-          ) : (
-            <>
-              <h2 className="text-3xl font-bold text-text-default mb-1">
-                {formatLocalMoney(totalValue)}
-              </h2>
-              <p className="text-sm text-text-subtle">
-                Your Portfolio • {formatUSD(totalValue)}
-              </p>
-            </>
-          )}
-        </div>
-
-        {/* Balance Cards */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-surface-alt rounded-xl p-4 border border-surface-subtle">
-            <div className="flex items-center gap-2 mb-2">
-              <IoWalletOutline className="w-4 h-4 text-text-subtle" />
-              <span className="text-xs text-text-subtle">Invested</span>
-            </div>
-            <p className="text-lg font-semibold text-text-default">
-              {formatLocalMoney(balance)}
-            </p>
-            <p className="text-xs text-text-subtle">{formatUSD(balance)}</p>
-          </div>
-
-          <div className="bg-surface-alt rounded-xl p-4 border border-surface-subtle">
-            <div className="flex items-center gap-2 mb-2">
-              <IoTrendingUp className="w-4 h-4 text-green-500" />
-              <span className="text-xs text-text-subtle">Dividends</span>
-            </div>
-            <p className="text-lg font-semibold text-green-500">
-              {formatLocalMoney(rewards)}
-            </p>
-            <p className="text-xs text-text-subtle">{formatUSD(rewards)}</p>
-          </div>
-        </div>
-
-        {/* Pending Status Alerts */}
-        {vaultData?.hasPendingWithdrawal && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-amber-600">
-                  Pending Withdrawal
-                </p>
-                <p className="text-xs text-amber-600/80">
-                  {formatLocalMoney(vaultData.pendingWithdrawal)} • Processing within 24h
-                </p>
+            {vaultLoading || loadingRate ? (
+              <div className="flex items-center justify-center gap-2">
+                <CgSpinner className="animate-spin text-accent-primary" />
+                <span className="text-text-subtle">Loading...</span>
               </div>
-              <button
-                onClick={handleCancelWithdrawal}
-                disabled={cancelWithdrawMutation.isPending}
-                className="text-xs text-amber-600 font-medium hover:underline disabled:opacity-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-
-        {vaultData?.hasPendingClaim && (
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600">
-                  Pending Dividend Claim
-                </p>
-                <p className="text-xs text-blue-600/80">Processing within 24h</p>
-              </div>
-              <button
-                onClick={handleCancelClaim}
-                disabled={cancelClaimMutation.isPending}
-                className="text-xs text-blue-600 font-medium hover:underline disabled:opacity-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Countdown to 29th */}
-        <div className="bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 rounded-xl p-4 mb-4 border border-accent-primary/20">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-accent-primary/20 flex items-center justify-center">
-              <IoTimeOutline className="w-5 h-5 text-accent-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-text-default">
-                Next Dividend Payout
-              </p>
-              <p className="text-xs text-text-subtle">29th of every month</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 gap-2 text-center">
-            <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
-              <p className="text-xl font-bold text-accent-primary">{countdown.days}</p>
-              <p className="text-xs text-text-subtle">Days</p>
-            </div>
-            <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
-              <p className="text-xl font-bold text-accent-primary">{countdown.hours}</p>
-              <p className="text-xs text-text-subtle">Hours</p>
-            </div>
-            <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
-              <p className="text-xl font-bold text-accent-primary">{countdown.minutes}</p>
-              <p className="text-xs text-text-subtle">Mins</p>
-            </div>
-            <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
-              <p className="text-xl font-bold text-accent-primary">{countdown.seconds}</p>
-              <p className="text-xs text-text-subtle">Secs</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Royalties from Shop */}
-        <button
-          onClick={() => {
-            setIframeLoading(true);
-            setViewMode("metrics");
-          }}
-          className="w-full bg-surface-alt rounded-xl p-4 mb-4 border border-surface-subtle hover:bg-surface-subtle transition-colors active:scale-[0.99]"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center">
-                <img
-                  src="https://www.liquidroyalty.com/sailr_logo.svg"
-                  alt="Sail"
-                  className="w-6 h-6 object-contain"
-                />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-medium text-text-default">
-                  Shop Sales
-                </p>
-                <p className="text-xs text-accent-primary">
-                  Tap to view live metrics →
-                </p>
-              </div>
-            </div>
-            {royaltiesLoading ? (
-              <CgSpinner className="animate-spin text-green-500" />
             ) : (
-              <div className="text-right">
-                <p className="text-sm font-semibold text-green-500">
-                  <span className="text-text-subtle font-normal">{currencySymbol}</span>{" "}
-                  {totalRoyaltiesLocal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              <>
+                <h2 className="text-3xl font-bold text-text-default mb-1">
+                  {formatLocalMoney(totalValue)}
+                </h2>
+                <p className="text-sm text-text-subtle">
+                  Your Portfolio • {formatUSD(totalValue)}
                 </p>
-                <p className="text-xs text-text-subtle">
-                  ${(royaltiesData?.totalRoyalties || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </p>
-              </div>
+              </>
             )}
           </div>
-        </button>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <button
-            onClick={() => openActionDrawer("deposit")}
-            className="flex flex-col items-center gap-2 p-4 bg-accent-primary rounded-xl text-white hover:opacity-90 transition-opacity active:scale-95"
-          >
-            <IoWalletOutline className="w-6 h-6" />
-            <span className="text-sm font-medium">Add Money</span>
-          </button>
+          {/* Balance Cards */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-surface-alt rounded-xl p-4 border border-surface-subtle">
+              <div className="flex items-center gap-2 mb-2">
+                <IoWalletOutline className="w-4 h-4 text-text-subtle" />
+                <span className="text-xs text-text-subtle">Invested</span>
+              </div>
+              <p className="text-lg font-semibold text-text-default">
+                {formatLocalMoney(balance)}
+              </p>
+              <p className="text-xs text-text-subtle">{formatUSD(balance)}</p>
+            </div>
 
-          <button
-            onClick={() => openActionDrawer("withdraw")}
-            disabled={balance <= 0 || vaultData?.hasPendingWithdrawal}
-            className="flex flex-col items-center gap-2 p-4 bg-surface-alt rounded-xl text-text-default border border-surface-subtle hover:bg-surface-subtle transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <IoWalletOutline className="w-6 h-6" />
-            <span className="text-sm font-medium">Withdraw</span>
-          </button>
+            <div className="bg-surface-alt rounded-xl p-4 border border-surface-subtle">
+              <div className="flex items-center gap-2 mb-2">
+                <IoTrendingUp className="w-4 h-4 text-green-500" />
+                <span className="text-xs text-text-subtle">Dividends</span>
+              </div>
+              <p className="text-lg font-semibold text-green-500">
+                {formatLocalMoney(rewards)}
+              </p>
+              <p className="text-xs text-text-subtle">{formatUSD(rewards)}</p>
+            </div>
+          </div>
 
-          <button
-            onClick={() => openActionDrawer("claim")}
-            disabled={rewards <= 0 || vaultData?.hasPendingClaim}
-            className="flex flex-col items-center gap-2 p-4 bg-green-500 rounded-xl text-white hover:opacity-90 transition-opacity active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <IoTrendingUp className="w-6 h-6" />
-            <span className="text-sm font-medium">Collect</span>
-          </button>
-        </div>
-
-        {/* Collapsible Explanation */}
-        <div className="bg-surface-alt rounded-xl border border-surface-subtle overflow-hidden">
-          <button
-            onClick={() => setShowExplanation(!showExplanation)}
-            className="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors"
-          >
-            <span className="text-sm font-medium text-text-default">
-              How does Sail Vault work?
-            </span>
-            {showExplanation ? (
-              <FiChevronUp className="w-5 h-5 text-text-subtle" />
-            ) : (
-              <FiChevronDown className="w-5 h-5 text-text-subtle" />
-            )}
-          </button>
-
-          <AnimatePresence>
-            {showExplanation && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="px-4 pb-4 space-y-4 text-sm text-text-subtle">
-                  {/* What is it */}
-                  <div>
-                    <p className="font-medium text-text-default mb-1">What is Sail?</p>
-                    <p>
-                      Sail is a company that sells products on Amazon across Europe, Japan, 
-                      and Southeast Asia. They own multiple successful brands in kitchen appliances, 
-                      cleaning gadgets, tools, and more.
-                    </p>
-                  </div>
-
-                  {/* The numbers */}
-                  <div className="bg-app-background rounded-lg p-3 space-y-2">
-                    <p className="font-medium text-text-default text-xs">📊 The Numbers</p>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <p className="text-text-subtle">2024 Revenue</p>
-                        <p className="font-semibold text-text-default">$49.6 Million</p>
-                      </div>
-                      <div>
-                        <p className="text-text-subtle">Growth Rate</p>
-                        <p className="font-semibold text-text-default">36% per year</p>
-                      </div>
-                      <div>
-                        <p className="text-text-subtle">Profit Margin</p>
-                        <p className="font-semibold text-text-default">38%</p>
-                      </div>
-                      <div>
-                        <p className="text-text-subtle">Global Offices</p>
-                        <p className="font-semibold text-text-default">6 Cities</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* How you earn */}
-                  <div>
-                    <p className="font-medium text-text-default mb-1">How do you earn?</p>
-                    <p>
-                      When you invest, you get a share of 10% of the company's revenue. 
-                      Every month on the 29th, dividends are distributed based on how much you invested.
-                    </p>
-                  </div>
-
-                  {/* Simple steps */}
-                  <div>
-                    <p className="font-medium text-text-default mb-2">Simple steps:</p>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">1</span>
-                        <span>Add money to start investing</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">2</span>
-                        <span>Earn dividends every month</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">3</span>
-                        <span>Collect on the 29th</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">4</span>
-                        <span>Withdraw anytime</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Why it's safe */}
-                  <div>
-                    <p className="font-medium text-text-default mb-1">Why is it safe?</p>
-                    <p>
-                      Revenue data comes directly from Amazon in real-time. You can verify 
-                      actual sales happening live. The company has offices in Shenzhen, Tokyo, 
-                      Kuala Lumpur, Ho Chi Minh City, Jakarta, and Bangkok.
-                    </p>
-                  </div>
-
-                  <p className="text-xs italic text-center pt-2 border-t border-surface-subtle">
-                    Think of it like owning a piece of a successful Amazon business that pays you every month.
+          {/* Pending Status Alerts */}
+          {vaultData?.hasPendingWithdrawal && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-amber-600">
+                    Pending Withdrawal
+                  </p>
+                  <p className="text-xs text-amber-600/80">
+                    {formatLocalMoney(vaultData.pendingWithdrawal)} • Processing
+                    within 24h
                   </p>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                <button
+                  onClick={handleCancelWithdrawal}
+                  disabled={cancelWithdrawMutation.isPending}
+                  className="text-xs text-amber-600 font-medium hover:underline disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
-        {/* Disclaimer */}
-        <p className="mt-6 text-xs text-text-subtle text-center">
-          Investment involves risk. Past performance doesn't guarantee future
-          returns.
-        </p>
-      </div>
+          {vaultData?.hasPendingClaim && (
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-600">
+                    Pending Dividend Claim
+                  </p>
+                  <p className="text-xs text-blue-600/80">
+                    Processing within 24h
+                  </p>
+                </div>
+                <button
+                  onClick={handleCancelClaim}
+                  disabled={cancelClaimMutation.isPending}
+                  className="text-xs text-blue-600 font-medium hover:underline disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Countdown to 29th */}
+          <div className="bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 rounded-xl p-4 mb-4 border border-accent-primary/20">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-accent-primary/20 flex items-center justify-center">
+                <IoTimeOutline className="w-5 h-5 text-accent-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text-default">
+                  Next Dividend Payout
+                </p>
+                <p className="text-xs text-text-subtle">29th of every month</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
+                <p className="text-xl font-bold text-accent-primary">
+                  {countdown.days}
+                </p>
+                <p className="text-xs text-text-subtle">Days</p>
+              </div>
+              <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
+                <p className="text-xl font-bold text-accent-primary">
+                  {countdown.hours}
+                </p>
+                <p className="text-xs text-text-subtle">Hours</p>
+              </div>
+              <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
+                <p className="text-xl font-bold text-accent-primary">
+                  {countdown.minutes}
+                </p>
+                <p className="text-xs text-text-subtle">Mins</p>
+              </div>
+              <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2">
+                <p className="text-xl font-bold text-accent-primary">
+                  {countdown.seconds}
+                </p>
+                <p className="text-xs text-text-subtle">Secs</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Total Royalties from Shop */}
+          <button
+            onClick={() => {
+              setIframeLoading(true);
+              setViewMode("metrics");
+            }}
+            className="w-full bg-surface-alt rounded-xl p-4 mb-4 border border-surface-subtle hover:bg-surface-subtle transition-colors active:scale-[0.99]"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center">
+                  <img
+                    src="https://www.liquidroyalty.com/sailr_logo.svg"
+                    alt="Sail"
+                    className="w-6 h-6 object-contain"
+                  />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-medium text-text-default">
+                    Shop Sales
+                  </p>
+                  <p className="text-xs text-accent-primary">
+                    Tap to view live metrics →
+                  </p>
+                </div>
+              </div>
+              {royaltiesLoading ? (
+                <CgSpinner className="animate-spin text-green-500" />
+              ) : (
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-green-500">
+                    <span className="text-text-subtle font-normal">
+                      {currencySymbol}
+                    </span>{" "}
+                    {totalRoyaltiesLocal.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                    })}
+                  </p>
+                  <p className="text-xs text-text-subtle">
+                    $
+                    {(royaltiesData?.totalRoyalties || 0).toLocaleString(
+                      undefined,
+                      { maximumFractionDigits: 0 }
+                    )}
+                  </p>
+                </div>
+              )}
+            </div>
+          </button>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <button
+              onClick={() => openActionDrawer("deposit")}
+              className="flex flex-col items-center gap-2 p-4 bg-accent-primary rounded-xl text-white hover:opacity-90 transition-opacity active:scale-95"
+            >
+              <IoWalletOutline className="w-6 h-6" />
+              <span className="text-sm font-medium">Add Money</span>
+            </button>
+
+            <button
+              onClick={() => openActionDrawer("withdraw")}
+              disabled={balance <= 0 || vaultData?.hasPendingWithdrawal}
+              className="flex flex-col items-center gap-2 p-4 bg-surface-alt rounded-xl text-text-default border border-surface-subtle hover:bg-surface-subtle transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <IoWalletOutline className="w-6 h-6" />
+              <span className="text-sm font-medium">Withdraw</span>
+            </button>
+
+            <button
+              onClick={() => openActionDrawer("claim")}
+              disabled={rewards <= 0 || vaultData?.hasPendingClaim}
+              className="flex flex-col items-center gap-2 p-4 bg-green-500 rounded-xl text-white hover:opacity-90 transition-opacity active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <IoTrendingUp className="w-6 h-6" />
+              <span className="text-sm font-medium">Collect</span>
+            </button>
+          </div>
+
+          {/* Collapsible Explanation */}
+          <div className="bg-surface-alt rounded-xl border border-surface-subtle overflow-hidden">
+            <button
+              onClick={() => setShowExplanation(!showExplanation)}
+              className="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors"
+            >
+              <span className="text-sm font-medium text-text-default">
+                How does Sail Vault work?
+              </span>
+              {showExplanation ? (
+                <FiChevronUp className="w-5 h-5 text-text-subtle" />
+              ) : (
+                <FiChevronDown className="w-5 h-5 text-text-subtle" />
+              )}
+            </button>
+
+            <AnimatePresence>
+              {showExplanation && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-4 pb-4 space-y-4 text-sm text-text-subtle">
+                    {/* What is it */}
+                    <div>
+                      <p className="font-medium text-text-default mb-1">
+                        What is Sail?
+                      </p>
+                      <p>
+                        Sail is a company that sells products on Amazon across
+                        Europe, Japan, and Southeast Asia. They own multiple
+                        successful brands in kitchen appliances, cleaning
+                        gadgets, tools, and more.
+                      </p>
+                    </div>
+
+                    {/* The numbers */}
+                    <div className="bg-app-background rounded-lg p-3 space-y-2">
+                      <p className="font-medium text-text-default text-xs">
+                        📊 The Numbers
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-text-subtle">2024 Revenue</p>
+                          <p className="font-semibold text-text-default">
+                            $49.6 Million
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-text-subtle">Growth Rate</p>
+                          <p className="font-semibold text-text-default">
+                            36% per year
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-text-subtle">Profit Margin</p>
+                          <p className="font-semibold text-text-default">38%</p>
+                        </div>
+                        <div>
+                          <p className="text-text-subtle">Global Offices</p>
+                          <p className="font-semibold text-text-default">
+                            6 Cities
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* How you earn */}
+                    <div>
+                      <p className="font-medium text-text-default mb-1">
+                        How do you earn?
+                      </p>
+                      <p>
+                        When you invest, you get a share of 10% of the company's
+                        revenue. Every month on the 29th, dividends are
+                        distributed based on how much you invested.
+                      </p>
+                    </div>
+
+                    {/* Simple steps */}
+                    <div>
+                      <p className="font-medium text-text-default mb-2">
+                        Simple steps:
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">
+                            1
+                          </span>
+                          <span>Add money to start investing</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">
+                            2
+                          </span>
+                          <span>Earn dividends every month</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">
+                            3
+                          </span>
+                          <span>Collect on the 29th</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium">
+                            4
+                          </span>
+                          <span>Withdraw anytime</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Why it's safe */}
+                    <div>
+                      <p className="font-medium text-text-default mb-1">
+                        Why is it safe?
+                      </p>
+                      <p>
+                        Revenue data comes directly from Amazon in real-time.
+                        You can verify actual sales happening live. The company
+                        has offices in Shenzhen, Tokyo, Kuala Lumpur, Ho Chi
+                        Minh City, Jakarta, and Bangkok.
+                      </p>
+                    </div>
+
+                    <p className="text-xs italic text-center pt-2 border-t border-surface-subtle">
+                      Think of it like owning a piece of a successful Amazon
+                      business that pays you every month.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Disclaimer */}
+          <p className="mt-6 text-xs text-text-subtle text-center">
+            Investment involves risk. Past performance doesn't guarantee future
+            returns.
+          </p>
+        </div>
       )}
 
       {/* Action Drawer */}
@@ -768,7 +858,7 @@ export default function SailVault() {
                       className="text-lg pl-12"
                     />
                   </div>
-                  
+
                   {/* Show USD equivalent */}
                   {localAmount && parseFloat(localAmount) > 0 && (
                     <p className="text-xs text-text-subtle">
@@ -783,7 +873,9 @@ export default function SailVault() {
                       </p>
                       <button
                         type="button"
-                        onClick={() => setLocalAmount((balance * exchangeRate).toFixed(0))}
+                        onClick={() =>
+                          setLocalAmount((balance * exchangeRate).toFixed(0))
+                        }
                         className="text-xs text-accent-primary font-medium hover:underline"
                       >
                         Max
@@ -797,31 +889,50 @@ export default function SailVault() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-xs text-text-subtle">
-                        Wallet Balance: {formatLocalMoney(walletBalance?.usdcAmount || 0)}
+                        Wallet Balance:{" "}
+                        {formatLocalMoney(walletBalance?.usdcAmount || 0)}
                       </p>
                       <button
                         type="button"
-                        onClick={() => setLocalAmount(((walletBalance?.usdcAmount || 0) * exchangeRate).toFixed(0))}
+                        onClick={() =>
+                          setLocalAmount(
+                            (
+                              (walletBalance?.usdcAmount || 0) * exchangeRate
+                            ).toFixed(0)
+                          )
+                        }
                         className="text-xs text-accent-primary font-medium hover:underline"
                       >
                         Max
                       </button>
                     </div>
-                    {localAmount && parseFloat(getUsdAmount(localAmount)) > (walletBalance?.usdcAmount || 0) && (
-                      <p className="text-xs text-red-500">
-                        ⚠️ Insufficient balance. You need {formatLocalMoney(parseFloat(getUsdAmount(localAmount)))} but only have {formatLocalMoney(walletBalance?.usdcAmount || 0)}
-                      </p>
-                    )}
+                    {localAmount &&
+                      parseFloat(getUsdAmount(localAmount)) >
+                        (walletBalance?.usdcAmount || 0) && (
+                        <p className="text-xs text-red-500">
+                          ⚠️ Insufficient balance. You need{" "}
+                          {formatLocalMoney(
+                            parseFloat(getUsdAmount(localAmount))
+                          )}{" "}
+                          but only have{" "}
+                          {formatLocalMoney(walletBalance?.usdcAmount || 0)}
+                        </p>
+                      )}
                   </div>
                 )}
 
                 <div className="text-xs text-text-subtle space-y-1">
                   {actionMode === "deposit" ? (
-                    <p>💡 This amount will be deducted from your wallet balance</p>
+                    <p>
+                      💡 This amount will be deducted from your wallet balance
+                    </p>
                   ) : (
                     <>
                       <p>💡 A 0.2% withdrawal fee will be charged</p>
-                      <p className="text-amber-500">⚠️ If you cancel after confirming, the 0.2% fee is non-refundable</p>
+                      <p className="text-amber-500">
+                        ⚠️ If you cancel after confirming, the 0.2% fee is
+                        non-refundable
+                      </p>
                     </>
                   )}
                 </div>
@@ -829,9 +940,11 @@ export default function SailVault() {
                 <ActionButton
                   onClick={() => setActionStep("confirm")}
                   disabled={
-                    !localAmount || 
+                    !localAmount ||
                     parseFloat(localAmount) <= 0 ||
-                    (actionMode === "deposit" && parseFloat(getUsdAmount(localAmount)) > (walletBalance?.usdcAmount || 0))
+                    (actionMode === "deposit" &&
+                      parseFloat(getUsdAmount(localAmount)) >
+                        (walletBalance?.usdcAmount || 0))
                   }
                 >
                   Continue
@@ -854,34 +967,47 @@ export default function SailVault() {
                   {actionMode === "claim" ? (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-text-subtle">Dividends to collect</span>
+                        <span className="text-text-subtle">
+                          Dividends to collect
+                        </span>
                         <div className="text-right">
                           <span className="font-semibold text-text-default">
                             {formatLocalMoney(rewards)}
                           </span>
-                          <p className="text-xs text-text-subtle">{formatUSD(rewards)}</p>
+                          <p className="text-xs text-text-subtle">
+                            {formatUSD(rewards)}
+                          </p>
                         </div>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-text-subtle">Performance Fee (2%)</span>
+                        <span className="text-text-subtle">
+                          Performance Fee (2%)
+                        </span>
                         <span className="text-red-500">
                           -{formatLocalMoney(rewards * PERFORMANCE_FEE_PERCENT)}
                         </span>
                       </div>
                       <div className="border-t border-surface-subtle pt-2 flex justify-between">
-                        <span className="font-medium text-text-default">You'll receive</span>
+                        <span className="font-medium text-text-default">
+                          You'll receive
+                        </span>
                         <span className="font-semibold text-green-500">
-                          {formatLocalMoney(rewards * (1 - PERFORMANCE_FEE_PERCENT))}
+                          {formatLocalMoney(
+                            rewards * (1 - PERFORMANCE_FEE_PERCENT)
+                          )}
                         </span>
                       </div>
                     </>
                   ) : actionMode === "deposit" ? (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-text-subtle">Amount to deposit</span>
+                        <span className="text-text-subtle">
+                          Amount to deposit
+                        </span>
                         <div className="text-right">
                           <span className="font-semibold text-text-default">
-                            {currencySymbol}{parseFloat(localAmount || "0").toLocaleString()}
+                            {currencySymbol}
+                            {parseFloat(localAmount || "0").toLocaleString()}
                           </span>
                           <p className="text-xs text-text-subtle">
                             {formatUSD(getUsdAmount(localAmount))}
@@ -889,25 +1015,34 @@ export default function SailVault() {
                         </div>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-text-subtle">From wallet balance</span>
+                        <span className="text-text-subtle">
+                          From wallet balance
+                        </span>
                         <span className="text-text-default">
                           {formatLocalMoney(walletBalance?.usdcAmount || 0)}
                         </span>
                       </div>
                       <div className="border-t border-surface-subtle pt-2 flex justify-between">
-                        <span className="font-medium text-text-default">New investment total</span>
+                        <span className="font-medium text-text-default">
+                          New investment total
+                        </span>
                         <span className="font-semibold text-accent-primary">
-                          {formatLocalMoney(balance + parseFloat(getUsdAmount(localAmount)))}
+                          {formatLocalMoney(
+                            balance + parseFloat(getUsdAmount(localAmount))
+                          )}
                         </span>
                       </div>
                     </>
                   ) : (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-text-subtle">Withdrawal amount</span>
+                        <span className="text-text-subtle">
+                          Withdrawal amount
+                        </span>
                         <div className="text-right">
                           <span className="font-semibold text-text-default">
-                            {currencySymbol}{parseFloat(localAmount || "0").toLocaleString()}
+                            {currencySymbol}
+                            {parseFloat(localAmount || "0").toLocaleString()}
                           </span>
                           <p className="text-xs text-text-subtle">
                             {formatUSD(getUsdAmount(localAmount))}
@@ -915,21 +1050,36 @@ export default function SailVault() {
                         </div>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-text-subtle">Withdrawal Fee (0.2%)</span>
+                        <span className="text-text-subtle">
+                          Withdrawal Fee (0.2%)
+                        </span>
                         <span className="text-red-500">
-                          -{formatLocalMoney(parseFloat(getUsdAmount(localAmount)) * WITHDRAWAL_FEE_PERCENT)}
+                          -
+                          {formatLocalMoney(
+                            parseFloat(getUsdAmount(localAmount)) *
+                              WITHDRAWAL_FEE_PERCENT
+                          )}
                         </span>
                       </div>
                       <div className="border-t border-surface-subtle pt-2 flex justify-between">
-                        <span className="font-medium text-text-default">You'll receive</span>
+                        <span className="font-medium text-text-default">
+                          You'll receive
+                        </span>
                         <span className="font-semibold text-green-500">
-                          {formatLocalMoney(parseFloat(getUsdAmount(localAmount)) * (1 - WITHDRAWAL_FEE_PERCENT))}
+                          {formatLocalMoney(
+                            parseFloat(getUsdAmount(localAmount)) *
+                              (1 - WITHDRAWAL_FEE_PERCENT)
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-text-subtle">Remaining investment</span>
+                        <span className="text-text-subtle">
+                          Remaining investment
+                        </span>
                         <span className="text-text-default">
-                          {formatLocalMoney(balance - parseFloat(getUsdAmount(localAmount)))}
+                          {formatLocalMoney(
+                            balance - parseFloat(getUsdAmount(localAmount))
+                          )}
                         </span>
                       </div>
                     </>
@@ -939,9 +1089,17 @@ export default function SailVault() {
                 {/* Warning about non-refundable fees - only for withdrawals */}
                 {actionMode === "withdraw" && (
                   <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
-                    <p className="text-xs text-amber-600 font-medium mb-1">⚠️ Important</p>
+                    <p className="text-xs text-amber-600 font-medium mb-1">
+                      ⚠️ Important
+                    </p>
                     <p className="text-xs text-amber-600/80">
-                      The 0.2% withdrawal fee ({formatLocalMoney(parseFloat(getUsdAmount(localAmount)) * WITHDRAWAL_FEE_PERCENT)}) is charged immediately. If you cancel before settlement, this fee is <strong>non-refundable</strong>.
+                      The 0.2% withdrawal fee (
+                      {formatLocalMoney(
+                        parseFloat(getUsdAmount(localAmount)) *
+                          WITHDRAWAL_FEE_PERCENT
+                      )}
+                      ) is charged immediately. If you cancel before settlement,
+                      this fee is <strong>non-refundable</strong>.
                     </p>
                   </div>
                 )}
@@ -950,7 +1108,9 @@ export default function SailVault() {
                   <ActionButton
                     variant="ghost"
                     onClick={() =>
-                      setActionStep(actionMode === "claim" ? "confirm" : "input")
+                      setActionStep(
+                        actionMode === "claim" ? "confirm" : "input"
+                      )
                     }
                     disabled={isLoading}
                     className="flex-1"
@@ -1046,6 +1206,13 @@ export default function SailVault() {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* KYC Required Modal */}
+      <KYCRequiredModal
+        isOpen={showKYCModal}
+        onClose={closeKYCModal}
+        featureName={featureName}
+      />
     </motion.div>
   );
 }

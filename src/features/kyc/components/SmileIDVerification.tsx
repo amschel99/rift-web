@@ -6,6 +6,7 @@ import { Country } from "../types";
 import { CgSpinner } from "react-icons/cg";
 import useUser from "@/hooks/data/use-user";
 import { ID_TYPES_BY_COUNTRY } from "../constants";
+import useKYCJobPolling from "@/hooks/data/use-kyc-job-polling";
 
 // Import Smile ID web component
 import "@smileid/web-components/smart-camera-web";
@@ -46,6 +47,9 @@ interface VerificationResult {
   reason: string;
   jobId?: string;
   isSystemError?: boolean;
+  underReview?: boolean;
+  isDuplicate?: boolean;
+  errorCode?: string;
 }
 
 // Helper to detect if an error is a system error vs user error
@@ -79,8 +83,59 @@ export default function SmileIDVerification({
   const [error, setError] = useState<string | null>(null);
   const [verificationResult, setVerificationResult] =
     useState<VerificationResult | null>(null);
+  const [shouldPoll, setShouldPoll] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { data: user } = useUser();
+
+  // KYC job polling for pending verification
+  const {
+    status: pollingStatus,
+    isPolling,
+    elapsedTime,
+    error: pollingError,
+    stopPolling,
+  } = useKYCJobPolling({
+    jobId: verificationResult?.jobId || null,
+    enabled: shouldPoll && !!verificationResult?.jobId,
+    onComplete: (result) => {
+      console.log("✅ Polling complete:", result);
+      if (result.passed) {
+        toast.success("Verification Complete!", {
+          description: "Your identity has been verified successfully.",
+        });
+        setVerificationResult({
+          passed: true,
+          pending: false,
+          reason: result.message || "Identity verified successfully",
+          jobId: result.jobId,
+          underReview: false,
+        });
+        setShouldPoll(false);
+        // Notify parent of success
+        setTimeout(() => {
+          onSuccess({ ...result, passed: true });
+        }, 2000);
+      } else if (result.complete && !result.passed) {
+        toast.error("Verification Failed", {
+          description: result.message || "Identity verification failed",
+        });
+        setVerificationResult({
+          passed: false,
+          pending: false,
+          reason: result.message || "Identity verification failed",
+          jobId: result.jobId,
+          underReview: false,
+        });
+        setShouldPoll(false);
+      }
+    },
+    onError: (err) => {
+      console.error("❌ Polling error:", err);
+      toast.error("Status check failed", {
+        description: err.message,
+      });
+    },
+  });
 
   // Get available ID types for the selected country
   const availableIdTypes = ID_TYPES_BY_COUNTRY[country.code] || [
@@ -185,10 +240,11 @@ export default function SmileIDVerification({
             onSuccess(data);
           }, 2000);
         } else if (data.pending) {
-          // ⏳ PENDING - Under review
+          // ⏳ PENDING - Under review, start polling
           console.log("⏳ KYC Pending:", userMessage);
           toast.info("Verification Under Review", {
-            description: userMessage,
+            description:
+              "We're checking your verification status automatically...",
           });
 
           setVerificationResult({
@@ -196,14 +252,33 @@ export default function SmileIDVerification({
             pending: true,
             reason: userMessage,
             jobId: data.jobId,
+            underReview: data.underReview ?? true,
           });
           setStep("result");
+
+          // Start polling for the result
+          if (data.jobId) {
+            console.log("🔄 Starting automatic polling for job:", data.jobId);
+            setShouldPoll(true);
+          }
         } else {
           // ❌ FAILED - Verification failed (includes success: false errors)
           console.log("❌ KYC Failed:", userMessage);
-          toast.error("Verification Failed", {
-            description: userMessage,
-          });
+
+          // Check for duplicate errors (ID or biometrics already registered)
+          const isDuplicateError =
+            data.code === "DUPLICATE_ID" ||
+            data.code === "DUPLICATE_BIOMETRICS";
+
+          if (isDuplicateError) {
+            toast.error("Already Registered", {
+              description: userMessage,
+            });
+          } else {
+            toast.error("Verification Failed", {
+              description: userMessage,
+            });
+          }
 
           // Check if this is a system error or user error
           // Use _debug.isSystemError if available, otherwise detect from message
@@ -213,9 +288,11 @@ export default function SmileIDVerification({
           setVerificationResult({
             passed: false,
             pending: false,
-            reason: userMessage,
+            reason: data.message || userMessage,
             jobId: data.jobId,
             isSystemError: systemError,
+            isDuplicate: isDuplicateError,
+            errorCode: data.code,
           });
           setStep("result");
         }
@@ -440,8 +517,14 @@ export default function SmileIDVerification({
       );
     }
 
-    // ⏳ PENDING
+    // ⏳ PENDING - with automatic polling
     if (verificationResult.pending) {
+      const formatElapsedTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+      };
+
       return (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -455,16 +538,59 @@ export default function SmileIDVerification({
             transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
             className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-6"
           >
-            <span className="text-4xl">⏳</span>
+            {isPolling ? (
+              <CgSpinner className="text-amber-600 dark:text-amber-400 w-10 h-10 animate-spin" />
+            ) : (
+              <span className="text-4xl">⏳</span>
+            )}
           </motion.div>
           <h2 className="text-2xl font-bold text-center mb-2">Under Review</h2>
-          <p className="text-muted-foreground text-center mb-6">
+          <p className="text-muted-foreground text-center mb-4">
             {verificationResult.reason}
           </p>
+
+          {/* Polling Status Indicator */}
+          {isPolling && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4 w-full max-w-sm mb-4"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <CgSpinner className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Checking verification status...
+                </p>
+              </div>
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Time elapsed: {formatElapsedTime(elapsedTime)}
+              </p>
+              {pollingStatus && (
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  Status: {pollingStatus.status}
+                </p>
+              )}
+            </motion.div>
+          )}
+
+          {/* Polling Error */}
+          {pollingError && !isPolling && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 dark:bg-red-950 rounded-lg p-4 w-full max-w-sm mb-4"
+            >
+              <p className="text-sm text-red-800 dark:text-red-200 text-center">
+                {pollingError.message}
+              </p>
+            </motion.div>
+          )}
+
           <div className="bg-amber-50 dark:bg-amber-950 rounded-lg p-4 w-full max-w-sm mb-6">
             <p className="text-sm text-amber-800 dark:text-amber-200 text-center">
-              Our team is reviewing your documents. This usually takes 1-2
-              business hours. We'll notify you once the review is complete.
+              {isPolling
+                ? "We're automatically checking your verification status. Please wait..."
+                : "Our team is reviewing your documents. This usually takes a few minutes. We'll notify you once the review is complete."}
             </p>
           </div>
           {verificationResult.jobId && (
@@ -472,14 +598,91 @@ export default function SmileIDVerification({
               Reference: {verificationResult.jobId}
             </p>
           )}
-          <ActionButton onClick={onBack} variant="secondary">
-            Continue to App
-          </ActionButton>
+          <div className="flex gap-3 w-full max-w-sm">
+            {isPolling ? (
+              <ActionButton
+                onClick={() => {
+                  stopPolling();
+                  setShouldPoll(false);
+                }}
+                variant="secondary"
+                className="flex-1"
+              >
+                Stop Checking
+              </ActionButton>
+            ) : (
+              <>
+                {verificationResult.jobId && (
+                  <ActionButton
+                    onClick={() => setShouldPoll(true)}
+                    className="flex-1"
+                  >
+                    Check Status
+                  </ActionButton>
+                )}
+                <ActionButton
+                  onClick={onBack}
+                  variant="secondary"
+                  className="flex-1"
+                >
+                  Continue to App
+                </ActionButton>
+              </>
+            )}
+          </div>
         </motion.div>
       );
     }
 
     // ❌ FAILED
+    // Check if this is a duplicate error (ID or biometrics already registered)
+    if (verificationResult.isDuplicate) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="flex flex-col items-center justify-center w-full h-full p-5"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+            className="w-20 h-20 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mb-6"
+          >
+            <span className="text-4xl">🚫</span>
+          </motion.div>
+          <h2 className="text-2xl font-bold text-center mb-2">
+            Already Registered
+          </h2>
+          <p className="text-muted-foreground text-center mb-6">
+            {verificationResult.reason}
+          </p>
+          <div className="bg-orange-50 dark:bg-orange-950 rounded-lg p-4 w-full max-w-sm mb-6">
+            <p className="text-sm font-medium text-orange-800 dark:text-orange-200 mb-2">
+              {verificationResult.errorCode === "DUPLICATE_BIOMETRICS"
+                ? "Your face is already linked to another account"
+                : "This ID is already linked to another account"}
+            </p>
+            <ul className="text-xs text-orange-700 dark:text-orange-300 space-y-1">
+              <li>• Each person can only verify one account</li>
+              <li>• If you believe this is an error, please contact support</li>
+              <li>• Provide your details for manual review</li>
+            </ul>
+          </div>
+          {verificationResult.jobId && (
+            <p className="text-xs text-muted-foreground mb-4">
+              Reference: {verificationResult.jobId}
+            </p>
+          )}
+          <ActionButton onClick={onBack} className="w-full max-w-sm">
+            Go Back
+          </ActionButton>
+        </motion.div>
+      );
+    }
+
+    // Regular failure
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}

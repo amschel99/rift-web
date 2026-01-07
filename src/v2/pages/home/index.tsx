@@ -1,9 +1,23 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
-import { IoArrowUpCircle, IoArrowDownCircle, IoWalletOutline, IoReceiptOutline, IoCashOutline, IoEyeOutline, IoEyeOffOutline, IoAddCircleOutline, IoTrophyOutline } from "react-icons/io5";
+import {
+  IoArrowUpCircle,
+  IoArrowDownCircle,
+  IoWalletOutline,
+  IoReceiptOutline,
+  IoCashOutline,
+  IoEyeOutline,
+  IoEyeOffOutline,
+  IoAddCircleOutline,
+  IoTrophyOutline,
+} from "react-icons/io5";
 import { useDisclosure } from "@/hooks/use-disclosure";
-import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+import useKYCGuard from "@/hooks/use-kyc-guard";
+import KYCRequiredModal from "@/components/kyc/KYCRequiredModal";
+import useBaseUSDCBalance, {
+  SupportedCurrency,
+} from "@/hooks/data/use-base-usdc-balance";
 import useCountryDetection from "@/hooks/data/use-country-detection";
 import useLoyaltyStats from "@/hooks/data/use-loyalty-stats";
 import usePointValue from "@/hooks/data/use-point-value";
@@ -12,8 +26,13 @@ import useOnrampOrders from "@/hooks/data/use-onramp-orders";
 import useWithdrawalOrders from "@/hooks/data/use-withdrawal-orders";
 import useOnchainHistory from "@/hooks/data/use-onchain-history";
 import { useDeposits } from "@/hooks/data/use-deposits";
-import CurrencySelector, { Currency, SUPPORTED_CURRENCIES } from "@/components/ui/currency-selector";
-import AdvancedModeToggle, { useAdvancedMode } from "@/components/ui/advanced-mode-toggle";
+import CurrencySelector, {
+  Currency,
+  SUPPORTED_CURRENCIES,
+} from "@/components/ui/currency-selector";
+import AdvancedModeToggle, {
+  useAdvancedMode,
+} from "@/components/ui/advanced-mode-toggle";
 import HistoryTabs from "@/components/ui/history-tabs";
 import ViewAllModal from "@/components/ui/view-all-modal";
 import OnrampOrderCard from "@/components/ui/onramp-order-card";
@@ -29,26 +48,30 @@ import { usePlatformDetection } from "@/utils/platform";
 import { backButton } from "@telegram-apps/sdk-react";
 import { formatNumberWithCommas } from "@/lib/utils";
 
-
 export default function Home() {
   const navigate = useNavigate();
   const { logEvent } = useAnalaytics();
   const { isTelegram } = usePlatformDetection();
   const receive_disclosure = useDisclosure();
   const send_disclosure = useDisclosure();
+  const { checkKYC, showKYCModal, closeKYCModal, featureName } = useKYCGuard();
 
   // Detect user's country and currency based on IP
-  const { data: countryInfo, isLoading: countryLoading } = useCountryDetection();
+  const { data: countryInfo, isLoading: countryLoading } =
+    useCountryDetection();
 
   // Currency state - initialize with stored or detected currency
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(() => {
     // Try to load from localStorage first
     const stored = localStorage.getItem("selected_currency");
     if (stored) {
-      const currency = SUPPORTED_CURRENCIES.find(c => c.code === stored);
+      const currency = SUPPORTED_CURRENCIES.find((c) => c.code === stored);
       if (currency) return currency;
     }
-    return SUPPORTED_CURRENCIES.find(c => c.code === "USD") || SUPPORTED_CURRENCIES[0];
+    return (
+      SUPPORTED_CURRENCIES.find((c) => c.code === "USD") ||
+      SUPPORTED_CURRENCIES[0]
+    );
   });
 
   // Update selected currency when country is detected (only on first load)
@@ -58,7 +81,7 @@ export default function Home() {
       // Only auto-set if user hasn't manually selected one
       if (!stored) {
         const detectedCurrency = SUPPORTED_CURRENCIES.find(
-          c => c.code === countryInfo.currency
+          (c) => c.code === countryInfo.currency
         );
         if (detectedCurrency) {
           setSelectedCurrency(detectedCurrency);
@@ -75,19 +98,23 @@ export default function Home() {
   };
 
   // Fetch balance with selected currency
-  const { data: BASE_USDC_BALANCE, isLoading: BASE_USDC_LOADING } = useBaseUSDCBalance({
-    currency: selectedCurrency.code as SupportedCurrency,
-  });
+  const { data: BASE_USDC_BALANCE, isLoading: BASE_USDC_LOADING } =
+    useBaseUSDCBalance({
+      currency: selectedCurrency.code as SupportedCurrency,
+    });
 
   // Fetch loyalty stats and point value
   const { data: loyaltyStats, isLoading: loyaltyLoading } = useLoyaltyStats();
   const { data: pointValue } = usePointValue();
-  
+
   // Debug logging
   useEffect(() => {
     console.log("🏠 [Home] Loyalty stats:", loyaltyStats);
     console.log("🏠 [Home] Loyalty loading:", loyaltyLoading);
-    console.log("🏠 [Home] Should show badge:", !!(loyaltyStats && !loyaltyLoading));
+    console.log(
+      "🏠 [Home] Should show badge:",
+      !!(loyaltyStats && !loyaltyLoading)
+    );
   }, [loyaltyStats, loyaltyLoading]);
 
   // Advanced mode state
@@ -98,11 +125,13 @@ export default function Home() {
 
   // Simple mode data
   const { data: ONRAMP_ORDERS, isLoading: ONRAMP_LOADING } = useOnrampOrders();
-  const { data: WITHDRAWAL_ORDERS, isLoading: WITHDRAWALS_LOADING } = useWithdrawalOrders();
+  const { data: WITHDRAWAL_ORDERS, isLoading: WITHDRAWALS_LOADING } =
+    useWithdrawalOrders();
   const { data: DEPOSITS, isLoading: DEPOSITS_LOADING } = useDeposits();
-  
+
   // Only fetch onchain data in advanced mode
-  const { data: ONCHAIN_TRANSACTIONS, isLoading: ONCHAIN_LOADING } = useOnchainHistory();
+  const { data: ONCHAIN_TRANSACTIONS, isLoading: ONCHAIN_LOADING } =
+    useOnchainHistory();
 
   // Modal states for viewing all items
   const [showAllDeposits, setShowAllDeposits] = useState(false);
@@ -113,7 +142,6 @@ export default function Home() {
   const [redirectType, setRedirectType] = useState<
     "RECEIVE-FROM-COLLECT-LINK" | "SEND-TO-REQUEST-LINK"
   >("RECEIVE-FROM-COLLECT-LINK");
-
 
   const handleCloseRedirectDrawer = useCallback(() => {
     setIsRedirectDrawerOpen(false);
@@ -133,7 +161,6 @@ export default function Home() {
       setIsRedirectDrawerOpen(false);
     }
   }, []);
-
 
   useEffect(() => {
     checkRedirectObjects();
@@ -181,7 +208,9 @@ export default function Home() {
         <div className="flex justify-between items-center p-4">
           <div className="flex items-center gap-2">
             <img src="/rift.png" alt="Rift" className="w-10 h-10" />
-            <span className="text-lg font-semibold text-text-default">Rift</span>
+            <span className="text-lg font-semibold text-text-default">
+              Rift
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <AdvancedModeToggle
@@ -212,7 +241,9 @@ export default function Home() {
               ) : !BASE_USDC_BALANCE ? (
                 <Skeleton className="h-10 w-32 inline-block" />
               ) : isBalanceVisible ? (
-                `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${selectedCurrency.code}`
+                `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${
+                  selectedCurrency.code
+                }`
               ) : (
                 `**** ${selectedCurrency.code}`
               )}
@@ -231,16 +262,20 @@ export default function Home() {
           </div>
 
           {/* Rift Points - Next to Balance */}
-          {loyaltyStats && !loyaltyLoading && loyaltyStats.totalPoints !== undefined && (
-            <button
-              onClick={() => navigate("/app/profile/loyalty")}
-              className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
-            >
-              <IoTrophyOutline className="w-4 h-4" />
-              <span>{formatNumberWithCommas(loyaltyStats.totalPoints)} Rift Points</span>
-            </button>
-          )}
-          
+          {loyaltyStats &&
+            !loyaltyLoading &&
+            loyaltyStats.totalPoints !== undefined && (
+              <button
+                onClick={() => navigate("/app/profile/loyalty")}
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+              >
+                <IoTrophyOutline className="w-4 h-4" />
+                <span>
+                  {formatNumberWithCommas(loyaltyStats.totalPoints)} Rift Points
+                </span>
+              </button>
+            )}
+
           {/* Top Up Button - Integrated with balance */}
           <div className="mt-4">
             <button
@@ -263,6 +298,7 @@ export default function Home() {
             <div className="w-full flex flex-row items-center justify-center gap-2 mb-3">
               <SendDrawer
                 {...send_disclosure}
+                beforeOpen={() => checkKYC("sending crypto")}
                 renderTrigger={() => (
                   <ActionButton
                     icon={<IoArrowUpCircle className="w-5 h-5" />}
@@ -288,19 +324,23 @@ export default function Home() {
                 title="Withdraw"
                 className="w-[30%]"
                 onClick={() => {
+                  if (!checkKYC("withdrawals")) return;
                   logEvent("WITHDRAW_BUTTON_CLICKED");
                   navigate("/app/withdraw");
                 }}
               />
             </div>
-            
+
             {/* Second row */}
             <div className="w-full flex flex-row items-center justify-center gap-2">
               <ActionButton
                 icon={<IoReceiptOutline className="w-5 h-5" />}
                 title="Request"
-                className={selectedCurrency.code === "KES" ? "w-[30%]" : "w-[45%]"}
+                className={
+                  selectedCurrency.code === "KES" ? "w-[30%]" : "w-[45%]"
+                }
                 onClick={() => {
+                  if (!checkKYC("payment requests")) return;
                   logEvent("REQUEST_BUTTON_CLICKED");
                   navigate("/app/request?type=request");
                 }}
@@ -311,6 +351,7 @@ export default function Home() {
                 title="Send"
                 className="w-[30%]"
                 onClick={() => {
+                  if (!checkKYC("sending payments")) return;
                   logEvent("SEND_BUTTON_CLICKED");
                   navigate("/app/pay");
                 }}
@@ -335,14 +376,17 @@ export default function Home() {
             onViewAllOnchain={() => setShowAllOnchain(true)}
             isAdvancedMode={isAdvanced}
             onWithdrawClick={() => {
+              if (!checkKYC("withdrawals")) return;
               logEvent("WITHDRAW_BUTTON_CLICKED");
               navigate("/app/withdraw");
             }}
             onRequestClick={() => {
+              if (!checkKYC("payment requests")) return;
               logEvent("REQUEST_BUTTON_CLICKED");
               navigate("/app/request?type=request");
             }}
             onPayClick={() => {
+              if (!checkKYC("sending payments")) return;
               logEvent("SEND_BUTTON_CLICKED");
               navigate("/app/pay");
             }}
@@ -356,18 +400,21 @@ export default function Home() {
         />
       </motion.div>
 
-
       {/* View All Modals */}
       <ViewAllModal
         isOpen={showAllDeposits}
         onClose={() => setShowAllDeposits(false)}
         title="All Deposits"
-        description={`${(ONRAMP_ORDERS?.length || 0) + (DEPOSITS?.length || 0)} deposits`}
+        description={`${
+          (ONRAMP_ORDERS?.length || 0) + (DEPOSITS?.length || 0)
+        } deposits`}
       >
         <div className="space-y-6">
           {/* Mobile Money Deposits Section */}
           <div>
-            <h3 className="text-sm font-medium text-text-default mb-3">Mobile Money Deposits</h3>
+            <h3 className="text-sm font-medium text-text-default mb-3">
+              Mobile Money Deposits
+            </h3>
             {ONRAMP_ORDERS && ONRAMP_ORDERS.length > 0 ? (
               <div className="space-y-3">
                 {ONRAMP_ORDERS.map((order) => (
@@ -383,7 +430,9 @@ export default function Home() {
 
           {/* USDC Deposits Section */}
           <div>
-            <h3 className="text-sm font-medium text-text-default mb-3">USDC Deposits</h3>
+            <h3 className="text-sm font-medium text-text-default mb-3">
+              USDC Deposits
+            </h3>
             {DEPOSITS && DEPOSITS.length > 0 ? (
               <div className="space-y-3">
                 {DEPOSITS.map((deposit) => (
@@ -427,7 +476,10 @@ export default function Home() {
         {ONCHAIN_TRANSACTIONS && ONCHAIN_TRANSACTIONS.length > 0 ? (
           <div className="space-y-3">
             {ONCHAIN_TRANSACTIONS.map((transaction) => (
-              <OnchainTransactionCard key={transaction.id} transaction={transaction} />
+              <OnchainTransactionCard
+                key={transaction.id}
+                transaction={transaction}
+              />
             ))}
           </div>
         ) : (
@@ -436,6 +488,13 @@ export default function Home() {
           </div>
         )}
       </ViewAllModal>
+
+      {/* KYC Required Modal */}
+      <KYCRequiredModal
+        isOpen={showKYCModal}
+        onClose={closeKYCModal}
+        featureName={featureName}
+      />
     </Fragment>
   );
 }

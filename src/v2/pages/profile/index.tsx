@@ -13,6 +13,8 @@ import {
   IoShareSocialOutline,
   IoCopyOutline,
   IoLogoWhatsapp,
+  IoCheckmarkCircle,
+  IoWarning,
 } from "react-icons/io5";
 import { FaTelegram } from "react-icons/fa";
 import { HiMiniUser } from "react-icons/hi2";
@@ -23,6 +25,7 @@ import { Pencil, Check, X, Gift } from "lucide-react";
 import { usePlatformDetection } from "@/utils/platform";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import useUser from "@/hooks/data/use-user";
+import useKYCStatus from "@/hooks/data/use-kyc-status";
 import useUpdateUser from "@/hooks/data/use-update-user";
 import useLoyaltyStats from "@/hooks/data/use-loyalty-stats";
 import usePointValue from "@/hooks/data/use-point-value";
@@ -57,6 +60,7 @@ export default function Profile() {
   const { userQuery } = useWalletAuth();
   const { data: user, isLoading: userLoading } = useUser();
   const updateUserMutation = useUpdateUser();
+  const { isKYCVerified, isLoading: kycLoading } = useKYCStatus();
 
   const { recoveryMethodsQuery } = useWalletRecovery({
     externalId: userQuery?.data?.externalId,
@@ -102,13 +106,22 @@ export default function Profile() {
   };
 
   const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(`Join me on Rift - your global USD account for payments, transfers & wealth building!\n\n${referralLink}`);
+    const text = encodeURIComponent(
+      `Join me on Rift - your global USD account for payments, transfers & wealth building!\n\n${referralLink}`
+    );
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
   const handleShareTelegram = () => {
-    const text = encodeURIComponent(`Join me on Rift - your global USD account for payments, transfers & wealth building!`);
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${text}`, "_blank");
+    const text = encodeURIComponent(
+      `Join me on Rift - your global USD account for payments, transfers & wealth building!`
+    );
+    window.open(
+      `https://t.me/share/url?url=${encodeURIComponent(
+        referralLink
+      )}&text=${text}`,
+      "_blank"
+    );
   };
 
   const handleNativeShare = async () => {
@@ -204,7 +217,7 @@ export default function Profile() {
               <HiMiniUser className="text-3xl text-accent-primary" />
             </div>
           )}
-          
+
           {/* Editable Display Name */}
           <div className="flex-1 min-w-0">
             {isEditingName ? (
@@ -263,10 +276,15 @@ export default function Profile() {
                 <IoTrophyOutline className="text-white text-lg" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-text-default">Rift Points</p>
+                <p className="text-sm font-semibold text-text-default">
+                  Rift Points
+                </p>
                 <p className="text-xs text-text-subtle">
                   {formatNumberWithCommas(loyaltyStats.totalPoints)} points
-                  {pointValue && ` • $${(loyaltyStats.totalPoints * pointValue.pointValue).toFixed(2)}`}
+                  {pointValue &&
+                    ` • $${(
+                      loyaltyStats.totalPoints * pointValue.pointValue
+                    ).toFixed(2)}`}
                 </p>
               </div>
             </div>
@@ -276,8 +294,10 @@ export default function Profile() {
 
         {/* Settings Sections */}
         <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
-          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">Account</p>
-          
+          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
+            Account
+          </p>
+
           {/* Withdrawal Account */}
           <button
             onClick={() => setShowPaymentSetup(true)}
@@ -288,10 +308,13 @@ export default function Profile() {
                 <IoWalletOutline className="text-blue-500 text-lg" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-text-default">Withdrawal Account</p>
+                <p className="text-sm font-medium text-text-default">
+                  Withdrawal Account
+                </p>
                 <p className="text-xs text-text-subtle">
                   {(() => {
-                    const paymentAccount = user?.paymentAccount || user?.payment_account;
+                    const paymentAccount =
+                      user?.paymentAccount || user?.payment_account;
                     if (paymentAccount) {
                       try {
                         const account = JSON.parse(paymentAccount);
@@ -318,7 +341,9 @@ export default function Profile() {
                 <IoNotificationsOutline className="text-purple-500 text-lg" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-text-default">Push Notifications</p>
+                <p className="text-sm font-medium text-text-default">
+                  Push Notifications
+                </p>
                 <p className="text-xs text-text-subtle">Manage alerts</p>
               </div>
             </div>
@@ -335,18 +360,78 @@ export default function Profile() {
                 <Gift className="text-accent-primary w-4 h-4" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-text-default">Invite Friends</p>
-                <p className="text-xs text-text-subtle">Share your referral link</p>
+                <p className="text-sm font-medium text-text-default">
+                  Invite Friends
+                </p>
+                <p className="text-xs text-text-subtle">
+                  Share your referral link
+                </p>
               </div>
             </div>
             <IoChevronForward className="text-text-subtle" />
           </button>
         </div>
 
+        {/* Compliance Section */}
+        <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
+          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
+            Compliance
+          </p>
+
+          <button
+            onClick={() => !isKYCVerified && navigate("/kyc")}
+            disabled={isKYCVerified}
+            className={`w-full px-4 py-3.5 flex items-center justify-between transition-colors ${
+              isKYCVerified
+                ? "cursor-default"
+                : "hover:bg-surface-subtle/50 cursor-pointer"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                  isKYCVerified ? "bg-green-500/10" : "bg-amber-500/10"
+                }`}
+              >
+                {kycLoading ? (
+                  <div className="w-4 h-4 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+                ) : isKYCVerified ? (
+                  <IoCheckmarkCircle className="text-green-500 text-lg" />
+                ) : (
+                  <IoWarning className="text-amber-500 text-lg" />
+                )}
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">
+                  Identity Verification
+                </p>
+                <p
+                  className={`text-xs ${
+                    isKYCVerified
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-amber-600 dark:text-amber-400"
+                  }`}
+                >
+                  {kycLoading
+                    ? "Checking..."
+                    : isKYCVerified
+                    ? "Verified ✓"
+                    : "Not verified - Tap to verify"}
+                </p>
+              </div>
+            </div>
+            {!isKYCVerified && !kycLoading && (
+              <IoChevronForward className="text-text-subtle" />
+            )}
+          </button>
+        </div>
+
         {/* Security Section */}
         <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
-          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">Security</p>
-          
+          <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
+            Security
+          </p>
+
           {userQuery?.data?.externalId && (
             <button
               onClick={onAddRecovery}
@@ -357,8 +442,12 @@ export default function Profile() {
                   <IoShieldCheckmarkOutline className="text-green-500 text-lg" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-text-default">Account Recovery</p>
-                  <p className="text-xs text-text-subtle">Backup your account</p>
+                  <p className="text-sm font-medium text-text-default">
+                    Account Recovery
+                  </p>
+                  <p className="text-xs text-text-subtle">
+                    Backup your account
+                  </p>
                 </div>
               </div>
               <IoChevronForward className="text-text-subtle" />
@@ -498,16 +587,22 @@ export default function Profile() {
           <div className="w-full p-4 pb-8 space-y-4">
             {/* Referral Code Display */}
             <div className="bg-surface-subtle rounded-xl p-4 text-center">
-              <p className="text-xs text-text-subtle mb-1">Your Referral Code</p>
-              <p className="text-2xl font-bold text-accent-primary tracking-widest">{referralCode}</p>
+              <p className="text-xs text-text-subtle mb-1">
+                Your Referral Code
+              </p>
+              <p className="text-2xl font-bold text-accent-primary tracking-widest">
+                {referralCode}
+              </p>
             </div>
 
             {/* Referral Link */}
-            <div 
+            <div
               onClick={handleCopyReferralLink}
               className="flex items-center gap-2 p-3 bg-surface-subtle rounded-xl cursor-pointer hover:bg-surface transition-colors"
             >
-              <p className="flex-1 text-sm text-text-subtle truncate">{referralLink}</p>
+              <p className="flex-1 text-sm text-text-subtle truncate">
+                {referralLink}
+              </p>
               <div className="p-2 bg-accent-primary/10 rounded-lg">
                 <IoCopyOutline className="text-accent-primary" />
               </div>
@@ -516,7 +611,7 @@ export default function Profile() {
             {/* Share Options */}
             <div className="space-y-2">
               <p className="text-xs text-text-subtle font-medium">Share via</p>
-              
+
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={handleCopyReferralLink}
