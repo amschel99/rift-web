@@ -8,7 +8,6 @@ import { Country } from "@/features/kyc/types";
 import useAnalaytics from "@/hooks/use-analytics";
 import { useFlow } from "../context";
 import ActionButton from "@/components/ui/action-button";
-import DeviceDebugInfo from "@/features/kyc/components/DeviceDebugInfo";
 
 type KYCSubStep = "nationality" | "mobile-prompt" | "verification";
 
@@ -138,11 +137,5 @@ export default function KYC() {
     );
   }
 
-  return (
-    <>
-      {/* Debug info - remove in production */}
-      {import.meta.env.DEV && <DeviceDebugInfo />}
-      {null}
-    </>
-  );
+  return null;
 }

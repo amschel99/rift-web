@@ -6,8 +6,6 @@ import MobileOnlyPrompt from "./components/MobileOnlyPrompt";
 import SmileIDVerification from "./components/SmileIDVerification";
 import { Country } from "./types";
 import useAnalaytics from "@/hooks/use-analytics";
-import DeviceDebugInfo from "./components/DeviceDebugInfo";
-import DeviceOverride from "./components/DeviceOverride";
 
 type KYCStep = "nationality" | "mobile-prompt" | "verification" | "complete";
 
@@ -18,23 +16,6 @@ export default function KYCFlow() {
   const [showQR, setShowQR] = useState(false);
   const { logEvent } = useAnalaytics();
   const navigate = useNavigate();
-
-  const handleDeviceOverride = (
-    override: "auto" | "force-desktop" | "force-mobile"
-  ) => {
-    // Recalculate device detection with override
-    const mobile = isMobileDevice();
-    const needsQR = shouldShowQRCode();
-
-    setIsMobile(mobile);
-    setShowQR(needsQR);
-
-    logEvent("KYC_DEVICE_OVERRIDE", {
-      override,
-      isMobile: mobile,
-      showQR: needsQR,
-    });
-  };
 
   // Check device type on mount
   useEffect(() => {
@@ -135,13 +116,6 @@ export default function KYCFlow() {
   return (
     <div className="flex flex-col w-full h-screen bg-app-background">
       {renderStep()}
-      {/* Debug tools - remove in production */}
-      {import.meta.env.DEV && (
-        <>
-          <DeviceDebugInfo />
-          <DeviceOverride onOverrideChange={handleDeviceOverride} />
-        </>
-      )}
     </div>
   );
 }

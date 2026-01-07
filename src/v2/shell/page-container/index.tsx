@@ -29,6 +29,7 @@ import Request from "@/features/request";
 import Pay from "@/features/pay";
 import Withdraw from "@/features/withdraw";
 import SuspendedPage from "@/v2/pages/suspended";
+import KYCPage from "@/v2/pages/kyc";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -53,9 +54,7 @@ export default function PageContainer() {
   }, [form]);
 
   const RenderScreenWithShell = useCallback(
-    (props: {
-      screen: "home" | "invest" | "profile";
-    }) => {
+    (props: { screen: "home" | "invest" | "profile" }) => {
       const { screen } = props;
       switch (screen) {
         case "home": {
@@ -92,6 +91,7 @@ export default function PageContainer() {
       <Route path="/" index element={<Splash />} />
       <Route path="/auth" index element={<Onboarding />} />
       <Route path="/suspended" element={<SuspendedPage />} />
+      <Route path="/kyc" element={<KYCPage />} />
       <Route
         path="/app"
         index
@@ -105,28 +105,37 @@ export default function PageContainer() {
         path="/app/invest"
         element={<RenderScreenWithShell screen="invest" />}
       />
-      <Route path="/app/swap" element={
-        <AuthenticatedShell>
-          <Swap />
-        </AuthenticatedShell>
-      } />
-      <Route path="/app/history" element={
-        <AuthenticatedShell>
-          <History />
-        </AuthenticatedShell>
-      } />
-      <Route path="/app/explore" element={
-        <AuthenticatedShell>
-          <Explore />
-        </AuthenticatedShell>
-      } />
-      <Route 
-        path="/app/walletconnect" 
+      <Route
+        path="/app/swap"
+        element={
+          <AuthenticatedShell>
+            <Swap />
+          </AuthenticatedShell>
+        }
+      />
+      <Route
+        path="/app/history"
+        element={
+          <AuthenticatedShell>
+            <History />
+          </AuthenticatedShell>
+        }
+      />
+      <Route
+        path="/app/explore"
+        element={
+          <AuthenticatedShell>
+            <Explore />
+          </AuthenticatedShell>
+        }
+      />
+      <Route
+        path="/app/walletconnect"
         element={
           <AuthenticatedShell>
             <WalletConnect />
           </AuthenticatedShell>
-        } 
+        }
       />
       <Route path="/app/agent" element={<Agent />} />
       <Route
@@ -139,22 +148,28 @@ export default function PageContainer() {
       <Route path="/app/send/open-link" element={<SendOpenLink />} />
       <Route path="/app/send/specific-link" element={<SendSpecificLink />} />
       <Route path="/app/buy" element={<BuyCrypto />} />
-              <Route path="/app/request" element={<Request />} />
-              <Route path="/app/pay" element={<Pay />} />
-              <Route path="/app/withdraw" element={<Withdraw />} />
+      <Route path="/app/request" element={<Request />} />
+      <Route path="/app/pay" element={<Pay />} />
+      <Route path="/app/withdraw" element={<Withdraw />} />
       <Route path="/app/markets" element={<PredictionMarkets />} />
       <Route path="/app/markets/:id" element={<PredictionMarketDetails />} />
-      <Route path="/app/profile/loyalty" element={
-        <AuthenticatedShell>
-          <Loyalty />
-        </AuthenticatedShell>
-      } />
+      <Route
+        path="/app/profile/loyalty"
+        element={
+          <AuthenticatedShell>
+            <Loyalty />
+          </AuthenticatedShell>
+        }
+      />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
-      <Route path="/app/invest/sail-vault" element={
-        <AuthenticatedShell>
-          <SailVault />
-        </AuthenticatedShell>
-      } />
+      <Route
+        path="/app/invest/sail-vault"
+        element={
+          <AuthenticatedShell>
+            <SailVault />
+          </AuthenticatedShell>
+        }
+      />
     </Routes>
   );
 }
