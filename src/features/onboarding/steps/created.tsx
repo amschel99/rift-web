@@ -104,7 +104,7 @@ export default function Created() {
         navigate("/kyc");
       }
     } else {
-      navigate("/app");
+    navigate("/app");
     }
   };
 

@@ -13,13 +13,13 @@ export default function AuthCheck() {
 
   useEffect(() => {
     const checkAuthAndKYC = async () => {
-      const auth_token = localStorage.getItem("token");
-      const address = localStorage.getItem("address");
+    const auth_token = localStorage.getItem("token");
+    const address = localStorage.getItem("address");
 
       console.log("🔍 [AuthCheck] Token exists:", !!auth_token, "Address exists:", !!address);
 
-      if (auth_token && address) {
-        rift.setBearerToken(auth_token);
+    if (auth_token && address) {
+      rift.setBearerToken(auth_token);
 
         // Check KYC status before navigating
         setChecking(true);
@@ -62,7 +62,7 @@ export default function AuthCheck() {
             navigate("/app");
           } else if (data.underReview === true) {
             console.log("⏳ [AuthCheck] User KYC is under review, going to /app");
-            navigate("/app");
+      navigate("/app");
           } else {
             console.log("⚠️ [AuthCheck] User not KYC verified, going to /kyc");
             navigate("/kyc");
@@ -72,10 +72,10 @@ export default function AuthCheck() {
           // On error, go to KYC to be safe
           navigate("/kyc");
         }
-        return;
-      } else {
-        flow.goToNext("start");
-      }
+      return;
+    } else {
+      flow.goToNext("start");
+    }
     };
 
     checkAuthAndKYC();

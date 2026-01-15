@@ -122,7 +122,7 @@ export default function EmailCode(props: Props) {
             }
           } else {
             console.error("❌ [EmailLogin] No auth token found after login!");
-            navigate("/app");
+          navigate("/app");
           }
         } catch (e) {
           toast.custom(() => <RenderErrorToast />, {

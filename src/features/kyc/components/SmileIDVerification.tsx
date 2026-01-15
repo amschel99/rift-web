@@ -87,6 +87,8 @@ export default function SmileIDVerification({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { data: user } = useUser();
 
+  const [backgroundPolling, setBackgroundPolling] = useState(false);
+
   // KYC job polling for pending verification
   const {
     status: pollingStatus,
@@ -96,12 +98,16 @@ export default function SmileIDVerification({
     stopPolling,
   } = useKYCJobPolling({
     jobId: verificationResult?.jobId || null,
-    enabled: shouldPoll && !!verificationResult?.jobId,
+    enabled: (shouldPoll || backgroundPolling) && !!verificationResult?.jobId,
+    backgroundMode: backgroundPolling,
+    showToasts: backgroundPolling, // Show toasts when in background mode
     onComplete: (result) => {
       console.log("✅ Polling complete:", result);
-      if (result.passed) {
-        toast.success("Verification Complete!", {
-          description: "Your identity has been verified successfully.",
+      if (result.passed && result.complete) {
+        toast.success("✅ Verification Approved!", {
+          description:
+            result.message || "Your identity has been verified successfully.",
+          duration: 5000,
         });
         setVerificationResult({
           passed: true,
@@ -111,13 +117,19 @@ export default function SmileIDVerification({
           underReview: false,
         });
         setShouldPoll(false);
+        setBackgroundPolling(false);
         // Notify parent of success
         setTimeout(() => {
           onSuccess({ ...result, passed: true });
         }, 2000);
-      } else if (result.complete && !result.passed) {
-        toast.error("Verification Failed", {
+      } else if (
+        result.complete &&
+        !result.passed &&
+        result.status === "failed"
+      ) {
+        toast.error("❌ Verification Failed", {
           description: result.message || "Identity verification failed",
+          duration: 5000,
         });
         setVerificationResult({
           passed: false,
@@ -127,13 +139,24 @@ export default function SmileIDVerification({
           underReview: false,
         });
         setShouldPoll(false);
+        setBackgroundPolling(false);
+      } else if (result.underReview && !result.complete) {
+        // Still pending after timeout
+        toast.info("⏳ Still Under Review", {
+          description:
+            result.message ||
+            "Your verification is still being reviewed. We'll notify you when it's complete.",
+          duration: 5000,
+        });
       }
     },
     onError: (err) => {
       console.error("❌ Polling error:", err);
-      toast.error("Status check failed", {
-        description: err.message,
-      });
+      if (!backgroundPolling) {
+        toast.error("Status check failed", {
+          description: err.message,
+        });
+      }
     },
   });
 
@@ -215,44 +238,27 @@ export default function SmileIDVerification({
           console.log("🔧 Debug info:", data._debug);
         }
 
-        // All responses now have: success, passed, pending, reason, jobId
-        // Use `reason` for user-friendly messages (safe to display)
-        const userMessage = data.reason || "Verification failed";
+        // New API response structure:
+        // - success: true, jobId, status: "pending", message (immediate response)
+        // - Or error responses with code (DUPLICATE_ID, DUPLICATE_BIOMETRICS, etc.)
 
-        // Determine the result state
-        if (data.success && data.passed) {
-          // ✅ PASSED - Verification successful
-          console.log("✅ KYC Passed:", userMessage);
-          toast.success("Verification Complete!", {
-            description: userMessage,
-          });
-
-          setVerificationResult({
-            passed: true,
-            pending: false,
-            reason: userMessage,
-            jobId: data.jobId,
-          });
-          setStep("result");
-
-          // Call onSuccess after short delay to show result screen
-          setTimeout(() => {
-            onSuccess(data);
-          }, 2000);
-        } else if (data.pending) {
-          // ⏳ PENDING - Under review, start polling
-          console.log("⏳ KYC Pending:", userMessage);
-          toast.info("Verification Under Review", {
+        if (data.success && data.jobId && data.status === "pending") {
+          // ⏳ PENDING - Verification submitted, waiting for approval
+          console.log("⏳ KYC Submitted:", data.message);
+          toast.info("Verification Submitted", {
             description:
-              "We're checking your verification status automatically...",
+              data.message ||
+              "Your verification is being processed. We'll notify you when it's complete.",
           });
 
           setVerificationResult({
             passed: false,
             pending: true,
-            reason: userMessage,
+            reason:
+              data.message ||
+              "Verification submitted successfully. Waiting for approval.",
             jobId: data.jobId,
-            underReview: data.underReview ?? true,
+            underReview: true,
           });
           setStep("result");
 
@@ -261,8 +267,29 @@ export default function SmileIDVerification({
             console.log("🔄 Starting automatic polling for job:", data.jobId);
             setShouldPoll(true);
           }
+        } else if (data.success && data.passed) {
+          // ✅ PASSED - Verification successful (shouldn't happen immediately, but handle it)
+          console.log("✅ KYC Passed:", data.message);
+          toast.success("Verification Complete!", {
+            description: data.message || "Identity verified successfully",
+          });
+
+          setVerificationResult({
+            passed: true,
+            pending: false,
+            reason: data.message || "Identity verified successfully",
+            jobId: data.jobId,
+          });
+          setStep("result");
+
+          // Call onSuccess after short delay to show result screen
+          setTimeout(() => {
+            onSuccess(data);
+          }, 2000);
         } else {
           // ❌ FAILED - Verification failed (includes success: false errors)
+          const userMessage =
+            data.message || data.reason || "Verification failed";
           console.log("❌ KYC Failed:", userMessage);
 
           // Check for duplicate errors (ID or biometrics already registered)
@@ -288,7 +315,7 @@ export default function SmileIDVerification({
           setVerificationResult({
             passed: false,
             pending: false,
-            reason: data.message || userMessage,
+            reason: userMessage,
             jobId: data.jobId,
             isSystemError: systemError,
             isDuplicate: isDuplicateError,
@@ -590,7 +617,9 @@ export default function SmileIDVerification({
             <p className="text-sm text-amber-800 dark:text-amber-200 text-center">
               {isPolling
                 ? "We're automatically checking your verification status. Please wait..."
-                : "Our team is reviewing your documents. This usually takes a few minutes. Check back shortly to see your status."}
+                : backgroundPolling
+                ? "We'll check your verification status in the background and notify you when it's complete."
+                : "Our team is reviewing your documents. This usually takes a few minutes. You can close this and we'll notify you when it's complete."}
             </p>
           </div>
           {verificationResult.jobId && (
@@ -602,13 +631,31 @@ export default function SmileIDVerification({
             {isPolling ? (
               <ActionButton
                 onClick={() => {
-                  stopPolling();
+                  // Enable background polling and close
+                  setBackgroundPolling(true);
                   setShouldPoll(false);
+                  stopPolling();
+                  // Restart polling in background mode
+                  setTimeout(() => {
+                    setShouldPoll(true);
+                  }, 100);
+                  // Close the modal
+                  if (onBack) {
+                    onBack();
+                  }
                 }}
                 variant="secondary"
                 className="flex-1"
               >
-                Stop Checking
+                Close & Wait for Approval
+              </ActionButton>
+            ) : backgroundPolling ? (
+              <ActionButton
+                onClick={onBack}
+                variant="secondary"
+                className="flex-1"
+              >
+                Close
               </ActionButton>
             ) : (
               <>
@@ -621,11 +668,19 @@ export default function SmileIDVerification({
                   </ActionButton>
                 )}
                 <ActionButton
-                  onClick={onBack}
+                  onClick={() => {
+                    // Enable background polling
+                    setBackgroundPolling(true);
+                    setShouldPoll(true);
+                    // Close the modal
+                    if (onBack) {
+                      onBack();
+                    }
+                  }}
                   variant="secondary"
                   className="flex-1"
                 >
-                  Continue to App
+                  Close & Wait for Approval
                 </ActionButton>
               </>
             )}
