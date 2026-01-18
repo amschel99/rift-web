@@ -1,5 +1,6 @@
 FROM node:18-alpine
 
+# Cache bust: 2026-01-18
 WORKDIR /app
 
 # Accept build arguments from CapRover
