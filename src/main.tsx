@@ -8,15 +8,26 @@ import { POSTHOG_HOST, POSTHOG_KEY } from "./constants.ts";
 import AppShell from "./v2/shell/index.tsx";
 import { Toaster } from "./components/ui/sonner.tsx";
 import { PWAInstallPrompt } from "./components/pwa-install-prompt.tsx";
-import { WalletConnectSocketProvider } from "./hooks/walletconnect/use-walletconnect-socket.tsx";
 import { WalletConnectUserProvider } from "./components/walletconnect/WalletConnectUserProvider.tsx";
 import MaintenanceMode from "./components/MaintenanceMode.tsx";
 import { NotificationProvider } from "./contexts/NotificationContext.tsx";
 import { SuspensionProvider } from "./contexts/SuspensionContext.tsx";
 import { OnboardingDemoProvider } from "./contexts/OnboardingDemoContext.tsx";
+import { initAutoUpdate } from "./utils/auto-update.ts";
 import rift from "./lib/rift.ts";
 import "./styles/index.scss";
 import "./styles/tailwind.css";
+
+// Initialize auto-update checker - checks for new versions and forces refresh
+initAutoUpdate();
+
+// Listen for service worker updates and force refresh
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    // New service worker has taken control - reload to get fresh content
+    window.location.reload();
+  });
+}
 
 try {
   init();

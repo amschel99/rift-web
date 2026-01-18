@@ -10,8 +10,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      injectRegister: null, // Disable auto service worker registration
-      registerType: undefined,
+      injectRegister: "auto", // Auto-register service worker
+      registerType: "autoUpdate", // Auto-update when new version is available
       includeAssets: [
         "rift.png",
         "hero.png",
@@ -21,6 +21,7 @@ export default defineConfig({
         "s2.png",
         "s3.png",
         "service-worker.js",
+        "version.json",
       ],
       manifest: {
         name: "Rift Payment Solutions",
@@ -97,9 +98,19 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,json}"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB
+        // Skip waiting - immediately activate new service worker
+        skipWaiting: true,
+        clientsClaim: true,
+        // Clean old caches
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            // Don't cache version.json - always fetch fresh
+            urlPattern: /version\.json/,
+            handler: "NetworkOnly",
+          },
           {
             urlPattern: /^https:\/\/api\./,
             handler: "NetworkFirst",

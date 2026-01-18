@@ -8,12 +8,13 @@ import {
   IoNotificationsOutline,
   IoChevronForward,
   IoLogOutOutline,
-  IoShareSocialOutline,
-  IoCopyOutline,
-  IoLogoWhatsapp,
   IoCheckmarkCircle,
   IoWarning,
   IoPlayCircleOutline,
+  IoRefreshOutline,
+  IoShareSocialOutline,
+  IoCopyOutline,
+  IoLogoWhatsapp,
 } from "react-icons/io5";
 import { FaTelegram } from "react-icons/fa";
 import { HiMiniUser } from "react-icons/hi2";
@@ -43,6 +44,7 @@ import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
 import { formatNumberWithCommas } from "@/lib/utils";
 import { generateReferralCode, getReferralLink } from "@/utils/referral";
 import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
+import { forceClearCacheAndRefresh, APP_VERSION } from "@/utils/auto-update";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -459,11 +461,33 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Security Section */}
+        {/* App Section */}
         <div className="bg-surface-alt rounded-xl overflow-hidden">
           <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
-            Security
+            App
           </p>
+
+          {/* Clear Cache - for users with loading issues */}
+          <button
+            onClick={() => {
+              toast.info("Clearing cache and refreshing...");
+              setTimeout(() => {
+                forceClearCacheAndRefresh();
+              }, 500);
+            }}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <IoRefreshOutline className="text-blue-500 text-lg" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">Clear Cache & Refresh</p>
+                <p className="text-xs text-text-subtle">Fix loading issues</p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
 
           <button
             onClick={onLogOut}
@@ -480,7 +504,7 @@ export default function Profile() {
 
         {/* App Version */}
         <p className="text-center text-xs text-text-subtle/50 pt-2 pb-6">
-          Rift Wallet v1.0
+          Rift Wallet v{APP_VERSION}
         </p>
       </div>
 
