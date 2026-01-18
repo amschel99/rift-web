@@ -84,7 +84,7 @@ async function detectCountry(): Promise<CountryInfo> {
       countryName: "International",
     };
   } catch (error) {
-    console.error("Failed to detect country:", error);
+    
     
     // Fallback to USD on error
     return {

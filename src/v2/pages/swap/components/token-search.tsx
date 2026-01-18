@@ -49,7 +49,7 @@ export default function TokenSearch(props: Props) {
         });
         setAllTokens(supportedTokens);
       } catch (error) {
-        console.error("Error fetching tokens:", error);
+        
       }
     };
     

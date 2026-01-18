@@ -17,7 +17,7 @@ async function getWithdrawalFee(amount: number): Promise<GetWithdrawalFeeRespons
     const response = await rift.offramp.getWithdrawalFee(amount);
     return response;
   } catch (error) {
-    console.error("Error fetching withdrawal fee:", error);
+    
     throw error;
   }
 }

@@ -25,18 +25,9 @@ export default function SwapSummary() {
   const { transferQuoteMutation, transferQuotePending, transferQuoteData } = useLifiTransfer();
 
   useEffect(() => {
-    console.log("🔄 Quote triggered with:", {
-      from_chain: swapState.from_chain,
-      to_chain: swapState.to_chain,
-      from_token: swapState.from_token,
-      to_token: swapState.to_token,
-      amount_in: swapState.amount_in
-    });
-
     const address = localStorage.getItem("address");
     if (!address || !swapState.amount_in || parseFloat(swapState.amount_in) === 0) {
       swap.state.setValue("amount_out", "0");
-      console.log("❌ Quote skipped: invalid user address or amount");
       return;
     }
     
@@ -45,23 +36,14 @@ export default function SwapSummary() {
     const toChainName = Object.keys(SUPPORTED_CHAINS).find(key => SUPPORTED_CHAINS[key as keyof typeof SUPPORTED_CHAINS] === swapState.to_chain) as keyof typeof SUPPORTED_CHAINS | undefined;
     
     if (!fromChainName || !toChainName) {
-      console.log("❌ Quote skipped: invalid chain names", { fromChainName, toChainName });
       return;
     }
     
     // Get the actual token types from the user's selection
     const fromTokenType = getTokenType(swapState.from_token);
     const toTokenType = getTokenType(swapState.to_token);
-    console.log("fromTokenType", fromTokenType);
-    console.log("toTokenType", toTokenType);
     
     if (!fromTokenType || !toTokenType) {
-      console.log("❌ Quote skipped: unsupported token type", { 
-        from: swapState.from_token, 
-        to: swapState.to_token,
-        fromTokenType,
-        toTokenType 
-      });
       return;
     }
     
@@ -72,26 +54,8 @@ export default function SwapSummary() {
     const toTokenAddress = toChainAddresses?.[toTokenType as keyof typeof toChainAddresses];
     
     if (!fromTokenAddress || !toTokenAddress) {
-      console.log("❌ Quote skipped: missing token addresses", { 
-        fromChainName, 
-        toChainName, 
-        fromTokenType, 
-        toTokenType,
-        fromTokenAddress, 
-        toTokenAddress 
-      });
       return;
     }
-
-    console.log("✅ Fetching LiFi quote with:", {
-      fromChainName,
-      toChainName,
-      fromTokenType,
-      toTokenType,
-      fromTokenAddress,
-      toTokenAddress,
-      amount: swapState.amount_in
-    });
     
     transferQuoteMutation({
       from_chain: swapState.from_chain,
@@ -172,13 +136,6 @@ export default function SwapSummary() {
     // Get approval address from the LiFi response
     const approvalAddress = (transferQuoteData.rawData as { estimate?: { approvalAddress?: string } })?.estimate?.approvalAddress;
     
-    console.log("Transfer execution data:", {
-      approvalAddress,
-      fromTokenAddress,
-      amount: swapState.amount_in,
-      transaction: transferQuoteData.transaction
-    });
-    
     executeTransaction({
       transaction: transferQuoteData.transaction,
       fromAddress: address,
@@ -187,7 +144,7 @@ export default function SwapSummary() {
       amount: swapState.amount_in,
     });
   };
-  console.log(transferQuoteData);
+  
 
   return (
     <div className="w-full flex flex-col gap-y-2 flex-1 items-center justify-between">

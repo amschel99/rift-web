@@ -30,7 +30,7 @@ async function sendOTP(args: sendOTP) {
 
   const res = await rift.auth.sendOtp(payload);
 
-  console.log("Response from send otp::", res);
+  
 
   return true;
 }
@@ -144,7 +144,7 @@ async function signUpUser(args: signUpArgs) {
 
   const response = await rift.auth.signup(payload);
 
-  console.log("Response from sign up::", response);
+  
 
   const telegramId = response?.userId;
   if (telegramId) {
@@ -172,8 +172,7 @@ export default function useWalletAuth() {
 
   const sendOTPMutation = useMutation({
     mutationFn: sendOTP,
-    onError: console.log,
-    onSuccess: (data) => console.log("Successfully sent otp ::", data),
+    onSuccess: () => {},
   });
 
   const userQuery = useQuery({

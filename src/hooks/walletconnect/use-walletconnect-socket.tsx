@@ -219,17 +219,17 @@ export function WalletConnectSocketProvider({ children, userId }: WalletConnectS
     // Test connection and show debug info after 3 seconds
     setTimeout(() => {
       if (socketInstance.connected) {
-        console.log('🧪 Testing Socket.IO connection...');
-        console.log('🔌 Connected:', socketInstance.connected);
-        console.log('📊 Socket ID:', socketInstance.id);
-        console.log('🔧 Transport:', socketInstance.io.engine.transport.name);
-        console.log('👤 User ID for filtering:', userId);
+        
+        
+        
+        
+        
         
         // Test if we can emit events (optional - for debugging)
         socketInstance.emit('test-connection', { userId, timestamp: Date.now() });
-        console.log('📤 Test event emitted');
+        
       } else {
-        console.error('❌ Socket.IO not connected after 3 seconds');
+        
       }
     }, 3000);
 

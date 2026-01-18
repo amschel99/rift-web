@@ -142,7 +142,7 @@ export default function Confirmation(
         steps_form.setValue("currentstep", "success");
       })
       .catch((err) => {
-        console.log(err);
+        
         steps_form.setValue("currentstep", "failed");
       });
   };

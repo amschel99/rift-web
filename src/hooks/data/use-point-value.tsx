@@ -22,10 +22,10 @@ export default function usePointValue() {
         const authToken = localStorage.getItem("token");
         const apiKey = import.meta.env.VITE_SDK_API_KEY;
         
-        console.log("💎 [Point Value] Fetching point value...");
+        
         
         if (!apiKey) {
-          console.error("❌ [Point Value] No API key found");
+          
           return null;
         }
 
@@ -35,7 +35,7 @@ export default function usePointValue() {
         }
 
         const url = "https://payment.riftfi.xyz/api/loyalty/point-value";
-        console.log("💎 [Point Value] Calling API:", url);
+        
 
         const response = await fetch(url, {
           method: "GET",
@@ -45,19 +45,19 @@ export default function usePointValue() {
           },
         });
 
-        console.log("💎 [Point Value] Response status:", response.status);
+        
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("❌ [Point Value] API error:", response.status, errorText);
+          
           return null;
         }
 
         const data: PointValueResponse = await response.json();
-        console.log("✅ [Point Value] Fetched successfully:", data.data);
+        
         return data.data;
       } catch (error) {
-        console.error("❌ [Point Value] Error:", error);
+        
         return null;
       }
     },

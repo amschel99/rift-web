@@ -44,7 +44,7 @@ async function fetchTokenHistoricalData({
 
     return data.sort((a, b) => (a.time as number) - (b.time as number));
   } catch (error) {
-    console.error("Error fetching token historical data:", error);
+    
     throw error instanceof Error
       ? error
       : new Error("Failed to fetch token historical data");

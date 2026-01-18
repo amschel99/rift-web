@@ -5,7 +5,7 @@
 
 export const clearPusherBeamsCache = async (): Promise<void> => {
   try {
-    console.log("🧹 [Pusher Beams] Clearing cache...");
+    
 
     // 1. Clear IndexedDB
     const databases = await indexedDB.databases();
@@ -16,7 +16,7 @@ export const clearPusherBeamsCache = async (): Promise<void> => {
     for (const db of pusherDatabases) {
       if (db.name) {
         indexedDB.deleteDatabase(db.name);
-        console.log(`✅ [Pusher Beams] Deleted database: ${db.name}`);
+        
       }
     }
 
@@ -30,7 +30,7 @@ export const clearPusherBeamsCache = async (): Promise<void> => {
     }
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);
-      console.log(`✅ [Pusher Beams] Removed localStorage: ${key}`);
+      
     });
 
     // 3. Unregister service workers (except if already active)
@@ -40,15 +40,15 @@ export const clearPusherBeamsCache = async (): Promise<void> => {
         const scriptURL = registration.active?.scriptURL || "";
         if (scriptURL.includes("service-worker.js")) {
           await registration.unregister();
-          console.log(`✅ [Pusher Beams] Unregistered: ${scriptURL}`);
+          
         }
       }
     }
 
-    console.log("✅ [Pusher Beams] Cache cleared successfully!");
-    console.log("🔄 Please refresh the page to reinitialize");
+    
+    
   } catch (error) {
-    console.error("❌ [Pusher Beams] Failed to clear cache:", error);
+    
   }
 };
 

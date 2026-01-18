@@ -60,7 +60,7 @@ export default function DescriptionInput() {
         setSellingRate(response.selling_rate); // Use .selling_rate for invoice/onramp
         setWithdrawalRate(response.rate); // Use .rate to show how much they'll receive
       } catch (error) {
-        console.error("Error fetching exchange rate:", error);
+        
         // Fallback to approximate rates if API fails
         const fallbackRates: Record<SupportedCurrency, number> = {
           KES: 136,
@@ -126,7 +126,7 @@ export default function DescriptionInput() {
       setCurrentStep("sharing");
       toast.success("Payment request created successfully!");
     } catch (error) {
-      console.error("Error creating invoice:", error);
+      
       toast.error("Failed to create payment request. Please try again.");
     }
   };

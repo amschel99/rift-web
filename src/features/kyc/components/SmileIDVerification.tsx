@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import ActionButton from "@/components/ui/action-button";
 import { Country } from "../types";
 import { CgSpinner } from "react-icons/cg";
 import useUser from "@/hooks/data/use-user";
 import { ID_TYPES_BY_COUNTRY } from "../constants";
 import useKYCJobPolling from "@/hooks/data/use-kyc-job-polling";
+import useKYCStatus from "@/hooks/data/use-kyc-status";
 
 // Import Smile ID web component
 import "@smileid/web-components/smart-camera-web";
@@ -84,8 +86,11 @@ export default function SmileIDVerification({
   const [verificationResult, setVerificationResult] =
     useState<VerificationResult | null>(null);
   const [shouldPoll, setShouldPoll] = useState(false);
+  const [isCheckingRealStatus, setIsCheckingRealStatus] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { data: user } = useUser();
+  const queryClient = useQueryClient();
+  const { refetch: refetchKYCStatus } = useKYCStatus();
 
   // KYC job polling for pending verification
   const {
@@ -98,7 +103,7 @@ export default function SmileIDVerification({
     jobId: verificationResult?.jobId || null,
     enabled: shouldPoll && !!verificationResult?.jobId,
     onComplete: (result) => {
-      console.log("✅ Polling complete:", result);
+      
       if (result.passed) {
         toast.success("Verification Complete!", {
           description: "Your identity has been verified successfully.",
@@ -130,7 +135,7 @@ export default function SmileIDVerification({
       }
     },
     onError: (err) => {
-      console.error("❌ Polling error:", err);
+      
       toast.error("Status check failed", {
         description: err.message,
       });
@@ -161,10 +166,6 @@ export default function SmileIDVerification({
     async (capturedData: any) => {
       try {
         setSubmitting(true);
-        console.log(
-          "📤 Submitting captured images for verification:",
-          capturedData
-        );
 
         // Prepare user identifier
         const identifier =
@@ -208,11 +209,11 @@ export default function SmileIDVerification({
         });
 
         const data = await response.json();
-        console.log("📥 KYC Response:", data);
+        
 
         // Log debug info if present (for developers only)
         if (data._debug) {
-          console.log("🔧 Debug info:", data._debug);
+          
         }
 
         // All responses now have: success, passed, pending, reason, jobId
@@ -222,7 +223,7 @@ export default function SmileIDVerification({
         // Determine the result state
         if (data.success && data.passed) {
           // ✅ PASSED - Verification successful
-          console.log("✅ KYC Passed:", userMessage);
+          
           toast.success("Verification Complete!", {
             description: userMessage,
           });
@@ -241,7 +242,7 @@ export default function SmileIDVerification({
           }, 2000);
         } else if (data.pending) {
           // ⏳ PENDING - Under review, start polling
-          console.log("⏳ KYC Pending:", userMessage);
+          
           toast.info("Verification Under Review", {
             description:
               "We're checking your verification status automatically...",
@@ -258,27 +259,99 @@ export default function SmileIDVerification({
 
           // Start polling for the result
           if (data.jobId) {
-            console.log("🔄 Starting automatic polling for job:", data.jobId);
+            
             setShouldPoll(true);
           }
         } else {
           // ❌ FAILED - Verification failed (includes success: false errors)
-          console.log("❌ KYC Failed:", userMessage);
-
+          
           // Check for duplicate errors (ID or biometrics already registered)
           const isDuplicateError =
             data.code === "DUPLICATE_ID" ||
-            data.code === "DUPLICATE_BIOMETRICS";
+            data.code === "DUPLICATE_BIOMETRICS" ||
+            userMessage.toLowerCase().includes("already") ||
+            userMessage.toLowerCase().includes("duplicate") ||
+            userMessage.toLowerCase().includes("registered");
 
+          // If it's a duplicate error, the user might actually be verified already
+          // Let's check the real status from the backend
           if (isDuplicateError) {
-            toast.error("Already Registered", {
-              description: userMessage,
+            toast.info("Checking your verification status...", {
+              description: "Please wait while we verify your account status.",
             });
-          } else {
-            toast.error("Verification Failed", {
-              description: userMessage,
-            });
+            
+            setIsCheckingRealStatus(true);
+            
+            // Check real KYC status multiple times with delays
+            const checkRealStatus = async () => {
+              for (let i = 0; i < 5; i++) {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                
+                // Invalidate and refetch KYC status
+                await queryClient.invalidateQueries({ queryKey: ["kyc-status"] });
+                const result = await refetchKYCStatus();
+                
+                if (result.data?.kycVerified) {
+                  // User is actually verified!
+                  toast.success("Verification Complete!", {
+                    description: "Your identity has been verified successfully.",
+                  });
+                  setVerificationResult({
+                    passed: true,
+                    pending: false,
+                    reason: "Your identity has been verified successfully.",
+                    jobId: data.jobId,
+                  });
+                  setStep("result");
+                  setIsCheckingRealStatus(false);
+                  setTimeout(() => {
+                    onSuccess({ passed: true, kycVerified: true });
+                  }, 2000);
+                  return;
+                }
+                
+                if (result.data?.underReview) {
+                  // User is under review
+                  toast.info("Verification Under Review", {
+                    description: "Your verification is being processed. Please check back shortly.",
+                  });
+                  setVerificationResult({
+                    passed: false,
+                    pending: true,
+                    reason: "Your verification is being processed. Please check back shortly.",
+                    jobId: data.jobId,
+                    underReview: true,
+                  });
+                  setStep("result");
+                  setIsCheckingRealStatus(false);
+                  setShouldPoll(true);
+                  return;
+                }
+              }
+              
+              // After all retries, show the original error
+              setIsCheckingRealStatus(false);
+              toast.error("Already Registered", {
+                description: "This ID or face has been used before. If this is your account, please contact support.",
+              });
+              setVerificationResult({
+                passed: false,
+                pending: false,
+                reason: "This ID or face has been used before. If this is your account, please contact support.",
+                jobId: data.jobId,
+                isDuplicate: true,
+                errorCode: data.code,
+              });
+              setStep("result");
+            };
+            
+            checkRealStatus();
+            return;
           }
+
+          toast.error("Verification Failed", {
+            description: userMessage,
+          });
 
           // Check if this is a system error or user error
           // Use _debug.isSystemError if available, otherwise detect from message
@@ -297,10 +370,54 @@ export default function SmileIDVerification({
           setStep("result");
         }
       } catch (err: any) {
-        console.error("❌ KYC Submission Error:", err);
-
-        // Network or unexpected error - this is always a system error
+        // Network or unexpected error - check if user might actually be verified
         const errorMessage = err.message || "Network error. Please try again.";
+        
+        // Check if the error might indicate the user is already processed
+        const mightBeAlreadyProcessed = 
+          errorMessage.toLowerCase().includes("already") ||
+          errorMessage.toLowerCase().includes("duplicate") ||
+          errorMessage.toLowerCase().includes("exists");
+        
+        if (mightBeAlreadyProcessed) {
+          toast.info("Checking your verification status...");
+          setIsCheckingRealStatus(true);
+          
+          // Check real status
+          for (let i = 0; i < 3; i++) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await queryClient.invalidateQueries({ queryKey: ["kyc-status"] });
+            const result = await refetchKYCStatus();
+            
+            if (result.data?.kycVerified) {
+              toast.success("Verification Complete!");
+              setVerificationResult({
+                passed: true,
+                pending: false,
+                reason: "Your identity has been verified successfully.",
+              });
+              setStep("result");
+              setIsCheckingRealStatus(false);
+              setTimeout(() => onSuccess({ passed: true }), 2000);
+              return;
+            }
+            
+            if (result.data?.underReview) {
+              toast.info("Verification Under Review");
+              setVerificationResult({
+                passed: false,
+                pending: true,
+                reason: "Your verification is being processed.",
+                underReview: true,
+              });
+              setStep("result");
+              setIsCheckingRealStatus(false);
+              return;
+            }
+          }
+          setIsCheckingRealStatus(false);
+        }
+
         toast.error("Verification Failed", {
           description: errorMessage,
         });
@@ -309,7 +426,7 @@ export default function SmileIDVerification({
           passed: false,
           pending: false,
           reason: errorMessage,
-          isSystemError: true, // Network errors are always system errors
+          isSystemError: true,
         });
         setStep("result");
 
@@ -333,29 +450,20 @@ export default function SmileIDVerification({
   useEffect(() => {
     // Don't attach listeners if not on capture step
     if (step !== "capture") {
-      console.log("📍 Not on capture step, skipping event listener setup");
+      
       return;
     }
 
-    console.log("🔧 Setting up SmileID event listeners...");
+    
 
     // Handler for when images are captured and confirmed by user
     const handlePublish = (event: Event) => {
       const customEvent = event as CustomEvent;
-      console.log(
-        "📸 smart-camera-web.publish event received:",
-        customEvent.detail
-      );
       submitRef.current(customEvent.detail);
     };
 
     // Handler for when user cancels the capture
-    const handleCancel = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      console.log(
-        "❌ smart-camera-web.cancelled event received:",
-        customEvent.detail
-      );
+    const handleCancel = () => {
       toast.info("Verification cancelled");
       if (onBackRef.current) {
         onBackRef.current();
@@ -363,12 +471,8 @@ export default function SmileIDVerification({
     };
 
     // Handler for when user clicks back
-    const handleBack = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      console.log(
-        "⬅️ smart-camera-web.back event received:",
-        customEvent.detail
-      );
+    const handleBack = () => {
+      // Back button clicked
     };
 
     // Listen at DOCUMENT level - this catches events that bubble up from anywhere
@@ -377,7 +481,7 @@ export default function SmileIDVerification({
     document.addEventListener("smart-camera-web.cancelled", handleCancel);
     document.addEventListener("smart-camera-web.back", handleBack);
 
-    console.log("🎧 Document-level event listeners attached for SmileID");
+    
 
     // Also try to attach directly to the element as backup
     let retryCount = 0;
@@ -391,9 +495,6 @@ export default function SmileIDVerification({
       if (!element) {
         if (retryCount < maxRetries) {
           retryCount++;
-          console.log(
-            `⏳ Waiting for smart-camera-web element... (attempt ${retryCount}/${maxRetries})`
-          );
           retryTimeout = setTimeout(attachToElement, 300);
         }
         return;
@@ -406,7 +507,7 @@ export default function SmileIDVerification({
       element.addEventListener("smart-camera-web.cancelled", handleCancel);
       element.addEventListener("smart-camera-web.back", handleBack);
 
-      console.log("🎧 Element-level event listeners also attached");
+      
     };
 
     // Small delay to ensure DOM is ready
@@ -437,7 +538,7 @@ export default function SmileIDVerification({
         );
       }
 
-      console.log("🧹 All SmileID event listeners removed");
+      
     };
   }, [step]); // Only depend on step - use refs for functions
 
@@ -460,8 +561,8 @@ export default function SmileIDVerification({
     );
   }
 
-  // Show loading overlay when submitting images
-  if (submitting) {
+  // Show loading overlay when submitting images or checking real status
+  if (submitting || isCheckingRealStatus) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -469,9 +570,13 @@ export default function SmileIDVerification({
         className="flex flex-col items-center justify-center w-full h-full p-5"
       >
         <CgSpinner className="text-accent-primary w-10 h-10 animate-spin mb-4" />
-        <p className="text-center font-medium">Verifying your identity...</p>
+        <p className="text-center font-medium">
+          {isCheckingRealStatus ? "Checking your verification status..." : "Verifying your identity..."}
+        </p>
         <p className="text-center text-sm text-muted-foreground mt-2">
-          Please wait while we process your documents
+          {isCheckingRealStatus 
+            ? "Please wait while we confirm your account status" 
+            : "Please wait while we process your documents"}
         </p>
       </motion.div>
     );

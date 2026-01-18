@@ -131,7 +131,7 @@ export default function useLifiTransfer() {
       });
     },
     onError: (error) => {
-      console.error('LiFi transfer quote error:', error);
+      
       toast.custom(() => <RenderErrorToast message="Transfer quote failed" />, {
         position: "top-center",
         duration: 2000,

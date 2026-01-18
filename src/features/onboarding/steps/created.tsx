@@ -31,14 +31,11 @@ export default function Created() {
       // Only process if we have a pending referrer, auth token, and signup was successful
       if (pendingReferrer && token && !loading && !error && signUpMutation?.isSuccess) {
         try {
-          console.log("📎 Updating user with referrer:", pendingReferrer);
           rift.setBearerToken(token);
           await rift.auth.updateUser({ referrer: pendingReferrer });
           localStorage.removeItem("pending_referrer");
-          console.log("✅ Referrer updated successfully");
-        } catch (err) {
-          console.error("❌ Failed to update referrer:", err);
-          // Don't show error to user, just log it
+        } catch {
+          // Don't show error to user
         }
       }
     };
@@ -51,14 +48,11 @@ export default function Created() {
 
     // Check KYC status before navigating
     const auth_token = localStorage.getItem("token");
-    console.log("🔍 [Created] Auth token exists:", !!auth_token);
 
     if (auth_token) {
       try {
         const apiUrl = import.meta.env.VITE_API_URL;
         const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-        console.log("🔍 [Created] Checking KYC at:", `${apiUrl}/api/kyc/verified`);
 
         const response = await fetch(`${apiUrl}/api/kyc/verified`, {
           method: "GET",
@@ -70,36 +64,26 @@ export default function Created() {
           },
         });
 
-        console.log("🔍 [Created] KYC response status:", response.status);
-
         // Get raw text first to handle non-JSON responses
         const text = await response.text();
-        console.log("🔍 [Created] KYC raw response:", text.substring(0, 200));
 
         let data;
         try {
           data = JSON.parse(text);
-        } catch (parseError) {
-          console.error("❌ [Created] KYC response is not JSON:", parseError);
+        } catch {
           // If we can't parse the response, go to KYC to be safe
           navigate("/kyc");
           return;
         }
 
-        console.log("🔍 [Created] KYC status:", data);
-
         if (data.kycVerified === true) {
-          console.log("✅ [Created] User is KYC verified, going to /app");
           navigate("/app");
         } else if (data.underReview === true) {
-          console.log("⏳ [Created] User KYC is under review, going to /app");
           navigate("/app");
         } else {
-          console.log("⚠️ [Created] User not KYC verified, going to /kyc");
           navigate("/kyc");
         }
-      } catch (kycError) {
-        console.error("❌ [Created] KYC check failed:", kycError);
+      } catch {
         // On error, go to KYC to be safe
         navigate("/kyc");
       }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { parseEther, formatEther } from "ethers";
 import { useQueryClient } from "@tanstack/react-query";
 import rift from "../../lib/rift";
 import { transactionsApi } from "../../lib/prediction-market";
@@ -75,13 +74,11 @@ export const useTransaction = (
 
     try {
       // Get wallet instance for the chain
-      console.log("🔍 Getting wallet instance...");
       const walletResponse = await (rift as any).proxyWallet.getWalletInstance({
         chain: CHAIN,
       });
 
       const userAddress = walletResponse.address;
-      console.log("👤 User address:", userAddress);
 
       // For operations that require tokens, check balances first
       if (
@@ -89,7 +86,6 @@ export const useTransaction = (
         params.amount
       ) {
         // Check ETH balance for gas fees using Sphere SDK
-        console.log("🔍 Checking ETH balance for gas fees...");
         try {
           const ethBalanceResponse = await rift.wallet.getChainBalance({
             chain: CHAIN,
@@ -102,7 +98,6 @@ export const useTransaction = (
           );
 
           const ethAmount = ethBalance?.amount || 0;
-          console.log("💰 ETH balance:", ethAmount);
 
           // Minimum 0.001 ETH required for gas fees
           if (ethAmount < 0.0001) {
@@ -112,16 +107,14 @@ export const useTransaction = (
               )} ETH but need at least 0.001 ETH. Please get more ETH on Arbitrum.`
             );
           }
-          console.log(`✅ ETH balance sufficient: ${ethAmount.toFixed(4)} ETH`);
         } catch (ethError: any) {
           if (ethError.message.includes("Insufficient ETH")) {
             throw ethError;
           }
-          console.warn("⚠️ Could not check ETH balance, proceeding anyway");
+          // Could not check ETH balance, proceeding anyway
         }
 
         // Check token balance for betting using Sphere SDK
-        console.log("🔍 Checking token balance...");
         try {
           // Try to get token balance - we'll check all balances since rETH might not be in TokenSymbol enum
           const tokenBalanceResponse = await rift.wallet.getChainBalance({
@@ -138,8 +131,6 @@ export const useTransaction = (
 
           const tokenAmount = rethBalance?.amount || 0;
           const requiredAmount = parseFloat(params.amount);
-          console.log("💰 rETH balance:", tokenAmount);
-          console.log("💰 required amount:", requiredAmount);
 
           if (tokenAmount < requiredAmount) {
             throw new ActionableError(
@@ -153,32 +144,22 @@ export const useTransaction = (
               }
             );
           }
-          console.log(
-            `✅ rETH balance sufficient: ${tokenAmount.toFixed(4)} rETH`
-          );
         } catch (tokenError: any) {
           if (tokenError.message.includes("Insufficient rETH")) {
             throw tokenError;
           }
-          console.warn("⚠️ Could not check token balance, proceeding anyway");
+          // Could not check token balance, proceeding anyway
         }
 
         // Check allowance and approve if needed
-        console.log("🔍 Checking token allowance via API...");
-
         try {
           // Check current allowance via backend API
           const allowanceResponse = await transactionsApi.getAllowance(
             userAddress
           );
-          console.log("📊 Allowance check response:", allowanceResponse.data);
 
           // The response contains transaction data if approval is needed
           if (allowanceResponse.data.data) {
-            console.log(
-              "❌ Insufficient allowance, requesting approval transaction..."
-            );
-
             // Get approval transaction data from backend
             const approvalResponse =
               await transactionsApi.getApproveTransaction(
@@ -187,10 +168,9 @@ export const useTransaction = (
               );
 
             const approvalTxData = approvalResponse.data.data;
-            console.log("📝 Sending approval transaction:", approvalTxData);
 
             // Send approval transaction via Sphere SDK
-            const approveResponse = await (rift as any).proxyWallet.sendTransaction({
+            await (rift as any).proxyWallet.sendTransaction({
               chain: CHAIN,
               transactionData: {
                 to: approvalTxData.to,
@@ -203,22 +183,13 @@ export const useTransaction = (
                 chainId: approvalTxData.chainId,
               },
             });
-
-            console.log("✅ Approval confirmed:", approveResponse.hash);
-          } else {
-            console.log("✅ Sufficient allowance already exists");
           }
         } catch (allowanceError) {
-          console.error(
-            "❌ Allowance check or approval failed:",
-            allowanceError
-          );
           throw new Error(`Allowance check/approval failed: ${allowanceError}`);
         }
       }
 
       // Generate main transaction through backend
-      console.log(`🔍 Generating ${operation} transaction...`);
       let txResponse;
 
       switch (operation) {
@@ -269,9 +240,6 @@ export const useTransaction = (
       }
 
       const txData = txResponse.data.data || txResponse.data;
-      console.log(`📦 Generated transaction data:`, txData);
-
-      console.log(`🔐 Sending ${operation} transaction through Sphere SDK...`);
 
       // Send transaction using Sphere's proxy wallet with proper data handling
       const finalTxResponse = await (rift as any).proxyWallet.sendTransaction({
@@ -289,7 +257,6 @@ export const useTransaction = (
       });
 
       const finalTxHash = finalTxResponse.hash;
-      console.log(`✅ ${operation} transaction successful:`, finalTxHash);
 
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["markets"] });
@@ -299,8 +266,6 @@ export const useTransaction = (
 
       return finalTxHash;
     } catch (err: any) {
-      console.error(`❌ ${operation} transaction failed:`, err);
-
       // Handle ActionableError first
       if (err instanceof ActionableError) {
         setError(err.message);
@@ -350,7 +315,6 @@ export const useTransaction = (
         errorMessage = err.message;
       }
 
-      console.error(`💥 Error message: ${errorMessage}`);
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -411,8 +375,7 @@ export const useAllowance = () => {
       const allowanceValue = allowanceResponse.data.data ? 0 : 1;
       setAllowance(allowanceValue);
       return allowanceValue;
-    } catch (error) {
-      console.error("Failed to check allowance:", error);
+    } catch {
       return 0;
     } finally {
       setIsLoading(false);
@@ -448,8 +411,7 @@ export const useTokenBalance = () => {
       const balanceValue = rethBalance?.amount || 0;
       setBalance(balanceValue);
       return balanceValue;
-    } catch (error) {
-      console.error("Failed to check balance:", error);
+    } catch {
       return 0;
     } finally {
       setIsLoading(false);

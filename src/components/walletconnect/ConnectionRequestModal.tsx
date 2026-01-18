@@ -61,7 +61,7 @@ export default function ConnectionRequestModal({
       
       onClose();
     } catch (error) {
-      console.error('Connection error:', error);
+      
       toast.error('Failed to connect to dApp');
     } finally {
       setIsConnecting(false);

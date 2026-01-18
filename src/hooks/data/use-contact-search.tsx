@@ -24,7 +24,7 @@ async function getAllContacts(): Promise<ContactData> {
       externalIds: externalId || [],
     };
   } catch (error) {
-    console.log("Error fetching contacts:", error);
+    
     return {
       phoneNumbers: [],
       emails: [],

@@ -72,7 +72,7 @@ async function getBaseUSDCBalance(currency: SupportedCurrency = "USD"): Promise<
       currency,
     };
   } catch (error) {
-    console.error(`Failed to get Base USDC balance for ${currency}:`, error);
+    
     return {
       usdcAmount: 0,
       localAmount: 0,

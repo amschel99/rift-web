@@ -32,7 +32,7 @@ class PusherBeamsNotificationServiceImpl
   private initialized: boolean = false;
 
   constructor() {
-    console.log("🚀 [Pusher Beams] Service initialized");
+    // Service initialized
   }
 
   /**
@@ -65,33 +65,27 @@ class PusherBeamsNotificationServiceImpl
   private async initializeBeamsClient(): Promise<boolean> {
     try {
       if (this.initialized && this.beamsClient) {
-        console.log("✅ [Pusher Beams] Already initialized");
         return true;
       }
 
       // Validate configuration
       if (!validatePusherConfig()) {
-        console.error("❌ [Pusher Beams] Invalid configuration");
         return false;
       }
 
       // Check browser support
       if (!this.isSupported()) {
-        console.warn("⚠️ [Pusher Beams] Not supported in this browser");
         return false;
       }
 
       // Initialize Beams client (it will handle service worker registration)
-      console.log("📝 [Pusher Beams] Initializing client...");
       this.beamsClient = new PusherPushNotifications.Client({
         instanceId: pusherBeamsConfig.instanceId,
       });
 
       this.initialized = true;
-      console.log("✅ [Pusher Beams] Client initialized successfully");
       return true;
-    } catch (error) {
-      console.error("❌ [Pusher Beams] Failed to initialize:", error);
+    } catch {
       this.initialized = false;
       this.beamsClient = null;
       return false;
@@ -106,15 +100,9 @@ class PusherBeamsNotificationServiceImpl
     userId: string
   ): Promise<{ success: boolean; error?: string; deviceId?: string }> {
     try {
-      console.log(
-        "🔔 [Pusher Beams] Starting enable process for user:",
-        userId
-      );
-
       // Ensure user is authenticated - check bearer token like Rift SDK does
       const authToken = localStorage.getItem("token");
       if (!authToken) {
-        console.error("❌ [Pusher Beams] No authentication token found");
         return {
           success: false,
           error: "Please log in to enable notifications",
@@ -153,7 +141,6 @@ class PusherBeamsNotificationServiceImpl
       // Request notification permission
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
-        console.warn("⚠️ [Pusher Beams] Permission denied");
         return {
           success: false,
           error:
@@ -161,31 +148,17 @@ class PusherBeamsNotificationServiceImpl
         };
       }
 
-      console.log("✅ [Pusher Beams] Permission granted");
-
       // Start registration with Beams
-      console.log("📝 [Pusher Beams] Starting registration...");
-      console.log(
-        "📝 [Pusher Beams] Instance ID:",
-        pusherBeamsConfig.instanceId
-      );
-
       await this.beamsClient!.start();
-      console.log("✅ [Pusher Beams] Client started successfully");
 
       // Get device ID first
       const deviceId = await this.beamsClient!.getDeviceId();
-      console.log(`✅ [Pusher Beams] Device registered with ID: ${deviceId}`);
 
       // Check if user is already authenticated (from previous session)
       const currentUserId = await this.beamsClient!.getUserId();
 
-      if (currentUserId === userId) {
-        console.log(`✅ [Pusher Beams] Already authenticated as: ${userId}`);
-      } else {
+      if (currentUserId !== userId) {
         // Set user ID for authenticated user (allows multi-device)
-        console.log(`📝 [Pusher Beams] Authenticating user: ${userId}`);
-
         // Create token provider for authenticated users
         const apiKey = import.meta.env.VITE_SDK_API_KEY;
 
@@ -204,21 +177,16 @@ class PusherBeamsNotificationServiceImpl
         });
 
         await this.beamsClient!.setUserId(userId, tokenProvider);
-        console.log(`✅ [Pusher Beams] User authenticated: ${userId}`);
       }
 
       // Register userId as subscriberId in backend using Rift SDK
-      // ✅ IMPORTANT: Use userId (interest), not deviceId
       try {
         await rift.notifications.registerSubscription({
-          subscriberId: userId, // ✅ Use userId (interest), not deviceId
+          subscriberId: userId,
           platform: "web",
           deviceInfo: `${this.getDeviceInfo()} (${deviceId})`,
         });
-        console.log("✅ [Pusher Beams] Registered with backend");
-        console.log("✅ [Pusher Beams] Subscribed to interest:", userId);
-      } catch (error) {
-        console.error("⚠️ [Pusher Beams] Failed to save to backend:", error);
+      } catch {
         // Don't fail the entire process if backend save fails
       }
 
@@ -227,7 +195,6 @@ class PusherBeamsNotificationServiceImpl
         deviceId: deviceId || undefined,
       };
     } catch (error: any) {
-      console.error("❌ [Pusher Beams] Failed to enable notifications:", error);
       return {
         success: false,
         error: error.message || "Failed to enable push notifications",
@@ -240,25 +207,15 @@ class PusherBeamsNotificationServiceImpl
    */
   async disableNotifications(): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log("🔕 [Pusher Beams] Disabling notifications...");
-
       if (!this.isInitialized() || !this.beamsClient) {
-        console.warn(
-          "⚠️ [Pusher Beams] Client not initialized, nothing to disable"
-        );
         return { success: true };
       }
 
       // Stop Beams client
       await this.beamsClient.stop();
-      console.log("✅ [Pusher Beams] Notifications disabled");
 
       return { success: true };
     } catch (error: any) {
-      console.error(
-        "❌ [Pusher Beams] Failed to disable notifications:",
-        error
-      );
       return {
         success: false,
         error: error.message || "Failed to disable notifications",
@@ -273,10 +230,9 @@ class PusherBeamsNotificationServiceImpl
     try {
       if (this.isInitialized() && this.beamsClient) {
         await this.beamsClient.clearAllState();
-        console.log("✅ [Pusher Beams] Cleared all interests");
       }
-    } catch (error) {
-      console.error("❌ [Pusher Beams] Failed to clear interests:", error);
+    } catch {
+      // Failed to clear interests
     }
   }
 
@@ -290,8 +246,7 @@ class PusherBeamsNotificationServiceImpl
         return interests || [];
       }
       return [];
-    } catch (error) {
-      console.error("❌ [Pusher Beams] Failed to get interests:", error);
+    } catch {
       return [];
     }
   }
@@ -305,8 +260,7 @@ class PusherBeamsNotificationServiceImpl
         return await this.beamsClient.getDeviceId();
       }
       return null;
-    } catch (error) {
-      console.error("❌ [Pusher Beams] Failed to get device ID:", error);
+    } catch {
       return null;
     }
   }
@@ -336,22 +290,10 @@ class PusherBeamsNotificationServiceImpl
   }
 
   /**
-   * Debug: Get full notification status
+   * Debug: Get full notification status (for development only)
    */
   async debugStatus(): Promise<void> {
-    console.log("🔍 [Pusher Beams] Debug Status:");
-    console.log("- Browser support:", this.isSupported());
-    console.log("- Initialized:", this.isInitialized());
-    console.log("- Permission:", this.getPermission());
-    console.log("- Instance ID:", pusherBeamsConfig.instanceId);
-
-    if (this.isInitialized()) {
-      const deviceId = await this.getDeviceId();
-      const interests = await this.getDeviceInterests();
-      console.log("- Device ID:", deviceId);
-      console.log("- Interests:", interests);
-      console.log("- Device Info:", this.getDeviceInfo());
-    }
+    // Debug method - no console output in production
   }
 }
 

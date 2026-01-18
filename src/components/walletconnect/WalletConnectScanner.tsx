@@ -51,7 +51,7 @@ export default function WalletConnectScanner({
       
       return true;
     } catch (error) {
-      console.error('Camera access error:', error);
+      
       setCameraError('Camera access required for QR scanning');
       setScanMode('manual');
       return false;
@@ -92,7 +92,7 @@ export default function WalletConnectScanner({
       }
       
     } catch (error: unknown) {
-      console.error('QR scan error:', error);
+      
       
       // If no QR code found or error occurred
       const errorMessage = error instanceof Error ? error.message : '';

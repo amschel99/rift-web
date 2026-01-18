@@ -83,15 +83,15 @@ export default function WithdrawConfirmation() {
         recipient: paymentAccount, // Use user's configured payment account
       };
 
-      console.log("Creating withdrawal order:", withdrawalRequest);
+      
       const response = await createOrderMutation.mutateAsync(withdrawalRequest);
 
-      console.log("Withdrawal order response:", response);
+      
       setCreatedOrder(response.order);
       setCurrentStep("success");
       toast.success("Withdrawal order created successfully!");
     } catch (error) {
-      console.error("Error creating withdrawal order:", error);
+      
       toast.error("Failed to create withdrawal order. Please try again.");
     }
   };

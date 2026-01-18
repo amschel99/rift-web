@@ -13,16 +13,15 @@ import { WalletConnectUserProvider } from "./components/walletconnect/WalletConn
 import MaintenanceMode from "./components/MaintenanceMode.tsx";
 import { NotificationProvider } from "./contexts/NotificationContext.tsx";
 import { SuspensionProvider } from "./contexts/SuspensionContext.tsx";
+import { OnboardingDemoProvider } from "./contexts/OnboardingDemoContext.tsx";
 import rift from "./lib/rift.ts";
 import "./styles/index.scss";
 import "./styles/tailwind.css";
 
 try {
   init();
-} catch (error) {
-  console.warn(
-    "Failed to initialize Telegram SDK - probably running in browser mode"
-  );
+} catch {
+  // Running in browser mode - Telegram SDK not available
 }
 
 const token = localStorage.getItem("token");
@@ -40,7 +39,7 @@ if (import.meta.env.MODE === "development") {
   // Comment this out once instance is stable
   const shouldClearPusherCache = localStorage.getItem("clear_pusher_cache");
   if (shouldClearPusherCache === "true") {
-    console.log("🧹 [Dev] Auto-clearing Pusher Beams cache...");
+    
 
     // Clear IndexedDB
     indexedDB.databases().then((databases) => {
@@ -50,14 +49,14 @@ if (import.meta.env.MODE === "development") {
           (db.name.includes("pusher") || db.name.includes("beams"))
         ) {
           indexedDB.deleteDatabase(db.name);
-          console.log("✅ Deleted database:", db.name);
+          
         }
       });
     });
 
     // Clear flag
     localStorage.removeItem("clear_pusher_cache");
-    console.log("✅ Pusher cache cleared! Refresh to reinitialize.");
+    
   }
 }
 
@@ -75,9 +74,11 @@ createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <SuspensionProvider>
             <NotificationProvider>
-              <WalletConnectUserProvider>
-                <AppShell />
-              </WalletConnectUserProvider>
+              <OnboardingDemoProvider>
+                <WalletConnectUserProvider>
+                  <AppShell />
+                </WalletConnectUserProvider>
+              </OnboardingDemoProvider>
             </NotificationProvider>
           </SuspensionProvider>
         </BrowserRouter>

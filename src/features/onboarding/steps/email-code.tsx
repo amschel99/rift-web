@@ -68,14 +68,11 @@ export default function EmailCode(props: Props) {
 
           // After successful login, check KYC status
           const auth_token = localStorage.getItem("token");
-          console.log("🔍 [EmailLogin] Auth token exists:", !!auth_token);
 
           if (auth_token) {
             try {
               const apiUrl = import.meta.env.VITE_API_URL;
               const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-              console.log("🔍 [EmailLogin] Checking KYC status at:", `${apiUrl}/api/kyc/verified`);
 
               const response = await fetch(`${apiUrl}/api/kyc/verified`, {
                 method: "GET",
@@ -87,44 +84,33 @@ export default function EmailCode(props: Props) {
                 },
               });
 
-              console.log("🔍 [EmailLogin] KYC response status:", response.status);
-
               // Get raw text first to handle non-JSON responses
               const text = await response.text();
-              console.log("🔍 [EmailLogin] KYC raw response:", text.substring(0, 200));
 
               let data;
               try {
                 data = JSON.parse(text);
-              } catch (parseError) {
-                console.error("❌ [EmailLogin] KYC response is not JSON:", parseError);
+              } catch {
                 // If we can't parse the response, go to KYC to be safe
                 navigate("/kyc");
                 return;
               }
 
-              console.log("🔍 [EmailLogin] KYC status:", data);
-
               if (data.kycVerified === true) {
-                console.log("✅ [EmailLogin] User is KYC verified, going to /app");
                 navigate("/app");
               } else if (data.underReview === true) {
-                console.log("⏳ [EmailLogin] User KYC is under review, going to /app");
                 navigate("/app");
               } else {
-                console.log("⚠️ [EmailLogin] User not KYC verified, going to /kyc");
                 navigate("/kyc");
               }
-            } catch (kycError) {
-              console.error("❌ [EmailLogin] KYC check failed:", kycError);
+            } catch {
               // On error, go to KYC to be safe
               navigate("/kyc");
             }
           } else {
-            console.error("❌ [EmailLogin] No auth token found after login!");
             navigate("/app");
           }
-        } catch (e) {
+        } catch {
           toast.custom(() => <RenderErrorToast />, {
             duration: 2000,
             position: "top-center",
@@ -135,27 +121,16 @@ export default function EmailCode(props: Props) {
       }
 
       try {
-        console.log("🔍 [EmailCode] Starting signup flow...");
-        console.log("🔍 [EmailCode] Stored data:", stored);
-
         // Only check for telegram user if we're actually in telegram platform
-        if (isTelegram && !telegramUser?.id) {
-          console.warn(
-            "⚠️ [EmailCode] Telegram mode but no telegram user id - might be browser mode"
-          );
-        }
+        // Telegram mode but no telegram user id - might be browser mode
 
         try {
           const signupParams = {
             email: userEmail!,
           };
-          console.log("📝 [EmailCode] Signup params:", signupParams);
 
           await flow.signUpMutation.mutateAsync(signupParams);
-          console.log("✅ [EmailCode] Signup successful");
         } catch (signupError: any) {
-          console.log("⚠️ [EmailCode] Signup error:", signupError);
-
           const is409Error =
             signupError?.status === 409 ||
             signupError?.response?.status === 409 ||
@@ -163,10 +138,8 @@ export default function EmailCode(props: Props) {
             signupError?.message?.toLowerCase()?.includes("already exists");
 
           if (is409Error) {
-            console.log("ℹ️ [EmailCode] User already exists, proceeding with login");
             flow.signUpMutation.reset();
           } else {
-            console.error("❌ [EmailCode] Signup failed with error:", signupError);
             throw signupError;
           }
         }
@@ -175,14 +148,11 @@ export default function EmailCode(props: Props) {
           otpCode: values.code,
           email: userEmail!,
         };
-        console.log("🔑 [EmailCode] Login params:", loginParams);
 
         await flow.signInMutation.mutateAsync(loginParams);
-        console.log("✅ [EmailCode] Login successful");
 
         flow.goToNext();
-      } catch (e) {
-        console.error("❌ [EmailCode] Final error:", e);
+      } catch {
         toast.custom(() => <RenderErrorToast />, {
           duration: 2000,
           position: "top-center",
@@ -191,8 +161,8 @@ export default function EmailCode(props: Props) {
     }
   };
 
-  const handleError = (error: any) => {
-    console.log("Something went wrong ::", error);
+  const handleError = () => {
+    // Form validation error
   };
 
   const handleSendOTP = async () => {
@@ -206,8 +176,7 @@ export default function EmailCode(props: Props) {
         description: `Check your email at ${userEmail}`,
         duration: 3000,
       });
-    } catch (e) {
-      console.log("Something went wrong ::", e);
+    } catch {
       toast.custom(() => <RenderErrorToast />, {
         duration: 2000,
         position: "top-center",
@@ -285,4 +254,3 @@ export default function EmailCode(props: Props) {
     />
   );
 }
-

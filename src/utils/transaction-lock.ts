@@ -35,7 +35,7 @@ export function getTransactionLock(): TransactionLockData | null {
     
     return parsed;
   } catch (error) {
-    console.error("Error reading transaction lock:", error);
+    
     return null;
   }
 }
@@ -50,9 +50,9 @@ export function setTransactionLock(data: Omit<TransactionLockData, "timestamp">)
       timestamp: Date.now(),
     };
     localStorage.setItem(LOCK_KEY, JSON.stringify(lockData));
-    console.log("🔒 Transaction lock set:", lockData);
+    
   } catch (error) {
-    console.error("Error setting transaction lock:", error);
+    
   }
 }
 
@@ -62,9 +62,9 @@ export function setTransactionLock(data: Omit<TransactionLockData, "timestamp">)
 export function clearTransactionLock(): void {
   try {
     localStorage.removeItem(LOCK_KEY);
-    console.log("🔓 Transaction lock cleared");
+    
   } catch (error) {
-    console.error("Error clearing transaction lock:", error);
+    
   }
 }
 
@@ -100,7 +100,7 @@ export function isDuplicateTransaction(
     const remainingSeconds = Math.ceil(remaining / 1000);
     
     if (remainingSeconds > 0) {
-      console.log(`⚠️ Duplicate transaction detected. Wait ${remainingSeconds}s`);
+      
       return { isDuplicate: true, remainingSeconds };
     }
   }

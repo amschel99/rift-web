@@ -41,7 +41,7 @@ export function checkForSuspension(
  * This is a standalone function for cases where context is not available
  */
 export function handleSuspension(): void {
-  console.log("🚫 [Suspension] Account suspended - clearing auth and redirecting");
+  
   
   // Clear auth tokens
   localStorage.removeItem("token");

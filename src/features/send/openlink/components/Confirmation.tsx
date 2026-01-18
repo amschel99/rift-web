@@ -133,11 +133,11 @@ export default function Confirmation(
     createPaymentLinkMutation
       .mutateAsync(TX_ARGS)
       .then(() => {
-        console.log("created link successfully");
+        
         steps_form.setValue("currentstep", "success");
       })
       .catch((e) => {
-        console.log("failed to create link because", e);
+        
         steps_form.setValue("currentstep", "failed");
       });
   };

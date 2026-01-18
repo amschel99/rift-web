@@ -37,7 +37,7 @@ export default function Email(props: Props) {
     EMAIL_VALUE?.trim().length > 0 && form.formState.isValid;
 
   const handleSubmit = async (values: EMAIL_SCHEMA) => {
-    console.log("Email submitted:", values);
+    
 
     flow.stateControl.setValue("email", values.email);
     localStorage.setItem("email", values.email);
@@ -52,7 +52,7 @@ export default function Email(props: Props) {
       }
       flow.goToNext(); // Goes to email-otp step
     } catch (e) {
-      console.log("something went wrong::", e);
+      
       toast.custom(() => <RenderErrorToast />, {
         duration: 2000,
         position: "top-center",
@@ -61,7 +61,7 @@ export default function Email(props: Props) {
   };
 
   const handleError = (error: any) => {
-    console.log("Something went wrong ::", error);
+    
     toast.error("Please enter a valid email address");
   };
 

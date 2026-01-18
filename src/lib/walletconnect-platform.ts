@@ -81,7 +81,7 @@ export class WalletConnectPlatform {
         return true;
       }
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      
       return false;
     }
   }
@@ -161,7 +161,7 @@ export class WalletConnectPlatform {
       stream.getTracks().forEach(track => track.stop());
       return true;
     } catch (error) {
-      console.error('Camera permission denied:', error);
+      
       return false;
     }
   }
@@ -194,7 +194,7 @@ export class WalletConnectPlatform {
 
       return true;
     } catch (error) {
-      console.error('Failed to enable push notifications:', error);
+      
       return false;
     }
   }
@@ -234,14 +234,13 @@ export class WalletConnectPlatform {
     // Telegram-specific initialization
     if (this.platform === 'telegram' && window.Telegram?.WebApp) {
       // You can add Telegram-specific initialization here
-      console.log('WalletConnect initialized for Telegram Mini App');
+      
     }
 
     // PWA-specific initialization
     if (this.isPWA) {
       // Register for push notifications if supported
-      this.enablePushNotifications().catch(console.error);
-      console.log('WalletConnect initialized for PWA');
+      this.enablePushNotifications().catch(() => {});
     }
   }
 }

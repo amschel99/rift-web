@@ -108,16 +108,6 @@ export default function Home() {
   const { data: loyaltyStats, isLoading: loyaltyLoading } = useLoyaltyStats();
   const { data: pointValue } = usePointValue();
 
-  // Debug logging
-  useEffect(() => {
-    console.log("🏠 [Home] Loyalty stats:", loyaltyStats);
-    console.log("🏠 [Home] Loyalty loading:", loyaltyLoading);
-    console.log(
-      "🏠 [Home] Should show badge:",
-      !!(loyaltyStats && !loyaltyLoading)
-    );
-  }, [loyaltyStats, loyaltyLoading]);
-
   // Advanced mode state
   const { isAdvanced, setIsAdvanced } = useAdvancedMode();
 
@@ -231,10 +221,10 @@ export default function Home() {
         initial={{ x: 4, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="w-full h-full overflow-y-auto mb-18 p-4"
+        className="w-full flex-1 p-4 pb-6"
       >
         {/* Balance Section with margin */}
-        <div className="text-center mt-6 mb-8">
+        <div id="balance-section" className="text-center mt-6 mb-8">
           <div className="flex items-center justify-center gap-3">
             <h1 className="text-4xl mb-2">
               {BASE_USDC_LOADING || countryLoading ? (
@@ -280,6 +270,7 @@ export default function Home() {
           {/* Top Up Button - Integrated with balance */}
           <div className="mt-4">
             <button
+              id="topup-button"
               onClick={() => {
                 logEvent("TOPUP_BUTTON_CLICKED");
                 navigate("/app/request?type=topup");
@@ -362,7 +353,7 @@ export default function Home() {
         )}
 
         {/* History Tabs - Show in both modes */}
-        <div className="w-full">
+        <div id="history-section" className="w-full">
           <HistoryTabs
             onrampOrders={ONRAMP_ORDERS}
             withdrawalOrders={WITHDRAWAL_ORDERS}

@@ -23,7 +23,7 @@ async function verifyOTP(
     code: otp,
     phone: phoneNumber,
   });
-  console.log("Response::", response.status);
+  
 
   return true;
 }

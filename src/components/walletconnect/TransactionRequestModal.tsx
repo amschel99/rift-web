@@ -60,7 +60,7 @@ export default function TransactionRequestModal({
       
       onClose();
     } catch (error) {
-      console.error('Approval error:', error);
+      
       toast.error('Failed to approve transaction');
     } finally {
       setIsProcessing(false);
@@ -88,7 +88,7 @@ export default function TransactionRequestModal({
       
       onClose();
     } catch (error) {
-      console.error('Rejection error:', error);
+      
       toast.error('Failed to reject transaction');
     } finally {
       setIsProcessing(false);

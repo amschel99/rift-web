@@ -73,7 +73,6 @@ export default function Start() {
     const referrer = searchParams.get("referrer");
     if (referrer) {
       localStorage.setItem("pending_referrer", referrer);
-      console.log("📎 Referrer code stored:", referrer);
     }
   }, [searchParams]);
 
@@ -139,8 +138,8 @@ export default function Start() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(46,140,150,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(46,140,150,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
-      {/* Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-8 pb-4 relative z-10">
+      {/* Hero Section - Responsive padding */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 pb-4 relative z-10">
         {/* Logo with glow effect */}
         <motion.div
           className="relative mb-4"
@@ -181,8 +180,8 @@ export default function Start() {
           <ConnectionLine delay={1.5} />
         </motion.div>
 
-        {/* Feature Cards with staggered animation */}
-        <div className="w-full max-w-sm space-y-2">
+        {/* Feature Cards with staggered animation - Responsive */}
+        <div className="w-full max-w-sm md:max-w-md space-y-2 sm:space-y-3">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}

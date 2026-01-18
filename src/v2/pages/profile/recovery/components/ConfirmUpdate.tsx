@@ -74,7 +74,7 @@ export default function PasswordConfirmUpdate(
         toast.error("Verification failed, please try again");
       }
     } catch (e) {
-      console.log(e);
+      
       toast.error("Verification failed, please try again");
     }
   };

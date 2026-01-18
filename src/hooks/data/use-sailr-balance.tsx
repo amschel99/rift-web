@@ -39,7 +39,7 @@ export default function useSailrBalance() {
         const authToken = localStorage.getItem("token");
 
         if (!authToken) {
-          console.log("⚓ [Sailr] No auth token, returning zero balances");
+          
           return {
             sailr: 0,
             sailrFormatted: "0",
@@ -52,7 +52,7 @@ export default function useSailrBalance() {
 
         rift.setBearerToken(authToken);
 
-        console.log("⚓ [Sailr] Fetching token balances...");
+        
 
         // Fetch balances in parallel
         const [sailrResponse, usdeResponse, usdcResponse] = await Promise.all([
@@ -62,7 +62,7 @@ export default function useSailrBalance() {
               chain: "berachain" as any,
             })
             .catch((e) => {
-              console.log("⚓ [Sailr] SAIL.R balance fetch failed:", e.message);
+              
               return { data: [] };
             }),
           rift.wallet
@@ -71,7 +71,7 @@ export default function useSailrBalance() {
               chain: "berachain" as any,
             })
             .catch((e) => {
-              console.log("⚓ [Sailr] USDe balance fetch failed:", e.message);
+              
               return { data: [] };
             }),
           rift.wallet
@@ -80,7 +80,7 @@ export default function useSailrBalance() {
               chain: "base" as any,
             })
             .catch((e) => {
-              console.log("⚓ [Sailr] USDC balance fetch failed:", e.message);
+              
               return { data: [] };
             }),
         ]);
@@ -89,12 +89,6 @@ export default function useSailrBalance() {
         const sailrAmount = sailrResponse.data?.[0]?.amount || 0;
         const usdeAmount = usdeResponse.data?.[0]?.amount || 0;
         const usdcAmount = usdcResponse.data?.[0]?.amount || 0;
-
-        console.log("⚓ [Sailr] Balances fetched:", {
-          sailr: sailrAmount,
-          usde: usdeAmount,
-          usdc: usdcAmount,
-        });
 
         return {
           sailr: sailrAmount,
@@ -105,7 +99,7 @@ export default function useSailrBalance() {
           usdcFormatted: formatTokenBalance(usdcAmount, 2),
         };
       } catch (error) {
-        console.error("⚓ [Sailr] Error fetching balances:", error);
+        
         return {
           sailr: 0,
           sailrFormatted: "0",

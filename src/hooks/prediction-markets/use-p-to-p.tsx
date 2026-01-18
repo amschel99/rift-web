@@ -24,11 +24,7 @@ export const useAllP2PListings = (marketIds: string[]) => {
             try {
               const response = await p2pApi.getListings(marketId);
               return response.data.data.listings || [];
-            } catch (error) {
-              console.warn(
-                `Failed to fetch listings for market ${marketId}:`,
-                error
-              );
+            } catch {
               return [];
             }
           })
@@ -37,7 +33,7 @@ export const useAllP2PListings = (marketIds: string[]) => {
         // Flatten all listings into a single array
         return allListings.flat();
       } catch (error) {
-        console.warn("Failed to fetch all P2P listings:", error);
+        
         return [];
       }
     },
@@ -72,11 +68,6 @@ export const useCreateListing = () => {
       askPrice: number;
       duration: number;
     }) => {
-      // Note: In a real implementation, this should call the transaction hook
-      // The transaction hooks should be called from the component level
-      console.log(
-        "Creating listing - this should use transaction hook from component"
-      );
       return p2pApi.createListing(data);
     },
     onSuccess: (_, variables) => {
@@ -94,11 +85,6 @@ export const usePurchaseListing = () => {
 
   return useMutation({
     mutationFn: (listingId: string) => {
-      // Note: In a real implementation, this should call the transaction hook
-      // The transaction hooks should be called from the component level
-      console.log(
-        "Purchasing listing - this should use transaction hook from component"
-      );
       return p2pApi.purchaseListing(listingId);
     },
     onSuccess: () => {

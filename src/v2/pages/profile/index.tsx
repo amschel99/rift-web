@@ -4,21 +4,19 @@ import { motion } from "motion/react";
 import { toast } from "sonner";
 import {
   IoWalletOutline,
-  IoPersonOutline,
   IoTrophyOutline,
   IoNotificationsOutline,
   IoChevronForward,
-  IoShieldCheckmarkOutline,
   IoLogOutOutline,
   IoShareSocialOutline,
   IoCopyOutline,
   IoLogoWhatsapp,
   IoCheckmarkCircle,
   IoWarning,
+  IoPlayCircleOutline,
 } from "react-icons/io5";
 import { FaTelegram } from "react-icons/fa";
 import { HiMiniUser } from "react-icons/hi2";
-import { FaArrowsRotate } from "react-icons/fa6";
 import { MdAlternateEmail } from "react-icons/md";
 import { HiPhone } from "react-icons/hi";
 import { Pencil, Check, X, Gift } from "lucide-react";
@@ -44,6 +42,7 @@ import {
 import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
 import { formatNumberWithCommas } from "@/lib/utils";
 import { generateReferralCode, getReferralLink } from "@/utils/referral";
+import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -74,11 +73,8 @@ export default function Profile() {
   const { data: loyaltyStats } = useLoyaltyStats();
   const { data: pointValue } = usePointValue();
 
-  // Debug logging
-  useEffect(() => {
-    console.log("👤 [Profile] Loyalty stats:", loyaltyStats);
-    console.log("👤 [Profile] Should show rewards section:", !!loyaltyStats);
-  }, [loyaltyStats]);
+  // Onboarding demo
+  const { startDemo } = useOnboardingDemo();
 
   // Initialize display name from user data (handle both camelCase and snake_case)
   const userDisplayName = user?.displayName || user?.display_name;
@@ -152,7 +148,7 @@ export default function Profile() {
       await updateUserMutation.mutateAsync({ paymentAccount });
       toast.success("Withdrawal account updated successfully!");
     } catch (error) {
-      console.error("Error updating payment account:", error);
+      
       toast.error("Failed to update withdrawal account");
     }
   };
@@ -168,7 +164,7 @@ export default function Profile() {
       setIsEditingName(false);
       toast.success("Display name updated successfully!");
     } catch (error) {
-      console.error("Error updating display name:", error);
+      
       toast.error("Failed to update display name");
     }
   };
@@ -200,75 +196,77 @@ export default function Profile() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="w-full h-full overflow-y-auto"
+      className="w-full h-full flex flex-col"
     >
-      {/* Profile Header - Compact */}
-      <div className="px-4 pt-24 pb-4">
-        <div className="flex items-center gap-4">
-          {isTelegram ? (
-            <Avatar className="w-16 h-16 min-w-16 min-h-16 border-2 border-accent-primary/20">
-              <AvatarImage
-                className="rounded-full"
-                src={telegramUser?.photoUrl}
-                alt={telegramUser?.username}
-              />
-              <AvatarFallback className="bg-accent-primary/10 text-accent-primary text-xl">
-                {telegramUser?.username?.charAt(0)?.toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <div className="w-16 h-16 min-w-16 min-h-16 rounded-full bg-accent-primary/10 border-2 border-accent-primary/20 flex items-center justify-center flex-shrink-0">
-              <HiMiniUser className="text-3xl text-accent-primary" />
-            </div>
-          )}
-
-          {/* Editable Display Name */}
-          <div className="flex-1 min-w-0">
-            {isEditingName ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Your name"
-                  className="flex-1 min-w-0 bg-surface-subtle text-text-default text-lg font-semibold placeholder:text-text-subtle outline-none px-3 py-1.5 rounded-lg border border-surface"
-                  autoFocus
+      {/* Profile Header - Sticky */}
+      <div className="sticky top-0 z-20 bg-app-background border-b border-surface-subtle">
+        <div className="px-4 pt-6 pb-4">
+          <div className="flex items-center gap-4">
+            {isTelegram ? (
+              <Avatar className="w-14 h-14 min-w-14 min-h-14 border-2 border-accent-primary/20">
+                <AvatarImage
+                  className="rounded-full"
+                  src={telegramUser?.photoUrl}
+                  alt={telegramUser?.username}
                 />
-                <button
-                  onClick={handleUpdateDisplayName}
-                  disabled={updateUserMutation.isPending}
-                  className="p-2 bg-accent-primary text-white rounded-lg hover:bg-accent-secondary transition-colors flex-shrink-0"
-                >
-                  <Check className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditingName(false);
-                    setDisplayName(userDisplayName || "");
-                  }}
-                  className="p-2 bg-surface-subtle rounded-lg hover:bg-surface transition-colors flex-shrink-0"
-                >
-                  <X className="w-4 h-4 text-text-subtle" />
-                </button>
-              </div>
+                <AvatarFallback className="bg-accent-primary/10 text-accent-primary text-lg">
+                  {telegramUser?.username?.charAt(0)?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             ) : (
-              <button
-                onClick={() => setIsEditingName(true)}
-                className="flex items-center gap-2 hover:opacity-70 transition-opacity"
-              >
-                <span className="text-xl font-semibold text-text-default">
-                  {userDisplayName || "Set your name"}
-                </span>
-                <Pencil className="w-3.5 h-3.5 text-text-subtle" />
-              </button>
+              <div className="w-14 h-14 min-w-14 min-h-14 rounded-full bg-accent-primary/10 border-2 border-accent-primary/20 flex items-center justify-center flex-shrink-0">
+                <HiMiniUser className="text-2xl text-accent-primary" />
+              </div>
             )}
-            <p className="text-sm text-text-subtle mt-0.5">Profile Settings</p>
+
+            {/* Editable Display Name */}
+            <div className="flex-1 min-w-0">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Your name"
+                    className="flex-1 min-w-0 bg-surface-subtle text-text-default text-base font-semibold placeholder:text-text-subtle outline-none px-3 py-1.5 rounded-lg border border-surface"
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleUpdateDisplayName}
+                    disabled={updateUserMutation.isPending}
+                    className="p-2 bg-accent-primary text-white rounded-lg hover:bg-accent-secondary transition-colors flex-shrink-0"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingName(false);
+                      setDisplayName(userDisplayName || "");
+                    }}
+                    className="p-2 bg-surface-subtle rounded-lg hover:bg-surface transition-colors flex-shrink-0"
+                  >
+                    <X className="w-4 h-4 text-text-subtle" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditingName(true)}
+                  className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+                >
+                  <span className="text-lg font-semibold text-text-default">
+                    {userDisplayName || "Set your name"}
+                  </span>
+                  <Pencil className="w-3.5 h-3.5 text-text-subtle" />
+                </button>
+              )}
+              <p className="text-xs text-text-subtle mt-0.5">Profile Settings</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-4 pb-6 space-y-4">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {/* Rift Points Card */}
         {loyaltyStats && loyaltyStats.totalPoints !== undefined && (
           <button
@@ -297,7 +295,7 @@ export default function Profile() {
         )}
 
         {/* Settings Sections */}
-        <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
+        <div className="bg-surface-alt rounded-xl overflow-hidden">
           <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
             Account
           </p>
@@ -305,7 +303,7 @@ export default function Profile() {
           {/* Withdrawal Account */}
           <button
             onClick={() => setShowPaymentSetup(true)}
-            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors border-b border-surface-subtle"
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
@@ -338,7 +336,7 @@ export default function Profile() {
           {/* Push Notifications */}
           <button
             onClick={() => setShowNotificationSettings(true)}
-            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors border-b border-surface-subtle"
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
@@ -374,10 +372,31 @@ export default function Profile() {
             </div>
             <IoChevronForward className="text-text-subtle" />
           </button>
+
+          {/* Replay Demo */}
+          <button
+            onClick={startDemo}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                <IoPlayCircleOutline className="text-teal-500 text-lg" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">
+                  App Tutorial
+                </p>
+                <p className="text-xs text-text-subtle">
+                  Replay the welcome demo
+                </p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
         </div>
 
         {/* Compliance Section */}
-        <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
+        <div className="bg-surface-alt rounded-xl overflow-hidden">
           <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
             Compliance
           </p>
@@ -441,32 +460,10 @@ export default function Profile() {
         </div>
 
         {/* Security Section */}
-        <div className="bg-app-background rounded-xl shadow-sm border border-surface-subtle overflow-hidden">
+        <div className="bg-surface-alt rounded-xl overflow-hidden">
           <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
             Security
           </p>
-
-          {userQuery?.data?.externalId && (
-            <button
-              onClick={onAddRecovery}
-              className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors border-b border-surface-subtle"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <IoShieldCheckmarkOutline className="text-green-500 text-lg" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-text-default">
-                    Account Recovery
-                  </p>
-                  <p className="text-xs text-text-subtle">
-                    Backup your account
-                  </p>
-                </div>
-              </div>
-              <IoChevronForward className="text-text-subtle" />
-            </button>
-          )}
 
           <button
             onClick={onLogOut}
@@ -482,7 +479,7 @@ export default function Profile() {
         </div>
 
         {/* App Version */}
-        <p className="text-center text-xs text-text-subtle/50 pt-2">
+        <p className="text-center text-xs text-text-subtle/50 pt-2 pb-6">
           Rift Wallet v1.0
         </p>
       </div>

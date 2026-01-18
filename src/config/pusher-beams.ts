@@ -15,7 +15,7 @@ export const pusherBeamsConfig = {
  */
 export const validatePusherConfig = (): boolean => {
   if (!pusherBeamsConfig.instanceId) {
-    console.error("❌ [Pusher Beams] Instance ID is not configured");
+    
     return false;
   }
 

@@ -59,11 +59,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         const id = await pusherBeamsNotificationService.getDeviceId();
         setDeviceId(id);
       }
-    } catch (error) {
-      console.error(
-        "❌ [NotificationContext] Failed to check notification status:",
-        error
-      );
+    } catch {
+      // Failed to check notification status
     }
   };
 
@@ -105,20 +102,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       if (result.success) {
         setIsEnabled(true);
         setDeviceId(result.deviceId || null);
-
-        console.log(
-          "✅ [NotificationContext] Notifications enabled successfully"
-        );
-        console.log(`📱 [NotificationContext] Device ID: ${result.deviceId}`);
-        console.log(`👤 [NotificationContext] User Interest: ${userId}`);
       }
 
       return result;
     } catch (error: any) {
-      console.error(
-        "❌ [NotificationContext] Failed to enable notifications:",
-        error
-      );
       return {
         success: false,
         error:
@@ -138,16 +125,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       if (result.success) {
         setIsEnabled(false);
         setDeviceId(null);
-        console.log("✅ [NotificationContext] Notifications disabled");
+        
         return true;
       }
 
       return false;
-    } catch (error) {
-      console.error(
-        "❌ [NotificationContext] Failed to disable notifications:",
-        error
-      );
+    } catch {
       return false;
     } finally {
       setIsLoading(false);

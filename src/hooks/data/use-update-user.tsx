@@ -35,7 +35,7 @@ async function updateUser(request: UpdateUserRequest): Promise<UpdateUserRespons
     const response = await rift.auth.updateUser(request);
     return response;
   } catch (error) {
-    console.error("Error updating user:", error);
+    
     throw error;
   }
 }

@@ -82,7 +82,7 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
         toast.error(data.message || "Retry failed. Please try again later.");
       }
     } catch (error) {
-      console.error("Error retrying transaction:", error);
+      
       toast.error("Failed to retry transaction. Please try again later.");
     } finally {
       setIsRetrying(false);

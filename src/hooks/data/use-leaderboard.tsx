@@ -23,15 +23,15 @@ export default function useLeaderboard(limit: number = 100) {
       try {
         const apiKey = import.meta.env.VITE_SDK_API_KEY;
         
-        console.log("🏆 [Leaderboard] Fetching leaderboard...");
+        
         
         if (!apiKey) {
-          console.error("❌ [Leaderboard] No API key found");
+          
           return [];
         }
 
         const url = `https://payment.riftfi.xyz/api/loyalty/leaderboard?limit=${limit}`;
-        console.log("🏆 [Leaderboard] Calling API:", url);
+        
 
         const response = await fetch(url, {
           method: "GET",
@@ -41,19 +41,19 @@ export default function useLeaderboard(limit: number = 100) {
           },
         });
 
-        console.log("🏆 [Leaderboard] Response status:", response.status);
+        
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("❌ [Leaderboard] API error:", response.status, errorText);
+          
           return [];
         }
 
         const data: LeaderboardResponse = await response.json();
-        console.log("✅ [Leaderboard] Fetched successfully:", data.data.leaderboard.length, "entries");
+        
         return data.data.leaderboard;
       } catch (error) {
-        console.error("❌ [Leaderboard] Error:", error);
+        
         return [];
       }
     },

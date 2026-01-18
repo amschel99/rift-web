@@ -16,7 +16,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     notificationContext = useNotifications();
   } catch (error) {
     // During HMR, context might not be available yet
-    console.error("NotificationContext not available:", error);
+    
     return (
       <div className={`flex flex-col gap-4 ${className}`}>
         <div className="text-center p-4">
@@ -59,7 +59,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
         });
       }
     } catch (error) {
-      console.error("Error enabling notifications:", error);
+      
       toast.error("An error occurred", {
         description: "Please try again later.",
       });
@@ -82,7 +82,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
         });
       }
     } catch (error) {
-      console.error("Error disabling notifications:", error);
+      
       toast.error("An error occurred", {
         description: "Please try again later.",
       });
@@ -97,7 +97,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
       await checkStatus();
       toast.success("Notification status refreshed");
     } catch (error) {
-      console.error("Error refreshing status:", error);
+      
       toast.error("Failed to refresh");
     } finally {
       setIsProcessing(false);

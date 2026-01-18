@@ -49,7 +49,7 @@ const analyticsLog = (
   try {
     posthog.capture(event, properties);
   } catch (error) {
-    console.error("Error logging analytics event", event, error);
+    
   }
 };
 

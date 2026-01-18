@@ -35,7 +35,7 @@ async function fetchUser(): Promise<User> {
     const response = await rift.auth.getUser();
     return response;
   } catch (error: any) {
-    console.error("Error fetching user:", error);
+    
     
     // Check for account suspension in error response
     if (
@@ -45,7 +45,7 @@ async function fetchUser(): Promise<User> {
     ) {
       const errorData = error?.response?.data || error?.data || {};
       if (errorData?.message === "Account suspended") {
-        console.log("🚫 [User] Account suspended, redirecting...");
+        
         handleSuspension();
       }
     }

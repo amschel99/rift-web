@@ -9,20 +9,20 @@ export function DebugSocketEvents() {
   useEffect(() => {
     if (!socket || !userId) return;
 
-    console.log('🔌 Debug: Setting up Socket.IO event listeners for user:', userId);
+    
 
     // Listen to all events for debugging
     socket.onAny((eventName, ...args) => {
-      console.log('📡 Socket.IO Event:', eventName, args);
+      
     });
 
     // Test connection
     socket.on('connect', () => {
-      console.log('✅ Socket.IO Connected!');
+      
     });
 
     socket.on('disconnect', () => {
-      console.log('❌ Socket.IO Disconnected!');
+      
     });
 
     return () => {
