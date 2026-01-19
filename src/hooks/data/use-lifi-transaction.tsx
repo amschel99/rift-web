@@ -41,7 +41,7 @@ async function handleTokenApproval(
   spenderAddress: string,
 ): Promise<void> {
   try {
-    console.log("Sending token approval using Sphere proxy wallet...");
+    
     
     // ERC-20 approve function: approve(address spender, uint256 amount)
     const approveSelector = "0x095ea7b3";
@@ -66,19 +66,12 @@ async function handleTokenApproval(
       type: 0, // Legacy transaction
     };
 
-    console.log("Approval transaction details:", {
-      tokenAddress,
-      spenderAddress,
-      chainName,
-      data: data.slice(0, 20) + "..." // Truncate for readability
-    });
-
     const result = await (rift as any).proxyWallet.sendTransaction({
       chain: chainName,
       transactionData: approvalTx,
     });
 
-    console.log("Token approval successful:", result.hash);
+    
     
     toast.custom(() => <RenderSuccessToast message="Token approval successful!" />, {
       position: "top-center",
@@ -86,7 +79,7 @@ async function handleTokenApproval(
     });
 
   } catch (error) {
-    console.error("Token approval failed:", error);
+    
     toast.custom(() => <RenderErrorToast message="Token approval failed" />, {
       position: "top-center",
       duration: 3000,
@@ -117,22 +110,22 @@ async function checkNativeBalance(
     const nativeBalance = nativeBalanceData.data?.[0]?.amount || 0;
 
     if (nativeBalance * DECIMALS < Number(estimatedGasCost)) {
-      console.log("Insufficient native balance for gas fees", nativeBalance, estimatedGasCost);
+      
       toast.custom(() => <RenderErrorToast message="Insufficient native balance for gas fees" />, {
         position: "top-center",
         duration: 3000,
       });
       return false;
     }else{
-      console.log("Sufficient native balance for gas fees", nativeBalance, estimatedGasCost);
+      
       toast.custom(() => <RenderSuccessToast message="Sufficient native balance for gas fees" />, {
         position: "top-center",
         duration: 3000,
       });
-      console.log("Checking native balance for gas fees...");
-    console.log("Wallet address:", walletAddress);
-    console.log("Estimated gas cost:", estimatedGasCost);
-    console.log("Provider URL:", walletInstance.provider.url);
+      
+    
+    
+    
     
     return true;
     }
@@ -140,7 +133,7 @@ async function checkNativeBalance(
     
     
   } catch (error) {
-    console.error("Balance check failed:", error);
+    
     return false;
   }
 }
@@ -157,7 +150,7 @@ export default function useLifiTransaction() {
       try {
         const chainName = getChainName(args.transaction.chainId);
         
-        console.log("Getting wallet instance...");
+        
         const walletInstance = await (rift as any).proxyWallet.getWalletInstance({
           chain: chainName,
         });
@@ -166,7 +159,7 @@ export default function useLifiTransaction() {
           throw new Error("Failed to get wallet instance");
         }
 
-        console.log("Wallet instance retrieved:", walletInstance.address);
+        
 
         const estimatedGasCost = (BigInt(args.transaction.gasLimit) * BigInt(args.transaction.gasPrice || args.transaction.maxFeePerGas || "20000000000")).toString();
         const hasBalance = await checkNativeBalance(chainName, walletInstance.address, estimatedGasCost);
@@ -177,27 +170,18 @@ export default function useLifiTransaction() {
 
         // Check if token approval is needed
         if (args.approvalAddress && args.tokenAddress && args.amount) {
-          console.log("Approval required for:", {
-            tokenAddress: args.tokenAddress,
-            spenderAddress: args.approvalAddress,
-            amount: args.amount
-          });
-          
           try {
-            console.log("Handling token approval...");
             await handleTokenApproval(
               chainName,
               args.tokenAddress,
               args.approvalAddress,
             );
-          } catch (approvalError) {
-            console.log("Token approval failed, attempting transfer anyway:", approvalError);
+          } catch {
+            // Approval failed, continue anyway
           }
-        } else {
-          console.log("No token approval needed - proceeding directly to transfer");
         }
 
-        console.log("Executing LiFi transaction...");
+        
         
         // Use Sphere proxy wallet for the LiFi transfer (this was working)
         const result = await (rift as any).proxyWallet.sendTransaction({
@@ -215,11 +199,11 @@ export default function useLifiTransaction() {
           },
         });
 
-        console.log("LiFi transaction successful:", result.hash);
+        
         return { hash: result.hash, success: true };
         
       } catch (error) {
-        console.error('LiFi transaction execution error:', error);
+        
         throw error;
       }
     },
@@ -228,10 +212,10 @@ export default function useLifiTransaction() {
         position: "top-center",
         duration: 3000,
       });
-      console.log('LiFi transaction successful:', data.hash);
+      
     },
     onError: (error) => {
-      console.error('LiFi transaction error:', error);
+      
       let errorMessage = "Transfer failed";
       
       if (error.message.includes("Insufficient")) {

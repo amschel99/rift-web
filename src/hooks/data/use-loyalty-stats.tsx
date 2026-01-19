@@ -28,24 +28,17 @@ export default function useLoyaltyStats() {
         const authToken = localStorage.getItem("token");
         const apiKey = import.meta.env.VITE_SDK_API_KEY;
         
-        console.log("🏆 [Loyalty] Fetching loyalty stats...");
-        console.log("🏆 [Loyalty] Has auth token:", !!authToken);
-        console.log("🏆 [Loyalty] Has API key:", !!apiKey);
-        
         if (!authToken) {
-          console.error("❌ [Loyalty] No authentication token found");
           throw new Error("No authentication token found");
         }
 
         if (!apiKey) {
-          console.error("❌ [Loyalty] No API key found");
           throw new Error("No API key found");
         }
 
         rift.setBearerToken(authToken);
 
         const url = "https://payment.riftfi.xyz/api/loyalty/stats";
-        console.log("🏆 [Loyalty] Calling API:", url);
 
         const response = await fetch(url, {
           method: "GET",
@@ -55,8 +48,6 @@ export default function useLoyaltyStats() {
             "x-api-key": apiKey,
           },
         });
-
-        console.log("🏆 [Loyalty] Response status:", response.status);
 
         if (!response.ok) {
           // Clone response to read it multiple times if needed
@@ -68,7 +59,6 @@ export default function useLoyaltyStats() {
             // Check for account suspension
             const suspensionCheck = checkForSuspension(response.status, errorData);
             if (suspensionCheck.isSuspended) {
-              console.log("🚫 [Loyalty] Account suspended, redirecting...");
               handleSuspension();
               return null;
             }
@@ -76,22 +66,16 @@ export default function useLoyaltyStats() {
             // If JSON parse fails, continue with text error
           }
           
-          const errorText = await response.text();
-          console.error("❌ [Loyalty] API error:", response.status, errorText);
-          
           // If 404 or other error, user might not have loyalty account yet
           if (response.status === 404) {
-            console.log("ℹ️ [Loyalty] User doesn't have loyalty account yet (404)");
             return null;
           }
           throw new Error(`Failed to fetch loyalty stats: ${response.status}`);
         }
 
         const data: LoyaltyStatsResponse = await response.json();
-        console.log("✅ [Loyalty] Stats fetched successfully:", data.data);
         return data.data;
-      } catch (error) {
-        console.error("❌ [Loyalty] Error fetching loyalty stats:", error);
+      } catch {
         // Return null instead of throwing to prevent UI from breaking
         return null;
       }
@@ -101,4 +85,3 @@ export default function useLoyaltyStats() {
     retry: false, // Don't retry on error to avoid spam
   });
 }
-

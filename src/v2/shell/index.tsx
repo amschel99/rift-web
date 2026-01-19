@@ -11,10 +11,8 @@ export default function AppShell() {
         // Dynamically import to avoid errors if not in Farcaster context
         const { sdk } = await import("@farcaster/miniapp-sdk");
         await sdk.actions.ready();
-        console.log("Farcaster Mini App ready() called");
-      } catch (error) {
+      } catch {
         // SDK not available or not in Farcaster context - this is fine
-        console.log("Not running in Farcaster context or SDK not available");
       }
     };
 
@@ -23,9 +21,14 @@ export default function AppShell() {
 
   return (
     <ShellContextProvider>
-      <div className="w-screen h-screen flex flex-col items-center bg-app-background">
-        {/* Desktop: max-width container, Mobile: full width */}
-        <div className="w-full h-full max-w-md mx-auto relative bg-app-background shadow-2xl">
+      <div className="w-screen h-screen flex flex-col items-center bg-surface-subtle">
+        {/* 
+          Responsive container:
+          - Mobile: full width
+          - Tablet (md): centered with max-width 448px  
+          - Desktop (lg+): centered with max-width 448px, with subtle background pattern
+        */}
+        <div className="w-full h-full max-w-md mx-auto relative bg-app-background md:rounded-none lg:shadow-2xl lg:border-x lg:border-surface-subtle">
           <AnimatePresence mode="wait">
             <PageContainer />
           </AnimatePresence>

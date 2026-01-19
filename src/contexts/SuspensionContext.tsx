@@ -44,7 +44,7 @@ export const SuspensionProvider: React.FC<SuspensionProviderProps> = ({
 
   const setSuspended = useCallback(
     (info: Omit<SuspensionInfo, "isSuspended">) => {
-      console.log("🚫 [Suspension] Account suspended:", info);
+      
       
       // Clear auth tokens
       localStorage.removeItem("token");

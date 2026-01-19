@@ -75,7 +75,7 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
         }
       }
     } catch (error) {
-      console.error("Error retrying withdrawal:", error);
+      
       toast.error("Failed to retry transaction. Please try again later.");
     } finally {
       setIsRetrying(false);

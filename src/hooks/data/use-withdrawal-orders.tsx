@@ -31,7 +31,7 @@ async function getWithdrawalOrders(): Promise<OfframpOrder[]> {
       return dateB - dateA; // Latest first (descending order)
     });
   } catch (error) {
-    console.error("Error fetching withdrawal orders:", error);
+    
     throw error;
   }
 }

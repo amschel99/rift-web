@@ -164,7 +164,7 @@ function RequestPasswordReset(props: Props & ReturnType<typeof useDisclosure>) {
   const { recoveryMethodsQuery, requestRecoveryMutation } = useWalletRecovery({
     externalId: props.extenalId,
   });
-  console.log(recoveryMethodsQuery.data?.recoveryOptions);
+  
 
   return (
     <Drawer

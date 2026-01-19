@@ -49,7 +49,7 @@ export default function AmountInput() {
         // Minimum payment is 1 USDC × buying_rate
         setBuyingRate((response as any).buying_rate || response.rate);
       } catch (error) {
-        console.error("Error fetching exchange rate:", error);
+        
         // Fallback rates
         const fallbackRates: Record<SupportedCurrency, number> = {
           KES: 136,

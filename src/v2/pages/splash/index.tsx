@@ -90,29 +90,29 @@ export default function Splash() {
         try {
           enableClosingConfirmation();
         } catch (error) {
-          console.log("Not in Telegram Mini App context - skipping closing confirmation");
+          
         }
 
         try {
           disableVerticalSwipes();
         } catch (error) {
-          console.log("Not in Telegram Mini App context - skipping swipe disable");
+          
         }
 
         return () => {
           try {
             unmountClosingBehavior();
           } catch (error) {
-            console.log("Error unmounting closing behavior");
+            
           }
           try {
             unmountSwipeBehavior();
           } catch (error) {
-            console.log("Error unmounting swipe behavior");
+            
           }
         };
       } catch (error) {
-        console.warn("Telegram SDK error:", error);
+        
       }
     }
   }, [isTelegram]);

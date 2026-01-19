@@ -86,7 +86,7 @@ export function useBuySailr() {
       // Convert USDC to wei (6 decimals)
       const amountWei = ethers.parseUnits(usdcAmount.toString(), 6).toString();
 
-      console.log("⚓ [Sailr] Getting buy quote for:", usdcAmount, "USDC");
+      
 
       const response = await (rift as any).sailr.getBuyQuote(amountWei);
 
@@ -100,7 +100,7 @@ export function useBuySailr() {
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || "Failed to get quote";
       setError(errorMsg);
-      console.error("⚓ [Sailr] Buy quote error:", errorMsg);
+      
       return null;
     } finally {
       setLoading(false);
@@ -122,7 +122,7 @@ export function useBuySailr() {
 
       const amountWei = ethers.parseUnits(usdcAmount.toString(), 6).toString();
 
-      console.log("⚓ [Sailr] Executing buy for:", usdcAmount, "USDC");
+      
 
       const result = await (rift as any).sailr.buy({ amount: amountWei });
 
@@ -135,7 +135,7 @@ export function useBuySailr() {
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || "Transaction failed";
       setError(errorMsg);
-      console.error("⚓ [Sailr] Buy execution error:", errorMsg);
+      
       throw err;
     } finally {
       setLoading(false);
@@ -173,7 +173,7 @@ export function useSellSailr() {
       // Convert SAIL.R to wei (18 decimals)
       const amountWei = ethers.parseUnits(sailrAmount.toString(), 18).toString();
 
-      console.log("⚓ [Sailr] Getting sell quote for:", sailrAmount, "SAIL.R");
+      
 
       const response = await (rift as any).sailr.getSellQuote(amountWei);
 
@@ -187,7 +187,7 @@ export function useSellSailr() {
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || "Failed to get quote";
       setError(errorMsg);
-      console.error("⚓ [Sailr] Sell quote error:", errorMsg);
+      
       return null;
     } finally {
       setLoading(false);
@@ -209,7 +209,7 @@ export function useSellSailr() {
 
       const amountWei = ethers.parseUnits(sailrAmount.toString(), 18).toString();
 
-      console.log("⚓ [Sailr] Executing sell for:", sailrAmount, "SAIL.R");
+      
 
       const result = await (rift as any).sailr.sell({
         amount: amountWei,
@@ -225,7 +225,7 @@ export function useSellSailr() {
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || "Transaction failed";
       setError(errorMsg);
-      console.error("⚓ [Sailr] Sell execution error:", errorMsg);
+      
       throw err;
     } finally {
       setLoading(false);
@@ -263,7 +263,7 @@ export function useSellUSDe() {
       // Convert USDe to wei (18 decimals)
       const amountWei = ethers.parseUnits(usdeAmount.toString(), 18).toString();
 
-      console.log("⚓ [Sailr] Getting USDe sell quote for:", usdeAmount, "USDe");
+      
 
       const response = await (rift as any).sailr.getUSDeSellQuote(amountWei);
 
@@ -277,7 +277,7 @@ export function useSellUSDe() {
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || "Failed to get quote";
       setError(errorMsg);
-      console.error("⚓ [Sailr] USDe sell quote error:", errorMsg);
+      
       return null;
     } finally {
       setLoading(false);
@@ -299,7 +299,7 @@ export function useSellUSDe() {
 
       const amountWei = ethers.parseUnits(usdeAmount.toString(), 18).toString();
 
-      console.log("⚓ [Sailr] Executing USDe sell for:", usdeAmount, "USDe");
+      
 
       const result = await (rift as any).sailr.sellUSDe({
         amount: amountWei,
@@ -315,7 +315,7 @@ export function useSellUSDe() {
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || "Transaction failed";
       setError(errorMsg);
-      console.error("⚓ [Sailr] USDe sell execution error:", errorMsg);
+      
       throw err;
     } finally {
       setLoading(false);

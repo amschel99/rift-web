@@ -33,7 +33,7 @@ async function makePayment(request: PayRequest): Promise<PayResponse> {
     const response = await rift.offramp.pay(request);
     return response;
   } catch (error) {
-    console.error("Error making payment:", error);
+    
     throw error;
   }
 }

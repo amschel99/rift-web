@@ -32,7 +32,7 @@ async function createInvoice(request: CreateInvoiceRequest): Promise<CreateInvoi
     const response = await rift.merchant.createInvoice(request);
     return response;
   } catch (error) {
-    console.error("Error creating invoice:", error);
+    
     throw error;
   }
 }

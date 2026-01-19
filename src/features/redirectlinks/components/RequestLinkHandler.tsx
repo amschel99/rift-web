@@ -44,7 +44,7 @@ export default function RequestLinkHandler(props: Props) {
       // Close drawer after successful payment
       props.onDismissDrawer();
     } catch (err) {
-      console.log("error", err);
+      
       toast.warning(
         "We couldn't process the payment request, please try again"
       );

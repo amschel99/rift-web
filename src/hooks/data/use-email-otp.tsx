@@ -29,7 +29,7 @@ async function verifyEmailOTP(
     email: email,
   });
 
-  console.log("Email OTP Response::", response.status);
+  
   return true;
 }
 

@@ -126,7 +126,7 @@ export default function useKYCJobPolling({
     if (startTimeRef.current) {
       const elapsed = Date.now() - startTimeRef.current;
       if (elapsed >= maxPollingTime) {
-        console.log("⏰ KYC polling max time exceeded, stopping...");
+        
         stopPolling();
         const timeoutError = new Error(
           "Verification is taking longer than expected. Please check back later or contact support."
@@ -138,12 +138,12 @@ export default function useKYCJobPolling({
     }
 
     try {
-      console.log(`🔄 Polling KYC job status for: ${jobId}`);
+      
       const result = await fetchJobStatus(jobId);
       setStatus(result);
       setError(null);
 
-      console.log("📥 KYC Job Status:", result);
+      
 
       // Check for status changes and show toasts if enabled
       if (showToasts && previousStatusRef.current) {
@@ -174,7 +174,7 @@ export default function useKYCJobPolling({
 
       // Check if verification is complete
       if (result.complete) {
-        console.log("✅ KYC job complete, stopping polling");
+        
         stopPolling();
         onCompleteRef.current?.(result);
       } else if (result.status === "pending" && result.underReview) {
@@ -182,7 +182,7 @@ export default function useKYCJobPolling({
         console.log("⏳ KYC still pending, continuing to poll...");
       }
     } catch (err) {
-      console.error("❌ KYC polling error:", err);
+      
       const pollError =
         err instanceof Error ? err : new Error("Failed to check status");
       setError(pollError);
@@ -194,7 +194,7 @@ export default function useKYCJobPolling({
   const startPolling = useCallback(() => {
     if (!jobId || isPolling) return;
 
-    console.log(`🚀 Starting KYC polling for job: ${jobId}`);
+    
     setIsPolling(true);
     setError(null);
     setElapsedTime(0);

@@ -58,7 +58,7 @@ export default function PaymentConfirmation() {
 
         setExchangeRate(response.rate); // Use .rate for offramp
       } catch (error) {
-        console.error("Error fetching exchange rate:", error);
+        
         // Fallback to approximate rates if API fails
         const fallbackRates: Record<SupportedCurrency, number> = {
           KES: 136,
@@ -128,10 +128,10 @@ export default function PaymentConfirmation() {
         recipient: recipientString,
       };
 
-      console.log("Making payment:", paymentRequest);
+      
       const response = await paymentMutation.mutateAsync(paymentRequest);
 
-      console.log("Payment response:", response);
+      
       setPaymentSuccess(true);
       toast.success("Payment initiated successfully!");
 
@@ -141,7 +141,7 @@ export default function PaymentConfirmation() {
         navigate("/app");
       }, 3000);
     } catch (error) {
-      console.error("Error making payment:", error);
+      
       toast.error("Failed to process payment. Please try again.");
     }
   };

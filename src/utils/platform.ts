@@ -74,11 +74,8 @@ export function usePlatformDetection() {
       const launchParams = useLaunchParams();
       initData = launchParams.initData;
       telegramUser = initData?.user;
-    } catch (error) {
-      console.warn(
-        "Failed to get Telegram launch params in usePlatformDetection:",
-        error
-      );
+    } catch {
+      // Failed to get Telegram launch params
     }
   }
 
@@ -106,10 +103,8 @@ export function useSafeLaunchParams() {
 
   try {
     return useLaunchParams();
-  } catch (error) {
-    console.warn(
-      "Failed to retrieve launch params, probably using outside of Telegram"
-    );
+  } catch {
+    // Using outside of Telegram
     return null;
   }
 }

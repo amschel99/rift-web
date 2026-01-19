@@ -4,10 +4,10 @@ export const registerSW = () => {
       navigator.serviceWorker
         .register("/service-worker.js")
         .then((registration) => {
-          console.log("SW registered: ", registration);
+          
         })
         .catch((registrationError) => {
-          console.log("SW registration failed: ", registrationError);
+          
         });
     });
   }
@@ -34,7 +34,7 @@ export const addToHomeScreen = async (): Promise<boolean> => {
     }
     return false;
   } catch (error) {
-    console.error("Error adding to home screen:", error);
+    
     return false;
   }
 };

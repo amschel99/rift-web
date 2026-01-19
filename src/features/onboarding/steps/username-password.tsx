@@ -46,7 +46,7 @@ export default function UsernamePassword(props: Props) {
     form.formState.isValid;
 
   const handleSubmit = async (values: USERNAME_PASSWORD_SCHEMA) => {
-    console.log("Username/Password submitted:", values);
+    
 
     flow.stateControl.setValue("externalId", values.externalId);
     flow.stateControl.setValue("password", values.password);
@@ -63,17 +63,12 @@ export default function UsernamePassword(props: Props) {
 
         // After successful login, check KYC status
         const auth_token = localStorage.getItem("token");
-        console.log("🔍 [UsernameLogin] Auth token exists:", !!auth_token);
+        
 
         if (auth_token) {
           try {
             const apiUrl = import.meta.env.VITE_API_URL;
             const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-            console.log(
-              "🔍 [UsernameLogin] Checking KYC status at:",
-              `${apiUrl}/api/kyc/verified`
-            );
 
             const response = await fetch(`${apiUrl}/api/kyc/verified`, {
               method: "GET",
@@ -85,60 +80,34 @@ export default function UsernamePassword(props: Props) {
               },
             });
 
-            console.log(
-              "🔍 [UsernameLogin] KYC response status:",
-              response.status
-            );
-
             // Get raw text first to handle non-JSON responses
             const text = await response.text();
-            console.log(
-              "🔍 [UsernameLogin] KYC raw response:",
-              text.substring(0, 200)
-            );
 
             let data;
             try {
               data = JSON.parse(text);
-            } catch (parseError) {
-              console.error(
-                "❌ [UsernameLogin] KYC response is not JSON:",
-                parseError
-              );
+            } catch {
               // If we can't parse the response, go to KYC to be safe
               navigate("/kyc");
               return;
             }
 
-            console.log("🔍 [UsernameLogin] KYC status:", data);
-
             if (data.kycVerified === true) {
-              console.log(
-                "✅ [UsernameLogin] User is KYC verified, going to /app"
-              );
               navigate("/app");
             } else if (data.underReview === true) {
-              console.log(
-                "⏳ [UsernameLogin] User KYC is under review, going to /app"
-              );
               navigate("/app");
             } else {
-              console.log(
-                "⚠️ [UsernameLogin] User not KYC verified, going to /kyc"
-              );
               navigate("/kyc");
             }
-          } catch (kycError) {
-            console.error("❌ [UsernameLogin] KYC check failed:", kycError);
+          } catch {
             // On error, go to KYC to be safe
             navigate("/kyc");
           }
         } else {
-          console.error("❌ [UsernameLogin] No auth token found after login!");
           navigate("/app");
         }
       } catch (e) {
-        console.log("Login failed:", e);
+        
         toast.custom(
           () => <RenderErrorToast message="Invalid username or password" />,
           {
@@ -164,7 +133,7 @@ export default function UsernamePassword(props: Props) {
           signupError?.message?.toLowerCase()?.includes("already exists");
 
         if (is409Error) {
-          console.log("User already exists, proceeding with login");
+          
           signUpMutation.reset();
         } else {
           throw signupError;
@@ -178,7 +147,7 @@ export default function UsernamePassword(props: Props) {
 
       flow.goToNext();
     } catch (e) {
-      console.log("Error:", e);
+      
       toast.custom(() => <RenderErrorToast />, {
         duration: 2000,
         position: "top-center",
@@ -187,7 +156,7 @@ export default function UsernamePassword(props: Props) {
   };
 
   const handleError = (error: any) => {
-    console.log("Form validation error:", error);
+    
     toast.custom(
       () => <RenderErrorToast message="Please fill all fields correctly" />,
       {

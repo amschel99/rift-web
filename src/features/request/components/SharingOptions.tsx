@@ -107,7 +107,7 @@ export default function SharingOptions() {
           setCreatedInvoice(invoiceWithLocalAmount);
           toast.success("Top-up link created successfully!");
         } catch (error) {
-          console.error("Error creating top-up invoice:", error);
+          
           toast.error("Failed to create top-up link. Please try again.");
           // Go back to amount step on error
           navigate("/app/request?type=topup");
@@ -162,13 +162,6 @@ export default function SharingOptions() {
     const isSecureContext =
       window.isSecureContext || window.location.protocol === "https:";
 
-    console.log("Share attempt:", {
-      isMobile,
-      isSecureContext,
-      hasNavigatorShare: !!navigator.share,
-      userAgent: navigator.userAgent,
-    });
-
     // Try Web Share API first (works best on mobile)
     if (navigator.share && isSecureContext) {
       try {
@@ -178,12 +171,12 @@ export default function SharingOptions() {
           url: shareUrl,
         };
 
-        console.log("Sharing with Web Share API:", shareData);
+        
         await navigator.share(shareData);
-        console.log("Share successful");
+        
         return;
       } catch (error: any) {
-        console.log("Web Share API error:", error);
+        
         if (error.name === "AbortError") {
           // User cancelled
           return;
@@ -200,15 +193,15 @@ export default function SharingOptions() {
       try {
         // Try to open WhatsApp
         window.open(whatsappUrl, "_blank");
-        console.log("Opened WhatsApp share");
+        
         return;
       } catch (error: any) {
-        console.log("WhatsApp fallback failed:", error);
+        
       }
     }
 
     // Final fallback: Copy to clipboard
-    console.log("Using copy fallback");
+    
     toast.info("Copied to clipboard - paste in WhatsApp or any app");
     handleCopyUrl();
   };
@@ -283,7 +276,7 @@ export default function SharingOptions() {
       setPhoneNumber("");
       setShowPhoneDrawer(false);
     } catch (error: any) {
-      console.error("Error sending to phone:", error);
+      
       toast.error("Failed to send to phone number");
     } finally {
       setSendingToPhone(false);
@@ -369,11 +362,11 @@ export default function SharingOptions() {
         country_code: requestCurrency,
       };
 
-      console.log("Sending M-Pesa prompt:", request);
-      console.log("Auth token exists:", !!authToken);
+      
+      
 
       const response = await rift.onrampV2.buy(request);
-      console.log("M-Pesa prompt response:", response);
+      
 
       toast.success(
         "M-Pesa prompt sent! Customer will receive payment request on their phone."
@@ -381,14 +374,6 @@ export default function SharingOptions() {
       setMpesaNumber("");
       setShowMpesaDrawer(false);
     } catch (error: any) {
-      console.error("Error sending M-Pesa prompt:", error);
-      console.error("Error details:", {
-        message: error.message,
-        status: error.status,
-        response: error.response,
-        stack: error.stack,
-      });
-
       // More specific error messages
       if (error.message?.includes("404")) {
         toast.error("M-Pesa prompt API not found. Please contact support.");

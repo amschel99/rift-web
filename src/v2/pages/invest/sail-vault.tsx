@@ -176,8 +176,7 @@ export default function SailVault() {
         });
 
         setExchangeRate(response.rate);
-      } catch (error) {
-        console.error("Error fetching exchange rate:", error);
+      } catch {
         // Fallback rates
         const fallbackRates: Record<SupportedCurrency, number> = {
           KES: 136,
@@ -252,15 +251,9 @@ export default function SailVault() {
     try {
       if (actionMode === "deposit") {
         const usdAmount = getUsdAmount(localAmount);
-        console.log(
-          `💰 Depositing: ${localAmount} ${userCurrency} = ${usdAmount} USD`
-        );
         await depositMutation.mutateAsync(usdAmount);
       } else if (actionMode === "withdraw") {
         const usdAmount = getUsdAmount(localAmount);
-        console.log(
-          `💰 Withdrawing: ${localAmount} ${userCurrency} = ${usdAmount} USD`
-        );
         await withdrawMutation.mutateAsync(usdAmount);
       } else if (actionMode === "claim") {
         await claimMutation.mutateAsync();
@@ -269,7 +262,6 @@ export default function SailVault() {
       setActionStep("success");
       setTimeout(() => refetchVault(), 2000);
     } catch (error: any) {
-      console.error("Action failed:", error);
       toast.error(error.message || "Something went wrong");
       setActionStep("failed");
     }

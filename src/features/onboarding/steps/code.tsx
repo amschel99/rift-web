@@ -49,7 +49,7 @@ export default function Code(props: Props) {
     const authMethod = stored.authMethod;
     flow.stateControl.setValue("code", values.code);
 
-    if (values.code) {
+      if (values.code) {
       if (!flow.signInMutation || !flow.signUpMutation) {
         return;
       }
@@ -68,14 +68,11 @@ export default function Code(props: Props) {
 
           // After successful login, check KYC status
           const auth_token = localStorage.getItem("token");
-          console.log("🔍 [Login] Auth token exists:", !!auth_token);
 
           if (auth_token) {
             try {
               const apiUrl = import.meta.env.VITE_API_URL;
               const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-              console.log("🔍 [Login] Checking KYC status at:", `${apiUrl}/api/kyc/verified`);
 
               const response = await fetch(`${apiUrl}/api/kyc/verified`, {
                 method: "GET",
@@ -87,44 +84,31 @@ export default function Code(props: Props) {
                 },
               });
 
-              console.log("🔍 [Login] KYC response status:", response.status);
-
-              // Get raw text first to handle non-JSON responses
               const text = await response.text();
-              console.log("🔍 [Login] KYC raw response:", text.substring(0, 200));
 
               let data;
               try {
                 data = JSON.parse(text);
-              } catch (parseError) {
-                console.error("❌ [Login] KYC response is not JSON:", parseError);
-                // If we can't parse the response, go to KYC to be safe
+              } catch {
                 navigate("/kyc");
                 return;
               }
 
-              console.log("🔍 [Login] KYC status:", data);
-
               if (data.kycVerified === true) {
-                console.log("✅ [Login] User is KYC verified, going to /app");
                 navigate("/app");
               } else if (data.underReview === true) {
-                console.log("⏳ [Login] User KYC is under review, going to /app");
                 navigate("/app");
               } else {
-                console.log("⚠️ [Login] User not KYC verified, going to /kyc");
                 navigate("/kyc");
               }
-            } catch (kycError) {
-              console.error("❌ [Login] KYC check failed:", kycError);
-              // On error, go to KYC to be safe
+            } catch {
               navigate("/kyc");
             }
           } else {
             console.error("❌ [Login] No auth token found after login!");
-          navigate("/app");
+            navigate("/app");
           }
-        } catch (e) {
+        } catch {
           toast.custom(() => <RenderErrorToast />, {
             duration: 2000,
             position: "top-center",
@@ -135,17 +119,9 @@ export default function Code(props: Props) {
       }
 
       try {
-        console.log("🔍 [Code] Starting signup flow...");
-        console.log("🔍 [Code] Stored data:", stored);
-        console.log("🔍 [Code] isTelegram:", isTelegram);
-        console.log("🔍 [Code] telegramUser:", telegramUser);
-
         // Only check for telegram user if we're actually in telegram platform
         // Don't block browser/web signups
         if (isTelegram && !telegramUser?.id) {
-          console.warn(
-            "⚠️ [Code] Telegram mode but no telegram user id - might be browser mode"
-          );
           // Don't throw - allow signup to proceed for browser mode
         }
 
@@ -153,13 +129,9 @@ export default function Code(props: Props) {
           const signupParams = {
             phoneNumber: stored.identifier!?.replace("-", ""),
           };
-          console.log("📝 [Code] Signup params:", signupParams);
 
           await flow.signUpMutation.mutateAsync(signupParams);
-          console.log("✅ [Code] Signup successful");
         } catch (signupError: any) {
-          console.log("⚠️ [Code] Signup error:", signupError);
-
           const is409Error =
             signupError?.status === 409 ||
             signupError?.response?.status === 409 ||
@@ -167,10 +139,8 @@ export default function Code(props: Props) {
             signupError?.message?.toLowerCase()?.includes("already exists");
 
           if (is409Error) {
-            console.log("ℹ️ [Code] User already exists, proceeding with login");
             flow.signUpMutation.reset();
           } else {
-            console.error("❌ [Code] Signup failed with error:", signupError);
             throw signupError;
           }
         }
@@ -179,14 +149,11 @@ export default function Code(props: Props) {
           otpCode: values.code,
           phoneNumber: stored.identifier!?.replace("-", ""),
         };
-        console.log("🔑 [Code] Login params:", loginParams);
 
         await flow.signInMutation.mutateAsync(loginParams);
-        console.log("✅ [Code] Login successful");
 
         flow.goToNext();
-      } catch (e) {
-        console.error("❌ [Code] Final error:", e);
+      } catch {
         toast.custom(() => <RenderErrorToast />, {
           duration: 2000,
           position: "top-center",
@@ -195,13 +162,12 @@ export default function Code(props: Props) {
     }
   };
 
-  const handleError = (error: any) => {
-    console.log("Something went wrong ::", error);
+  const handleError = () => {
+    // Form validation error
   };
 
   const handleSendOTP = async () => {
     const stored = flow.stateControl.getValues();
-    const authMethod = stored.authMethod;
 
     if (sendOTPMutation.isPending) return;
 
@@ -212,8 +178,7 @@ export default function Code(props: Props) {
       const otpParams = { phoneNumber: stored.identifier!?.replace("-", "") };
 
       await sendOTPMutation.mutateAsync(otpParams);
-    } catch (e) {
-      console.log("Something went wrong ::", e);
+    } catch {
       toast.custom(() => <RenderErrorToast />, {
         duration: 2000,
         position: "top-center",

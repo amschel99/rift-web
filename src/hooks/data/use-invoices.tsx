@@ -39,7 +39,7 @@ async function getInvoices(request?: GetInvoicesRequest): Promise<Invoice[]> {
     // API returns invoices directly as an array, not wrapped in an object
     return Array.isArray(response) ? response : (response.invoices || []);
   } catch (error) {
-    console.error("Error fetching invoices:", error);
+    
     throw error;
   }
 }

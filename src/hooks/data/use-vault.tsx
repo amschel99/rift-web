@@ -28,18 +28,13 @@ export function useVaultData() {
       try {
         const authToken = localStorage.getItem("token");
         if (!authToken) {
-          console.log("🏦 [Vault] No auth token");
           return null;
         }
 
         rift.setBearerToken(authToken);
-        console.log("🏦 [Vault] Fetching vault data...");
-
         const data = await rift.vault.getMyVaultData();
-        console.log("🏦 [Vault] Data fetched:", data);
         return data;
-      } catch (error: any) {
-        console.error("🏦 [Vault] Error fetching vault data:", error);
+      } catch {
         return null;
       }
     },
@@ -55,12 +50,9 @@ export function useProtocolStats() {
     queryKey: ["vault-protocol-stats"],
     queryFn: async (): Promise<ProtocolStats | null> => {
       try {
-        console.log("🏦 [Vault] Fetching protocol stats...");
         const stats = await rift.vault.getProtocolStats();
-        console.log("🏦 [Vault] Protocol stats:", stats);
         return stats;
-      } catch (error: any) {
-        console.error("🏦 [Vault] Error fetching protocol stats:", error);
+      } catch {
         return null;
       }
     },
@@ -81,18 +73,13 @@ export function useVaultDeposit() {
         throw new Error("Please log in to continue");
       }
 
-      console.log("🏦 [Vault] Rift SDK instance:", rift);
-      console.log("🏦 [Vault] Vault service:", rift.vault);
-      
       rift.setBearerToken(authToken);
-      console.log("🏦 [Vault] Depositing:", amount);
 
       if (!rift.vault) {
         throw new Error("Vault service not available. Please update the app.");
       }
 
       const result = await rift.vault.deposit({ amount });
-      console.log("🏦 [Vault] Deposit result:", result);
       return result;
     },
     onSuccess: () => {
@@ -117,10 +104,7 @@ export function useVaultWithdraw() {
       }
 
       rift.setBearerToken(authToken);
-      console.log("🏦 [Vault] Requesting withdrawal:", amount);
-
       const result = await rift.vault.withdraw({ amount });
-      console.log("🏦 [Vault] Withdrawal result:", result);
       return result;
     },
     onSuccess: () => {
@@ -143,10 +127,7 @@ export function useVaultCancelWithdrawal() {
       }
 
       rift.setBearerToken(authToken);
-      console.log("🏦 [Vault] Cancelling withdrawal...");
-
       const result = await rift.vault.cancelWithdrawal();
-      console.log("🏦 [Vault] Cancel withdrawal result:", result);
       return result;
     },
     onSuccess: () => {
@@ -167,10 +148,7 @@ export function useVaultClaimRewards() {
       }
 
       rift.setBearerToken(authToken);
-      console.log("🏦 [Vault] Claiming rewards...");
-
       const result = await rift.vault.claimRewards();
-      console.log("🏦 [Vault] Claim result:", result);
       return result;
     },
     onSuccess: () => {
@@ -193,10 +171,7 @@ export function useVaultCancelClaim() {
       }
 
       rift.setBearerToken(authToken);
-      console.log("🏦 [Vault] Cancelling claim...");
-
       const result = await rift.vault.cancelClaim();
-      console.log("🏦 [Vault] Cancel claim result:", result);
       return result;
     },
     onSuccess: () => {

@@ -76,7 +76,7 @@ export default function Identifier(props: Props) {
   }, [PHONE_SEARCH_FILTER]);
 
   const handleSubmit = async (values: IDENTIFIER_SCHEMA) => {
-    console.log("Clicked", values);
+    
     let phoneNum = values.phone.startsWith("0")
       ? values.phone.trim().replace("0", "")
       : values.phone.trim();
@@ -94,7 +94,7 @@ export default function Identifier(props: Props) {
       }
       flow.goToNext();
     } catch (e) {
-      console.log("something went wrong::", e);
+      
       
       // On phone OTP failure during signup, redirect to email signup
       if (flowType !== "login") {
@@ -121,7 +121,7 @@ export default function Identifier(props: Props) {
   };
 
   const handleError = (error: any) => {
-    console.log("Something went wrong ::", error);
+    
     toast.custom(
       () => <RenderErrorToast message="Fill the input correctly" />,
       {

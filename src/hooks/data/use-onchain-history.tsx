@@ -64,7 +64,7 @@ async function getOnchainHistory(): Promise<OnchainTransaction[]> {
       return dateB - dateA; // Latest first (descending order)
     });
   } catch (error) {
-    console.error("Error fetching onchain history:", error);
+    
     throw error;
   }
 }

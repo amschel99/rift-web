@@ -15,7 +15,7 @@ async function verifyExternalIdAuth(
 
   // Note: This would typically verify against backend, but for now we'll assume success
   // In real implementation, this would make an API call to verify credentials
-  console.log("Verifying external ID auth for:", externalId);
+  
 
   // TODO: Implement actual verification call when backend supports it
   // const response = await rift.auth.verifyCredentials({

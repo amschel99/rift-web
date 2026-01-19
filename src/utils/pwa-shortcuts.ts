@@ -66,7 +66,7 @@ export const handleShortcutNavigation = (navigate: (path: string) => void) => {
       navigate("/app/oo");
       break;
     default:
-      console.log("PWA unhadled shortcut route");
+      
   }
 };
 
@@ -75,7 +75,7 @@ export const clearAppBadge = () => {
     try {
       (navigator as any).clearAppBadge();
     } catch (error) {
-      console.log("App badge not supported:", error);
+      
     }
   }
 };

@@ -1,9 +1,10 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import BottomTabs from "../bottom-tabs";
 import rift from "@/lib/rift";
 import { useNavigate } from "react-router";
 import useAnalaytics from "@/hooks/use-analytics";
 import { handleSuspension } from "@/utils/api-suspension-handler";
+import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
 
 interface Props {
   children: ReactNode;
@@ -13,6 +14,8 @@ export default function AuthenticatedShell(props: Props) {
   const { children } = props;
   const navigate = useNavigate();
   const { logEvent } = useAnalaytics();
+  const { checkAndStartDemo } = useOnboardingDemo();
+  const hasCheckedDemo = useRef(false);
 
   useEffect(() => {
     const auth_token = localStorage.getItem("token");
@@ -24,6 +27,12 @@ export default function AuthenticatedShell(props: Props) {
 
       // Verify user is not suspended on app load
       verifyUserStatus();
+
+      // Check and start demo for new users (only once)
+      if (!hasCheckedDemo.current) {
+        hasCheckedDemo.current = true;
+        checkAndStartDemo();
+      }
     } else {
       navigate("/auth");
     }
@@ -34,13 +43,10 @@ export default function AuthenticatedShell(props: Props) {
     try {
       await rift.auth.getUser();
     } catch (error: any) {
-      console.error("Error verifying user status:", error);
-
       // Check for account suspension
       if (error?.response?.status === 403 || error?.status === 403) {
         const errorData = error?.response?.data || error?.data || {};
         if (errorData?.message === "Account suspended") {
-          console.log("🚫 [AuthShell] Account suspended, redirecting...");
           handleSuspension();
         }
       }
@@ -48,9 +54,15 @@ export default function AuthenticatedShell(props: Props) {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center relative">
-      <div className="flex flex-col w-full flex-1 ">{children}</div>
-      <BottomTabs />
+    <div className="w-full h-full relative">
+      {/* Main content area - scrollable, with padding for bottom tabs */}
+      <div className="absolute inset-0 bottom-[72px] overflow-y-auto overflow-x-hidden">
+        {children}
+      </div>
+      {/* Bottom tabs - fixed at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-50">
+        <BottomTabs />
+      </div>
     </div>
   );
 }

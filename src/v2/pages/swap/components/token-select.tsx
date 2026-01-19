@@ -27,7 +27,7 @@ export default function TokenSelect(props: TokenSelectProps) {
 
     state.setValue(position == "from" ? "from_chain" : "to_chain", args.chain);
 
-    console.log("triggering close::");
+    
     onClose();
   };
 

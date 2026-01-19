@@ -1,5 +1,6 @@
 FROM node:18-alpine
 
+# Cache bust: 2026-01-18
 WORKDIR /app
 
 # Accept build arguments from CapRover
@@ -45,5 +46,7 @@ RUN npm install -g serve
 
 EXPOSE 8088
 
-# Just specify the port; serve will bind to 0.0.0.0 automatically in Docker
-CMD ["serve", "-s", "dist", "-l", "8088"]
+# Change to dist directory and serve from there
+# The -s flag enables SPA mode (all unknown routes fallback to index.html)
+WORKDIR /app/dist
+CMD ["serve", "-s", ".", "-l", "8088"]

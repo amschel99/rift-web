@@ -18,7 +18,7 @@ export default function CollectLinkHandler(props: Props) {
     base64ToString(collectobjectb64) ?? "{}"
   );
 
-  console.log(collectobject);
+  
 
   const { data: TOKEN_INFO } = useToken({
     name: collectobject?.token,

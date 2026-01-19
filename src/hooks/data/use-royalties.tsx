@@ -24,7 +24,6 @@ export default function useRoyalties() {
       
       // Try direct fetch first (in case CORS is fixed or we're on same origin)
       try {
-        console.log("💰 [Royalties] Trying direct fetch...");
         const directResponse = await fetch(targetUrl, { 
           mode: 'cors',
           headers: { 'Accept': 'application/json' }
@@ -32,32 +31,28 @@ export default function useRoyalties() {
         
         if (directResponse.ok) {
           const data: RoyaltiesData = await directResponse.json();
-          console.log("💰 [Royalties] Direct fetch successful:", data);
           return data;
         }
-      } catch (directError) {
-        console.log("💰 [Royalties] Direct fetch failed, trying proxies...");
+      } catch {
+        // Direct fetch failed, try proxies
       }
 
       // Try CORS proxies
       for (const proxy of CORS_PROXIES) {
         try {
-          console.log(`💰 [Royalties] Trying proxy: ${proxy}`);
           const proxyUrl = `${proxy}${encodeURIComponent(targetUrl)}`;
           const response = await fetch(proxyUrl);
           
           if (response.ok) {
             const data: RoyaltiesData = await response.json();
-            console.log("💰 [Royalties] Proxy fetch successful:", data);
             return data;
           }
-        } catch (proxyError) {
-          console.log(`💰 [Royalties] Proxy ${proxy} failed:`, proxyError);
+        } catch {
+          // Proxy failed, try next
         }
       }
 
       // If all proxies fail, return fallback data based on last known values
-      console.log("💰 [Royalties] All fetches failed, using fallback");
       return {
         totalRoyalties: 45000, // Approximate fallback
         avgRoyaltiesPerMinuteLast24h: 2.07,

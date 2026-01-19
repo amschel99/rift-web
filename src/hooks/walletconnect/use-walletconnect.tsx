@@ -37,7 +37,7 @@ export function useWalletConnectStart() {
       queryClient.invalidateQueries({ queryKey: ['walletconnect', 'status'] });
     },
     onError: (error) => {
-      console.error('Failed to start WalletConnect service:', error);
+      
       toast.error('Failed to start WalletConnect service');
     }
   });
@@ -97,7 +97,7 @@ export function useWalletConnectDisconnect() {
       queryClient.invalidateQueries({ queryKey: ['walletconnect', 'sessions'] });
     },
     onError: (error) => {
-      console.error('Disconnect error:', error);
+      
       toast.error('Failed to disconnect');
     }
   });
@@ -134,7 +134,7 @@ export function useWalletConnectApproval() {
       queryClient.invalidateQueries({ queryKey: ['walletconnect', 'requests'] });
     },
     onError: (error) => {
-      console.error('Approval error:', error);
+      
       toast.error('Failed to approve transaction');
     }
   });
@@ -151,7 +151,7 @@ export function useWalletConnectRejection() {
       queryClient.invalidateQueries({ queryKey: ['walletconnect', 'requests'] });
     },
     onError: (error) => {
-      console.error('Rejection error:', error);
+      
       toast.error('Failed to reject transaction');
     }
   });

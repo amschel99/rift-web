@@ -33,7 +33,7 @@ async function createWithdrawalOrder(request: CreateOfframpOrderRequest): Promis
     const response = await rift.offramp.createOrder(request);
     return response;
   } catch (error) {
-    console.error("Error creating withdrawal order:", error);
+    
     throw error;
   }
 }
