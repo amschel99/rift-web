@@ -176,16 +176,17 @@ export default function WithdrawConfirmation() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex flex-col h-full p-4"
+      className="flex flex-col h-full overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between px-4 pt-4 pb-6 flex-shrink-0">
         <button onClick={handleBack} className="p-2">
           <FiArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-semibold">Confirm Withdrawal</h1>
-        <div className="w-5 h-5" /> {/* Placeholder for alignment */}
+        <div className="w-5 h-5" />
       </div>
 
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-medium mb-2">Review Details</h2>
         <p className="text-text-subtle">
@@ -291,7 +292,9 @@ export default function WithdrawConfirmation() {
         </p>
       </div>
 
-      <div className="mt-auto">
+      </div>
+
+      <div className="flex-shrink-0 px-4 pb-4 pt-2 bg-gradient-to-t from-app-background via-app-background/90 to-transparent">
         <ActionButton
           onClick={handleConfirmWithdrawal}
           disabled={isLoading || hasInsufficientBalance}

@@ -269,33 +269,6 @@ export default function Profile() {
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-4 space-y-4">
-        {/* Rift Points Card */}
-        {loyaltyStats && loyaltyStats.totalPoints !== undefined && (
-          <button
-            onClick={() => navigate("/app/profile/loyalty")}
-            className="w-full bg-app-background rounded-xl p-4 shadow-lg border border-surface-subtle flex items-center justify-between hover:shadow-xl transition-shadow"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center">
-                <IoTrophyOutline className="text-white text-lg" />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-text-default">
-                  Rift Points
-                </p>
-                <p className="text-xs text-text-subtle">
-                  {formatNumberWithCommas(loyaltyStats.totalPoints)} points
-                  {pointValue &&
-                    ` • $${(
-                      loyaltyStats.totalPoints * pointValue.pointValue
-                    ).toFixed(2)}`}
-                </p>
-              </div>
-            </div>
-            <IoChevronForward className="text-text-subtle" />
-          </button>
-        )}
-
         {/* Settings Sections */}
         <div className="bg-surface-alt rounded-xl overflow-hidden">
           <p className="px-4 pt-4 pb-2 text-xs font-medium text-text-subtle uppercase tracking-wide">
@@ -467,10 +440,10 @@ export default function Profile() {
             App
           </p>
 
-          {/* Clear Cache - for users with loading issues */}
+        {/* Clear cache & restart */}
           <button
             onClick={() => {
-              toast.info("Clearing cache and refreshing...");
+            toast.info("Clearing cache and restarting...");
               setTimeout(() => {
                 forceClearCacheAndRefresh();
               }, 500);
@@ -482,8 +455,8 @@ export default function Profile() {
                 <IoRefreshOutline className="text-blue-500 text-lg" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-text-default">Clear Cache & Refresh</p>
-                <p className="text-xs text-text-subtle">Fix loading issues</p>
+                <p className="text-sm font-medium text-text-default">Clear Cache & Restart</p>
+                <p className="text-xs text-text-subtle">Restarts the app after clearing cache</p>
               </div>
             </div>
             <IoChevronForward className="text-text-subtle" />

@@ -55,6 +55,7 @@ User receives:          10 USDC ✓
 Rift collects:          13 KES
 ```
 
+
 **To Pretium API:**
 ```json
 {
