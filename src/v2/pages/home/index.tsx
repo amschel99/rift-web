@@ -3,7 +3,8 @@ import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 
 import { forceClearCacheAndRefresh } from "@/utils/auto-update";
-import { IoRefreshOutline, IoChevronForward } from "react-icons/io5";
+import { IoChevronForward } from "react-icons/io5";
+import { FiRefreshCw } from "react-icons/fi";
 import {
   IoArrowUpCircle,
   IoArrowDownCircle,
@@ -273,7 +274,7 @@ export default function Home() {
     <div className="flex items-center gap-3">
       {/* Added -ml-2 to shift this div to the left */}
       <div className="w-9 h-9 -ml-6 rounded-lg bg-transparent flex items-center justify-center">
-        <IoRefreshOutline className="text-black text-lg" />
+        <FiRefreshCw className="text-black text-lg" />
       </div>
     </div>
   </button>
