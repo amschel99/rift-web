@@ -911,7 +911,7 @@ export default function SmileIDVerification({
         initial={{ x: 4, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="flex flex-col w-full h-full"
+        className="flex flex-col w-full h-full min-h-0 overflow-hidden"
       >
         {/* Header */}
         <div className="p-5 pb-3">
@@ -930,7 +930,7 @@ export default function SmileIDVerification({
         </div>
 
         {/* ID Details Form */}
-        <div className="flex-1 px-5 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 space-y-4 min-h-0 pb-4">
           {/* ID Type Selection */}
           <div>
             <label className="block text-sm font-medium mb-2">
@@ -999,58 +999,86 @@ export default function SmileIDVerification({
       initial={{ x: 4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex flex-col w-full h-full"
+      className="flex flex-col w-full h-full min-h-0 overflow-hidden"
     >
-      {/* Header */}
-      <div className="p-5 pb-3">
-        <button
-          onClick={() => setStep("id-details")}
-          className="text-sm text-muted-foreground hover:text-text-default mb-4"
-        >
-          ← Back to ID Details
-        </button>
-        <h1 className="text-2xl font-bold mb-2">Identity Verification</h1>
-        <p className="text-muted-foreground text-sm">
-          Follow the instructions to capture your selfie and ID document
-        </p>
-      </div>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        {/* Header */}
+        <div className="p-5 pb-3">
+          <button
+            onClick={() => setStep("id-details")}
+            className="text-sm text-muted-foreground hover:text-text-default mb-4"
+          >
+            ← Back to ID Details
+          </button>
+          <h1 className="text-2xl font-bold mb-2">Identity Verification</h1>
+          <p className="text-muted-foreground text-sm">
+            Follow the instructions to capture your selfie and ID document
+          </p>
+        </div>
 
-      {/* Selected ID Info */}
-      <div className="px-5 pb-2">
-        <div className="bg-surface-secondary rounded-lg p-3 flex items-center gap-3">
-          <div className="text-2xl">{country.flag}</div>
-          <div>
-            <p className="text-sm font-medium">
-              {ID_TYPE_LABELS[idType] || idType}
-            </p>
-            <p className="text-xs text-muted-foreground">ID: {idNumber}</p>
+        {/* Selected ID Info */}
+        <div className="px-5 pb-2">
+          <div className="bg-surface-secondary rounded-lg p-3 flex items-center gap-3">
+            <div className="text-2xl">{country.flag}</div>
+            <div>
+              <p className="text-sm font-medium">
+                {ID_TYPE_LABELS[idType] || idType}
+              </p>
+              <p className="text-xs text-muted-foreground">ID: {idNumber}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Instructions */}
-      <div className="px-5 pb-4">
-        <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4">
-          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-            📸 What you'll need:
-          </p>
-          <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
-            <li>• Your face clearly visible</li>
-            <li>• Your {ID_TYPE_LABELS[idType] || "ID"} document</li>
-            <li>• Good lighting</li>
-            <li>• A steady hand</li>
-          </ul>
+        {/* Instructions */}
+        <div className="px-5 pb-4">
+          <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4">
+            <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+              📸 What you'll need:
+            </p>
+            <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+              <li>• Your face clearly visible</li>
+              <li>• Your {ID_TYPE_LABELS[idType] || "ID"} document</li>
+              <li>• Good lighting</li>
+              <li>• A steady hand</li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      {/* Smile ID Component Container */}
-      <div className="flex-1 px-5">
-        <div
-          ref={containerRef}
-          id="smile-id-container"
-          className="w-full h-full"
-        >
-          <smart-camera-web capture-id theme-color="#000" />
+        {/* Selfie Tips */}
+        <div className="px-5 pb-4">
+          <h3 className="text-lg font-semibold mb-3">Next, we'll take a quick selfie</h3>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <span className="text-xl">☀️</span>
+              <div>
+                <p className="text-sm font-medium">Good Light</p>
+                <p className="text-xs text-muted-foreground">
+                  Make sure you are in a well-lit environment.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-xl">📷</span>
+              <div>
+                <p className="text-sm font-medium">Clear Image</p>
+                <p className="text-xs text-muted-foreground">
+                  Hold your phone steady so the selfie is clear and sharp.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Smile ID Component Container */}
+        <div className="px-5 pb-4">
+          <div
+            ref={containerRef}
+            id="smile-id-container"
+            className="w-full min-h-[400px]"
+          >
+            <smart-camera-web capture-id theme-color="#000" />
+          </div>
         </div>
       </div>
     </motion.div>
