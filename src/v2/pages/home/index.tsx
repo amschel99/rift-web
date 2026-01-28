@@ -101,6 +101,10 @@ export default function Home() {
   const handleCurrencyChange = (currency: Currency) => {
     setSelectedCurrency(currency);
     localStorage.setItem("selected_currency", currency.code);
+    logEvent("CURRENCY_CHANGED", {
+      currency: currency.code,
+      currency_name: currency.name,
+    });
   };
 
   // Fetch balance with selected currency
@@ -250,7 +254,12 @@ export default function Home() {
 
 
             <button
-              onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+              onClick={() => {
+                setIsBalanceVisible(!isBalanceVisible);
+                logEvent("BALANCE_VISIBILITY_TOGGLED", {
+                  visible: !isBalanceVisible,
+                });
+              }}
               className="p-2 hover:bg-surface-subtle rounded-full transition-colors"
               title={isBalanceVisible ? "Hide balance" : "Show balance"}
             >
@@ -263,6 +272,7 @@ export default function Home() {
             <div>
   <button
     onClick={() => {
+      logEvent("APP_REFRESHED");
       toast.info("reloading..");
       setTimeout(() => {
         forceClearCacheAndRefresh();

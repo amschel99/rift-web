@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import useKYCGuard from "@/hooks/use-kyc-guard";
 import KYCRequiredModal from "@/components/kyc/KYCRequiredModal";
+import useAnalaytics from "@/hooks/use-analytics";
 import {
   FiArrowLeft,
   FiChevronDown,
@@ -94,6 +95,7 @@ function getCountdownTo29th(): {
 
 export default function SailVault() {
   const navigate = useNavigate();
+  const { logEvent, updatePersonProperties } = useAnalaytics();
   const [showExplanation, setShowExplanation] = useState(false);
   const [actionMode, setActionMode] = useState<ActionMode>(null);
   const [actionStep, setActionStep] = useState<ActionStep>("input");
@@ -102,6 +104,15 @@ export default function SailVault() {
   const [exchangeRate, setExchangeRate] = useState<number>(1);
   const [loadingRate, setLoadingRate] = useState(true);
   const [countdown, setCountdown] = useState(getCountdownTo29th());
+
+  // Track page visit
+  useEffect(() => {
+    logEvent("PAGE_VISIT_VAULT", {
+      product_id: "sail-vault",
+      product_name: "Senior Vault",
+      apy: "~10%",
+    });
+  }, [logEvent]);
 
   // Detect user's country/currency
   const { data: countryInfo } = useCountryDetection();
@@ -217,6 +228,28 @@ export default function SailVault() {
     };
     if (mode && !checkKYC(featureNames[mode] || "this feature")) return;
 
+    // Track action initiation
+    if (mode === "deposit") {
+      logEvent("VAULT_DEPOSIT_INITIATED", {
+        product_id: "sail-vault",
+        product_name: "Senior Vault",
+        currency: userCurrency,
+      });
+    } else if (mode === "withdraw") {
+      logEvent("VAULT_WITHDRAW_INITIATED", {
+        product_id: "sail-vault",
+        product_name: "Senior Vault",
+        currency: userCurrency,
+        current_balance: vaultData?.balance || 0,
+      });
+    } else if (mode === "claim") {
+      logEvent("VAULT_REWARDS_CLAIMED", {
+        product_id: "sail-vault",
+        product_name: "Senior Vault",
+        rewards_amount: vaultData?.rewards || 0,
+      });
+    }
+
     setActionMode(mode);
     setActionStep(mode === "claim" ? "confirm" : "input");
     setLocalAmount("");
@@ -244,17 +277,70 @@ export default function SailVault() {
     try {
       if (actionMode === "deposit") {
         const usdAmount = getUsdAmount(localAmount);
+        const localNum = parseFloat(localAmount);
         await depositMutation.mutateAsync(usdAmount);
+        
+        // Track successful deposit
+        logEvent("VAULT_DEPOSIT_COMPLETED", {
+          product_id: "sail-vault",
+          product_name: "Senior Vault",
+          amount_usd: parseFloat(usdAmount),
+          amount_local: localNum,
+          currency: userCurrency,
+          exchange_rate: exchangeRate,
+        });
+        
+        // Update person property
+        updatePersonProperties({ has_used_vault: true });
       } else if (actionMode === "withdraw") {
         const usdAmount = getUsdAmount(localAmount);
+        const localNum = parseFloat(localAmount);
         await withdrawMutation.mutateAsync(usdAmount);
+        
+        // Track successful withdrawal
+        logEvent("VAULT_WITHDRAW_COMPLETED", {
+          product_id: "sail-vault",
+          product_name: "Senior Vault",
+          amount_usd: parseFloat(usdAmount),
+          amount_local: localNum,
+          currency: userCurrency,
+          exchange_rate: exchangeRate,
+        });
       } else if (actionMode === "claim") {
+        const rewardsAmount = vaultData?.rewards || 0;
         await claimMutation.mutateAsync();
+        
+        // Track successful claim (already logged in openActionDrawer, but log completion)
+        logEvent("VAULT_REWARDS_CLAIMED", {
+          product_id: "sail-vault",
+          product_name: "Senior Vault",
+          rewards_amount: rewardsAmount,
+          completed: true,
+        });
       }
 
       setActionStep("success");
       setTimeout(() => refetchVault(), 2000);
     } catch (error: any) {
+      // Track failures
+      if (actionMode === "deposit") {
+        logEvent("VAULT_DEPOSIT_FAILED", {
+          product_id: "sail-vault",
+          product_name: "Senior Vault",
+          error: error.message || "Unknown error",
+          amount_local: localAmount,
+          currency: userCurrency,
+        });
+      } else if (actionMode === "withdraw") {
+        logEvent("VAULT_WITHDRAW_FAILED", {
+          product_id: "sail-vault",
+          product_name: "Senior Vault",
+          error: error.message || "Unknown error",
+          amount_local: localAmount,
+          currency: userCurrency,
+        });
+      }
+      
       toast.error(error.message || "Something went wrong");
       setActionStep("failed");
     }
@@ -541,7 +627,15 @@ export default function SailVault() {
           {/* Collapsible Explanation */}
           <div className="bg-surface-alt rounded-xl border border-surface-subtle overflow-hidden">
             <button
-              onClick={() => setShowExplanation(!showExplanation)}
+              onClick={() => {
+                setShowExplanation(!showExplanation);
+                if (!showExplanation) {
+                  logEvent("VAULT_EXPLANATION_EXPANDED", {
+                    product_id: "sail-vault",
+                    product_name: "Senior Vault",
+                  });
+                }
+              }}
               className="w-full flex items-center justify-between p-4 hover:bg-surface-subtle transition-colors"
             >
               <span className="text-sm font-medium text-text-default">

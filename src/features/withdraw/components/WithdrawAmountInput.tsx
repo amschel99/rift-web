@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useWithdraw } from "../context";
 import useUser from "@/hooks/data/use-user";
 import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
+import useAnalaytics from "@/hooks/use-analytics";
 import ActionButton from "@/components/ui/action-button";
 import { useOfframpFeePreview, calculateOfframpFeeBreakdown } from "@/hooks/data/use-offramp-fee";
 import rift from "@/lib/rift";
@@ -24,6 +25,7 @@ export default function WithdrawAmountInput() {
   const navigate = useNavigate();
   const { updateWithdrawData, setCurrentStep } = useWithdraw();
   const { data: user } = useUser();
+  const { logEvent } = useAnalaytics();
   
   // Get payment account currency
   const paymentAccountCurrency: SupportedCurrency = (() => {
@@ -108,6 +110,18 @@ export default function WithdrawAmountInput() {
       );
       return;
     }
+
+    // Track withdrawal initiation
+    const usdAmount = feeBreakdown?.usdcAmount || (amount / (balanceData?.exchangeRate || 1));
+    logEvent("WITHDRAW_INITIATED", {
+      amount_local: amount,
+      amount_usd: usdAmount,
+      currency: currencyCode,
+      exchange_rate: balanceData?.exchangeRate || 1,
+      fee_local: feeBreakdown?.feeLocal || 0,
+      fee_percentage: feeBreakdown?.feePercentage || 0,
+      total_deducted_local: feeBreakdown?.totalLocalDeducted || amount,
+    });
 
     // Pass fee breakdown to context for confirmation screen
     updateWithdrawData({ 

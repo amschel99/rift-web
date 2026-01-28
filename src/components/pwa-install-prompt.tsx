@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import useAnalaytics from "@/hooks/use-analytics";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -17,6 +18,7 @@ declare global {
 }
 
 export const PWAInstallPrompt: React.FC = () => {
+  const { logEvent } = useAnalaytics();
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
@@ -28,6 +30,7 @@ export const PWAInstallPrompt: React.FC = () => {
       // Stash the event so it can be triggered later
       setDeferredPrompt(e);
       setShowInstallPrompt(true);
+      logEvent("PWA_INSTALL_PROMPTED");
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
@@ -52,9 +55,9 @@ export const PWAInstallPrompt: React.FC = () => {
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === "accepted") {
-      
+      logEvent("PWA_INSTALL_ACCEPTED");
     } else {
-      
+      logEvent("PWA_INSTALL_DISMISSED");
     }
 
     setDeferredPrompt(null);
@@ -62,6 +65,7 @@ export const PWAInstallPrompt: React.FC = () => {
   };
 
   const handleDismiss = () => {
+    logEvent("PWA_INSTALL_DISMISSED");
     setShowInstallPrompt(false);
   };
 

@@ -1,6 +1,8 @@
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { FiChevronRight } from "react-icons/fi";
+import { useEffect } from "react";
+import useAnalaytics from "@/hooks/use-analytics";
 
 interface Asset {
   id: string;
@@ -39,6 +41,32 @@ const ASSETS: Asset[] = [
 
 export default function Invest() {
   const navigate = useNavigate();
+  const { logEvent } = useAnalaytics();
+
+  useEffect(() => {
+    logEvent("PAGE_VISIT_INVEST");
+  }, [logEvent]);
+
+  const handleAssetClick = (asset: Asset) => {
+    if (asset.comingSoon) {
+      logEvent("VAULT_CARD_CLICKED", {
+        product_id: asset.id,
+        product_name: asset.name,
+        apy: asset.apy,
+        coming_soon: true,
+      });
+      return;
+    }
+    
+    logEvent("VAULT_CARD_CLICKED", {
+      product_id: asset.id,
+      product_name: asset.name,
+      apy: asset.apy,
+      coming_soon: false,
+    });
+    
+    navigate(`/app/invest/${asset.id}`);
+  };
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-app-background">
@@ -60,7 +88,7 @@ export default function Invest() {
             key={asset.id}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            onClick={asset.comingSoon ? undefined : () => navigate(`/app/invest/${asset.id}`)}
+            onClick={() => handleAssetClick(asset)}
             className={`flex items-center gap-4 p-4 bg-surface-alt rounded-xl border border-surface-subtle transition-all ${
               asset.comingSoon 
                 ? "opacity-75 cursor-not-allowed" 
@@ -68,13 +96,13 @@ export default function Invest() {
             }`}
           >
             {asset.imageUrl ? (
-              <div className="w-12 h-12 rounded-xl bg-black flex items-center justify-center">
-                <img
-                  src={asset.imageUrl}
-                  alt={asset.name}
-                  className="w-8 h-8 object-contain"
-                />
-              </div>
+            <div className="w-12 h-12 rounded-xl bg-black flex items-center justify-center">
+              <img
+                src={asset.imageUrl}
+                alt={asset.name}
+                className="w-8 h-8 object-contain"
+              />
+            </div>
             ) : (
               <div className="w-12 h-12 rounded-xl bg-surface-subtle flex items-center justify-center">
                 <span className="text-lg font-semibold text-text-subtle">
@@ -104,7 +132,7 @@ export default function Invest() {
               <p className="text-sm text-text-subtle">{asset.tagline}</p>
             </div>
             {!asset.comingSoon && (
-              <FiChevronRight className="w-5 h-5 text-text-subtle" />
+            <FiChevronRight className="w-5 h-5 text-text-subtle" />
             )}
           </motion.div>
         ))}

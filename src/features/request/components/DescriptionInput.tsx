@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useRequest } from "../context";
 import useCreateInvoice from "@/hooks/data/use-create-invoice";
 import useKYCStatus from "@/hooks/data/use-kyc-status";
+import useAnalaytics from "@/hooks/use-analytics";
 import ActionButton from "@/components/ui/action-button";
 import { useNavigate } from "react-router";
 import rift from "@/lib/rift";
@@ -28,6 +29,7 @@ export default function DescriptionInput() {
     requestType,
   } = useRequest();
   const navigate = useNavigate();
+  const { logEvent, updatePersonProperties } = useAnalaytics();
   const [description, setDescription] = useState("");
   const [sellingRate, setSellingRate] = useState<number | null>(null);
   const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
@@ -139,6 +141,21 @@ export default function DescriptionInput() {
       };
 
       setCreatedInvoice(invoiceWithLocalAmount);
+      
+      // Track payment request creation
+      logEvent("PAYMENT_REQUEST_CREATED", {
+        amount_usd: usdAmount,
+        amount_local: localAmount,
+        currency: requestCurrency,
+        exchange_rate: sellingRate,
+        chain: requestData.chain,
+        token: requestData.token,
+        description: description.trim(),
+      });
+      
+      // Update person property
+      updatePersonProperties({ has_created_payment_request: true });
+      
       setCurrentStep("sharing");
       toast.success("Payment request created successfully!");
     } catch (error: any) {
@@ -152,7 +169,7 @@ export default function DescriptionInput() {
           },
         });
       } else {
-        toast.error("Failed to create payment request. Please try again.");
+      toast.error("Failed to create payment request. Please try again.");
       }
     }
   };

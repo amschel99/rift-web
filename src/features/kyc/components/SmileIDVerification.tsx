@@ -1003,47 +1003,47 @@ export default function SmileIDVerification({
     >
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto min-h-0">
-        {/* Header */}
-        <div className="p-5 pb-3">
-          <button
-            onClick={() => setStep("id-details")}
-            className="text-sm text-muted-foreground hover:text-text-default mb-4"
-          >
-            ← Back to ID Details
-          </button>
-          <h1 className="text-2xl font-bold mb-2">Identity Verification</h1>
-          <p className="text-muted-foreground text-sm">
-            Follow the instructions to capture your selfie and ID document
-          </p>
-        </div>
+      {/* Header */}
+      <div className="p-5 pb-3">
+        <button
+          onClick={() => setStep("id-details")}
+          className="text-sm text-muted-foreground hover:text-text-default mb-4"
+        >
+          ← Back to ID Details
+        </button>
+        <h1 className="text-2xl font-bold mb-2">Identity Verification</h1>
+        <p className="text-muted-foreground text-sm">
+          Follow the instructions to capture your selfie and ID document
+        </p>
+      </div>
 
-        {/* Selected ID Info */}
-        <div className="px-5 pb-2">
-          <div className="bg-surface-secondary rounded-lg p-3 flex items-center gap-3">
-            <div className="text-2xl">{country.flag}</div>
-            <div>
-              <p className="text-sm font-medium">
-                {ID_TYPE_LABELS[idType] || idType}
-              </p>
-              <p className="text-xs text-muted-foreground">ID: {idNumber}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="px-5 pb-4">
-          <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4">
-            <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-              📸 What you'll need:
+      {/* Selected ID Info */}
+      <div className="px-5 pb-2">
+        <div className="bg-surface-secondary rounded-lg p-3 flex items-center gap-3">
+          <div className="text-2xl">{country.flag}</div>
+          <div>
+            <p className="text-sm font-medium">
+              {ID_TYPE_LABELS[idType] || idType}
             </p>
-            <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
-              <li>• Your face clearly visible</li>
-              <li>• Your {ID_TYPE_LABELS[idType] || "ID"} document</li>
-              <li>• Good lighting</li>
-              <li>• A steady hand</li>
-            </ul>
+            <p className="text-xs text-muted-foreground">ID: {idNumber}</p>
           </div>
         </div>
+      </div>
+
+      {/* Instructions */}
+      <div className="px-5 pb-4">
+        <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4">
+          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+            📸 What you'll need:
+          </p>
+          <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+            <li>• Your face clearly visible</li>
+            <li>• Your {ID_TYPE_LABELS[idType] || "ID"} document</li>
+            <li>• Good lighting</li>
+            <li>• A steady hand</li>
+          </ul>
+        </div>
+      </div>
 
         {/* Selfie Tips */}
         <div className="px-5 pb-4">
@@ -1070,14 +1070,14 @@ export default function SmileIDVerification({
           </div>
         </div>
 
-        {/* Smile ID Component Container */}
+      {/* Smile ID Component Container */}
         <div className="px-5 pb-4">
-          <div
-            ref={containerRef}
-            id="smile-id-container"
+        <div
+          ref={containerRef}
+          id="smile-id-container"
             className="w-full min-h-[400px]"
-          >
-            <smart-camera-web capture-id theme-color="#000" />
+        >
+          <smart-camera-web capture-id theme-color="#000" />
           </div>
         </div>
       </div>

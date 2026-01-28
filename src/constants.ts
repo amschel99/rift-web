@@ -1,5 +1,5 @@
-export const POSTHOG_KEY = "phc_5su0p9tKjaWpxMh1IsqCiKd2jcg8W084l4N4eCTRTwo";
-export const POSTHOG_HOST = "https://us.i.posthog.com";
+export const POSTHOG_KEY = import.meta.env.VITE_PUBLIC_POSTHOG_KEY || "phc_5su0p9tKjaWpxMh1IsqCiKd2jcg8W084l4N4eCTRTwo";
+export const POSTHOG_HOST = import.meta.env.VITE_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
 // Feature flags for login/signup methods
 // Set to false to disable the method

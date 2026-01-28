@@ -7,6 +7,7 @@ import {
 import { useBuyCrypto, buyTokens } from "../context";
 import useOnRamp from "@/hooks/wallet/use-on-ramp";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
+import useAnalaytics from "@/hooks/use-analytics";
 import ActionButton from "@/components/ui/action-button";
 
 export default function StepsPicker() {
@@ -14,6 +15,7 @@ export default function StepsPicker() {
   const { state, switchCurrentStep } = useBuyCrypto();
   const { userQuery } = useWalletAuth();
   const { data: USER_INFO } = userQuery;
+  const { logEvent, updatePersonProperties } = useAnalaytics();
 
   const formaValues = state?.getValues();
   const cryptoAmount = Number(formaValues?.cryptoAmount);
@@ -24,10 +26,29 @@ export default function StepsPicker() {
 
   const { onRampMutation } = useOnRamp({
     onSuccess: (ONRAMP_RES: MpesaSTKInitiateResponse) => {
+      // Track onramp initiation
+      logEvent("ONRAMP_INITIATED", {
+        checkout_request_id: ONRAMP_RES?.data?.checkoutRequestID,
+        amount: kesAmount,
+        currency: "KES",
+        crypto_asset: purchaseToken,
+        payment_method: "mpesa_stk",
+        phone: mpesaNumber,
+      });
+      
       switchCurrentStep("CONFIRM");
       state?.setValue("checkoutRequestId", ONRAMP_RES?.data?.checkoutRequestID);
     },
-    onError: () => {
+    onError: (error: any) => {
+      // Track onramp initiation failure
+      logEvent("ONRAMP_FAILED", {
+        amount: kesAmount,
+        currency: "KES",
+        crypto_asset: purchaseToken,
+        payment_method: "mpesa_stk",
+        error: error?.message || "Unknown error",
+      });
+      
       toast.error("Sorry, we coulndn't process the transaction");
     },
   });

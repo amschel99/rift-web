@@ -1,17 +1,32 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { motion } from "motion/react";
 import { useBuyCrypto } from "../context";
 import { useBackButton } from "@/hooks/use-backbutton";
 import useOnRamp from "@/hooks/wallet/use-on-ramp";
 import useToken from "@/hooks/data/use-token";
 import useGeckoPrice from "@/hooks/data/use-gecko-price";
+import useAnalaytics from "@/hooks/use-analytics";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 
 export default function CryptoAmount() {
   const { state, switchCurrentStep } = useBuyCrypto();
+  const { logEvent } = useAnalaytics();
 
   const selectedTokenId = state?.watch("purchaseTokenId");
   const cryptoAmount = Number(state?.watch("cryptoAmount"));
+  
+  // Track when user views quote
+  useEffect(() => {
+    if (cryptoAmount > 0) {
+      const kesAmount = Number(state?.watch("kesAmount"));
+      logEvent("ONRAMP_QUOTE_VIEWED", {
+        crypto_asset: state?.watch("purchaseToken"),
+        crypto_amount: cryptoAmount,
+        local_amount: kesAmount,
+        currency: "KES",
+      });
+    }
+  }, [cryptoAmount, state, logEvent]);
 
   const { USD_EXCHANGE_RATE } = useOnRamp();
   const { geckoQuery } = useGeckoPrice({ base: "usd", token: selectedTokenId });

@@ -9,7 +9,7 @@ export default function Confirmation() {
   const [shouldPoll, setShouldPoll] = useState<boolean>(true);
   const currentStep = state?.watch("currentStep");
   const transactionId = state?.watch("checkoutRequestId");
-  const { logEvent } = useAnalaytics();
+  const { logEvent, updatePersonProperties } = useAnalaytics();
 
   const { onRampStatusQuery } = useOnRamp({
     checkoutRequestId: transactionId,
@@ -28,7 +28,25 @@ export default function Confirmation() {
       setShouldPoll(false);
 
       // Track successful crypto purchase (deposit)
-      logEvent("DEPOSIT");
+      const transactionData = onRampStatusQuery?.data?.data;
+      logEvent("ONRAMP_COMPLETED", {
+        checkout_request_id: transactionId,
+        amount: transactionData?.amount || null,
+        currency: transactionData?.currency || null,
+        payment_method: transactionData?.paymentMethod || null,
+        status: "success",
+      });
+      
+      // Also track as deposit
+      logEvent("DEPOSIT", {
+        source: "onramp",
+        checkout_request_id: transactionId,
+        amount: transactionData?.amount || null,
+        currency: transactionData?.currency || null,
+      });
+      
+      // Update person property
+      updatePersonProperties({ has_deposited: true });
 
       toast.success("The transaction was completed successfully");
       switchCurrentStep("CRYPTO-AMOUNT");
@@ -36,6 +54,18 @@ export default function Confirmation() {
 
     if (status === "failed") {
       setShouldPoll(false);
+      
+      // Track failed onramp
+      const transactionData = onRampStatusQuery?.data?.data;
+      logEvent("ONRAMP_FAILED", {
+        checkout_request_id: transactionId,
+        amount: transactionData?.amount || null,
+        currency: transactionData?.currency || null,
+        payment_method: transactionData?.paymentMethod || null,
+        status: "failed",
+        error: transactionData?.error || "Unknown error",
+      });
+      
       toast.error("Sorry, we couldn't process the transaction");
       switchCurrentStep("CRYPTO-AMOUNT");
     }

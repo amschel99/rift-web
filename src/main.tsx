@@ -62,6 +62,18 @@ if (import.meta.env.MODE === "development") {
 posthog.init(POSTHOG_KEY, {
   api_host: POSTHOG_HOST,
   person_profiles: "identified_only",
+  capture_pageview: true,
+  capture_pageleave: true,
+  session_recording: {
+    maskAllInputs: true,
+    maskTextSelector: '[data-mask-text]',
+    recordCrossOriginIframes: false,
+  },
+  loaded: (posthog) => {
+    if (import.meta.env.MODE === "development") {
+      posthog.debug();
+    }
+  },
 });
 
 const queryclient = new QueryClient();

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Settings, Zap } from "lucide-react";
 import { motion } from "motion/react";
+import useAnalaytics from "@/hooks/use-analytics";
 
 interface AdvancedModeToggleProps {
   isAdvanced: boolean;
@@ -13,10 +14,18 @@ export default function AdvancedModeToggle({
   onToggle,
   className = "",
 }: AdvancedModeToggleProps) {
+  const { logEvent } = useAnalaytics();
+  
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <button
-        onClick={() => onToggle(!isAdvanced)}
+        onClick={() => {
+          const newValue = !isAdvanced;
+          onToggle(newValue);
+          logEvent("ADVANCED_MODE_TOGGLED", {
+            advanced: newValue,
+          });
+        }}
         className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
           isAdvanced
             ? "bg-accent-primary text-white shadow-md"

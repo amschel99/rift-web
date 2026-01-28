@@ -45,9 +45,11 @@ import { formatNumberWithCommas } from "@/lib/utils";
 import { generateReferralCode, getReferralLink } from "@/utils/referral";
 import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
 import { forceClearCacheAndRefresh, APP_VERSION } from "@/utils/auto-update";
+import useAnalaytics from "@/hooks/use-analytics";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { logEvent } = useAnalaytics();
   const { onOpen, onClose, isOpen } = useDisclosure();
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] =
@@ -101,6 +103,9 @@ export default function Profile() {
   const handleCopyReferralLink = async () => {
     try {
       await navigator.clipboard.writeText(referralLink);
+      logEvent("REFERRAL_LINK_COPIED", {
+        referral_code: referralCode,
+      });
       toast.success("Referral link copied!");
     } catch (error) {
       toast.error("Failed to copy link");
@@ -108,6 +113,10 @@ export default function Profile() {
   };
 
   const handleShareWhatsApp = () => {
+    logEvent("REFERRAL_LINK_SHARED", {
+      referral_code: referralCode,
+      share_method: "whatsapp",
+    });
     const text = encodeURIComponent(
       `Join me on Rift - your global USD account for payments, transfers & wealth building!\n\n${referralLink}`
     );
@@ -115,6 +124,10 @@ export default function Profile() {
   };
 
   const handleShareTelegram = () => {
+    logEvent("REFERRAL_LINK_SHARED", {
+      referral_code: referralCode,
+      share_method: "telegram",
+    });
     const text = encodeURIComponent(
       `Join me on Rift - your global USD account for payments, transfers & wealth building!`
     );
@@ -133,6 +146,10 @@ export default function Profile() {
           title: "Join Rift",
           text: "Join me on Rift - your global USD account for payments, transfers & wealth building!",
           url: referralLink,
+        });
+        logEvent("REFERRAL_LINK_SHARED", {
+          referral_code: referralCode,
+          share_method: "native",
         });
       } catch (error) {
         // User cancelled or error

@@ -7,6 +7,7 @@ import { useWithdraw } from "../context";
 import useUser from "@/hooks/data/use-user";
 import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 import useCreateWithdrawalOrder from "@/hooks/data/use-create-withdrawal-order";
+import useAnalaytics from "@/hooks/use-analytics";
 import ActionButton from "@/components/ui/action-button";
 import { checkAndSetTransactionLock } from "@/utils/transaction-lock";
 import { useOfframpFeePreview, calculateOfframpFeeBreakdown } from "@/hooks/data/use-offramp-fee";
@@ -25,6 +26,7 @@ export default function WithdrawConfirmation() {
   const navigate = useNavigate();
   const { withdrawData, setCurrentStep, setCreatedOrder } = useWithdraw();
   const { data: user } = useUser();
+  const { logEvent, updatePersonProperties } = useAnalaytics();
   
   // Get withdrawal currency from withdraw data
   const withdrawCurrency = (withdrawData.currency || "KES") as SupportedCurrency;
@@ -130,10 +132,33 @@ export default function WithdrawConfirmation() {
 
       const response = await createOrderMutation.mutateAsync(withdrawalRequest);
 
+      // Track successful withdrawal
+      logEvent("WITHDRAW_COMPLETED", {
+        amount_usd: usdAmountToSend,
+        amount_local: localAmount,
+        currency: withdrawCurrency,
+        exchange_rate: balanceData.exchangeRate,
+        fee_local: feeData?.feeLocal || 0,
+        fee_percentage: feeData?.feePercentage || 0,
+        total_deducted_local: feeData?.totalLocalDeducted || localAmount,
+        payment_account_type: paymentAccount ? "configured" : "none",
+      });
+
+      // Update person property
+      updatePersonProperties({ has_withdrawn: true });
+
       setCreatedOrder(response.order);
       setCurrentStep("success");
       toast.success("Withdrawal order created successfully!");
-    } catch (error) {
+    } catch (error: any) {
+      // Track withdrawal failure
+      logEvent("WITHDRAW_FAILED", {
+        amount_usd: usdAmountToSend,
+        amount_local: localAmount,
+        currency: withdrawCurrency,
+        error: error.message || "Unknown error",
+      });
+      
       toast.error("Failed to create withdrawal order. Please try again.");
     }
   };

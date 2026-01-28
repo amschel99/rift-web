@@ -3,7 +3,7 @@ import rift from "@/lib/rift";
 import { sleep } from "@/lib/utils";
 import { LoginResponse, SignupResponse } from "@rift-finance/wallet";
 import { useMutation, useQuery } from "@tanstack/react-query";
-// import { authenticateUser, analyticsLog } from "@/analytics/events";
+import posthog from "posthog-js";
 
 
 const TEST = import.meta.env.VITE_TEST == "true";
@@ -92,15 +92,40 @@ async function signIn(args: signInArgs) {
 
   // Identify user for analytics after successful login
   try {
-    await rift.auth.getUser();
-    // User data is available for future analytics implementation by consuming components
+    const userResponse = await rift.auth.getUser();
+    const user = userResponse?.user;
     
-    // Note: Analytics tracking should be handled by components that use this hook
-    // authenticateUser(user?.telegramId || args.externalId, user?.externalId);
-    // analyticsLog("SIGN_IN", { telegram_id: user?.telegramId || args.externalId ?? "UNKNOWN USER" });
+    // Track sign in
+    const authMethod = args.externalId && args.password 
+      ? "username_password" 
+      : args.phoneNumber 
+      ? "phone_otp" 
+      : args.email 
+      ? "email_otp" 
+      : "unknown";
+    
+    posthog.identify(user?.externalId || user?.email || user?.phoneNumber || args.externalId || "unknown", {
+      email: user?.email,
+      phone: user?.phoneNumber,
+      external_id: user?.externalId,
+      telegram_id: user?.telegramId,
+      address: response.address,
+    });
+    
+    posthog.capture("SIGN_IN", {
+      auth_method: authMethod,
+      has_email: !!user?.email,
+      has_phone: !!user?.phoneNumber,
+      has_external_id: !!user?.externalId,
+      telegram_id: user?.telegramId || null,
+    });
   } catch {
-    // If we can't get user data, still try to identify with what we have
-    // authenticateUser(args.externalId);
+    // If we can't get user data, still identify with what we have
+    const identifier = args.externalId || args.phoneNumber || args.email || "unknown";
+    posthog.identify(identifier);
+    posthog.capture("SIGN_IN", {
+      auth_method: args.externalId ? "username_password" : args.phoneNumber ? "phone_otp" : "email_otp",
+    });
   }
 
   return response;
@@ -144,12 +169,31 @@ async function signUpUser(args: signUpArgs) {
 
   const response = await rift.auth.signup(payload);
 
+  // Track sign up
+  const signupMethod = args.externalId && args.password 
+    ? "username_password" 
+    : args.phoneNumber 
+    ? "phone_otp" 
+    : args.email 
+    ? "email_otp" 
+    : "unknown";
   
-
-  const telegramId = response?.userId;
-  if (telegramId) {
-    // analyticsLog("SIGN_UP", { telegram_id: telegramId });
-  }
+  const identifier = response?.userId || args.externalId || args.phoneNumber || args.email || "unknown";
+  
+  posthog.identify(identifier, {
+    email: args.email || null,
+    phone: args.phoneNumber || null,
+    external_id: args.externalId || null,
+    telegram_id: response?.userId || null,
+  });
+  
+  posthog.capture("SIGN_UP", {
+    auth_method: signupMethod,
+    has_email: !!args.email,
+    has_phone: !!args.phoneNumber,
+    has_external_id: !!args.externalId,
+    telegram_id: response?.userId || null,
+  });
 
   return response;
 }
@@ -186,11 +230,19 @@ export default function useWalletAuth() {
   // This handles cases where user is already logged in and app restarts
   useEffect(() => {
     if (userQuery.data) {
-      // User data is available for analytics implementation by consuming components
-      // const userData = userQuery.data;
-      // const telegramId = userData.telegramId || userData.externalId;
-      // const userDisplayName = userData.externalId;
-      // authenticateUser(telegramId, userDisplayName);
+      const userData = userQuery.data;
+      const identifier = userData.externalId || userData.email || userData.phoneNumber || "unknown";
+      
+      posthog.identify(identifier, {
+        email: userData.email,
+        phone: userData.phoneNumber,
+        external_id: userData.externalId,
+        telegram_id: userData.telegramId,
+        address: userData.address,
+        display_name: userData.displayName || userData.display_name,
+        has_payment_account: !!(userData.paymentAccount || userData.payment_account),
+        created_at: userData.createdAt,
+      });
     }
   }, [userQuery.data]);
 
