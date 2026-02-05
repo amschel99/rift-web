@@ -298,16 +298,16 @@ export default function Confirmation(
             >
               <div className="w-full max-w-md mx-auto rounded-2xl border border-border bg-white shadow-sm p-6 md:p-7 text-center space-y-4">
                 <div className="flex items-center justify-center p-5 rounded-full bg-accent-primary/10">
-                  <CgSpinner className="text-accent-primary w-10 h-10 animate-spin" />
-                </div>
+                <CgSpinner className="text-accent-primary w-10 h-10 animate-spin" />
+              </div>
 
                 <div className="space-y-1">
                   <p className="text-lg font-semibold text-foreground">Sending</p>
                   <p className="font-medium text-sm text-muted-foreground">
-                    {formatFloatNumber(parseFloat(AMOUNT!))} {TOKEN_INFO?.name}
-                    <span className="text-muted-foreground mx-2">to</span>
-                    {shortenString(RECEIVER_ADDRESS ?? "")}
-                  </p>
+                {formatFloatNumber(parseFloat(AMOUNT!))} {TOKEN_INFO?.name}
+                <span className="text-muted-foreground mx-2">to</span>
+                {shortenString(RECEIVER_ADDRESS ?? "")}
+              </p>
                   <p className="text-sm font-medium text-foreground mt-1">Please wait...</p>
                 </div>
               </div>

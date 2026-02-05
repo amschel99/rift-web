@@ -15,13 +15,18 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       ref={ref}
       onClick={onClick}
       className={cn(
-        className,
-        "w-1/4 flex flex-col items-center justify-center bg-secondary p-4 rounded-2xl cursor-pointer hover:bg-surface-subtle transition-colors"
+        // Mobile: minimal icon + label, no border/container
+        "flex flex-col items-center justify-center px-1.5 py-1.5 text-[11px] sm:text-xs text-text-default",
+        // Desktop / larger: card-style button
+        "md:bg-white md:border md:border-gray-200 md:px-3 md:py-3 md:rounded-2xl md:shadow-sm md:hover:border-accent-primary md:hover:bg-accent-primary/5 md:transition-all",
+        className
       )}
       {...rest}
     >
-      <span className="text-text-subtle">{icon}</span>
-      <p className="text-sm font-medium text-text-subtle">{title}</p>
+      <span className="mb-0.5 flex items-center justify-center text-accent-primary">
+        {icon}
+      </span>
+      <p className="font-medium text-text-default">{title}</p>
     </button>
   )
 );
