@@ -2,6 +2,7 @@
   "github": {
     "enabled": true
   },
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "rewrites": [
     {
       "source": "/((?!assets|.*\\..*|_next).*)",
