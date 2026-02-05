@@ -200,9 +200,9 @@ export default function DescriptionInput() {
 
         {/* Description Input */}
         <div className="flex-1 flex flex-col">
-        <div className={`text-center ${isDesktop ? "mb-10" : "mb-8"}`}>
-          <h2 className={`${isDesktop ? "text-3xl" : "text-2xl"} font-semibold mb-3 text-text-default`}>Add Description</h2>
-          <p className={`${isDesktop ? "text-base" : "text-sm"} text-gray-600`}>
+        <div className={`text-center ${isDesktop ? "mb-10" : "mb-6"}`}>
+          <h2 className={`${isDesktop ? "text-3xl" : "text-xl"} font-semibold mb-2 text-text-default`}>Add Description</h2>
+          <p className={`${isDesktop ? "text-base" : "text-xs"} text-gray-600`}>
             {requestType === "topup"
               ? "What is this top-up for?"
               : "What is this payment for?"}
@@ -210,17 +210,17 @@ export default function DescriptionInput() {
         </div>
 
         {/* Amount Summary - Stripe-like */}
-        <div className={`bg-white rounded-xl border border-gray-200 ${isDesktop ? "p-8 mb-8" : "p-6 mb-6"} shadow-sm`}>
+        <div className={`bg-white rounded-xl border border-gray-200 ${isDesktop ? "p-8 mb-8" : "p-4 mb-5"} shadow-sm`}>
           <div className="text-center">
-            <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mb-2`}>
+            <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mb-1`}>
               {requestType === "topup" ? "Adding to account" : "Requesting"}
             </p>
-            <p className={`${isDesktop ? "text-4xl" : "text-3xl"} font-bold text-text-default tracking-tight`}>
+            <p className={`${isDesktop ? "text-4xl" : "text-2xl"} font-bold text-text-default tracking-tight`}>
               {currencySymbol} {(requestData.amount || 0).toLocaleString()} ({requestCurrency})
             </p>
             {sellingRate && withdrawalRate && (
-              <div className={`${isDesktop ? "mt-6 pt-6" : "mt-4 pt-4"} border-t border-gray-100`}>
-                <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mb-1`}>
+              <div className={`${isDesktop ? "mt-6 pt-6" : "mt-3 pt-3"} border-t border-gray-100`}>
+                <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mb-1`}>
                   You will receive
                 </p>
                 <p className={`${isDesktop ? "text-2xl" : "text-xl"} font-semibold text-green-600`}>
@@ -237,25 +237,25 @@ export default function DescriptionInput() {
         </div>
 
         {/* Description Input - Stripe-like */}
-        <div className={`${isDesktop ? "mb-8" : "mb-6"}`}>
-          <label className={`block ${isDesktop ? "text-sm" : "text-xs"} font-medium mb-2 text-gray-700`}>Description</label>
+        <div className={`${isDesktop ? "mb-8" : "mb-5"}`}>
+          <label className={`block ${isDesktop ? "text-sm" : "text-xs"} font-medium mb-1 text-gray-700`}>Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g., Payment for services, Product purchase, etc."
-            className={`w-full ${isDesktop ? "p-4 text-base" : "p-3 text-sm"} bg-white rounded-lg border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-all`}
-            rows={isDesktop ? 5 : 4}
+            className={`w-full ${isDesktop ? "p-4 text-base" : "p-2.5 text-sm"} bg-white rounded-lg border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-all`}
+            rows={isDesktop ? 5 : 3}
             maxLength={200}
             autoFocus
           />
-          <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mt-2`}>
+          <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mt-1`}>
             {description.length}/200 characters
           </p>
         </div>
 
         {/* Quick Description Options - Stripe-like */}
-        <div className={`${isDesktop ? "mb-8" : "mb-6"}`}>
-          <p className={`${isDesktop ? "text-sm" : "text-xs"} font-medium mb-3 text-gray-700`}>Quick options</p>
+        <div className={`${isDesktop ? "mb-8" : "mb-4"}`}>
+          <p className={`${isDesktop ? "text-sm" : "text-xs"} font-medium mb-2 text-gray-700`}>Quick options</p>
           <div className="flex flex-wrap gap-2">
             {[
               "Payment for services",

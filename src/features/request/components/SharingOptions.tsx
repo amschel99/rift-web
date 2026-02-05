@@ -459,7 +459,7 @@ export default function SharingOptions() {
     >
       <div className={`w-full h-full flex flex-col ${isDesktop ? "max-w-2xl mx-auto" : ""}`}>
         {/* Header - Stripe-like minimal */}
-        <div className={`flex items-center ${isDesktop ? "px-8 pt-10 pb-8" : "px-6 py-6"}`}>
+        <div className={`flex items-center ${isDesktop ? "px-8 pt-10 pb-8" : "px-4 py-4"}`}>
           <button
             type="button"
             onClick={handleBack}
@@ -475,11 +475,11 @@ export default function SharingOptions() {
         </div>
 
         {/* Scrollable Content */}
-        <div className={`flex-1 overflow-y-auto ${isDesktop ? "px-8 pb-8" : "px-6 pb-24"}`}>
+        <div className={`flex-1 overflow-y-auto ${isDesktop ? "px-8 pb-8" : "px-4 pb-20"}`}>
           {/* Success Message - Stripe-like */}
-          <div className="text-center mb-10">
-            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
-              <FiCheck className="w-8 h-8 text-green-600" />
+          <div className="text-center mb-6 md:mb-10">
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-5">
+              <FiCheck className="w-7 h-7 md:w-8 md:h-8 text-green-600" />
             </div>
             <h2 className={`${isDesktop ? "text-3xl" : "text-2xl"} font-semibold text-text-default mb-2`}>
               {requestType === "topup" ? "Top-Up Link Ready!" : "Request Created!"}
@@ -492,12 +492,12 @@ export default function SharingOptions() {
           </div>
 
           {/* Payment Details Card - Stripe-like */}
-          <div className={`bg-white rounded-xl border border-gray-200 shadow-sm ${isDesktop ? "p-8" : "p-6"} mb-8`}>
-            <div className="text-center mb-6">
-              <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mb-2`}>
+          <div className={`bg-white rounded-xl border border-gray-200 shadow-sm ${isDesktop ? "p-8" : "p-4"} mb-6 md:mb-8`}>
+            <div className="text-center mb-4 md:mb-6">
+              <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mb-1`}>
                 {requestType === "topup" ? "Adding to account" : "Requesting"}
               </p>
-              <p className={`${isDesktop ? "text-4xl" : "text-3xl"} font-bold text-text-default tracking-tight`}>
+              <p className={`${isDesktop ? "text-4xl" : "text-2xl"} font-bold text-text-default tracking-tight`}>
                 {currencySymbol}{" "}
                 {(
                   createdInvoice.localAmount || createdInvoice.amount
@@ -507,20 +507,20 @@ export default function SharingOptions() {
             
             {/* Fee Breakdown for Top-ups */}
             {requestType === "topup" && requestData.feeBreakdown && (
-              <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
-                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-xs"}`}>
+              <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-2xs"}`}>
                   <span className="text-gray-600">Amount</span>
                   <span className="font-medium text-text-default">{currencySymbol} {requestData.feeBreakdown.localAmount.toLocaleString()}</span>
                 </div>
-                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-xs"}`}>
+                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-2xs"}`}>
                   <span className="text-gray-600">Fee ({requestData.feeBreakdown.feePercentage}%)</span>
                   <span className="font-medium text-text-default">+{currencySymbol} {requestData.feeBreakdown.feeLocal.toLocaleString()}</span>
                 </div>
-                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-xs"} font-semibold pt-3 border-t border-gray-100`}>
+                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-2xs"} font-semibold pt-2 border-t border-gray-100`}>
                   <span className="text-text-default">You pay</span>
                   <span className="text-text-default">{currencySymbol} {requestData.feeBreakdown.totalLocalToPay.toLocaleString()}</span>
                 </div>
-                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-xs"} pt-2`}>
+                <div className={`flex justify-between ${isDesktop ? "text-sm" : "text-2xs"} pt-1`}>
                   <span className="text-gray-600">You receive</span>
                   <span className="font-bold text-green-600">{currencySymbol} {(requestData.feeBreakdown.usdcToReceive * requestData.feeBreakdown.exchangeRate).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({requestCurrency})</span>
                 </div>
@@ -529,9 +529,9 @@ export default function SharingOptions() {
             
             {/* Legacy display for when no fee breakdown */}
             {createdInvoice.receiveAmount && !requestData.feeBreakdown && (
-              <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-                <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mb-1`}>You will receive</p>
-                <p className={`${isDesktop ? "text-2xl" : "text-xl"} font-semibold text-green-600`}>
+              <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+                <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mb-1`}>You will receive</p>
+                <p className={`${isDesktop ? "text-2xl" : "text-lg"} font-semibold text-green-600`}>
                   {currencySymbol} {createdInvoice.receiveAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({requestCurrency})
                 </p>
                 <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mt-1`}>in your wallet</p>
@@ -539,7 +539,7 @@ export default function SharingOptions() {
             )}
             
             {createdInvoice.description && (
-              <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 text-center mt-6 pt-6 border-t border-gray-100`}>
+            <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 text-center mt-4 pt-4 border-t border-gray-100`}>
                 {createdInvoice.description}
               </p>
             )}

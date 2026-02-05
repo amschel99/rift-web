@@ -100,7 +100,7 @@ export default function AmountInput() {
     >
       <div className={`w-full h-full flex flex-col ${isDesktop ? "max-w-2xl mx-auto" : ""}`}>
         {/* Header */}
-        <div className="flex items-center p-6 border-b border-gray-200">
+        <div className="flex items-center px-4 py-3 md:px-6 md:py-4 border-b border-gray-200">
           <button
             onClick={() => navigate("/app")}
             className="mr-4 p-2 rounded-2xl hover:bg-accent-primary/10 transition-colors"
@@ -113,10 +113,10 @@ export default function AmountInput() {
         </div>
 
         {/* Amount Input */}
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 md:p-6">
           <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-semibold text-text-default mb-2">Enter Amount</h2>
+          <div className="text-center mb-6 md:mb-8">
+            <h2 className="text-xl md:text-2xl font-semibold text-text-default mb-2">Enter Amount</h2>
             <p className="text-text-subtle">
               {requestType === "topup" 
                 ? "How much do you want to add to your account?" 
@@ -126,14 +126,14 @@ export default function AmountInput() {
           </div>
 
           {/* Currency Info */}
-          <div className="text-center mb-6">
-            <span className="text-sm text-text-subtle bg-accent-primary/10 px-3 py-1.5 rounded-full">
+          <div className="text-center mb-4 md:mb-6">
+            <span className="text-xs md:text-sm text-text-subtle bg-accent-primary/10 px-3 py-1.5 rounded-full">
               {countryLoading ? "Detecting currency..." : `Requesting in ${selectedCurrency.code}`}
             </span>
           </div>
 
           {/* Amount Input Field */}
-          <div className="bg-white rounded-2xl border-2 border-accent-primary/20 p-8 mb-6">
+          <div className="bg-white rounded-2xl border-2 border-accent-primary/20 px-5 py-6 md:p-8 mb-4 md:mb-6">
             <div className="flex items-center justify-center">
               <span className="text-2xl font-medium mr-3 text-accent-primary">{CURRENCY_SYMBOLS[selectedCurrency.code as SupportedCurrency]}</span>
               <input
@@ -148,7 +148,7 @@ export default function AmountInput() {
           </div>
 
           {/* Quick Amount Buttons - Dynamic based on currency */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4 md:mb-6">
             {(() => {
               const quickAmounts = 
                 selectedCurrency.code === "KES" ? [100, 500, 1000, 2000, 5000, 10000] :
@@ -162,7 +162,7 @@ export default function AmountInput() {
                 <button
                   key={amount}
                   onClick={() => setLocalAmount(amount.toString())}
-                  className={`py-3 px-4 text-sm font-medium rounded-2xl transition-all ${
+                  className={`py-2.5 px-3 text-xs md:text-sm font-medium rounded-2xl transition-all ${
                     localAmount === amount.toString()
                       ? "bg-accent-primary text-white shadow-md"
                       : "bg-white border border-gray-200 text-text-default hover:border-accent-primary hover:bg-accent-primary/5"
@@ -176,7 +176,7 @@ export default function AmountInput() {
 
           {/* Fee Breakdown for Top-ups */}
           {requestType === "topup" && feeBreakdown && parseFloat(localAmount) > 0 && (
-            <div className="bg-accent-primary/5 rounded-2xl border border-accent-primary/20 p-5 mb-6 space-y-3">
+            <div className="bg-accent-primary/5 rounded-2xl border border-accent-primary/20 p-4 md:p-5 mb-4 md:mb-6 space-y-3">
               <div className="flex items-center gap-2 mb-3">
                 <FiInfo className="w-5 h-5 text-accent-primary" />
                 <span className="text-sm font-semibold text-text-default">Fee Breakdown</span>
@@ -220,7 +220,7 @@ export default function AmountInput() {
       </div>
 
         {/* Next Button */}
-        <div className={`p-6 ${isDesktop ? "max-w-md mx-auto w-full" : ""}`}>
+        <div className={`px-4 py-4 md:p-6 ${isDesktop ? "max-w-md mx-auto w-full" : ""}`}>
           <ActionButton
             onClick={handleNext}
             disabled={!isValidAmount || (requestType === "topup" && feeLoading && selectedCurrency.code !== "USD")}
