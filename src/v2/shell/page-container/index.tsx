@@ -2,14 +2,15 @@ import { useCallback, useEffect } from "react";
 import { useShellContext } from "../shell-context";
 import { Route, Routes, useNavigate, Navigate } from "react-router";
 import { usePWAShortcuts } from "@/hooks/use-pwa-shortcuts";
+import useDesktopDetection from "@/hooks/use-desktop-detection";
 import Home from "@/v2/pages/home";
 import History from "@/v2/pages/history";
 import AuthenticatedShell from "./authenticated-shell";
+import DesktopAuthenticatedShell from "./desktop-authenticated-shell";
 import Onboarding from "@/features/onboarding";
 import Swap from "@/v2/pages/swap";
 import Splash from "@/v2/pages/splash";
 import Profile from "@/v2/pages/profile";
-import Loyalty from "@/v2/pages/profile/loyalty";
 import Recovery from "@/v2/pages/profile/recovery";
 import Invest from "@/v2/pages/invest";
 import SailVault from "@/v2/pages/invest/sail-vault";
@@ -34,8 +35,12 @@ import KYCPage from "@/v2/pages/kyc";
 export default function PageContainer() {
   const { form } = useShellContext();
   const navigate = useNavigate();
+  const isDesktop = useDesktopDetection();
 
   usePWAShortcuts();
+
+  // Choose shell based on device type
+  const Shell = isDesktop ? DesktopAuthenticatedShell : AuthenticatedShell;
 
   useEffect(() => {
     const subscription = form?.watch((values) => {
@@ -59,23 +64,23 @@ export default function PageContainer() {
       switch (screen) {
         case "home": {
           return (
-            <AuthenticatedShell>
+            <Shell>
               <Home />
-            </AuthenticatedShell>
+            </Shell>
           );
         }
         case "invest": {
           return (
-            <AuthenticatedShell>
+            <Shell>
               <Invest />
-            </AuthenticatedShell>
+            </Shell>
           );
         }
         case "profile": {
           return (
-            <AuthenticatedShell>
+            <Shell>
               <Profile />
-            </AuthenticatedShell>
+            </Shell>
           );
         }
         default: {
@@ -83,7 +88,7 @@ export default function PageContainer() {
         }
       }
     },
-    []
+    [Shell]
   );
 
   return (
@@ -108,33 +113,33 @@ export default function PageContainer() {
       <Route
         path="/app/swap"
         element={
-          <AuthenticatedShell>
+          <Shell>
             <Swap />
-          </AuthenticatedShell>
+          </Shell>
         }
       />
       <Route
         path="/app/history"
         element={
-          <AuthenticatedShell>
+          <Shell>
             <History />
-          </AuthenticatedShell>
+          </Shell>
         }
       />
       <Route
         path="/app/explore"
         element={
-          <AuthenticatedShell>
+          <Shell>
             <Explore />
-          </AuthenticatedShell>
+          </Shell>
         }
       />
       <Route
         path="/app/walletconnect"
         element={
-          <AuthenticatedShell>
+          <Shell>
             <WalletConnect />
-          </AuthenticatedShell>
+          </Shell>
         }
       />
       <Route path="/app/agent" element={<Agent />} />
@@ -153,21 +158,13 @@ export default function PageContainer() {
       <Route path="/app/withdraw" element={<Withdraw />} />
       <Route path="/app/markets" element={<PredictionMarkets />} />
       <Route path="/app/markets/:id" element={<PredictionMarketDetails />} />
-      <Route
-        path="/app/profile/loyalty"
-        element={
-          <AuthenticatedShell>
-            <Loyalty />
-          </AuthenticatedShell>
-        }
-      />
       <Route path="/app/profile/recovery/:method" element={<Recovery />} />
       <Route
         path="/app/invest/sail-vault"
         element={
-          <AuthenticatedShell>
+          <Shell>
             <SailVault />
-          </AuthenticatedShell>
+          </Shell>
         }
       />
       {/* Catch-all route - redirect unknown paths to home */}
