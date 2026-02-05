@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft, FiCheck, FiInfo } from "react-icons/fi";
+import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { usePay } from "../context";
@@ -11,7 +12,6 @@ import { checkAndSetTransactionLock } from "@/utils/transaction-lock";
 import { useOfframpFeePreview, calculateOfframpFeeBreakdown } from "@/hooks/data/use-offramp-fee";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
 import DesktopPageLayout from "@/components/layouts/desktop-page-layout";
-import RiftLoader from "@/components/ui/rift-loader";
 
 const CURRENCY_SYMBOLS: Record<SupportedCurrency, string> = {
   KES: "KSh",
@@ -371,7 +371,7 @@ export default function PaymentConfirmation() {
               >
                 {(paymentMutation.isPending || isLoading) ? (
                   <>
-                    <RiftLoader size="sm" />
+                    <CgSpinner className="w-4 h-4 animate-spin" />
                     <span>Processing...</span>
                   </>
                 ) : displayFeeBreakdown && displayFeeBreakdown.usdcNeeded > usdcBalance ? (
@@ -515,7 +515,7 @@ export default function PaymentConfirmation() {
             >
               {paymentMutation.isPending || isLoading ? (
                 <>
-                  <RiftLoader size="sm" />
+                  <CgSpinner className="w-4 h-4 animate-spin" />
                   <span>Processing...</span>
                 </>
               ) : displayFeeBreakdown && displayFeeBreakdown.usdcNeeded > usdcBalance ? (

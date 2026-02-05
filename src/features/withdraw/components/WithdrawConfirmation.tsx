@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft, FiInfo } from "react-icons/fi";
+import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useWithdraw } from "../context";
@@ -9,7 +10,6 @@ import useBaseUSDCBalance, { SupportedCurrency } from "@/hooks/data/use-base-usd
 import useCreateWithdrawalOrder from "@/hooks/data/use-create-withdrawal-order";
 import useAnalaytics from "@/hooks/use-analytics";
 import ActionButton from "@/components/ui/action-button";
-import RiftLoader from "@/components/ui/rift-loader";
 import { checkAndSetTransactionLock } from "@/utils/transaction-lock";
 import { useOfframpFeePreview, calculateOfframpFeeBreakdown } from "@/hooks/data/use-offramp-fee";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
@@ -329,7 +329,7 @@ export default function WithdrawConfirmation() {
               >
                 {(createOrderMutation.isPending || isLoading) ? (
                   <>
-                    <RiftLoader size="sm" />
+                    <CgSpinner className="w-4 h-4 animate-spin" />
                     <span>Processing...</span>
                   </>
                 ) : hasInsufficientBalance ? (
@@ -466,7 +466,7 @@ export default function WithdrawConfirmation() {
             >
               {(createOrderMutation.isPending || isLoading) ? (
                 <>
-                  <RiftLoader size="sm" />
+                  <CgSpinner className="w-4 h-4 animate-spin" />
                   <span>Processing...</span>
                 </>
               ) : hasInsufficientBalance ? (

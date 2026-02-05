@@ -307,7 +307,7 @@ export default function HistoryTabs({
           <div className="w-full flex flex-row items-stretch justify-evenly gap-2 pl-1 pt-3">
             <ActionButton
               icon={
-                <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                   <IoWalletOutline className="w-6 h-6 text-accent-primary" />
                 </div>
               }
@@ -318,7 +318,7 @@ export default function HistoryTabs({
 
             <ActionButton
               icon={
-                <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                   <IoReceiptOutline className="w-6 h-6 text-accent-primary" />
                 </div>
               }
@@ -329,7 +329,7 @@ export default function HistoryTabs({
 
             <ActionButton
               icon={
-                <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                   <IoCashOutline className="w-6 h-6 text-accent-primary" />
                 </div>
               }

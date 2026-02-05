@@ -325,73 +325,79 @@ export default function Home() {
 
             {/* Action Buttons Grid - Binance-style */}
             {isAdvanced && (
-              <div className="grid grid-cols-5 gap-4">
-                <SendDrawer
-                  {...send_disclosure}
-                  beforeOpen={() => checkKYC("sending crypto")}
-                  renderTrigger={() => (
-                    <button className="flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group">
-                      <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
-                        <IoArrowUpCircle className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700">Send</span>
-                    </button>
-                  )}
-                />
+              <div className="space-y-4">
+                {/* First Row - 3 buttons */}
+                <div className="grid grid-cols-3 gap-4">
+                  <SendDrawer
+                    {...send_disclosure}
+                    beforeOpen={() => checkKYC("sending crypto")}
+                    renderTrigger={() => (
+                      <button className="w-full flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border-2 border-gray-300 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.18)] hover:-translate-y-1.5">
+                        <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)] md:shadow-[0_4px_8px_rgba(0,0,0,0.1)] border border-accent-primary/20">
+                          <IoArrowUpCircle className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900">Send</span>
+                      </button>
+                    )}
+                  />
 
-                <ReceiveDrawer
-                  {...receive_disclosure}
-                  renderTrigger={() => (
-                    <button className="flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group">
-                      <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
-                        <IoArrowDownCircle className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700">Address</span>
-                    </button>
-                  )}
-                />
+                  <ReceiveDrawer
+                    {...receive_disclosure}
+                    renderTrigger={() => (
+                      <button className="w-full flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border-2 border-gray-300 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.18)] hover:-translate-y-1.5">
+                        <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)] md:shadow-[0_4px_8px_rgba(0,0,0,0.1)] border border-accent-primary/20">
+                          <IoArrowDownCircle className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900">Address</span>
+                      </button>
+                    )}
+                  />
 
-                <button
-                  onClick={() => {
-                    if (!checkKYC("withdrawals")) return;
-                    logEvent("WITHDRAW_BUTTON_CLICKED");
-                    navigate("/app/withdraw");
-                  }}
-                  className="flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
-                    <IoWalletOutline className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-sm font-semibold text-gray-700">Withdraw</span>
-                </button>
+                  <button
+                    onClick={() => {
+                      if (!checkKYC("withdrawals")) return;
+                      logEvent("WITHDRAW_BUTTON_CLICKED");
+                      navigate("/app/withdraw");
+                    }}
+                    className="w-full flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border-2 border-gray-300 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.18)] hover:-translate-y-1.5"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)] md:shadow-[0_4px_8px_rgba(0,0,0,0.1)] border border-accent-primary/20">
+                      <IoWalletOutline className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">Withdraw</span>
+                  </button>
+                </div>
 
-                <button
-                  onClick={() => {
-                    if (!checkKYC("payment requests")) return;
-                    logEvent("REQUEST_BUTTON_CLICKED");
-                    navigate("/app/request?type=request");
-                  }}
-                  className="flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
-                    <IoReceiptOutline className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-sm font-semibold text-gray-700">Request</span>
-                </button>
+                {/* Second Row - 2 buttons centered */}
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => {
+                      if (!checkKYC("payment requests")) return;
+                      logEvent("REQUEST_BUTTON_CLICKED");
+                      navigate("/app/request?type=request");
+                    }}
+                    className="w-full max-w-[calc(33.333%-0.67rem)] flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border-2 border-gray-300 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.18)] hover:-translate-y-1.5"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)] md:shadow-[0_4px_8px_rgba(0,0,0,0.1)] border border-accent-primary/20">
+                      <IoReceiptOutline className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">Request</span>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    if (!checkKYC("sending payments")) return;
-                    logEvent("SEND_BUTTON_CLICKED");
-                    navigate("/app/pay");
-                  }}
-                  className="flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
-                    <IoCashOutline className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-sm font-semibold text-gray-700">Pay</span>
-                </button>
+                  <button
+                    onClick={() => {
+                      if (!checkKYC("sending payments")) return;
+                      logEvent("SEND_BUTTON_CLICKED");
+                      navigate("/app/pay");
+                    }}
+                    className="w-full max-w-[calc(33.333%-0.67rem)] flex flex-col items-center justify-center gap-3 p-6 bg-white rounded-xl border-2 border-gray-300 hover:border-accent-primary hover:bg-accent-primary/5 transition-all cursor-pointer group shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.18)] hover:-translate-y-1.5"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)] md:shadow-[0_4px_8px_rgba(0,0,0,0.1)] border border-accent-primary/20">
+                      <IoCashOutline className="w-6 h-6 text-accent-primary group-hover:text-white transition-colors" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">Pay</span>
+                  </button>
+                </div>
               </div>
             )}
 
