@@ -218,21 +218,6 @@ export default function DescriptionInput() {
             <p className={`${isDesktop ? "text-4xl" : "text-2xl"} font-bold text-text-default tracking-tight`}>
               {currencySymbol} {(requestData.amount || 0).toLocaleString()} ({requestCurrency})
             </p>
-            {sellingRate && withdrawalRate && (
-              <div className={`${isDesktop ? "mt-6 pt-6" : "mt-3 pt-3"} border-t border-gray-100`}>
-                <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mb-1`}>
-                  You will receive
-                </p>
-                <p className={`${isDesktop ? "text-2xl" : "text-xl"} font-semibold text-green-600`}>
-                  {currencySymbol}{" "}
-                  {requestCurrency === "USD" 
-                    ? (requestData.amount || 0).toFixed(2)
-                    : (((requestData.amount || 0) / sellingRate) * withdrawalRate).toLocaleString(undefined, { maximumFractionDigits: 2 })
-                  } ({requestCurrency})
-                </p>
-                <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mt-1`}>in your wallet</p>
-              </div>
-            )}
           </div>
         </div>
 

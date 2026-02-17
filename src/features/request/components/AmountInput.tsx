@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "motion/react";
-import { FiArrowLeft, FiInfo } from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import { useRequest } from "../context";
 import ActionButton from "@/components/ui/action-button";
@@ -43,7 +43,7 @@ export default function AmountInput() {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(getInitialCurrency());
 
   // Fetch fee preview for top-ups (onramp)
-  const { data: feePreview, isLoading: feeLoading, error: feeError } = useOfframpFeePreview(
+  const { data: feePreview } = useOfframpFeePreview(
     selectedCurrency.code, 
     requestType === "topup" && selectedCurrency.code !== "USD"
   );
@@ -174,48 +174,6 @@ export default function AmountInput() {
             })()}
           </div>
 
-          {/* Fee Breakdown for Top-ups */}
-          {requestType === "topup" && feeBreakdown && parseFloat(localAmount) > 0 && (
-            <div className="bg-accent-primary/5 rounded-2xl border border-accent-primary/20 p-4 md:p-5 mb-4 md:mb-6 space-y-3">
-              <div className="flex items-center gap-2 mb-3">
-                <FiInfo className="w-5 h-5 text-accent-primary" />
-                <span className="text-sm font-semibold text-text-default">Fee Breakdown</span>
-              </div>
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-text-subtle">Top-up amount</span>
-                <span className="font-medium text-text-default">{CURRENCY_SYMBOLS[selectedCurrency.code as SupportedCurrency]} {feeBreakdown.localAmount.toLocaleString()}</span>
-              </div>
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-text-subtle">Fee ({feeBreakdown.feePercentage}%)</span>
-                <span className="font-medium text-accent-primary">+ {CURRENCY_SYMBOLS[selectedCurrency.code as SupportedCurrency]} {feeBreakdown.feeLocal.toLocaleString()}</span>
-              </div>
-              
-              <div className="border-t border-accent-primary/20 pt-3 mt-3">
-                <div className="flex justify-between text-sm">
-                  <span className="font-semibold text-text-default">Total you pay</span>
-                  <span className="font-bold text-accent-primary text-base">{CURRENCY_SYMBOLS[selectedCurrency.code as SupportedCurrency]} {feeBreakdown.totalLocalToPay.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Loading fee info */}
-          {requestType === "topup" && feeLoading && parseFloat(localAmount) > 0 && selectedCurrency.code !== "USD" && (
-            <div className="bg-accent-primary/5 rounded-2xl border border-accent-primary/20 p-4 mb-6 text-center">
-              <p className="text-sm text-text-subtle">Loading fee information...</p>
-            </div>
-          )}
-          
-          {/* Error loading fee - show warning */}
-          {requestType === "topup" && feeError && !feeLoading && parseFloat(localAmount) > 0 && selectedCurrency.code !== "USD" && (
-            <div className="bg-warning/10 border border-warning/30 rounded-2xl p-4 mb-6">
-              <p className="text-sm text-warning">
-                ⚠️ Could not load fee info. A 1% service fee will apply to your top-up.
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
@@ -223,7 +181,7 @@ export default function AmountInput() {
         <div className={`px-4 py-4 md:p-6 ${isDesktop ? "max-w-md mx-auto w-full" : ""}`}>
           <ActionButton
             onClick={handleNext}
-            disabled={!isValidAmount || (requestType === "topup" && feeLoading && selectedCurrency.code !== "USD")}
+            disabled={!isValidAmount}
             className={`${isDesktop ? "max-w-sm mx-auto" : "w-full"} rounded-2xl`}
           >
             Next
