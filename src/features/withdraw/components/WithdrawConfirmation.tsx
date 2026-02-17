@@ -99,7 +99,7 @@ export default function WithdrawConfirmation() {
     
     // Check if user has sufficient balance (amount + fee)
     if (feeData && feeData.usdcNeeded > availableUsdBalance) {
-      toast.error(`Insufficient balance. You need ${feeData.usdcNeeded.toFixed(4)} USDC but only have ${availableUsdBalance.toFixed(4)} USDC.`);
+      toast.error(`Insufficient balance. You need ${currencySymbol} ${feeData.totalLocalDeducted.toLocaleString()} but only have ${currencySymbol} ${(balanceData.localAmount || 0).toLocaleString()}.`);
       return;
     }
 

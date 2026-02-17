@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft, FiInfo } from "react-icons/fi";
+import { IoSwapHorizontalOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { usePay } from "../context";
@@ -79,7 +80,7 @@ export default function AmountInput() {
 
     if (amount < minPaymentLocal) {
       toast.error(
-        `Minimum payment is ${currencySymbol} ${minPaymentLocal.toLocaleString()} (0.3 USDC)`
+        `Minimum payment is ${currencySymbol} ${minPaymentLocal.toLocaleString()}`
       );
       return;
     }
@@ -87,7 +88,7 @@ export default function AmountInput() {
     // Check if user has sufficient USDC balance (including fee)
     if (hasInsufficientBalance && feeBreakdown) {
       toast.error(
-        `Insufficient balance. You need ${feeBreakdown.usdcNeeded.toFixed(4)} USDC (includes ${currencySymbol} ${feeBreakdown.feeLocal.toLocaleString()} fee) but only have ${usdcBalance.toFixed(4)} USDC.`
+        `Insufficient balance. You need ${currencySymbol} ${feeBreakdown.totalLocalDeducted.toLocaleString()} (includes ${currencySymbol} ${feeBreakdown.feeLocal.toLocaleString()} fee) but only have ${currencySymbol} ${localBalance.toLocaleString()}.`
       );
       return;
     }
@@ -174,24 +175,34 @@ export default function AmountInput() {
                 <span className="text-sm text-text-subtle bg-accent-primary/10 px-3 py-1.5 rounded-full">
                   Sending in {currency}
                 </span>
+                {buyingRate && currency !== "USD" && (
+                  <div className="flex items-center justify-center gap-1 mt-3">
+                    <IoSwapHorizontalOutline className="w-3 h-3 text-text-subtle/50" />
+                    <p className="text-xs text-text-subtle">1 USD = {buyingRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {currency}</p>
+                  </div>
+                )}
               </div>
 
               {/* Amount Input Field */}
               <div className="bg-white rounded-2xl border-2 border-accent-primary/20 p-8 mb-6">
-                <div className="flex items-center justify-center">
-                  <span className="text-2xl font-medium mr-3 text-accent-primary">{currencySymbol}</span>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-2xl font-medium text-accent-primary">{currencySymbol}</span>
                   <input
                     type="number"
                     value={localAmount}
                     onChange={(e) => setLocalAmount(e.target.value)}
                     placeholder="0"
-                    className="text-5xl font-bold bg-transparent border-none outline-none text-center w-full text-text-default placeholder:text-gray-300"
+                    className="text-5xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-text-default placeholder:text-gray-300"
+                    style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
                     autoFocus
                   />
+                  {buyingRate && currency !== "USD" && parseFloat(localAmount) > 0 && (
+                    <span className="text-xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / buyingRate).toFixed(2)}</span>
+                  )}
                 </div>
               </div>
 
-              {/* Quick Amount Buttons */}
+              {/* Fee Breakdown */}
               {feeBreakdown && parseFloat(localAmount) > 0 && (
                 <div className="bg-accent-primary/5 rounded-2xl border border-accent-primary/20 p-5 mb-6 space-y-3">
                   <div className="flex items-center gap-2 mb-3">
@@ -275,16 +286,20 @@ export default function AmountInput() {
 
           <div className="w-full max-w-sm mx-auto">
             <div className="text-center mb-4">
-              <div className="flex items-center justify-center mb-2">
-                <span className="text-lg font-medium mr-2">{currencySymbol}</span>
+              <div className="flex items-baseline justify-center gap-1 mb-2">
+                <span className="text-lg font-medium">{currencySymbol}</span>
                 <input
                   type="number"
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
                   placeholder="0"
-                  className="text-4xl font-bold bg-transparent border-none outline-none text-center w-full"
+                  className="text-4xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
                   autoFocus
                 />
+                {buyingRate && currency !== "USD" && parseFloat(localAmount) > 0 && (
+                  <span className="text-2xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / buyingRate).toFixed(2)}</span>
+                )}
               </div>
               <p className="text-sm text-text-subtle">Sending in {currency}</p>
             </div>

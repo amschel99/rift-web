@@ -14,6 +14,7 @@ import {
   IoEyeOutline,
   IoEyeOffOutline,
   IoAddCircleOutline,
+  IoSwapHorizontalOutline,
 } from "react-icons/io5";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import useKYCGuard from "@/hooks/use-kyc-guard";
@@ -266,32 +267,8 @@ export default function Home() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <p className="text-sm font-medium text-white/70">Total Balance</p>
-                    <button
-                      onClick={() => {
-                        forceClearCacheAndRefresh();
-                      }}
-                      className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                      title="Reload app"
-                    >
-                      <FiRefreshCw className="w-4 h-4 text-white/60" />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-5xl font-bold text-white">
-                      {BASE_USDC_LOADING || countryLoading ? (
-                        <RiftLoader message="Loading balance..." />
-                      ) : !BASE_USDC_BALANCE ? (
-                        <Skeleton className="h-12 w-40 inline-block" />
-                      ) : isBalanceVisible ? (
-                        `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${
-                          selectedCurrency.code
-                        }`
-                      ) : (
-                        `**** ${selectedCurrency.code}`
-                      )}
-                    </h1>
                     <button
                       onClick={() => {
                         setIsBalanceVisible(!isBalanceVisible);
@@ -299,16 +276,45 @@ export default function Home() {
                           visible: !isBalanceVisible,
                         });
                       }}
-                      className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+                      className="p-1 hover:bg-white/10 rounded-lg transition-colors"
                       title={isBalanceVisible ? "Hide balance" : "Show balance"}
                     >
                       {isBalanceVisible ? (
-                        <IoEyeOutline className="w-5 h-5 text-white/80" />
+                        <IoEyeOutline className="w-4 h-4 text-white/60" />
                       ) : (
-                        <IoEyeOffOutline className="w-5 h-5 text-white/80" />
+                        <IoEyeOffOutline className="w-4 h-4 text-white/60" />
                       )}
                     </button>
+                    <button
+                      onClick={() => {
+                        forceClearCacheAndRefresh();
+                      }}
+                      className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                      title="Reload app"
+                    >
+                      <FiRefreshCw className="w-3.5 h-3.5 text-white/60" />
+                    </button>
                   </div>
+                  <h1 className="text-5xl font-bold text-white">
+                    {BASE_USDC_LOADING || countryLoading ? (
+                      <RiftLoader message="Loading balance..." />
+                    ) : !BASE_USDC_BALANCE ? (
+                      <Skeleton className="h-12 w-40 inline-block" />
+                    ) : isBalanceVisible ? (
+                      `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${
+                        selectedCurrency.code
+                      }`
+                    ) : (
+                      `**** ${selectedCurrency.code}`
+                    )}
+                  </h1>
+                  {BASE_USDC_BALANCE && isBalanceVisible && selectedCurrency.code !== "USD" && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-sm text-white/70">${BASE_USDC_BALANCE.usdcAmount.toFixed(2)} USD</span>
+                      <IoSwapHorizontalOutline className="w-3.5 h-3.5 text-white/40" />
+                      <span className="text-xs text-white/50">1 USD = {BASE_USDC_BALANCE.exchangeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {selectedCurrency.code}</span>
+                    </div>
+                  )}
                 </div>
                 <button
                   id="topup-button"
@@ -439,32 +445,8 @@ export default function Home() {
               className="mt-6 mb-8"
             >
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="flex items-center justify-center gap-1.5 mb-3">
                 <p className="text-xs text-text-subtle">Total Balance</p>
-                <button
-                  onClick={() => {
-                    forceClearCacheAndRefresh();
-                  }}
-                  className="p-1.5 hover:bg-surface-subtle rounded-xl transition-colors"
-                  title="Reload app"
-                >
-                  <FiRefreshCw className="w-3.5 h-3.5 text-text-subtle" />
-                </button>
-              </div>
-              <div className="flex items-center justify-center gap-3">
-                <h1 className="text-4xl mb-2">
-                  {BASE_USDC_LOADING || countryLoading ? (
-                    <RiftLoader message="Loading balance..." />
-                  ) : !BASE_USDC_BALANCE ? (
-                    <Skeleton className="h-10 w-32 inline-block" />
-                  ) : isBalanceVisible ? (
-                    `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${
-                      selectedCurrency.code
-                    }`
-                  ) : (
-                    `**** ${selectedCurrency.code}`
-                  )}
-                </h1>
                 <button
                   onClick={() => {
                     setIsBalanceVisible(!isBalanceVisible);
@@ -472,16 +454,45 @@ export default function Home() {
                       visible: !isBalanceVisible,
                     });
                   }}
-                  className="p-2 hover:bg-surface-subtle rounded-full transition-colors"
+                  className="p-1 hover:bg-surface-subtle rounded-lg transition-colors"
                   title={isBalanceVisible ? "Hide balance" : "Show balance"}
                 >
                   {isBalanceVisible ? (
-                    <IoEyeOutline className="w-5 h-5 text-text-subtle" />
+                    <IoEyeOutline className="w-4 h-4 text-text-subtle" />
                   ) : (
-                    <IoEyeOffOutline className="w-5 h-5 text-text-subtle" />
+                    <IoEyeOffOutline className="w-4 h-4 text-text-subtle" />
                   )}
                 </button>
+                <button
+                  onClick={() => {
+                    forceClearCacheAndRefresh();
+                  }}
+                  className="p-1 hover:bg-surface-subtle rounded-lg transition-colors"
+                  title="Reload app"
+                >
+                  <FiRefreshCw className="w-3.5 h-3.5 text-text-subtle" />
+                </button>
               </div>
+              <h1 className="text-4xl">
+                {BASE_USDC_LOADING || countryLoading ? (
+                  <RiftLoader message="Loading balance..." />
+                ) : !BASE_USDC_BALANCE ? (
+                  <Skeleton className="h-10 w-32 inline-block" />
+                ) : isBalanceVisible ? (
+                  `${formatNumberWithCommas(BASE_USDC_BALANCE.localAmount)} ${
+                    selectedCurrency.code
+                  }`
+                ) : (
+                  `**** ${selectedCurrency.code}`
+                )}
+              </h1>
+              {BASE_USDC_BALANCE && isBalanceVisible && selectedCurrency.code !== "USD" && (
+                <div className="flex items-center justify-center gap-1 mt-1.5">
+                  <span className="text-2xs text-text-subtle">${BASE_USDC_BALANCE.usdcAmount.toFixed(2)} USD</span>
+                  <IoSwapHorizontalOutline className="w-2.5 h-2.5 text-text-subtle/50" />
+                  <span className="text-2xs text-text-subtle">1 USD = {BASE_USDC_BALANCE.exchangeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {selectedCurrency.code}</span>
+                </div>
+              )}
               <div className="mt-4">
                 <button
                   id="topup-button"

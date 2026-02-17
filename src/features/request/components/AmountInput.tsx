@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft } from "react-icons/fi";
+import { IoSwapHorizontalOutline } from "react-icons/io5";
 import { useNavigate } from "react-router";
 import { useRequest } from "../context";
 import ActionButton from "@/components/ui/action-button";
@@ -134,18 +135,32 @@ export default function AmountInput() {
 
           {/* Amount Input Field */}
           <div className="bg-white rounded-2xl border-2 border-accent-primary/20 px-5 py-6 md:p-8 mb-4 md:mb-6">
-            <div className="flex items-center justify-center">
-              <span className="text-2xl font-medium mr-3 text-accent-primary">{CURRENCY_SYMBOLS[selectedCurrency.code as SupportedCurrency]}</span>
+            <div className="flex items-baseline justify-center gap-1">
+              <span className="text-2xl font-medium text-accent-primary">{CURRENCY_SYMBOLS[selectedCurrency.code as SupportedCurrency]}</span>
               <input
                 type="number"
                 value={localAmount}
                 onChange={(e) => setLocalAmount(e.target.value)}
                 placeholder="0"
-                className="text-5xl font-bold bg-transparent border-none outline-none text-center w-full text-text-default placeholder:text-gray-300"
+                className="text-5xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-text-default placeholder:text-gray-300"
+                style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
                 autoFocus
               />
+              {requestType === "topup" && feePreview && selectedCurrency.code !== "USD" && parseFloat(localAmount) > 0 && (
+                <span className="text-xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / feePreview.selling_rate).toFixed(2)}</span>
+              )}
             </div>
           </div>
+
+          {/* Rate */}
+          {requestType === "topup" && feePreview && selectedCurrency.code !== "USD" && (
+            <div className="flex items-center justify-center gap-1.5 mb-4 md:mb-6">
+              <IoSwapHorizontalOutline className="w-3 h-3 text-text-subtle/50" />
+              <p className="text-2xs text-text-subtle">
+                1 USD = {feePreview.selling_rate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {selectedCurrency.code}
+              </p>
+            </div>
+          )}
 
           {/* Quick Amount Buttons - Dynamic based on currency */}
           <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4 md:mb-6">

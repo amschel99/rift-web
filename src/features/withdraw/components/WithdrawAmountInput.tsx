@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft, FiAlertCircle, FiInfo } from "react-icons/fi";
+import { IoSwapHorizontalOutline } from "react-icons/io5";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useWithdraw } from "../context";
@@ -100,7 +101,7 @@ export default function WithdrawAmountInput() {
 
     if (amount < minWithdrawalLocal) {
       toast.error(
-        `Minimum withdrawal is ${currencySymbol} ${minWithdrawalLocal.toLocaleString()} (0.3 USDC)`
+        `Minimum withdrawal is ${currencySymbol} ${minWithdrawalLocal.toLocaleString()}`
       );
       return;
     }
@@ -108,7 +109,7 @@ export default function WithdrawAmountInput() {
     // Check if user has sufficient USDC balance (including fee)
     if (hasInsufficientBalance && feeBreakdown) {
       toast.error(
-        `Insufficient balance. You need ${feeBreakdown.usdcNeeded.toFixed(4)} USDC (includes ${currencySymbol} ${feeBreakdown.feeLocal.toLocaleString()} fee) but only have ${usdcBalance.toFixed(4)} USDC.`
+        `Insufficient balance. You need ${currencySymbol} ${feeBreakdown.totalLocalDeducted.toLocaleString()} (includes ${currencySymbol} ${feeBreakdown.feeLocal.toLocaleString()} fee) but only have ${currencySymbol} ${localBalance.toLocaleString()}.`
       );
       return;
     }
@@ -235,6 +236,13 @@ export default function WithdrawAmountInput() {
                   <p className="text-xl font-bold">
                     {currencySymbol} {localBalance.toLocaleString()}
                   </p>
+                  {balanceData && paymentAccountCurrency !== "USD" && (
+                    <div className="flex items-center justify-center gap-1 mt-1">
+                      <span className="text-2xs text-text-subtle">${balanceData.usdcAmount.toFixed(2)} USD</span>
+                      <IoSwapHorizontalOutline className="w-2.5 h-2.5 text-text-subtle/50" />
+                      <span className="text-2xs text-text-subtle">1 USD = {balanceData.exchangeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {paymentAccountCurrency}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -251,17 +259,21 @@ export default function WithdrawAmountInput() {
             <div className="w-full max-w-sm mx-auto">
               {/* Amount input */}
               <div className="text-center mb-4">
-                <div className="flex items-center justify-center mb-2">
-                  <span className="text-lg font-medium mr-2">{currencySymbol}</span>
+                <div className="flex items-baseline justify-center gap-1 mb-2">
+                  <span className="text-lg font-medium">{currencySymbol}</span>
                   <input
                     type="number"
                     value={localAmount}
                     onChange={(e) => handleAmountChange(e.target.value)}
                     placeholder="0"
-                    className="text-4xl font-bold bg-transparent border-none outline-none text-center w-full"
+                    className="text-4xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
                     autoFocus
                     max={localBalance || undefined}
                   />
+                  {buyingRate && paymentAccountCurrency !== "USD" && parseFloat(localAmount) > 0 && (
+                    <span className="text-xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / buyingRate).toFixed(2)}</span>
+                  )}
                 </div>
               </div>
 
@@ -384,6 +396,13 @@ export default function WithdrawAmountInput() {
                 <p className="text-xl font-bold">
                   {currencySymbol} {localBalance.toLocaleString()}
                 </p>
+                {balanceData && paymentAccountCurrency !== "USD" && (
+                  <div className="flex items-center justify-center gap-1.5 mt-1">
+                    <span className="text-2xs text-text-subtle">${balanceData.usdcAmount.toFixed(2)} USD</span>
+                    <IoSwapHorizontalOutline className="w-2.5 h-2.5 text-text-subtle/50" />
+                    <span className="text-2xs text-text-subtle">1 USD = {balanceData.exchangeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {paymentAccountCurrency}</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -396,20 +415,24 @@ export default function WithdrawAmountInput() {
 
             {/* Amount input */}
             <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <span className="text-lg font-medium mr-2">{currencySymbol}</span>
+              <div className="flex items-baseline justify-center gap-1 mb-2">
+                <span className="text-lg font-medium">{currencySymbol}</span>
                 <input
                   type="number"
                   value={localAmount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="0"
-                  className="text-4xl font-bold bg-transparent border-none outline-none text-center w-full"
+                  className="text-4xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
                   max={localBalance || undefined}
                   inputMode="decimal"
                 />
+                {buyingRate && paymentAccountCurrency !== "USD" && parseFloat(localAmount) > 0 && (
+                  <span className="text-2xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / buyingRate).toFixed(2)}</span>
+                )}
               </div>
               <p className="text-xs text-text-subtle">
-                Minimum {currencySymbol} {minWithdrawalLocal.toLocaleString()} (0.3 USDC)
+                Minimum {currencySymbol} {minWithdrawalLocal.toLocaleString()}
               </p>
             </div>
 
