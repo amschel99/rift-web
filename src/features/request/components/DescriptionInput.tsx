@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft } from "react-icons/fi";
+import { IoSwapHorizontalOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { useRequest } from "../context";
 import useCreateInvoice from "@/hooks/data/use-create-invoice";
@@ -218,19 +219,12 @@ export default function DescriptionInput() {
             <p className={`${isDesktop ? "text-4xl" : "text-2xl"} font-bold text-text-default tracking-tight`}>
               {currencySymbol} {(requestData.amount || 0).toLocaleString()} ({requestCurrency})
             </p>
-            {sellingRate && withdrawalRate && (
-              <div className={`${isDesktop ? "mt-6 pt-6" : "mt-3 pt-3"} border-t border-gray-100`}>
-                <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-500 mb-1`}>
-                  You will receive
+            {sellingRate && requestCurrency !== "USD" && (
+              <div className="flex items-center justify-center gap-1.5 mt-2">
+                <IoSwapHorizontalOutline className={`${isDesktop ? "w-3.5 h-3.5" : "w-3 h-3"} text-gray-400`} />
+                <p className={`${isDesktop ? "text-sm" : "text-2xs"} text-gray-400`}>
+                  1 USD = {sellingRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {requestCurrency}
                 </p>
-                <p className={`${isDesktop ? "text-2xl" : "text-xl"} font-semibold text-green-600`}>
-                  {currencySymbol}{" "}
-                  {requestCurrency === "USD" 
-                    ? (requestData.amount || 0).toFixed(2)
-                    : (((requestData.amount || 0) / sellingRate) * withdrawalRate).toLocaleString(undefined, { maximumFractionDigits: 2 })
-                  } ({requestCurrency})
-                </p>
-                <p className={`${isDesktop ? "text-sm" : "text-xs"} text-gray-500 mt-1`}>in your wallet</p>
               </div>
             )}
           </div>

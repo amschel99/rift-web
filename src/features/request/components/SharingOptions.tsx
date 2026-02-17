@@ -46,8 +46,6 @@ export default function SharingOptions() {
   const [mpesaNumber, setMpesaNumber] = useState("");
   const [sendingMpesaPrompt, setSendingMpesaPrompt] = useState(false);
   const [showMpesaDrawer, setShowMpesaDrawer] = useState(false);
-  const [sellingRate, setSellingRate] = useState<number | null>(null);
-  const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
   const [creatingInvoice, setCreatingInvoice] = useState(false);
   const createInvoiceMutation = useCreateInvoice();
   const { isKYCVerified, isLoading: kycLoading } = useKYCStatus();
@@ -92,9 +90,6 @@ export default function SharingOptions() {
               currency: topupCurrency as any,
             });
           }
-
-          setSellingRate(exchangeRateData.selling_rate);
-          setWithdrawalRate(exchangeRateData.rate);
 
           // Convert local currency amount to USD using the selling rate
           // Round to 6 decimal places (USDC precision)
@@ -509,30 +504,6 @@ export default function SharingOptions() {
                 </p>
               </div>
 
-              {/* Fee Breakdown for Top-ups */}
-              {requestType === "topup" && requestData.feeBreakdown && (
-                <div className="mt-3 pt-3 border-t border-accent-primary/20 space-y-1.5">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">You pay</span>
-                    <span className="font-semibold text-accent-primary">{currencySymbol} {requestData.feeBreakdown.totalLocalToPay.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">You receive</span>
-                    <span className="font-semibold text-green-600">
-                      {currencySymbol} {(requestData.feeBreakdown.usdcToReceive * requestData.feeBreakdown.exchangeRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Legacy display for when no fee breakdown */}
-              {createdInvoice.receiveAmount && !requestData.feeBreakdown && (
-                <div className="mt-3 pt-3 border-t border-accent-primary/20 text-center">
-                  <p className="text-sm font-semibold text-green-600">
-                    {currencySymbol} {createdInvoice.receiveAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({requestCurrency})
-                  </p>
-                </div>
-              )}
             </motion.div>
 
             {/* Payment Link */}

@@ -97,7 +97,7 @@ export default function PaymentConfirmation() {
     const feeData = displayFeeBreakdown;
     if (feeData && feeData.usdcNeeded > usdcBalance) {
       toast.error(
-        `Insufficient balance. You need ${feeData.usdcNeeded.toFixed(4)} USDC but only have ${usdcBalance.toFixed(4)} USDC.`
+        `Insufficient balance. You need ${currencySymbol} ${feeData.totalLocalDeducted.toLocaleString()} but only have ${currencySymbol} ${localBalance.toLocaleString()}.`
       );
       return;
     }
