@@ -26,7 +26,12 @@ export default function PasswordConfirmUpdate(
 ) {
   const { isOpen, onOpen, onClose } = props;
   const navigate = useNavigate();
-  const { signInMutation, addRecoveryMutation } = useRecovery();
+  const {
+    signInMutation,
+    addRecoveryMethodWithJwtMutation,
+    updateRecoveryMethodWithJwtMutation,
+    myRecoveryMethodsQuery,
+  } = useRecovery();
   const { userQuery } = useWalletAuth();
 
   const form = useForm<RECOVERY_SCHEMA_TYPE>({
@@ -34,6 +39,12 @@ export default function PasswordConfirmUpdate(
   });
 
   const PASSWORD = form.watch("password");
+
+  // Check if this specific method already exists
+  const hasCurrentMethod =
+    props.recovery_method === "email"
+      ? !!myRecoveryMethodsQuery?.data?.recovery?.email
+      : !!myRecoveryMethodsQuery?.data?.recovery?.phoneNumber;
 
   const onVerify = async () => {
     try {
@@ -52,19 +63,28 @@ export default function PasswordConfirmUpdate(
           : props.phoneNumber?.trim();
         phoneNum = (props.countryCode?.trim() || "+254") + phoneNum;
 
-        addRecoveryMutation
-          ?.mutateAsync({
-            externalId: EXTERNAL_ID!,
-            method:
-              props.recovery_method === "email"
-                ? "emailRecovery"
-                : "phoneRecovery",
-            password: PASSWORD!,
-            value:
-              props.recovery_method === "email"
-                ? props.emailAddress!
-                : phoneNum!,
-          })
+        const method: "emailRecovery" | "phoneRecovery" =
+          props.recovery_method === "email"
+            ? "emailRecovery"
+            : "phoneRecovery";
+        const value =
+          props.recovery_method === "email"
+            ? props.emailAddress!
+            : phoneNum!;
+
+        const mutationData = {
+          method,
+          value,
+          externalId: EXTERNAL_ID,
+          password: PASSWORD,
+        };
+
+        const mutation = hasCurrentMethod
+          ? updateRecoveryMethodWithJwtMutation
+          : addRecoveryMethodWithJwtMutation;
+
+        mutation
+          ?.mutateAsync(mutationData)
           .then(() => {
             toast.success("Recovery method was updated successfully");
             onClose();
@@ -77,10 +97,14 @@ export default function PasswordConfirmUpdate(
         toast.error("Verification failed, please try again");
       }
     } catch (e) {
-      
       toast.error("Verification failed, please try again");
     }
   };
+
+  const isPending =
+    signInMutation?.isPending ||
+    addRecoveryMethodWithJwtMutation?.isPending ||
+    updateRecoveryMethodWithJwtMutation?.isPending;
 
   return (
     <Drawer
@@ -125,14 +149,8 @@ export default function PasswordConfirmUpdate(
           <div className="flex flex-row flex-nowrap gap-3 fixed bottom-0 left-0 right-0 p-4 py-2 border-t-1 border-border bg-app-background">
             <ActionButton
               variant="secondary"
-              loading={
-                signInMutation?.isPending || addRecoveryMutation?.isPending
-              }
-              disabled={
-                !PASSWORD ||
-                signInMutation?.isPending ||
-                addRecoveryMutation?.isPending
-              }
+              loading={isPending}
+              disabled={!PASSWORD || isPending}
               onClick={onVerify}
               className="p-[0.625rem]"
             >

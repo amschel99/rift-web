@@ -27,7 +27,6 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import ActionButton from "@/components/ui/action-button";
-import PasswordConfirmCreate from "./components/ConfirmCreate";
 import PasswordConfirmUpdate from "./components/ConfirmUpdate";
 import COUNTRY_PHONES from "@/lib/country-phones";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
@@ -38,7 +37,6 @@ function RecoveryCtr() {
   const { method: recovery_method } = useParams() as {
     method: "phone" | "email";
   };
-  const confirm_create_disclosure = useDisclosure();
   const confirm_update_disclosure = useDisclosure();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { userQuery } = useWalletAuth();
@@ -56,7 +54,6 @@ function RecoveryCtr() {
   const {
     recoveryMethodsQuery,
     recoveryOptionsByIdentifierQuery,
-    createRecoveryWithJwtMutation,
     addRecoveryMethodWithJwtMutation,
     updateRecoveryMethodWithJwtMutation,
     myRecoveryMethodsQuery,
@@ -110,29 +107,31 @@ function RecoveryCtr() {
   }, [PHONE_SEARCH_FILTER]);
 
   // Determine what recovery methods already exist
-  // For non-password users, use recoveryOptionsByIdentifierQuery (same as profile page)
-  // with myRecoveryMethodsQuery as fallback
-  const existingEmail = hasPassword
-    ? !!recoveryMethodsQuery.data?.recoveryOptions?.email
-    : !!(
-        recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.email ||
-        myRecoveryMethodsQuery.data?.recovery?.email
-      );
+  // Use myRecoveryMethodsQuery (direct API, works for ALL users via JWT) as primary
+  // with SDK/identifier queries as fallback
+  const existingEmail = !!(
+    myRecoveryMethodsQuery.data?.recovery?.email ||
+    (hasPassword
+      ? recoveryMethodsQuery.data?.recoveryOptions?.email
+      : recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.email)
+  );
 
-  const existingPhone = hasPassword
-    ? !!recoveryMethodsQuery.data?.recoveryOptions?.phone
-    : !!(
-        recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.phone ||
-        myRecoveryMethodsQuery.data?.recovery?.phoneNumber
-      );
+  const existingPhone = !!(
+    myRecoveryMethodsQuery.data?.recovery?.phoneNumber ||
+    (hasPassword
+      ? recoveryMethodsQuery.data?.recoveryOptions?.phone
+      : recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.phone)
+  );
 
-  const hasAnyRecovery = existingEmail || existingPhone;
   const hasCurrentMethod =
     recovery_method === "email" ? existingEmail : existingPhone;
 
-  const isLoadingRecoveryData = hasPassword
-    ? recoveryMethodsQuery.isLoading
-    : recoveryOptionsByIdentifierQuery.isLoading && myRecoveryMethodsQuery.isLoading;
+  // Done loading when any query has resolved
+  const isLoadingRecoveryData =
+    myRecoveryMethodsQuery.isLoading &&
+    (hasPassword
+      ? recoveryMethodsQuery.isLoading
+      : recoveryOptionsByIdentifierQuery.isLoading);
 
   const getValue = () => {
     if (recovery_method === "email") return EMAIL_ADDR?.trim() || "";
@@ -174,29 +173,22 @@ function RecoveryCtr() {
 
     setIsSaving(true);
     try {
+      const method =
+        recovery_method === "email" ? "emailRecovery" : "phoneRecovery";
+
       if (hasCurrentMethod) {
         // Method already exists → UPDATE it
         await updateRecoveryMethodWithJwtMutation.mutateAsync({
-          method:
-            recovery_method === "email" ? "emailRecovery" : "phoneRecovery",
-          value,
-          otpCode,
-          ...identifierFields,
-        });
-      } else if (hasAnyRecovery) {
-        // Recovery exists but this specific method doesn't → ADD it
-        await addRecoveryMethodWithJwtMutation.mutateAsync({
-          method:
-            recovery_method === "email" ? "emailRecovery" : "phoneRecovery",
+          method,
           value,
           otpCode,
           ...identifierFields,
         });
       } else {
-        // No recovery at all → CREATE
-        await createRecoveryWithJwtMutation.mutateAsync({
-          emailRecovery: recovery_method === "email" ? value : undefined,
-          phoneRecovery: recovery_method === "phone" ? value : undefined,
+        // Method doesn't exist → ADD (also creates record if none exists)
+        await addRecoveryMethodWithJwtMutation.mutateAsync({
+          method,
+          value,
           otpCode,
           ...identifierFields,
         });
@@ -213,11 +205,8 @@ function RecoveryCtr() {
   const handleSave = () => {
     if (hasPassword) {
       // Password users: show password confirmation drawer
-      if (hasAnyRecovery) {
-        confirm_update_disclosure.onOpen();
-      } else {
-        confirm_create_disclosure.onOpen();
-      }
+      // ConfirmUpdate handles both add and update via direct API
+      confirm_update_disclosure.onOpen();
     } else {
       // Phone/email users: send OTP first, then verify
       handleSendOtp();
@@ -506,25 +495,15 @@ function RecoveryCtr() {
           )}
         </div>
 
-        {/* Password confirm drawers (only used for externalId/password users) */}
+        {/* Password confirm drawer (only used for externalId/password users) */}
         {hasPassword && (
-          <>
-            <PasswordConfirmCreate
-              {...confirm_create_disclosure}
-              recovery_method={recovery_method}
-              emailAddress={EMAIL_ADDR}
-              countryCode={COUNTRY}
-              phoneNumber={PHONE_NUMBER}
-            />
-
-            <PasswordConfirmUpdate
-              {...confirm_update_disclosure}
-              recovery_method={recovery_method}
-              emailAddress={EMAIL_ADDR}
-              countryCode={COUNTRY}
-              phoneNumber={PHONE_NUMBER}
-            />
-          </>
+          <PasswordConfirmUpdate
+            {...confirm_update_disclosure}
+            recovery_method={recovery_method}
+            emailAddress={EMAIL_ADDR}
+            countryCode={COUNTRY}
+            phoneNumber={PHONE_NUMBER}
+          />
         )}
       </div>
     </motion.div>

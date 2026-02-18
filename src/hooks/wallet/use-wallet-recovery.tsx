@@ -189,6 +189,8 @@ export default function useWalletRecovery(args: UseWalletRecoveryArgs) {
     mutationFn: (data: {
       method: "emailRecovery" | "phoneRecovery";
       value: string;
+      externalId?: string;
+      password?: string;
       otpCode?: string;
       phoneNumber?: string;
       email?: string;
@@ -199,6 +201,8 @@ export default function useWalletRecovery(args: UseWalletRecoveryArgs) {
     mutationFn: (data: {
       method: "emailRecovery" | "phoneRecovery";
       value: string;
+      externalId?: string;
+      password?: string;
       otpCode?: string;
       phoneNumber?: string;
       email?: string;

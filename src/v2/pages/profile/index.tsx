@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { toast } from "sonner";
@@ -38,6 +38,11 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { formatNumberWithCommas } from "@/lib/utils";
 import { generateReferralCode, getReferralLink } from "@/utils/referral";
 import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
@@ -65,7 +70,7 @@ export default function Profile() {
   const [referralCode, setReferralCode] = useState("");
 
   const { isTelegram, telegramUser } = usePlatformDetection();
-  const { userQuery } = useWalletAuth();
+  const { userQuery, signInMutation } = useWalletAuth();
   const { data: user, isLoading: userLoading } = useUser();
   const updateUserMutation = useUpdateUser();
   const {
@@ -86,6 +91,8 @@ export default function Profile() {
     recoveryMethodsQuery,
     recoveryOptionsByIdentifierQuery,
     removeRecoveryMethodMutation,
+    sendOtpMutation,
+    myRecoveryMethodsQuery,
   } = useWalletRecovery({
     externalId: userQuery?.data?.externalId,
     identifier: !hasPassword ? userIdentifier : undefined,
@@ -243,7 +250,15 @@ export default function Profile() {
     navigate(`/app/profile/recovery/${method}`);
   };
 
-  const onRemoveRecovery = async (method: "emailRecovery" | "phoneRecovery") => {
+  // --- Remove recovery verification flow ---
+  const [removeMethod, setRemoveMethod] = useState<"emailRecovery" | "phoneRecovery" | null>(null);
+  const [removeOtpStep, setRemoveOtpStep] = useState(false);
+  const [removeOtpCode, setRemoveOtpCode] = useState("");
+  const [removePassword, setRemovePassword] = useState("");
+  const [isSendingRemoveOtp, setIsSendingRemoveOtp] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const onRemoveRecovery = (method: "emailRecovery" | "phoneRecovery") => {
     // Can't remove the last method
     if (method === "emailRecovery" && !recoveryPhone) {
       toast.error("Cannot remove your only recovery method");
@@ -254,17 +269,81 @@ export default function Profile() {
       return;
     }
 
+    setRemoveMethod(method);
+    setRemoveOtpCode("");
+    setRemovePassword("");
+    setRemoveOtpStep(false);
+
+    if (!hasPassword && userIdentifier) {
+      // Non-password users: send OTP immediately
+      setIsSendingRemoveOtp(true);
+      sendOtpMutation
+        .mutateAsync({
+          identifier: userIdentifier,
+          type: userIdentifierType!,
+        })
+        .then(() => {
+          setRemoveOtpStep(true);
+          toast.success(
+            `Verification code sent to your ${userIdentifierType === "phone" ? "phone" : "email"}`
+          );
+        })
+        .catch((err: any) => {
+          toast.error(err.message || "Failed to send verification code");
+          setRemoveMethod(null);
+        })
+        .finally(() => setIsSendingRemoveOtp(false));
+    }
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!removeMethod) return;
+
+    const identifierFields =
+      userIdentifierType === "phone"
+        ? { phoneNumber: userIdentifier }
+        : { email: userIdentifier };
+
+    setIsRemoving(true);
     try {
-      await removeRecoveryMethodMutation.mutateAsync({
-        externalId: userQuery?.data?.externalId,
-        method,
-      });
+      if (hasPassword) {
+        // Verify password first
+        await signInMutation.mutateAsync({
+          externalId: userQuery?.data?.externalId,
+          password: removePassword,
+        });
+
+        await removeRecoveryMethodMutation.mutateAsync({
+          externalId: userQuery?.data?.externalId,
+          method: removeMethod,
+          password: removePassword,
+        });
+      } else {
+        // Non-password users: send OTP code + identifier
+        await removeRecoveryMethodMutation.mutateAsync({
+          method: removeMethod,
+          otpCode: removeOtpCode,
+          ...identifierFields,
+        });
+      }
+
       toast.success("Recovery method removed");
+      setRemoveMethod(null);
       recoveryMethodsQuery.refetch();
       recoveryOptionsByIdentifierQuery.refetch();
+      myRecoveryMethodsQuery.refetch();
     } catch (err: any) {
       toast.error(err.message || "Failed to remove recovery method");
+    } finally {
+      setIsRemoving(false);
     }
+  };
+
+  const closeRemoveDrawer = () => {
+    setRemoveMethod(null);
+    setRemoveOtpStep(false);
+    setRemoveOtpCode("");
+    setRemovePassword("");
   };
 
   const content = (
@@ -735,10 +814,10 @@ export default function Profile() {
                     <div className="w-px bg-gray-100" />
                     <button
                       onClick={() => onRemoveRecovery("emailRecovery")}
-                      disabled={removeRecoveryMethodMutation.isPending}
+                      disabled={!!removeMethod}
                       className="flex-1 py-2.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                     >
-                      {removeRecoveryMethodMutation.isPending ? "Removing..." : "Remove"}
+                      Remove
                     </button>
                   </>
                 ) : (
@@ -786,10 +865,10 @@ export default function Profile() {
                     <div className="w-px bg-gray-100" />
                     <button
                       onClick={() => onRemoveRecovery("phoneRecovery")}
-                      disabled={removeRecoveryMethodMutation.isPending}
+                      disabled={!!removeMethod}
                       className="flex-1 py-2.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                     >
-                      {removeRecoveryMethodMutation.isPending ? "Removing..." : "Remove"}
+                      Remove
                     </button>
                   </>
                 ) : (
@@ -802,6 +881,137 @@ export default function Profile() {
                 )}
               </div>
             </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Remove Recovery Verification Drawer */}
+      <Drawer
+        modal
+        open={!!removeMethod}
+        onClose={closeRemoveDrawer}
+        onOpenChange={(open) => {
+          if (!open) closeRemoveDrawer();
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader className="hidden">
+            <DrawerTitle>Verify to Remove</DrawerTitle>
+            <DrawerDescription>
+              Verify your identity to remove recovery method
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="w-full p-4 pb-6">
+            <p className="text-base font-semibold text-text-default">
+              Remove Recovery Method
+            </p>
+            <p className="text-sm text-text-subtle mt-0.5 mb-6">
+              Verify your identity to remove this recovery method
+            </p>
+
+            {hasPassword ? (
+              /* Password verification */
+              <div>
+                <p className="text-sm mb-2">Enter your password</p>
+                <div className="w-full rounded-2xl px-3 py-4 bg-surface-subtle border border-gray-200">
+                  <input
+                    className="w-full bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    placeholder="* * * * * *"
+                    type="password"
+                    value={removePassword}
+                    onChange={(e) => setRemovePassword(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <ActionButton
+                    onClick={closeRemoveDrawer}
+                    variant="ghost"
+                    className="flex-1 rounded-2xl border border-gray-200"
+                  >
+                    Cancel
+                  </ActionButton>
+                  <ActionButton
+                    variant="secondary"
+                    disabled={!removePassword || isRemoving}
+                    loading={isRemoving}
+                    onClick={handleConfirmRemove}
+                    className="flex-1 rounded-2xl bg-red-500 hover:bg-red-600"
+                  >
+                    Remove
+                  </ActionButton>
+                </div>
+              </div>
+            ) : removeOtpStep ? (
+              /* OTP verification */
+              <div>
+                <p className="text-sm text-text-subtle text-center mb-4">
+                  Enter the code sent to your{" "}
+                  {userIdentifierType === "phone" ? "phone" : "email"}
+                </p>
+
+                <div className="flex justify-center mb-4">
+                  <InputOTP
+                    value={removeOtpCode}
+                    onChange={setRemoveOtpCode}
+                    maxLength={4}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (!userIdentifier || !userIdentifierType) return;
+                    setIsSendingRemoveOtp(true);
+                    sendOtpMutation
+                      .mutateAsync({
+                        identifier: userIdentifier,
+                        type: userIdentifierType,
+                      })
+                      .then(() => toast.success("Code resent"))
+                      .catch((err: any) =>
+                        toast.error(err.message || "Failed to resend code")
+                      )
+                      .finally(() => setIsSendingRemoveOtp(false));
+                  }}
+                  disabled={isSendingRemoveOtp}
+                  className="w-full text-center text-sm text-accent-primary mb-4 disabled:opacity-50"
+                >
+                  {isSendingRemoveOtp ? "Sending..." : "Resend code"}
+                </button>
+
+                <div className="flex gap-3">
+                  <ActionButton
+                    onClick={closeRemoveDrawer}
+                    variant="ghost"
+                    className="flex-1 rounded-2xl border border-gray-200"
+                  >
+                    Cancel
+                  </ActionButton>
+                  <ActionButton
+                    variant="secondary"
+                    disabled={removeOtpCode.length < 4 || isRemoving}
+                    loading={isRemoving}
+                    onClick={handleConfirmRemove}
+                    className="flex-1 rounded-2xl bg-red-500 hover:bg-red-600"
+                  >
+                    Remove
+                  </ActionButton>
+                </div>
+              </div>
+            ) : (
+              /* Loading OTP */
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
           </div>
         </DrawerContent>
       </Drawer>

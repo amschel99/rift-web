@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router";
 
 import { forceClearCacheAndRefresh } from "@/utils/auto-update";
-import { IoChevronForward } from "react-icons/io5";
+import { IoChevronForward, IoCloseOutline } from "react-icons/io5";
 import { FiRefreshCw } from "react-icons/fi";
+import { Shield } from "lucide-react";
 import {
   IoArrowUpCircle,
   IoArrowDownCircle,
@@ -53,6 +54,8 @@ import { toast } from "sonner";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
 import DesktopPageLayout from "@/components/layouts/desktop-page-layout";
 import RiftLoader from "@/components/ui/rift-loader";
+import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
+import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -63,6 +66,55 @@ export default function Home() {
   const send_disclosure = useDisclosure();
   const { checkKYC, showKYCModal, closeKYCModal, featureName, isUnderReview } =
     useKYCGuard();
+
+  // Recovery warning
+  const { userQuery } = useWalletAuth();
+  const hasPassword = !!userQuery?.data?.externalId;
+  const userIdentifier = userQuery?.data?.phoneNumber || userQuery?.data?.email;
+  const userIdentifierType: "phone" | "email" | undefined = userQuery?.data?.phoneNumber
+    ? "phone"
+    : userQuery?.data?.email
+    ? "email"
+    : undefined;
+
+  const {
+    recoveryMethodsQuery,
+    recoveryOptionsByIdentifierQuery,
+    myRecoveryMethodsQuery,
+  } = useWalletRecovery({
+    externalId: userQuery?.data?.externalId,
+    identifier: !hasPassword ? userIdentifier : undefined,
+    identifierType: !hasPassword ? userIdentifierType : undefined,
+  });
+
+  const recoveryEmail = myRecoveryMethodsQuery.data?.recovery?.email
+    || (hasPassword
+      ? recoveryMethodsQuery.data?.recoveryOptions?.email
+      : recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.email);
+  const recoveryPhone = myRecoveryMethodsQuery.data?.recovery?.phoneNumber
+    || (hasPassword
+      ? recoveryMethodsQuery.data?.recoveryOptions?.phone
+      : recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.phone);
+
+  const hasNoRecovery = !recoveryEmail && !recoveryPhone;
+  const recoveryDataLoaded =
+    myRecoveryMethodsQuery.isFetched ||
+    recoveryMethodsQuery.isFetched ||
+    recoveryOptionsByIdentifierQuery.isFetched;
+
+  const [recoveryDismissed, setRecoveryDismissed] = useState(() => {
+    const dismissed = localStorage.getItem("recovery_warning_dismissed");
+    if (!dismissed) return false;
+    // Re-show after 24 hours
+    return Date.now() - parseInt(dismissed, 10) < 24 * 60 * 60 * 1000;
+  });
+
+  const dismissRecoveryWarning = () => {
+    localStorage.setItem("recovery_warning_dismissed", Date.now().toString());
+    setRecoveryDismissed(true);
+  };
+
+  const showRecoveryWarning = recoveryDataLoaded && hasNoRecovery && !recoveryDismissed;
 
   // Detect user's country and currency based on IP
   const { data: countryInfo, isLoading: countryLoading } =
@@ -329,6 +381,44 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Recovery Warning Banner */}
+            <AnimatePresence>
+              {showRecoveryWarning && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-4.5 h-4.5 text-amber-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-amber-900">
+                        No recovery method set up
+                      </p>
+                      <p className="text-xs text-amber-700 mt-0.5">
+                        You risk losing access to your account. Add a recovery email or phone number.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/app/profile")}
+                      className="px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-xl hover:bg-amber-700 transition-colors flex-shrink-0"
+                    >
+                      Set Up
+                    </button>
+                    <button
+                      onClick={dismissRecoveryWarning}
+                      className="p-1 text-amber-400 hover:text-amber-600 transition-colors flex-shrink-0"
+                    >
+                      <IoCloseOutline className="w-5 h-5" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Action Buttons */}
             {isAdvanced && (
               <div className="grid grid-cols-5 gap-3">
@@ -508,6 +598,44 @@ export default function Home() {
               </div>
             </div>
             </div>
+
+            {/* Recovery Warning Banner (Mobile) */}
+            <AnimatePresence>
+              {showRecoveryWarning && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden mb-4"
+                >
+                  <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-amber-900">
+                        No recovery method
+                      </p>
+                      <p className="text-2xs text-amber-700">
+                        You could lose access to your account
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/app/profile")}
+                      className="px-2.5 py-1 bg-amber-600 text-white text-2xs font-medium rounded-lg hover:bg-amber-700 transition-colors flex-shrink-0"
+                    >
+                      Set Up
+                    </button>
+                    <button
+                      onClick={dismissRecoveryWarning}
+                      className="p-0.5 text-amber-400 hover:text-amber-600 transition-colors flex-shrink-0"
+                    >
+                      <IoCloseOutline className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Mobile Action Buttons - Show only in advanced mode */}
             {isAdvanced && (

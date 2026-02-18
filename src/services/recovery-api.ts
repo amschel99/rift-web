@@ -140,6 +140,8 @@ export async function createRecoveryWithJwt(data: {
 export async function addRecoveryMethodWithJwt(data: {
   method: "emailRecovery" | "phoneRecovery";
   value: string;
+  externalId?: string;
+  password?: string;
   otpCode?: string;
   phoneNumber?: string;
   email?: string;
@@ -155,6 +157,8 @@ export async function addRecoveryMethodWithJwt(data: {
 export async function updateRecoveryMethodWithJwt(data: {
   method: "emailRecovery" | "phoneRecovery";
   value: string;
+  externalId?: string;
+  password?: string;
   otpCode?: string;
   phoneNumber?: string;
   email?: string;

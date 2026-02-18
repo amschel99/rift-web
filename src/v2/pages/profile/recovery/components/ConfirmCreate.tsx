@@ -26,8 +26,7 @@ export default function PasswordConfirmCreate(
 ) {
   const { isOpen, onOpen, onClose } = props;
   const navigate = useNavigate();
-  const { signInMutation, addRecoveryMutation, createRecoveryMutation } =
-    useRecovery();
+  const { signInMutation, addRecoveryMethodWithJwtMutation } = useRecovery();
   const { userQuery } = useWalletAuth();
 
   const form = useForm<RECOVERY_SCHEMA_TYPE>({
@@ -53,33 +52,41 @@ export default function PasswordConfirmCreate(
           : props.phoneNumber?.trim();
         phoneNum = (props.countryCode?.trim() || "+254") + phoneNum;
 
-        createRecoveryMutation
+        const method =
+          props.recovery_method === "email"
+            ? "emailRecovery"
+            : ("phoneRecovery" as const);
+        const value =
+          props.recovery_method === "email"
+            ? props.emailAddress!
+            : phoneNum!;
+
+        // add-method also creates the recovery record if none exists
+        addRecoveryMethodWithJwtMutation
           ?.mutateAsync({
-            externalId: EXTERNAL_ID!,
-            password: PASSWORD!,
-            emailRecovery:
-              props.recovery_method === "email"
-                ? props.emailAddress
-                : undefined,
-            phoneRecovery:
-              props.recovery_method === "phone" ? phoneNum : undefined,
+            method,
+            value,
+            externalId: EXTERNAL_ID,
+            password: PASSWORD,
           })
           .then(() => {
-            toast.success("Recovery method was updated successfully");
+            toast.success("Recovery method was created successfully");
             onClose();
             navigate("/app/profile");
           })
           .catch(() => {
-            toast.error("Failed to update your recovery method");
+            toast.error("Failed to create your recovery method");
           });
       } else {
         toast.error("Verification failed, please try again");
       }
     } catch (e) {
-      
       toast.error("Verification failed, please try again");
     }
   };
+
+  const isPending =
+    signInMutation?.isPending || addRecoveryMethodWithJwtMutation?.isPending;
 
   return (
     <Drawer
@@ -124,14 +131,8 @@ export default function PasswordConfirmCreate(
           <div className="flex flex-row flex-nowrap gap-3 fixed bottom-0 left-0 right-0 p-4 py-2 border-t-1 border-border bg-app-background">
             <ActionButton
               variant="secondary"
-              loading={
-                signInMutation?.isPending || addRecoveryMutation?.isPending
-              }
-              disabled={
-                !PASSWORD ||
-                signInMutation?.isPending ||
-                addRecoveryMutation?.isPending
-              }
+              loading={isPending}
+              disabled={!PASSWORD || isPending}
               onClick={onVerify}
               className="p-[0.625rem]"
             >

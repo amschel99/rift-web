@@ -50,7 +50,10 @@ export default function ForgotPassword() {
         return;
       }
 
-      setRecoveryOptions(options);
+      setRecoveryOptions({
+        email: options.email ?? null,
+        phone: options.phone ?? null,
+      });
       setStep("choose-method");
     } catch {
       toast.error("Could not find account. Please check your username.");
