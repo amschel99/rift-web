@@ -514,6 +514,18 @@ export default function Start() {
                   </span>
                 )}
               </motion.div>
+
+              {/* Lost access link */}
+              <button
+                onClick={() => {
+                  onLoginClose();
+                  flow.goToNext("account-recovery-start");
+                }}
+                className="w-full text-center py-2 text-xs text-text-subtle hover:text-accent-primary transition-colors"
+              >
+                Lost access to your phone or email?{" "}
+                <span className="text-accent-primary font-medium">Recover account</span>
+              </button>
             </div>
           </DrawerContent>
         </Drawer>

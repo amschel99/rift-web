@@ -25,6 +25,7 @@ const stepsSchema = z.enum([
   "login-email-code",
   "auth-check",
   "forgot-password",
+  "account-recovery-start",
 ]);
 
 const authMethodSchema = z.enum(["phone", "email", "username-password"]);
