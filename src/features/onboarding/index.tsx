@@ -10,6 +10,7 @@ import KYC from "./steps/kyc";
 import Created from "./steps/created";
 import AuthCheck from "./steps/auth-check";
 import ForgotPassword from "./steps/forgot-password";
+import AccountRecoveryStart from "./steps/account-recovery-start";
 
 export default function Onboarding() {
   return (
@@ -70,6 +71,9 @@ export function _Onboarding() {
       }
       case "forgot-password": {
         return <ForgotPassword />;
+      }
+      case "account-recovery-start": {
+        return <AccountRecoveryStart />;
       }
     }
   }, [CURRENT_STEP]);

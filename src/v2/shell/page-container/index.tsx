@@ -31,6 +31,8 @@ import Pay from "@/features/pay";
 import Withdraw from "@/features/withdraw";
 import SuspendedPage from "@/v2/pages/suspended";
 import KYCPage from "@/v2/pages/kyc";
+import ResetPassword from "@/features/recovery/reset-password";
+import RecoverAccount from "@/features/recovery/recover-account";
 
 export default function PageContainer() {
   const { form } = useShellContext();
@@ -167,6 +169,9 @@ export default function PageContainer() {
           </Shell>
         }
       />
+      {/* Recovery deep link routes (unauthenticated) */}
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/recover-account" element={<RecoverAccount />} />
       {/* Catch-all route - redirect unknown paths to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

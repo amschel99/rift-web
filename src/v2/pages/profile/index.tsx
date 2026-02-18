@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ import { FaTelegram } from "react-icons/fa";
 import { HiMiniUser } from "react-icons/hi2";
 import { MdAlternateEmail } from "react-icons/md";
 import { HiPhone } from "react-icons/hi";
-import { Pencil, Check, X, Gift } from "lucide-react";
+import { Pencil, Check, X, Gift, Shield } from "lucide-react";
 import { usePlatformDetection } from "@/utils/platform";
 import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import useUser from "@/hooks/data/use-user";
@@ -38,6 +38,11 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { formatNumberWithCommas } from "@/lib/utils";
 import { generateReferralCode, getReferralLink } from "@/utils/referral";
 import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
@@ -65,7 +70,7 @@ export default function Profile() {
   const [referralCode, setReferralCode] = useState("");
 
   const { isTelegram, telegramUser } = usePlatformDetection();
-  const { userQuery } = useWalletAuth();
+  const { userQuery, signInMutation } = useWalletAuth();
   const { data: user, isLoading: userLoading } = useUser();
   const updateUserMutation = useUpdateUser();
   const {
@@ -74,9 +79,33 @@ export default function Profile() {
     isLoading: kycLoading,
   } = useKYCStatus();
 
-  const { recoveryMethodsQuery } = useWalletRecovery({
+  const hasPassword = !!userQuery?.data?.externalId;
+  const userIdentifier = userQuery?.data?.phoneNumber || userQuery?.data?.email;
+  const userIdentifierType: "phone" | "email" | undefined = userQuery?.data?.phoneNumber
+    ? "phone"
+    : userQuery?.data?.email
+    ? "email"
+    : undefined;
+
+  const {
+    recoveryMethodsQuery,
+    recoveryOptionsByIdentifierQuery,
+    removeRecoveryMethodMutation,
+    sendOtpMutation,
+    myRecoveryMethodsQuery,
+  } = useWalletRecovery({
     externalId: userQuery?.data?.externalId,
+    identifier: !hasPassword ? userIdentifier : undefined,
+    identifierType: !hasPassword ? userIdentifierType : undefined,
   });
+
+  // Compute connected recovery methods (works for both user types)
+  const recoveryEmail = hasPassword
+    ? recoveryMethodsQuery.data?.recoveryOptions?.email
+    : recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.email;
+  const recoveryPhone = hasPassword
+    ? recoveryMethodsQuery.data?.recoveryOptions?.phone
+    : recoveryOptionsByIdentifierQuery.data?.recoveryOptions?.phone;
 
   // Detect country and get selected currency
   const { data: countryInfo } = useCountryDetection();
@@ -217,16 +246,104 @@ export default function Profile() {
   };
 
   const onRecover = (method: "phone" | "email") => {
-    if (
-      (method == "phone" &&
-        recoveryMethodsQuery?.data?.recoveryOptions?.phone) ||
-      (method == "email" && recoveryMethodsQuery?.data?.recoveryOptions?.email)
-    ) {
-      toast.success("Your'e all set");
-    } else {
-      onClose();
-      navigate(`/app/profile/recovery/${method}`);
+    onClose();
+    navigate(`/app/profile/recovery/${method}`);
+  };
+
+  // --- Remove recovery verification flow ---
+  const [removeMethod, setRemoveMethod] = useState<"emailRecovery" | "phoneRecovery" | null>(null);
+  const [removeOtpStep, setRemoveOtpStep] = useState(false);
+  const [removeOtpCode, setRemoveOtpCode] = useState("");
+  const [removePassword, setRemovePassword] = useState("");
+  const [isSendingRemoveOtp, setIsSendingRemoveOtp] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const onRemoveRecovery = (method: "emailRecovery" | "phoneRecovery") => {
+    // Can't remove the last method
+    if (method === "emailRecovery" && !recoveryPhone) {
+      toast.error("Cannot remove your only recovery method");
+      return;
     }
+    if (method === "phoneRecovery" && !recoveryEmail) {
+      toast.error("Cannot remove your only recovery method");
+      return;
+    }
+
+    setRemoveMethod(method);
+    setRemoveOtpCode("");
+    setRemovePassword("");
+    setRemoveOtpStep(false);
+
+    if (!hasPassword && userIdentifier) {
+      // Non-password users: send OTP immediately
+      setIsSendingRemoveOtp(true);
+      sendOtpMutation
+        .mutateAsync({
+          identifier: userIdentifier,
+          type: userIdentifierType!,
+        })
+        .then(() => {
+          setRemoveOtpStep(true);
+          toast.success(
+            `Verification code sent to your ${userIdentifierType === "phone" ? "phone" : "email"}`
+          );
+        })
+        .catch((err: any) => {
+          toast.error(err.message || "Failed to send verification code");
+          setRemoveMethod(null);
+        })
+        .finally(() => setIsSendingRemoveOtp(false));
+    }
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!removeMethod) return;
+
+    const identifierFields =
+      userIdentifierType === "phone"
+        ? { phoneNumber: userIdentifier }
+        : { email: userIdentifier };
+
+    setIsRemoving(true);
+    try {
+      if (hasPassword) {
+        // Verify password first
+        await signInMutation.mutateAsync({
+          externalId: userQuery?.data?.externalId,
+          password: removePassword,
+        });
+
+        await removeRecoveryMethodMutation.mutateAsync({
+          externalId: userQuery?.data?.externalId,
+          method: removeMethod,
+          password: removePassword,
+        });
+      } else {
+        // Non-password users: send OTP code + identifier
+        await removeRecoveryMethodMutation.mutateAsync({
+          method: removeMethod,
+          otpCode: removeOtpCode,
+          ...identifierFields,
+        });
+      }
+
+      toast.success("Recovery method removed");
+      setRemoveMethod(null);
+      recoveryMethodsQuery.refetch();
+      recoveryOptionsByIdentifierQuery.refetch();
+      myRecoveryMethodsQuery.refetch();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to remove recovery method");
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
+  const closeRemoveDrawer = () => {
+    setRemoveMethod(null);
+    setRemoveOtpStep(false);
+    setRemoveOtpCode("");
+    setRemovePassword("");
   };
 
   const content = (
@@ -465,6 +582,33 @@ export default function Profile() {
             </div>
             <IoChevronForward className="text-text-subtle" />
           </button>
+
+          {/* Account Recovery */}
+          <button
+            onClick={onAddRecovery}
+            className={`w-full px-4 py-3.5 flex items-center justify-between transition-colors ${
+              isDesktop
+                ? "hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                : "hover:bg-surface-subtle/50"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                <Shield className="text-orange-500 w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-text-default">
+                  Account Recovery
+                </p>
+                <p className="text-xs text-text-subtle">
+                  {recoveryEmail || recoveryPhone
+                    ? "Recovery method configured"
+                    : "Set up a backup contact"}
+                </p>
+              </div>
+            </div>
+            <IoChevronForward className="text-text-subtle" />
+          </button>
         </div>
 
         {/* Compliance Section */}
@@ -628,39 +772,246 @@ export default function Profile() {
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="w-full h-full p-4">
-            <p className="text-md font-medium">
-              Account Recovery <br />
-              <span className="text-sm font-light">
-                Setup an account recovery method
-              </span>
+          <div className="w-full h-full p-4 pb-6">
+            <p className="text-base font-semibold text-text-default">
+              Account Recovery
+            </p>
+            <p className="text-sm text-text-subtle mt-0.5 mb-4">
+              Add a backup contact to recover your account
             </p>
 
-            <ActionButton
-              onClick={() => onRecover("email")}
-              className="w-full bg-transparent p-3.5 mt-4 rounded-2xl border-1 border-surface-subtle"
-            >
-              <span className="w-full flex flex-row items-center justify-between">
-                <span className="text-text-subtle">
-                  {recoveryMethodsQuery?.data?.recoveryOptions?.email ??
-                    "Add an Email Address"}
-                </span>
-                <MdAlternateEmail className="text-text-subtle text-xl" />
-              </span>
-            </ActionButton>
+            {/* Email Recovery */}
+            <div className="mt-2 rounded-2xl border border-gray-200 bg-white overflow-hidden">
+              <div className="w-full flex items-center gap-3 p-3.5">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                  recoveryEmail ? "bg-green-500/10" : "bg-gray-100"
+                }`}>
+                  <MdAlternateEmail className={`text-lg ${
+                    recoveryEmail ? "text-green-500" : "text-text-subtle"
+                  }`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-text-default">
+                    Email Recovery
+                  </p>
+                  <p className={`text-xs truncate ${recoveryEmail ? "text-green-600" : "text-text-subtle"}`}>
+                    {recoveryEmail || "Not configured"}
+                  </p>
+                </div>
+                {recoveryEmail ? (
+                  <IoCheckmarkCircle className="text-green-500 text-lg flex-shrink-0" />
+                ) : null}
+              </div>
+              <div className="flex border-t border-gray-100">
+                {recoveryEmail ? (
+                  <>
+                    <button
+                      onClick={() => onRecover("email")}
+                      className="flex-1 py-2.5 text-xs font-medium text-accent-primary hover:bg-gray-50 transition-colors"
+                    >
+                      Update
+                    </button>
+                    <div className="w-px bg-gray-100" />
+                    <button
+                      onClick={() => onRemoveRecovery("emailRecovery")}
+                      disabled={!!removeMethod}
+                      className="flex-1 py-2.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      Remove
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => onRecover("email")}
+                    className="flex-1 py-2.5 text-xs font-medium text-accent-primary hover:bg-gray-50 transition-colors"
+                  >
+                    Add Email
+                  </button>
+                )}
+              </div>
+            </div>
 
-            <ActionButton
-              onClick={() => onRecover("phone")}
-              className="w-full bg-transparent p-3.5 mt-4 rounded-2xl border-1 border-surface-subtle"
-            >
-              <span className="w-full flex flex-row items-center justify-between">
-                <span className="text-text-subtle">
-                  {recoveryMethodsQuery?.data?.recoveryOptions?.phone ??
-                    "Add a Phone Number"}
-                </span>
-                <HiPhone className="text-text-subtle text-xl" />
-              </span>
-            </ActionButton>
+            {/* Phone Recovery */}
+            <div className="mt-2 rounded-2xl border border-gray-200 bg-white overflow-hidden">
+              <div className="w-full flex items-center gap-3 p-3.5">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                  recoveryPhone ? "bg-green-500/10" : "bg-gray-100"
+                }`}>
+                  <HiPhone className={`text-lg ${
+                    recoveryPhone ? "text-green-500" : "text-text-subtle"
+                  }`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-text-default">
+                    Phone Recovery
+                  </p>
+                  <p className={`text-xs truncate ${recoveryPhone ? "text-green-600" : "text-text-subtle"}`}>
+                    {recoveryPhone || "Not configured"}
+                  </p>
+                </div>
+                {recoveryPhone ? (
+                  <IoCheckmarkCircle className="text-green-500 text-lg flex-shrink-0" />
+                ) : null}
+              </div>
+              <div className="flex border-t border-gray-100">
+                {recoveryPhone ? (
+                  <>
+                    <button
+                      onClick={() => onRecover("phone")}
+                      className="flex-1 py-2.5 text-xs font-medium text-accent-primary hover:bg-gray-50 transition-colors"
+                    >
+                      Update
+                    </button>
+                    <div className="w-px bg-gray-100" />
+                    <button
+                      onClick={() => onRemoveRecovery("phoneRecovery")}
+                      disabled={!!removeMethod}
+                      className="flex-1 py-2.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      Remove
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => onRecover("phone")}
+                    className="flex-1 py-2.5 text-xs font-medium text-accent-primary hover:bg-gray-50 transition-colors"
+                  >
+                    Add Phone
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Remove Recovery Verification Drawer */}
+      <Drawer
+        modal
+        open={!!removeMethod}
+        onClose={closeRemoveDrawer}
+        onOpenChange={(open) => {
+          if (!open) closeRemoveDrawer();
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader className="hidden">
+            <DrawerTitle>Verify to Remove</DrawerTitle>
+            <DrawerDescription>
+              Verify your identity to remove recovery method
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="w-full p-4 pb-6">
+            <p className="text-base font-semibold text-text-default">
+              Remove Recovery Method
+            </p>
+            <p className="text-sm text-text-subtle mt-0.5 mb-6">
+              Verify your identity to remove this recovery method
+            </p>
+
+            {hasPassword ? (
+              /* Password verification */
+              <div>
+                <p className="text-sm mb-2">Enter your password</p>
+                <div className="w-full rounded-2xl px-3 py-4 bg-surface-subtle border border-gray-200">
+                  <input
+                    className="w-full bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    placeholder="* * * * * *"
+                    type="password"
+                    value={removePassword}
+                    onChange={(e) => setRemovePassword(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <ActionButton
+                    onClick={closeRemoveDrawer}
+                    variant="ghost"
+                    className="flex-1 rounded-2xl border border-gray-200"
+                  >
+                    Cancel
+                  </ActionButton>
+                  <ActionButton
+                    variant="secondary"
+                    disabled={!removePassword || isRemoving}
+                    loading={isRemoving}
+                    onClick={handleConfirmRemove}
+                    className="flex-1 rounded-2xl bg-red-500 hover:bg-red-600"
+                  >
+                    Remove
+                  </ActionButton>
+                </div>
+              </div>
+            ) : removeOtpStep ? (
+              /* OTP verification */
+              <div>
+                <p className="text-sm text-text-subtle text-center mb-4">
+                  Enter the code sent to your{" "}
+                  {userIdentifierType === "phone" ? "phone" : "email"}
+                </p>
+
+                <div className="flex justify-center mb-4">
+                  <InputOTP
+                    value={removeOtpCode}
+                    onChange={setRemoveOtpCode}
+                    maxLength={4}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (!userIdentifier || !userIdentifierType) return;
+                    setIsSendingRemoveOtp(true);
+                    sendOtpMutation
+                      .mutateAsync({
+                        identifier: userIdentifier,
+                        type: userIdentifierType,
+                      })
+                      .then(() => toast.success("Code resent"))
+                      .catch((err: any) =>
+                        toast.error(err.message || "Failed to resend code")
+                      )
+                      .finally(() => setIsSendingRemoveOtp(false));
+                  }}
+                  disabled={isSendingRemoveOtp}
+                  className="w-full text-center text-sm text-accent-primary mb-4 disabled:opacity-50"
+                >
+                  {isSendingRemoveOtp ? "Sending..." : "Resend code"}
+                </button>
+
+                <div className="flex gap-3">
+                  <ActionButton
+                    onClick={closeRemoveDrawer}
+                    variant="ghost"
+                    className="flex-1 rounded-2xl border border-gray-200"
+                  >
+                    Cancel
+                  </ActionButton>
+                  <ActionButton
+                    variant="secondary"
+                    disabled={removeOtpCode.length < 4 || isRemoving}
+                    loading={isRemoving}
+                    onClick={handleConfirmRemove}
+                    className="flex-1 rounded-2xl bg-red-500 hover:bg-red-600"
+                  >
+                    Remove
+                  </ActionButton>
+                </div>
+              </div>
+            ) : (
+              /* Loading OTP */
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
           </div>
         </DrawerContent>
       </Drawer>

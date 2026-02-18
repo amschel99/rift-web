@@ -1,13 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import { z } from "zod";
-import { UseMutationResult } from "@tanstack/react-query";
-import {
-  LoginResponse,
-  CreateRecoveryRequest,
-  UpdateRecoveryMethodRequest,
-  CreateRecoveryResponse,
-  UpdateRecoveryMethodResponse,
-} from "@rift-finance/wallet";
+import { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
+import { LoginResponse } from "@rift-finance/wallet";
 import useWalletAuth, { signInArgs } from "@/hooks/wallet/use-wallet-auth";
 import useWalletRecovery from "@/hooks/wallet/use-wallet-recovery";
 
@@ -30,24 +24,50 @@ interface RecoveryContext {
     signInArgs,
     unknown
   > | null;
-  createRecoveryMutation: UseMutationResult<
-    CreateRecoveryResponse,
+  addRecoveryMethodWithJwtMutation: UseMutationResult<
+    { message: string },
     Error,
-    CreateRecoveryRequest,
+    {
+      method: "emailRecovery" | "phoneRecovery";
+      value: string;
+      externalId?: string;
+      password?: string;
+      otpCode?: string;
+      phoneNumber?: string;
+      email?: string;
+    },
     unknown
   > | null;
-  addRecoveryMutation: UseMutationResult<
-    UpdateRecoveryMethodResponse,
+  updateRecoveryMethodWithJwtMutation: UseMutationResult<
+    { message: string },
     Error,
-    UpdateRecoveryMethodRequest,
+    {
+      method: "emailRecovery" | "phoneRecovery";
+      value: string;
+      externalId?: string;
+      password?: string;
+      otpCode?: string;
+      phoneNumber?: string;
+      email?: string;
+    },
     unknown
   > | null;
+  myRecoveryMethodsQuery: UseQueryResult<{
+    recovery: {
+      id: string;
+      email: string | null;
+      phoneNumber: string | null;
+      createdAt?: string;
+      updatedAt?: string;
+    } | null;
+  }> | null;
 }
 
 const RecoveryContext = createContext<RecoveryContext>({
-  signInMutation: null, // attemp login to verify paasword
-  createRecoveryMutation: null,
-  addRecoveryMutation: null,
+  signInMutation: null,
+  addRecoveryMethodWithJwtMutation: null,
+  updateRecoveryMethodWithJwtMutation: null,
+  myRecoveryMethodsQuery: null,
 });
 
 interface Props {
@@ -58,14 +78,19 @@ export default function RecoveryContextProvider(props: Props) {
   const { children } = props;
 
   const { signInMutation } = useWalletAuth();
-  const { addRecoveryMutation, createRecoveryMutation } = useWalletRecovery({});
+  const {
+    addRecoveryMethodWithJwtMutation,
+    updateRecoveryMethodWithJwtMutation,
+    myRecoveryMethodsQuery,
+  } = useWalletRecovery({});
 
   return (
     <RecoveryContext.Provider
       value={{
         signInMutation,
-        createRecoveryMutation,
-        addRecoveryMutation,
+        addRecoveryMethodWithJwtMutation,
+        updateRecoveryMethodWithJwtMutation,
+        myRecoveryMethodsQuery,
       }}
     >
       {children}
