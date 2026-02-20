@@ -1,9 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import { useSearchParams, useNavigate } from "react-router";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { FiUser, FiMail, FiSmartphone } from "react-icons/fi";
 import { ChevronDown, SearchIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -351,6 +348,7 @@ export default function RecoverAccount() {
                   value={otpCode}
                   onChange={setOtpCode}
                   maxLength={identifierType === "phone" ? 6 : 4}
+                  inputMode={identifierType === "email" ? "text" : "numeric"}
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />

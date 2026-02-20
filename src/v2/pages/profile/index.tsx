@@ -956,6 +956,7 @@ export default function Profile() {
                     value={removeOtpCode}
                     onChange={setRemoveOtpCode}
                     maxLength={4}
+                    inputMode={userIdentifierType === "email" ? "text" : "numeric"}
                   >
                     <InputOTPGroup>
                       <InputOTPSlot index={0} />
