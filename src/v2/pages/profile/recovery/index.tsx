@@ -277,6 +277,7 @@ function RecoveryCtr() {
                   value={otpCode}
                   onChange={setOtpCode}
                   maxLength={4}
+                  inputMode={userIdentifierType === "email" ? "text" : "numeric"}
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
