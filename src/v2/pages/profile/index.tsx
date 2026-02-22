@@ -44,7 +44,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { formatNumberWithCommas } from "@/lib/utils";
-import { generateReferralCode, getReferralLink } from "@/utils/referral";
+import { getReferralLink } from "@/utils/referral";
 import { useOnboardingDemo } from "@/contexts/OnboardingDemoContext";
 import { forceClearCacheAndRefresh, APP_VERSION } from "@/utils/auto-update";
 import useAnalaytics from "@/hooks/use-analytics";
@@ -67,11 +67,11 @@ export default function Profile() {
   const [showWithdrawalWarning, setShowWithdrawalWarning] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
-  const [referralCode, setReferralCode] = useState("");
 
   const { isTelegram, telegramUser } = usePlatformDetection();
   const { userQuery, signInMutation } = useWalletAuth();
   const { data: user, isLoading: userLoading } = useUser();
+  const referralCode = user?.referralCode || "";
   const updateUserMutation = useUpdateUser();
   const {
     isKYCVerified,
@@ -133,18 +133,6 @@ export default function Profile() {
   if (userDisplayName && !displayName) {
     setDisplayName(userDisplayName);
   }
-
-  // Initialize or load referral code
-  useEffect(() => {
-    const storedCode = localStorage.getItem("referral_code");
-    if (storedCode) {
-      setReferralCode(storedCode);
-    } else {
-      const newCode = generateReferralCode();
-      localStorage.setItem("referral_code", newCode);
-      setReferralCode(newCode);
-    }
-  }, []);
 
   const referralLink = getReferralLink(referralCode);
 

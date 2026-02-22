@@ -25,6 +25,7 @@ type ANALYTIC_EVENT_TYPES =
   | "PAGE_VISIT_INVEST"
   | "PAGE_VISIT_VAULT"
   | "PAGE_VISIT_KYC"
+  | "PAGE_VISIT_WEEKLY_POOL"
   
   // Money Flows - Deposits & Onramps
   | "DEPOSIT"
