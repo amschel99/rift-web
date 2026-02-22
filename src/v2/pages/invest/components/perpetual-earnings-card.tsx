@@ -46,9 +46,6 @@ export default function PerpetualEarningsCard() {
             <p className="text-sm font-semibold text-text-default">
               Referral Earnings
             </p>
-            <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-700 rounded-full">
-              FOREVER
-            </span>
           </div>
 
           <p className="text-xs text-text-subtle">
