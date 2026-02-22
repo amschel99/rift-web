@@ -22,7 +22,22 @@ export default function WeeklyPoolCard() {
     return () => clearInterval(interval);
   }, []);
 
-  if (isLoading || !pool) return null;
+  if (isLoading) {
+    return (
+      <div className="bg-surface-alt border border-surface-subtle rounded-2xl p-4 animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-surface flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-28 bg-surface rounded-full" />
+            <div className="h-3 w-40 bg-surface rounded-full" />
+            <div className="h-1.5 w-full bg-surface rounded-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!pool) return null;
 
   return (
     <motion.div
