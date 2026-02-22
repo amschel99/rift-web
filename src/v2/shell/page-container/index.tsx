@@ -14,6 +14,7 @@ import Profile from "@/v2/pages/profile";
 import Recovery from "@/v2/pages/profile/recovery";
 import Invest from "@/v2/pages/invest";
 import SailVault from "@/v2/pages/invest/sail-vault";
+import WeeklyPool from "@/v2/pages/invest/weekly-pool";
 import Agent from "@/features/agent";
 import TokenInfo from "@/features/token";
 import ReceiveFromAddress from "@/features/receive/address";
@@ -166,6 +167,14 @@ export default function PageContainer() {
         element={
           <Shell>
             <SailVault />
+          </Shell>
+        }
+      />
+      <Route
+        path="/app/invest/weekly-pool"
+        element={
+          <Shell>
+            <WeeklyPool />
           </Shell>
         }
       />
