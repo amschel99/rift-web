@@ -317,7 +317,7 @@ export default function WeeklyPool() {
                       "Use at least $50 this week (swaps, sends, payments, top-ups — it all counts)",
                       "Invite friends — if they use $50 total between them, you get a 1.2x boost for each friend",
                       "Every Sunday at midnight, one lucky winner is picked from everyone who qualified",
-                      "$10 USDC goes straight to the winner's wallet",
+                      "$10 USD goes straight to the winner's wallet",
                     ].map((text, i) => (
                       <div key={i} className="flex items-start gap-2.5">
                         <span className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-primary text-xs flex items-center justify-center font-medium flex-shrink-0 mt-0.5">
@@ -387,7 +387,7 @@ export default function WeeklyPool() {
         {/* Disclaimer */}
         <p className="text-xs text-text-subtle/60 text-center mt-2 mb-6">
           Winner is selected randomly from qualified participants. $10 prize
-          paid in USDC.
+          paid in USD.
         </p>
       </div>
     </motion.div>

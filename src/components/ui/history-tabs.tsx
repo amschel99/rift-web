@@ -75,7 +75,7 @@ export default function HistoryTabs({
     // Only show onchain tab in advanced mode
     ...(isAdvancedMode ? [{
       id: "onchain" as TabType,
-      label: "Onchain",
+      label: "Transfers",
       icon: History,
     }] : []),
   ];

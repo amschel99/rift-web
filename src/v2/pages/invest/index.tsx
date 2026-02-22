@@ -6,6 +6,7 @@ import useAnalaytics from "@/hooks/use-analytics";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
 import DesktopPageLayout from "@/components/layouts/desktop-page-layout";
 import WeeklyPoolCard from "./components/weekly-pool-card";
+import PerpetualEarningsCard from "./components/perpetual-earnings-card";
 
 interface Asset {
   id: string;
@@ -103,6 +104,7 @@ export default function Invest() {
       >
         <div className={`${isDesktop ? "max-w-4xl mx-auto" : ""} space-y-4`}>
           <WeeklyPoolCard />
+          <PerpetualEarningsCard />
           {ASSETS.map((asset) => (
             <motion.div
               key={asset.id}

@@ -430,7 +430,7 @@ export default function Home() {
                       <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
                         <IoArrowUpCircle className="w-5 h-5 text-accent-primary group-hover:text-white transition-colors" />
                       </div>
-                      <span className="text-sm font-medium text-gray-700">Send</span>
+                      <span className="text-sm font-medium text-gray-700">Wallet</span>
                     </button>
                   )}
                 />
@@ -652,7 +652,7 @@ export default function Home() {
                             <IoArrowUpCircle className="w-6 h-6 text-accent-primary" />
                           </div>
                         }
-                        title="Send"
+                        title="Wallet"
                         className="w-[30%]"
                       />
                     )}
@@ -714,7 +714,7 @@ export default function Home() {
                         <IoCashOutline className="w-6 h-6 text-accent-primary" />
                       </div>
                     }
-                    title="Send"
+                    title="Pay"
                     className="w-[30%]"
                     onClick={() => {
                       if (!checkKYC("sending payments")) return;
@@ -838,7 +838,7 @@ export default function Home() {
       <ViewAllModal
         isOpen={showAllOnchain}
         onClose={() => setShowAllOnchain(false)}
-        title="All Onchain Transactions"
+        title="All Transfers"
         description={`${ONCHAIN_TRANSACTIONS?.length || 0} transactions`}
       >
         {ONCHAIN_TRANSACTIONS && ONCHAIN_TRANSACTIONS.length > 0 ? (
@@ -852,7 +852,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-12 text-text-subtle">
-            <p className="text-sm">No onchain transactions found</p>
+            <p className="text-sm">No transfers found</p>
           </div>
         )}
       </ViewAllModal>

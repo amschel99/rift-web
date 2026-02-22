@@ -59,9 +59,9 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
           <DrawerHeader className={isDesktop ? "relative" : "hidden"}>
             <div className="flex items-center justify-between">
               <div>
-                <DrawerTitle className="text-xl font-semibold">Send Base USDC</DrawerTitle>
+                <DrawerTitle className="text-xl font-semibold">Send to Wallet</DrawerTitle>
                 <DrawerDescription className="text-sm text-gray-600 mt-1">
-                  Send Base USDC to another wallet address
+                  Send to another wallet address
                 </DrawerDescription>
               </div>
               <button
@@ -76,10 +76,10 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
           <div className={`overflow-y-auto ${isDesktop ? "p-6" : ""}`}>
             {!isDesktop && (
               <div className="mx-4 mt-2">
-                <span className="font-medium text-lg">Send Base USDC</span>
+                <span className="font-medium text-lg">Send to Wallet</span>
                 <br />
                 <span className="text-sm">
-                  Send Base USDC to another wallet address
+                  Send to another wallet address
                 </span>
               </div>
             )}
@@ -95,7 +95,7 @@ export function SendDrawer(props: Props & ReturnType<typeof useDisclosure>) {
               <div>
                 <p className="font-semibold text-gray-900">Send to Address</p>
                 <p className="text-sm text-gray-600">
-                  Enter wallet address to send Base USDC
+                  Enter a wallet address to send funds
                 </p>
               </div>
             </div>
