@@ -243,7 +243,7 @@ interface template_action {
 }
 
 const templateActions: template_action[] = [
-  { text: "Send 100 USDC on Polygon to" },
+  { text: "Send $100 on Polygon to" },
   { text: "What's my total ETH balance" },
   { text: "Create a link to send 0.5 BERA to" },
   { text: "Swap 0.5 ETH for rETH on Arbitrum" },
