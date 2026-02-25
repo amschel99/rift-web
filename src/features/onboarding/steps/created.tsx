@@ -43,53 +43,9 @@ export default function Created() {
     updateReferrer();
   }, [loading, error, signUpMutation?.isSuccess]);
 
-  const handleOpenWallet = async () => {
+  const handleOpenWallet = () => {
     logEvent("WALLET_CREATED");
-
-    // Check KYC status before navigating
-    const auth_token = localStorage.getItem("token");
-
-    if (auth_token) {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL;
-        const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-        const response = await fetch(`${apiUrl}/api/kyc/verified`, {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth_token}`,
-            "x-api-key": apiKey,
-          },
-        });
-
-        // Get raw text first to handle non-JSON responses
-        const text = await response.text();
-
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch {
-          // If we can't parse the response, go to KYC to be safe
-          navigate("/kyc");
-          return;
-        }
-
-        if (data.kycVerified === true) {
-          navigate("/app");
-        } else if (data.underReview === true) {
-          navigate("/app");
-        } else {
-          navigate("/kyc");
-        }
-      } catch {
-        // On error, go to KYC to be safe
-        navigate("/kyc");
-      }
-    } else {
     navigate("/app");
-    }
   };
 
   const handleEnableNotifications = async () => {

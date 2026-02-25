@@ -119,18 +119,14 @@ export default function OnboardingContextProvider(props: Props) {
         return;
       }
       case "username-password": {
-        control.setValue("steps", "kyc");
+        control.setValue("steps", "created");
         return;
       }
       case "otp": {
-        control.setValue("steps", "kyc");
+        control.setValue("steps", "created");
         return;
       }
       case "email-otp": {
-        control.setValue("steps", "kyc");
-        return;
-      }
-      case "kyc": {
         control.setValue("steps", "created");
         return;
       }
@@ -173,10 +169,6 @@ export default function OnboardingContextProvider(props: Props) {
         return;
       }
       case "created": {
-        control.setValue("steps", "kyc");
-        return;
-      }
-      case "kyc": {
         if (authMethod === "username-password") {
           control.setValue("steps", "username-password");
         } else if (authMethod === "email") {

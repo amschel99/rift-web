@@ -5,7 +5,6 @@ import { IoSwapHorizontalOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { useRequest } from "../context";
 import useCreateInvoice from "@/hooks/data/use-create-invoice";
-import useKYCStatus from "@/hooks/data/use-kyc-status";
 import useAnalaytics from "@/hooks/use-analytics";
 import { useNavigate } from "react-router";
 import rift from "@/lib/rift";
@@ -37,8 +36,6 @@ export default function DescriptionInput() {
   const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
   const createInvoiceMutation = useCreateInvoice();
-  const { isKYCVerified, isLoading: kycLoading } = useKYCStatus();
-
   const requestCurrency = (requestData.currency || "KES") as SupportedCurrency;
   const currencySymbol = CURRENCY_SYMBOLS[requestCurrency];
 
@@ -104,18 +101,6 @@ export default function DescriptionInput() {
       return;
     }
 
-    // Check KYC status before creating invoice
-    if (!kycLoading && !isKYCVerified) {
-      toast.error("Identity verification required", {
-        description: "Please complete identity verification before creating a payment request link.",
-        action: {
-          label: "Verify Now",
-          onClick: () => navigate("/app/kyc"),
-        },
-      });
-      return;
-    }
-
     try {
       // Convert local currency amount to USD using the selling rate
       // Round to 6 decimal places (USDC precision)
@@ -161,18 +146,10 @@ export default function DescriptionInput() {
       setCurrentStep("sharing");
       toast.success("Payment request created successfully!");
     } catch (error: any) {
-      // Check if error is related to KYC
-      if (error?.message?.includes("KYC") || error?.message?.includes("verification") || error?.response?.status === 403) {
-        toast.error("Identity verification required", {
-          description: "Please complete identity verification before creating a payment request link.",
-          action: {
-            label: "Verify Now",
-            onClick: () => navigate("/app/kyc"),
-          },
-        });
-      } else {
-      toast.error("Failed to create payment request. Please try again.");
-      }
+      const isKYC = error?.error === "KYC verification required" || error?.message?.toLowerCase().includes("kyc");
+      toast.error(isKYC ? "You've reached the transaction limit. Verify your identity to continue." : (error?.message || "Failed to create payment request. Please try again."), isKYC ? {
+        action: { label: "Verify now", onClick: () => navigate("/kyc") },
+      } : undefined);
     }
   };
 

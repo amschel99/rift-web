@@ -49,7 +49,10 @@ export default function StepsPicker() {
         error: error?.message || "Unknown error",
       });
       
-      toast.error("Sorry, we coulndn't process the transaction");
+      const isKYC = error?.error === "KYC verification required" || error?.message?.toLowerCase().includes("kyc");
+      toast.error(isKYC ? "You've reached the transaction limit. Verify your identity to continue." : (error?.message || "Sorry, we couldn't process the transaction"), isKYC ? {
+        action: { label: "Verify now", onClick: () => navigate("/kyc") },
+      } : undefined);
     },
   });
 
