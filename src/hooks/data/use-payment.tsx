@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import rift from "@/lib/rift";
 
 export interface PayRequest {
@@ -39,7 +39,15 @@ async function makePayment(request: PayRequest): Promise<PayResponse> {
 }
 
 export default function usePayment() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: makePayment,
+    onSuccess: () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["base-usdc-balance"] });
+        queryClient.invalidateQueries({ queryKey: ["sailr-balances"] });
+        queryClient.invalidateQueries({ queryKey: ["chains-balances"] });
+      }, 3000);
+    },
   });
 }

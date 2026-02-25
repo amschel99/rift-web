@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import RenderErrorToast from "@/components/ui/helpers/render-error-toast";
 import RenderSuccessToast from "@/components/ui/helpers/render-success-toast";
@@ -139,6 +139,7 @@ async function checkNativeBalance(
 }
 
 export default function useLifiTransaction() {
+  const queryClient = useQueryClient();
   const { mutate: executeTransaction, isPending: isExecuting } = useMutation({
     mutationFn: async (args: LifiTransactionArgs) => {
       if (import.meta.env.VITE_TEST === "true") {
@@ -212,7 +213,11 @@ export default function useLifiTransaction() {
         position: "top-center",
         duration: 3000,
       });
-      
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["base-usdc-balance"] });
+        queryClient.invalidateQueries({ queryKey: ["sailr-balances"] });
+        queryClient.invalidateQueries({ queryKey: ["chains-balances"] });
+      }, 3000);
     },
     onError: (error) => {
       

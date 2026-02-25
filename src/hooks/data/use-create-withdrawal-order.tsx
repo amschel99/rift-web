@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import rift from "@/lib/rift";
 
 export interface CreateOfframpOrderRequest {
@@ -39,7 +39,15 @@ async function createWithdrawalOrder(request: CreateOfframpOrderRequest): Promis
 }
 
 export default function useCreateWithdrawalOrder() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createWithdrawalOrder,
+    onSuccess: () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["base-usdc-balance"] });
+        queryClient.invalidateQueries({ queryKey: ["sailr-balances"] });
+        queryClient.invalidateQueries({ queryKey: ["chains-balances"] });
+      }, 3000);
+    },
   });
 }
