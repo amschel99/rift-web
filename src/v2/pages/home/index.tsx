@@ -18,8 +18,6 @@ import {
   IoSwapHorizontalOutline,
 } from "react-icons/io5";
 import { useDisclosure } from "@/hooks/use-disclosure";
-import useKYCGuard from "@/hooks/use-kyc-guard";
-import KYCRequiredModal from "@/components/kyc/KYCRequiredModal";
 import useBaseUSDCBalance, {
   SupportedCurrency,
 } from "@/hooks/data/use-base-usdc-balance";
@@ -64,8 +62,6 @@ export default function Home() {
   const isDesktop = useDesktopDetection();
   const receive_disclosure = useDisclosure();
   const send_disclosure = useDisclosure();
-  const { checkKYC, showKYCModal, closeKYCModal, featureName, isUnderReview } =
-    useKYCGuard();
 
   // Recovery warning
   const { userQuery } = useWalletAuth();
@@ -424,7 +420,6 @@ export default function Home() {
               <div className="grid grid-cols-5 gap-3">
                 <SendDrawer
                   {...send_disclosure}
-                  beforeOpen={() => checkKYC("sending crypto")}
                   renderTrigger={() => (
                     <button className="w-full flex flex-col items-center justify-center gap-2 p-4 bg-white rounded-xl border border-gray-100 hover:border-accent-primary/30 hover:bg-accent-primary/5 transition-all cursor-pointer group shadow-sm hover:shadow-md">
                       <div className="w-10 h-10 rounded-xl bg-accent-primary/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors">
@@ -449,7 +444,6 @@ export default function Home() {
 
                 <button
                   onClick={() => {
-                    if (!checkKYC("withdrawals")) return;
                     logEvent("WITHDRAW_BUTTON_CLICKED");
                     navigate("/app/withdraw");
                   }}
@@ -463,7 +457,6 @@ export default function Home() {
 
                 <button
                   onClick={() => {
-                    if (!checkKYC("payment requests")) return;
                     logEvent("REQUEST_BUTTON_CLICKED");
                     navigate("/app/request?type=request");
                   }}
@@ -477,7 +470,6 @@ export default function Home() {
 
                 <button
                   onClick={() => {
-                    if (!checkKYC("sending payments")) return;
                     logEvent("SEND_BUTTON_CLICKED");
                     navigate("/app/pay");
                   }}
@@ -509,17 +501,14 @@ export default function Home() {
                 onViewAllOnchain={() => setShowAllOnchain(true)}
                 isAdvancedMode={isAdvanced}
                 onWithdrawClick={() => {
-                  if (!checkKYC("withdrawals")) return;
                   logEvent("WITHDRAW_BUTTON_CLICKED");
                   navigate("/app/withdraw");
                 }}
                 onRequestClick={() => {
-                  if (!checkKYC("payment requests")) return;
                   logEvent("REQUEST_BUTTON_CLICKED");
                   navigate("/app/request?type=request");
                 }}
                 onPayClick={() => {
-                  if (!checkKYC("sending payments")) return;
                   logEvent("SEND_BUTTON_CLICKED");
                   navigate("/app/pay");
                 }}
@@ -644,7 +633,6 @@ export default function Home() {
                 <div className="w-full flex flex-row items-center justify-center gap-2 mb-3">
                   <SendDrawer
                     {...send_disclosure}
-                    beforeOpen={() => checkKYC("sending crypto")}
                     renderTrigger={() => (
                       <ActionButton
                         icon={
@@ -682,7 +670,6 @@ export default function Home() {
                     title="Withdraw"
                     className="w-[30%]"
                     onClick={() => {
-                      if (!checkKYC("withdrawals")) return;
                       logEvent("WITHDRAW_BUTTON_CLICKED");
                       navigate("/app/withdraw");
                     }}
@@ -702,7 +689,6 @@ export default function Home() {
                       selectedCurrency.code === "KES" ? "w-[30%]" : "w-[45%]"
                     }
                     onClick={() => {
-                      if (!checkKYC("payment requests")) return;
                       logEvent("REQUEST_BUTTON_CLICKED");
                       navigate("/app/request?type=request");
                     }}
@@ -717,7 +703,6 @@ export default function Home() {
                     title="Pay"
                     className="w-[30%]"
                     onClick={() => {
-                      if (!checkKYC("sending payments")) return;
                       logEvent("SEND_BUTTON_CLICKED");
                       navigate("/app/pay");
                     }}
@@ -742,17 +727,14 @@ export default function Home() {
                 onViewAllOnchain={() => setShowAllOnchain(true)}
                 isAdvancedMode={isAdvanced}
                 onWithdrawClick={() => {
-                  if (!checkKYC("withdrawals")) return;
                   logEvent("WITHDRAW_BUTTON_CLICKED");
                   navigate("/app/withdraw");
                 }}
                 onRequestClick={() => {
-                  if (!checkKYC("payment requests")) return;
                   logEvent("REQUEST_BUTTON_CLICKED");
                   navigate("/app/request?type=request");
                 }}
                 onPayClick={() => {
-                  if (!checkKYC("sending payments")) return;
                   logEvent("SEND_BUTTON_CLICKED");
                   navigate("/app/pay");
                 }}
@@ -857,13 +839,6 @@ export default function Home() {
         )}
       </ViewAllModal>
 
-      {/* KYC Required Modal */}
-      <KYCRequiredModal
-        isOpen={showKYCModal}
-        onClose={closeKYCModal}
-        featureName={featureName}
-        isUnderReview={isUnderReview}
-      />
     </>
   );
 

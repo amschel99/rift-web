@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import useKYCGuard from "@/hooks/use-kyc-guard";
-import KYCRequiredModal from "@/components/kyc/KYCRequiredModal";
 import useAnalaytics from "@/hooks/use-analytics";
 import {
   FiArrowLeft,
@@ -216,19 +214,8 @@ export default function SailVault() {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-  // KYC Guard
-  const { checkKYC, showKYCModal, closeKYCModal, featureName, isUnderReview } =
-    useKYCGuard();
-
   // Open action drawer
   const openActionDrawer = (mode: ActionMode) => {
-    // Check KYC for all vault actions
-    const featureNames: Record<string, string> = {
-      deposit: "vault deposits",
-      withdraw: "vault withdrawals",
-      claim: "dividend collection",
-    };
-    if (mode && !checkKYC(featureNames[mode] || "this feature")) return;
 
     // Track action initiation
     if (mode === "deposit") {
@@ -1151,13 +1138,6 @@ export default function SailVault() {
         </DrawerContent>
       </Drawer>
 
-      {/* KYC Required Modal */}
-      <KYCRequiredModal
-        isOpen={showKYCModal}
-        onClose={closeKYCModal}
-        featureName={featureName}
-        isUnderReview={isUnderReview}
-      />
     </motion.div>
   );
 }
