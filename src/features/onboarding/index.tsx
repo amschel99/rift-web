@@ -79,7 +79,7 @@ export function _Onboarding() {
   }, [CURRENT_STEP]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-app-background">
+    <div className="flex flex-col w-full h-[100dvh] bg-app-background">
       <RenderOnboardingStep />
     </div>
   );

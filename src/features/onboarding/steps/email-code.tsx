@@ -65,55 +65,7 @@ export default function EmailCode(props: Props) {
           };
 
           await flow.signInMutation.mutateAsync(loginParams);
-
-          // Small delay to ensure token is saved
-          await new Promise((resolve) => setTimeout(resolve, 100));
-
-          // After successful login, check KYC status
-          const auth_token = localStorage.getItem("token");
-
-          if (auth_token) {
-            try {
-              const apiUrl = import.meta.env.VITE_API_URL;
-              const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-              const response = await fetch(`${apiUrl}/api/kyc/verified`, {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${auth_token}`,
-                  "x-api-key": apiKey,
-                },
-              });
-
-              // Get raw text first to handle non-JSON responses
-              const text = await response.text();
-
-              let data;
-              try {
-                data = JSON.parse(text);
-              } catch {
-                // If we can't parse the response, go to KYC to be safe
-                navigate("/kyc");
-                return;
-              }
-
-              if (data.kycVerified === true) {
-                navigate("/app");
-              } else if (data.underReview === true) {
-                navigate("/app");
-              } else {
-                navigate("/kyc");
-              }
-            } catch {
-              // On error, go to KYC to be safe
-              navigate("/kyc");
-            }
-          } else {
-            console.error("❌ [EmailLogin] No auth token found after login!");
-            navigate("/app");
-          }
+          navigate("/app");
         } catch {
           toast.custom(() => <RenderErrorToast />, {
             duration: 2000,
@@ -198,9 +150,9 @@ export default function EmailCode(props: Props) {
             initial={{ x: 4, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className={`w-full h-full ${isDesktop ? "p-8" : "p-4"}`}
+            className={`w-full h-full ${isDesktop ? "p-8" : "p-4 pb-0 flex flex-col"}`}
           >
-            <div className={isDesktop ? "max-w-md mx-auto" : ""}>
+            <div className={isDesktop ? "max-w-md mx-auto" : "flex-1 flex flex-col min-h-0 overflow-y-auto"}>
               <h1 className={`font-semibold ${isDesktop ? "text-2xl mb-2" : "text-md"}`}>
                 Verification Code
               </h1>
@@ -242,7 +194,7 @@ export default function EmailCode(props: Props) {
                 )}
               </div>
 
-              <div className={`flex flex-row flex-nowrap gap-3 ${isDesktop ? "max-w-md mx-auto" : "fixed bottom-0 left-0 right-0 p-4 py-2 border-t-1 border-border bg-app-background"}`}>
+              <div className={`flex flex-row flex-nowrap gap-3 ${isDesktop ? "max-w-md mx-auto" : "sticky bottom-0 -mx-4 px-4 py-3 border-t border-border bg-app-background pb-[max(0.75rem,env(safe-area-inset-bottom))]"}`}>
                 <ActionButton
                   disabled={!ENABLED}
                   variant="secondary"

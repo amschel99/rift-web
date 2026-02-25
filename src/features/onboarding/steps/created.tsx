@@ -75,7 +75,7 @@ export default function Created() {
       initial={{ x: 4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex flex-col items-center justify-between w-full h-full p-5"
+      className="flex flex-col items-center justify-between w-full h-full p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
     >
       <div />
       <div className="w-full flex flex-col items-center justify-center p-5">

@@ -139,9 +139,9 @@ export default function Identifier(props: Props) {
       initial={{ x: 4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`w-full h-full ${isDesktop ? "p-8" : "p-4"}`}
+      className={`w-full h-full ${isDesktop ? "p-8" : "p-4 pb-0 flex flex-col"}`}
     >
-      <div className={isDesktop ? "max-w-md mx-auto" : ""}>
+      <div className={isDesktop ? "max-w-md mx-auto" : "flex-1 flex flex-col min-h-0 overflow-y-auto"}>
         <p className={`font-medium ${isDesktop ? "text-xl mb-2" : "text-md"}`}>Phone</p>
         <p className={`${isDesktop ? "text-base mb-6" : "text-sm mb-4"}`}>Enter your phone number to continue</p>
 
@@ -240,7 +240,7 @@ export default function Identifier(props: Props) {
         />
       </div>
 
-        <div className={`flex flex-row flex-nowrap gap-3 ${isDesktop ? "mt-8 max-w-md mx-auto" : "fixed bottom-0 left-0 right-0"} p-4 py-2 ${isDesktop ? "" : "border-t-1 border-border bg-app-background"}`}>
+        <div className={`flex flex-row flex-nowrap gap-3 ${isDesktop ? "mt-8 max-w-md mx-auto p-4 py-2" : "sticky bottom-0 -mx-4 px-4 py-3 border-t border-border bg-app-background pb-[max(0.75rem,env(safe-area-inset-bottom))]"}`}>
           <button
             onClick={() => flow.gotBack()}
             className={`flex items-center justify-center ${isDesktop ? "flex-1 py-2.5 px-4" : "w-[48%] py-2.5 px-3"} rounded-2xl text-sm font-medium bg-accent-primary text-white hover:opacity-90 transition-opacity`}
