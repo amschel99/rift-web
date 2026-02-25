@@ -142,7 +142,7 @@ export default function Start() {
       </div>
 
       {/* Main Content Container */}
-      <div className={`flex-1 flex flex-col ${isDesktop ? "max-w-6xl mx-auto w-full px-8 py-12" : "px-4 sm:px-6 md:px-8"} relative z-10`}>
+      <div className={`flex-1 flex flex-col min-h-0 overflow-y-auto ${isDesktop ? "max-w-6xl mx-auto w-full px-8 py-12" : "px-4 sm:px-6 md:px-8"} relative z-10`}>
         {/* Hero Section */}
         <div className={`flex-1 flex flex-col ${isDesktop ? "items-start justify-center" : "items-center justify-center"} ${isDesktop ? "pt-0" : "pt-6 sm:pt-8 pb-4"}`}>
           {/* Logo with glow effect */}
@@ -241,7 +241,7 @@ export default function Start() {
 
         {/* CTA Buttons */}
         <motion.div 
-          className={`${isDesktop ? "w-full max-w-md" : "w-full px-6"} pb-6 space-y-3 relative z-10`}
+          className={`${isDesktop ? "w-full max-w-md" : "w-full px-6"} pb-[max(1.5rem,env(safe-area-inset-bottom))] space-y-3 relative z-10 shrink-0`}
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.4 }}

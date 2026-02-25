@@ -86,11 +86,13 @@ export default function KYC() {
 
   if (subStep === "nationality") {
     return (
-      <>
-        <NationalitySelector onSelect={handleCountrySelect} />
+      <div className="flex flex-col w-full h-full">
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <NationalitySelector onSelect={handleCountrySelect} />
+        </div>
 
         {/* Skip option - can be removed if KYC is mandatory */}
-        <div className="fixed bottom-20 left-0 right-0 px-5">
+        <div className="shrink-0 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <button
             onClick={handleSkipKYC}
             className="w-full text-center text-sm text-muted-foreground hover:text-text-default transition-colors py-2"
@@ -98,17 +100,19 @@ export default function KYC() {
             Skip for now
           </button>
         </div>
-      </>
+      </div>
     );
   }
 
   if (subStep === "mobile-prompt") {
     return (
       <div className="flex flex-col w-full h-full">
-        <MobileOnlyPrompt selectedCountry={selectedCountry} />
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <MobileOnlyPrompt selectedCountry={selectedCountry} />
+        </div>
 
         {/* Back button */}
-        <div className="fixed bottom-5 left-0 right-0 px-5 space-y-2">
+        <div className="shrink-0 px-5 py-3 space-y-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <ActionButton onClick={handleBack} variant="secondary">
             Go Back
           </ActionButton>

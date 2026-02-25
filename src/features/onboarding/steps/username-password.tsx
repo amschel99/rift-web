@@ -61,54 +61,7 @@ export default function UsernamePassword(props: Props) {
           password: values.password,
         });
 
-        // Small delay to ensure token is saved
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // After successful login, check KYC status
-        const auth_token = localStorage.getItem("token");
-        
-
-        if (auth_token) {
-          try {
-            const apiUrl = import.meta.env.VITE_API_URL;
-            const apiKey = import.meta.env.VITE_SDK_API_KEY;
-
-            const response = await fetch(`${apiUrl}/api/kyc/verified`, {
-              method: "GET",
-              mode: "cors",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${auth_token}`,
-                "x-api-key": apiKey,
-              },
-            });
-
-            // Get raw text first to handle non-JSON responses
-            const text = await response.text();
-
-            let data;
-            try {
-              data = JSON.parse(text);
-            } catch {
-              // If we can't parse the response, go to KYC to be safe
-              navigate("/kyc");
-              return;
-            }
-
-            if (data.kycVerified === true) {
-              navigate("/app");
-            } else if (data.underReview === true) {
-              navigate("/app");
-            } else {
-              navigate("/kyc");
-            }
-          } catch {
-            // On error, go to KYC to be safe
-            navigate("/kyc");
-          }
-        } else {
-          navigate("/app");
-        }
+        navigate("/app");
       } catch (e) {
         
         toast.custom(
@@ -176,9 +129,9 @@ export default function UsernamePassword(props: Props) {
       initial={{ x: 4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`w-full h-full ${isDesktop ? "p-8" : "p-4"}`}
+      className={`w-full h-full ${isDesktop ? "p-8" : "p-4 pb-0 flex flex-col"}`}
     >
-      <div className={isDesktop ? "max-w-lg mx-auto w-full" : ""}>
+      <div className={isDesktop ? "max-w-lg mx-auto w-full" : "flex-1 flex flex-col min-h-0 overflow-y-auto"}>
         <p className={`font-medium ${isDesktop ? "text-xl mb-2" : "text-md"}`}>Username & Password</p>
         <p className={`${isDesktop ? "text-base mb-6" : "text-sm mb-4"}`}>
           {flowType === "login"
@@ -257,7 +210,7 @@ export default function UsernamePassword(props: Props) {
           </p>
         )}
 
-        <div className={`flex flex-row flex-nowrap gap-3 ${isDesktop ? "mt-8" : "fixed bottom-0 left-0 right-0"} p-4 py-2 ${isDesktop ? "" : "border-t-1 border-border bg-app-background"}`}>
+        <div className={`flex flex-row flex-nowrap gap-3 ${isDesktop ? "mt-8 p-4 py-2" : "sticky bottom-0 -mx-4 px-4 py-3 border-t border-border bg-app-background pb-[max(0.75rem,env(safe-area-inset-bottom))]"}`}>
           <ActionButton
             onClick={() => flow.gotBack()}
             variant="ghost"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   FiArrowLeft,
@@ -46,13 +46,15 @@ export default function SharingOptions() {
   const [sendingMpesaPrompt, setSendingMpesaPrompt] = useState(false);
   const [showMpesaDrawer, setShowMpesaDrawer] = useState(false);
   const [creatingInvoice, setCreatingInvoice] = useState(false);
+  const creatingRef = useRef(false);
   const createInvoiceMutation = useCreateInvoice();
 
   // Auto-create invoice for top-ups when component mounts
   useEffect(() => {
     const createInvoiceForTopup = async () => {
       // Only create invoice if it's a top-up and no invoice exists yet
-      if (requestType === "topup" && !createdInvoice && !creatingInvoice) {
+      if (requestType === "topup" && !createdInvoice && !creatingRef.current) {
+        creatingRef.current = true;
         setCreatingInvoice(true);
 
         try {
@@ -128,21 +130,14 @@ export default function SharingOptions() {
           // Go back to amount step on error
           navigate("/app/request?type=topup");
         } finally {
+          creatingRef.current = false;
           setCreatingInvoice(false);
         }
       }
     };
 
     createInvoiceForTopup();
-  }, [
-    requestType,
-    createdInvoice,
-    creatingInvoice,
-    requestData,
-    createInvoiceMutation,
-    setCreatedInvoice,
-    navigate,
-  ]);
+  }, [requestType]);
 
   const handleBack = () => {
       navigate("/app");
