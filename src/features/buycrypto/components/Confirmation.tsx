@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import useOnRamp from "@/hooks/wallet/use-on-ramp";
 import { useBuyCrypto } from "../context";
 import useAnalaytics from "@/hooks/use-analytics";
@@ -10,6 +11,7 @@ export default function Confirmation() {
   const currentStep = state?.watch("currentStep");
   const transactionId = state?.watch("checkoutRequestId");
   const { logEvent, updatePersonProperties } = useAnalaytics();
+  const queryClient = useQueryClient();
 
   const { onRampStatusQuery } = useOnRamp({
     checkoutRequestId: transactionId,
@@ -47,6 +49,11 @@ export default function Confirmation() {
       
       // Update person property
       updatePersonProperties({ has_deposited: true });
+
+      // Refresh balance
+      queryClient.invalidateQueries({ queryKey: ["base-usdc-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["sailr-balances"] });
+      queryClient.invalidateQueries({ queryKey: ["chains-balances"] });
 
       toast.success("The transaction was completed successfully");
       switchCurrentStep("CRYPTO-AMOUNT");
