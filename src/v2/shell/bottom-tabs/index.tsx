@@ -46,7 +46,7 @@ export default function BottomTabs() {
         name="tab"
         render={({ field }) => {
           return (
-            <div className="w-full max-w-[240px] mx-auto px-4 pt-2 pb-1 flex flex-row items-center justify-center gap-2">
+            <div className="w-full px-8 pt-2 pb-1 flex flex-row items-center justify-between">
               {TABS.map((tab) => {
                 const active = field.value === tab.name;
                 return (
