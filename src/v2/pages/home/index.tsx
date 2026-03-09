@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { forceClearCacheAndRefresh } from "@/utils/auto-update";
 import { IoChevronForward, IoCloseOutline } from "react-icons/io5";
 import { FiRefreshCw } from "react-icons/fi";
-import { Shield, PiggyBank, Repeat, PieChart, Coins, Globe, Zap } from "lucide-react";
+import { Shield, PiggyBank, Repeat, PieChart, Coins, Globe, Zap, Loader2 } from "lucide-react";
 import {
   IoWalletOutline,
   IoEyeOutline,
@@ -36,6 +36,7 @@ import {
   useWalletConnectRequests,
 } from "@/hooks/walletconnect/use-walletconnect";
 import { formatMethod } from "@/lib/walletconnect";
+import { getInTransit, clearInTransit, type InTransitEntry } from "@/lib/in-transit";
 
 const COMING_SOON_FEATURES = [
   {
@@ -122,6 +123,15 @@ export default function Home() {
   const { data: wcPendingRequests } = useWalletConnectRequests(hasActiveSessions);
   const wcPendingCount = wcPendingRequests?.length ?? 0;
   const firstPending = wcPendingRequests?.[0];
+
+  // In-transit tokens (after cross-chain convert)
+  const [inTransit, setInTransit] = useState<InTransitEntry[]>(() => getInTransit());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setInTransit(getInTransit());
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Detect user's country and currency based on IP
   const { data: countryInfo, isLoading: countryLoading } =
@@ -410,6 +420,25 @@ export default function Home() {
               )}
             </AnimatePresence>
 
+            {/* In-transit tokens */}
+            {inTransit.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-center gap-3 px-4 py-2.5 bg-accent-primary/[0.04] border border-accent-primary/10 rounded-xl"
+              >
+                <Loader2 className="w-4 h-4 text-accent-primary animate-spin flex-shrink-0" />
+                <p className="text-sm text-text-subtle flex-1">
+                  Processing {entry.amount} {entry.token} <span className="text-text-subtle/50">({entry.fromChain} → {entry.toChain})</span>
+                </p>
+                <button
+                  onClick={() => { clearInTransit(entry.id); setInTransit(getInTransit()); }}
+                  className="p-0.5 text-text-subtle/30 hover:text-text-subtle transition-colors flex-shrink-0"
+                >
+                  <IoCloseOutline className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+
             {/* Desktop Feature Cards */}
             <div className="grid grid-cols-2 gap-4">
               <motion.div
@@ -660,6 +689,25 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* In-transit tokens */}
+        {inTransit.map((entry) => (
+          <div
+            key={entry.id}
+            className="flex items-center gap-2.5 px-3.5 py-2 mb-3 bg-accent-primary/[0.06] border border-accent-primary/10 rounded-xl"
+          >
+            <Loader2 className="w-3.5 h-3.5 text-accent-primary animate-spin flex-shrink-0" />
+            <p className="text-xs text-text-subtle flex-1">
+              Processing {entry.amount} {entry.token} <span className="text-text-subtle/50">({entry.fromChain} → {entry.toChain})</span>
+            </p>
+            <button
+              onClick={() => { clearInTransit(entry.id); setInTransit(getInTransit()); }}
+              className="p-0.5 text-text-subtle/30 hover:text-text-subtle transition-colors flex-shrink-0"
+            >
+              <IoCloseOutline className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
 
         {/* Feature Cards — unified teal theme */}
         <div className="space-y-2.5 mb-6">

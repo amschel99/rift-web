@@ -20,6 +20,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { formatFloatNumber } from "@/lib/utils";
+import { addInTransit } from "@/lib/in-transit";
 
 // Supported chains
 const SUPPORTED_CHAINS = ["BASE", "ETHEREUM", "POLYGON", "ARBITRUM", "CELO"] as const;
@@ -117,7 +118,8 @@ export default function Convert() {
   const balanceAmount = sourceBalance?.amount ?? 0;
   const insufficientBalance = amountNum > balanceAmount;
   const sameChain = sourceChain === destChain;
-  const canConvert = amountNum > 0 && !insufficientBalance && !sameChain && !!sourceChain && !!destChain && !!token;
+  const belowMinimum = amountNum > 0 && amountNum < 1;
+  const canConvert = amountNum >= 1 && !insufficientBalance && !sameChain && !!sourceChain && !!destChain && !!token;
 
   // Available dest chains = all supported chains except source
   const destChainOptions = SUPPORTED_CHAINS.filter((c) => c !== sourceChain);
@@ -143,11 +145,13 @@ export default function Convert() {
       if (result.timedOut) {
         toast.error("Conversion timed out. It may still complete — check your transaction history.");
         setTxHash(result.transactionHash || null);
+        addInTransit({ amount, token, fromChain: sourceChain, toChain: destChain, txHash: result.transactionHash || null });
         setStep("success");
         return;
       }
 
       setTxHash(result.transactionHash);
+      addInTransit({ amount, token, fromChain: sourceChain, toChain: destChain, txHash: result.transactionHash });
       setStep("success");
     } catch (err: any) {
       toast.error(err.message || "Conversion failed");
@@ -254,6 +258,9 @@ export default function Convert() {
       {/* Errors */}
       {sameChain && amount && (
         <p className="text-sm text-danger font-medium px-1">Source and destination chain must be different</p>
+      )}
+      {belowMinimum && !sameChain && (
+        <p className="text-sm text-danger font-medium px-1">Minimum amount is 1 {token}</p>
       )}
       {insufficientBalance && amount && !sameChain && (
         <p className="text-sm text-danger font-medium px-1">Insufficient {token} balance</p>

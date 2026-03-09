@@ -1,14 +1,21 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { BiCopy } from "react-icons/bi";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronDown } from "lucide-react";
 import { FiX } from "react-icons/fi";
 import useAnalaytics from "@/hooks/use-analytics";
 import { Button } from "@/components/ui/button";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
-import { shortenString } from "@/lib/utils";
+
+const EXPLORERS = [
+  { name: "Base", url: "https://basescan.org/address/" },
+  { name: "Ethereum", url: "https://etherscan.io/address/" },
+  { name: "Polygon", url: "https://polygonscan.com/address/" },
+  { name: "Arbitrum", url: "https://arbiscan.io/address/" },
+] as const;
 
 export default function ReceiveFromAddress() {
   const navigate = useNavigate();
@@ -23,10 +30,12 @@ export default function ReceiveFromAddress() {
     logEvent("COPY_ADDRESS");
   };
 
-  const onViewOnBaseScan = () => {
-    const baseScanUrl = `https://basescan.org/address/${address}`;
-    window.open(baseScanUrl, '_blank');
+  const [explorerOpen, setExplorerOpen] = useState(false);
+
+  const onViewExplorer = (explorerUrl: string) => {
+    window.open(`${explorerUrl}${address}`, '_blank');
     logEvent("VIEW_ON_BASESCAN");
+    setExplorerOpen(false);
   };
 
   const onClose = () => {
@@ -82,18 +91,39 @@ export default function ReceiveFromAddress() {
                   <span className="text-sm font-medium">Copy Address</span>
                 </Button>
 
-                <Button
-                  variant="outline"
-                  onClick={onViewOnBaseScan}
-                  className="w-full rounded-2xl"
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">View on Base Scan</span>
-                </Button>
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    onClick={() => setExplorerOpen(!explorerOpen)}
+                    className="w-full rounded-2xl"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-medium">View on Explorer</span>
+                    <ChevronDown className={`w-3.5 h-3.5 ml-1 transition-transform ${explorerOpen ? "rotate-180" : ""}`} />
+                  </Button>
+                  {explorerOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-10">
+                      {EXPLORERS.map((e) => (
+                        <button
+                          key={e.name}
+                          onClick={() => onViewExplorer(e.url)}
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                        >
+                          {e.name}
+                          <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-xs text-text-subtle mt-2">
+              USDC, USDT on Base, Ethereum, Polygon, Arbitrum
+            </p>
+
+            <p className="text-center text-sm text-gray-600 mt-3">
               Use your address to check your onchain history and topup your wallet
             </p>
           </div>
@@ -141,18 +171,39 @@ export default function ReceiveFromAddress() {
             <span className="text-sm font-medium">Copy Address</span>
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={onViewOnBaseScan}
-            className="w-full rounded-2xl"
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">View on Base Scan</span>
-          </Button>
+          <div className="relative">
+            <Button
+              variant="outline"
+              onClick={() => setExplorerOpen(!explorerOpen)}
+              className="w-full rounded-2xl"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              <span className="text-sm font-medium">View on Explorer</span>
+              <ChevronDown className={`w-3.5 h-3.5 ml-1 transition-transform ${explorerOpen ? "rotate-180" : ""}`} />
+            </Button>
+            {explorerOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-10">
+                {EXPLORERS.map((e) => (
+                  <button
+                    key={e.name}
+                    onClick={() => onViewExplorer(e.url)}
+                    className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-default hover:bg-surface-subtle transition-colors flex items-center justify-between"
+                  >
+                    {e.name}
+                    <ExternalLink className="w-3.5 h-3.5 text-text-subtle" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      <p className="mt-6 mb-12 text-center text-sm text-gray-600">
+      <p className="text-center text-xs text-text-subtle mt-3">
+        USDC, USDT on Base, Ethereum, Polygon, Arbitrum
+      </p>
+
+      <p className="mt-4 mb-12 text-center text-sm text-gray-600">
         Use your address to check your onchain history and topup your wallet
       </p>
 
