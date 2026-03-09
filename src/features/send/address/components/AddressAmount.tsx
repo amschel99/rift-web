@@ -20,7 +20,6 @@ import {
 import { formatFloatNumber, formatNumberUsd } from "@/lib/utils";
 import { isAddressValid } from "@/utils/address-verifier";
 import { WalletToken } from "@/lib/entities";
-import useSupportedTokens from "@/hooks/data/use-supported-tokens";
 import TokenRenderer from "../../components/token-renderer";
 
 const search = z.object({
@@ -72,9 +71,6 @@ export default function AddressAmount() {
 
   // Fetch user's owned tokens for the picker
   const { data: ownedTokens } = useOwnedTokens();
-
-  // Fetch all supported tokens/chains
-  const { data: supportedTokens } = useSupportedTokens();
 
   const update_state_amount = useCallback(() => {
     if (Number(amount) > TOKEN_BALANCE?.amount!) {
@@ -243,25 +239,6 @@ export default function AddressAmount() {
         </div>
       )}
 
-      {/* Supported assets info */}
-      {supportedTokens && supportedTokens.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-border">
-          <p className="text-xs font-medium text-text-subtle mb-2">Supported assets</p>
-          <div className="flex flex-wrap gap-1.5">
-            {[...new Set(supportedTokens.map((t) => t.name))].map((name) => (
-              <span
-                key={name}
-                className="px-2 py-1 rounded-full bg-surface-subtle text-xs font-medium text-text-subtle"
-              >
-                {name}
-              </span>
-            ))}
-          </div>
-          <p className="text-2xs text-text-subtle/60 mt-2">
-            On {[...new Set(supportedTokens.map((t) => t.chain_name))].join(", ")}
-          </p>
-        </div>
-      )}
     </motion.div>
   );
 }
