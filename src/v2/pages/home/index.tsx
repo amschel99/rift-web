@@ -446,7 +446,7 @@ export default function Home() {
             {/* Pending withdrawals */}
             {pendingWithdrawals.map((entry) => {
               const elapsed = Math.floor((Date.now() - entry.createdAt) / 1000);
-              const remaining = Math.max(0, 120 - elapsed);
+              const remaining = Math.max(0, 180 - elapsed);
               const mins = Math.floor(remaining / 60);
               const secs = remaining % 60;
               return (
@@ -746,7 +746,7 @@ export default function Home() {
         {/* Pending withdrawals */}
         {pendingWithdrawals.map((entry) => {
           const elapsed = Math.floor((Date.now() - entry.createdAt) / 1000);
-          const remaining = Math.max(0, 120 - elapsed);
+          const remaining = Math.max(0, 180 - elapsed);
           const mins = Math.floor(remaining / 60);
           const secs = remaining % 60;
           return (
