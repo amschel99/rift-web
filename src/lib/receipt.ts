@@ -199,17 +199,42 @@ export function downloadReceipt(data: ReceiptData) {
   shareBtn.style.cssText = "padding:14px 36px;background:#0d9488;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;";
   shareBtn.onclick = async () => {
     try {
-      const blob = await (await fetch(dataUrl)).blob();
+      // Convert dataURL to blob
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
       const file = new File([blob], `rift-receipt-${data.transactionCode}.png`, { type: "image/png" });
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Rift Receipt" });
-      } else {
-        // Fallback: copy image to clipboard
-        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-        shareBtn.textContent = "Copied!";
-        setTimeout(() => { shareBtn.textContent = "Share"; }, 2000);
+
+      // Try native share (works on most mobile browsers + PWAs)
+      if (typeof navigator.share === "function") {
+        try {
+          await navigator.share({ files: [file], title: "Rift Receipt" });
+          return;
+        } catch (e: any) {
+          // AbortError = user cancelled, that's fine
+          if (e?.name === "AbortError") return;
+          // If share with files fails, try without files
+          try {
+            await navigator.share({ title: "Rift Receipt", text: "Transaction receipt from Rift" });
+            return;
+          } catch {}
+        }
       }
-    } catch {}
+
+      // Fallback: open the image as a downloadable link
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `rift-receipt-${data.transactionCode}.png`;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      shareBtn.textContent = "\u2705 Done";
+      setTimeout(() => { shareBtn.textContent = "\u{1F4E4} Save / Share"; }, 2000);
+    } catch {
+      shareBtn.textContent = "\u274C Failed";
+      setTimeout(() => { shareBtn.textContent = "\u{1F4E4} Save / Share"; }, 2000);
+    }
   };
 
   // Close button
