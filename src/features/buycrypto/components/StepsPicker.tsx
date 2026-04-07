@@ -1,21 +1,15 @@
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import {
-  MpesaSTKInitiateRequest,
-  MpesaSTKInitiateResponse,
-} from "@rift-finance/wallet";
+import { BuyRequest, BuyResponse, RampChain, RampToken } from "@rift-finance/wallet";
 import { useBuyCrypto, buyTokens } from "../context";
 import useOnRamp from "@/hooks/wallet/use-on-ramp";
-import useWalletAuth from "@/hooks/wallet/use-wallet-auth";
 import useAnalytics from "@/hooks/use-analytics";
 import ActionButton from "@/components/ui/action-button";
 
 export default function StepsPicker() {
   const navigate = useNavigate();
   const { state, switchCurrentStep } = useBuyCrypto();
-  const { userQuery } = useWalletAuth();
-  const { data: USER_INFO } = userQuery;
-  const { logEvent, updatePersonProperties } = useAnalytics();
+  const { logEvent } = useAnalytics();
 
   const formaValues = state?.getValues();
   const cryptoAmount = Number(formaValues?.cryptoAmount);
@@ -25,9 +19,9 @@ export default function StepsPicker() {
   const currentStep = state?.watch("currentStep");
 
   const { onRampMutation } = useOnRamp({
-    onSuccess: (ONRAMP_RES: MpesaSTKInitiateResponse) => {
+    onSuccess: (res: BuyResponse) => {
       logEvent("ONRAMP_INITIATED", {
-        checkout_request_id: ONRAMP_RES?.data?.checkoutRequestID,
+        checkout_request_id: res?.transaction_code,
         amount: kesAmount,
         currency: "KES",
         crypto_asset: purchaseToken,
@@ -36,7 +30,7 @@ export default function StepsPicker() {
       });
 
       switchCurrentStep("CONFIRM");
-      state?.setValue("checkoutRequestId", ONRAMP_RES?.data?.checkoutRequestID);
+      state?.setValue("checkoutRequestId", res?.transaction_code);
     },
     onError: (error: any) => {
       logEvent("ONRAMP_FAILED", {
@@ -54,13 +48,13 @@ export default function StepsPicker() {
     },
   });
 
-  const address = localStorage.getItem("address");
-  const tx_args: MpesaSTKInitiateRequest = {
+  const tx_args: BuyRequest = {
+    shortcode: mpesaNumber,
     amount: kesAmount,
-    cryptoAsset: purchaseToken,
-    cryptoWalletAddress: String(address),
-    externalReference: USER_INFO?.externalId as string,
-    phone: mpesaNumber,
+    chain: RampChain.BASE,
+    asset: RampToken.USDC,
+    mobile_network: "Safaricom",
+    country_code: "KES",
   };
 
   const onCancel = () => {

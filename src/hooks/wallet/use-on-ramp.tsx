@@ -1,16 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  MpesaSTKInitiateRequest,
-  MpesaSTKInitiateResponse,
+  BuyRequest,
+  BuyResponse,
 } from "@rift-finance/wallet";
 import rift from "@/lib/rift";
 
 interface UseOnRampParams {
-  tx_args?: MpesaSTKInitiateRequest;
-  onSuccess?: (ONRAMP_RES: MpesaSTKInitiateResponse) => void;
+  onSuccess?: (res: BuyResponse) => void;
   onError?: (error?: unknown) => void;
   checkoutRequestId?: string;
-  merchantId?: string;
   enableStatusPolling?: boolean;
 }
 
@@ -20,17 +18,15 @@ function getUsdExchangeRate() {
 
 export default function useOnRamp(params: UseOnRampParams = {}) {
   const {
-    tx_args,
     onSuccess,
     onError,
     checkoutRequestId,
-    merchantId,
     enableStatusPolling = true,
   } = params;
 
   const onRampMutation = useMutation({
-    mutationFn: async (args: MpesaSTKInitiateRequest) => {
-      const res = await rift.onramp.initiateSafaricomSTK(args);
+    mutationFn: async (args: BuyRequest) => {
+      const res = await rift.onrampV2.buy(args);
       if (res?.success) {
         onSuccess?.(res);
       } else {
@@ -46,7 +42,7 @@ export default function useOnRamp(params: UseOnRampParams = {}) {
   const onRampStatusQuery = useQuery({
     queryKey: ["onrampstatus", checkoutRequestId],
     queryFn: async () =>
-      await rift.onramp.pollSafaricomTransactionStatus(checkoutRequestId),
+      await rift.onrampV2.getOnrampStatus(checkoutRequestId!),
     enabled: !!(checkoutRequestId && enableStatusPolling),
     refetchInterval: enableStatusPolling ? 3000 : false,
     refetchIntervalInBackground: true,
