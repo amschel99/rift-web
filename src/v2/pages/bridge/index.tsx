@@ -24,14 +24,13 @@ import { addInTransit } from "@/lib/in-transit";
 import useAnalytics from "@/hooks/use-analytics";
 
 // Supported chains
-const SUPPORTED_CHAINS = ["BASE", "ETHEREUM", "POLYGON", "ARBITRUM", "CELO"] as const;
+const SUPPORTED_CHAINS = ["BASE", "ETHEREUM", "POLYGON", "ARBITRUM"] as const;
 
 const CHAIN_ID_MAP: Record<string, string> = {
   ARBITRUM: "42161",
   BASE: "8453",
   POLYGON: "137",
   ETHEREUM: "1",
-  CELO: "42220",
 };
 
 const CHAIN_LABELS: Record<string, string> = {
@@ -39,7 +38,6 @@ const CHAIN_LABELS: Record<string, string> = {
   BASE: "Base",
   POLYGON: "Polygon",
   ETHEREUM: "Ethereum",
-  CELO: "Celo",
 };
 
 const CHAIN_ICONS: Record<string, string> = {
@@ -47,7 +45,6 @@ const CHAIN_ICONS: Record<string, string> = {
   BASE: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png",
   POLYGON: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png",
   ETHEREUM: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
-  CELO: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/celo/info/logo.png",
 };
 
 // Only USDC and USDT can be converted (same token, different chain)
