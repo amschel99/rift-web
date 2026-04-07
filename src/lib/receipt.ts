@@ -180,16 +180,14 @@ export function downloadReceipt(data: ReceiptData) {
   ctx.textAlign = "center";
   ctx.fillText("Powered by Rift  |  riftfi.xyz  |  admin@riftfi.xyz", w / 2, h - 30);
 
-  // Download
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `rift-receipt-${data.transactionCode}.png`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, "image/png");
+  // Download — use dataURL for mobile compatibility
+  const dataUrl = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = `rift-receipt-${data.transactionCode}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {

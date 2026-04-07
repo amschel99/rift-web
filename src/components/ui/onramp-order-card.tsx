@@ -178,10 +178,10 @@ export default function OnrampOrderCard({ order }: OnrampOrderCardProps) {
                 createdAt: order.createdAt,
                 status: order.status,
               })}
-              className="p-0.5 hover:bg-gray-100 rounded transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded-md transition-colors active:bg-gray-200"
               title="Download receipt"
             >
-              <Download className="w-3.5 h-3.5 text-gray-400" />
+              <Download className="w-4 h-4 text-gray-500" />
             </button>
           </div>
         </div>
