@@ -180,14 +180,31 @@ export function downloadReceipt(data: ReceiptData) {
   ctx.textAlign = "center";
   ctx.fillText("Powered by Rift  |  riftfi.xyz  |  admin@riftfi.xyz", w / 2, h - 30);
 
-  // Download — use dataURL for mobile compatibility
-  const dataUrl = canvas.toDataURL("image/png");
-  const a = document.createElement("a");
-  a.href = dataUrl;
-  a.download = `rift-receipt-${data.transactionCode}.png`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  // Download — handle PWA/mobile by using share API or fallback to new tab
+  const fileName = `rift-receipt-${data.transactionCode}.png`;
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+
+    // Try Web Share API first (works in PWAs and mobile browsers)
+    if (navigator.share && navigator.canShare) {
+      try {
+        const file = new File([blob], fileName, { type: "image/png" });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: "Rift Receipt" });
+          return;
+        }
+      } catch {
+        // User cancelled or share failed — fall through
+      }
+    }
+
+    // Fallback: open image in new tab (works in PWAs)
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    // Clean up after a delay
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }, "image/png");
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
