@@ -180,83 +180,23 @@ export function downloadReceipt(data: ReceiptData) {
   ctx.textAlign = "center";
   ctx.fillText("Powered by Rift  |  riftfi.xyz  |  admin@riftfi.xyz", w / 2, h - 30);
 
-  // Show receipt as a fullscreen overlay image the user can share/save
-  const dataUrl = canvas.toDataURL("image/png");
-
-  const overlay = document.createElement("div");
-  overlay.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;";
-
-  const img = document.createElement("img");
-  img.src = dataUrl;
-  img.style.cssText = "max-width:100%;max-height:70vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);";
-
-  const btnRow = document.createElement("div");
-  btnRow.style.cssText = "display:flex;gap:12px;margin-top:20px;";
-
-  // Share button
-  const shareBtn = document.createElement("button");
-  shareBtn.textContent = "\u{1F4E4} Save / Share";
-  shareBtn.style.cssText = "padding:14px 36px;background:#0d9488;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;";
-  shareBtn.onclick = async () => {
-    try {
-      // Convert dataURL to blob
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const file = new File([blob], `rift-receipt-${data.transactionCode}.png`, { type: "image/png" });
-
-      // Try native share (works on most mobile browsers + PWAs)
-      if (typeof navigator.share === "function") {
-        try {
-          await navigator.share({ files: [file], title: "Rift Receipt" });
-          return;
-        } catch (e: any) {
-          // AbortError = user cancelled, that's fine
-          if (e?.name === "AbortError") return;
-          // If share with files fails, try without files
-          try {
-            await navigator.share({ title: "Rift Receipt", text: "Transaction receipt from Rift" });
-            return;
-          } catch {}
-        }
-      }
-
-      // Fallback: open the image as a downloadable link
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `rift-receipt-${data.transactionCode}.png`;
-      link.target = "_blank";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      shareBtn.textContent = "\u2705 Done";
-      setTimeout(() => { shareBtn.textContent = "\u{1F4E4} Save / Share"; }, 2000);
-    } catch {
-      shareBtn.textContent = "\u274C Failed";
-      setTimeout(() => { shareBtn.textContent = "\u{1F4E4} Save / Share"; }, 2000);
-    }
-  };
-
-  // Close button
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "Close";
-  closeBtn.style.cssText = "padding:12px 32px;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;";
-  closeBtn.onclick = () => document.body.removeChild(overlay);
-
-  const hint = document.createElement("p");
-  hint.textContent = "Tap the button above to save to your gallery or share";
-  hint.style.cssText = "color:rgba(255,255,255,0.5);font-size:13px;margin-top:12px;text-align:center;";
-
-  btnRow.appendChild(shareBtn);
-  btnRow.appendChild(closeBtn);
-  overlay.appendChild(img);
-  overlay.appendChild(btnRow);
-  overlay.appendChild(hint);
-
-  // Close on backdrop tap
-  overlay.onclick = (e) => { if (e.target === overlay) document.body.removeChild(overlay); };
-
-  document.body.appendChild(overlay);
+  // Download as PNG
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `rift-receipt-${data.transactionCode}.png`;
+    // For PWA/mobile: setting target helps some browsers
+    a.setAttribute("target", "_self");
+    document.body.appendChild(a);
+    a.click();
+    // Small delay before cleanup so mobile browsers can process
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 3000);
+  }, "image/png");
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
