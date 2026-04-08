@@ -19,7 +19,7 @@ export default function Confirmation() {
   });
 
   useEffect(() => {
-    const status = onRampStatusQuery?.data?.data?.status;
+    const status = onRampStatusQuery?.data?.status;
 
     if (status === "pending") {
       // wait for status failed/success
@@ -30,7 +30,7 @@ export default function Confirmation() {
       setShouldPoll(false);
 
       // Track successful crypto purchase (deposit)
-      const transactionData: any = onRampStatusQuery?.data?.data;
+      const transactionData: any = onRampStatusQuery?.data;
       logEvent("ONRAMP_COMPLETED", {
         checkout_request_id: transactionId,
         amount: transactionData?.amount || null,
@@ -63,7 +63,7 @@ export default function Confirmation() {
       setShouldPoll(false);
       
       // Track failed onramp
-      const transactionData: any = onRampStatusQuery?.data?.data;
+      const transactionData: any = onRampStatusQuery?.data;
       logEvent("ONRAMP_FAILED", {
         checkout_request_id: transactionId,
         amount: transactionData?.amount || null,
