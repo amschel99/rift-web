@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { motion } from "motion/react";
 import { FiArrowLeft } from "react-icons/fi";
 import { ArrowLeftRight, ChevronRight, Wallet } from "lucide-react";
@@ -69,11 +69,18 @@ export default function PaySourceSelect() {
     setCurrentStep("amount");
   };
 
-  useMemo(() => {
+  const autoSelectedRef = useRef(false);
+  useEffect(() => {
+    if (autoSelectedRef.current) return;
+    if (paymentData.selectedSource) {
+      autoSelectedRef.current = true;
+      return;
+    }
     if (!isLoading && sourcesWithBalance.length === 1) {
+      autoSelectedRef.current = true;
       handleSelect(sourcesWithBalance[0].id);
     }
-  }, [isLoading, sourcesWithBalance.length]);
+  }, [isLoading, sourcesWithBalance, paymentData.selectedSource]);
 
   const handleBack = () => {
     if (paymentData.currency === "KES") {
