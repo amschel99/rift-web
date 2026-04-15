@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { motion } from "motion/react";
-import { FiArrowLeft } from "react-icons/fi";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { FiArrowLeft, FiSearch, FiCheck, FiX } from "react-icons/fi";
 import { usePay } from "../context";
 import ActionButton from "@/components/ui/action-button";
 import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
 import DesktopPageLayout from "@/components/layouts/desktop-page-layout";
+import { useKenyaBankPaybills } from "@/hooks/data/use-kenya-bank-paybills";
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   KES: "KSh",
@@ -23,16 +24,7 @@ const INSTITUTIONS: Record<string, { name: string; type: "mobile" | "bank" | "pi
   KES: [
     { name: "Safaricom", type: "mobile" },
     { name: "Airtel", type: "mobile" },
-    { name: "KCB Bank", type: "bank" },
-    { name: "Equity Bank", type: "bank" },
-    { name: "Co-operative Bank", type: "bank" },
-    { name: "ABSA Bank", type: "bank" },
-    { name: "Stanbic Bank", type: "bank" },
-    { name: "Standard Chartered", type: "bank" },
-    { name: "NCBA Bank", type: "bank" },
-    { name: "I&M Bank", type: "bank" },
-    { name: "DTB Bank", type: "bank" },
-    { name: "Family Bank", type: "bank" },
+    // KES banks are loaded dynamically from /reference/kenya-bank-paybills
   ],
   NGN: [
     { name: "Access Bank", type: "bank" },
@@ -81,6 +73,36 @@ const INSTITUTIONS: Record<string, { name: string; type: "mobile" | "bank" | "pi
   ],
 };
 
+// Brand-adjacent tints for bank avatars — avoids the generic "gray circle"
+// look while staying within the app's existing palette. Order matters only
+// for stable assignment.
+const BANK_AVATAR_TINTS: { bg: string; fg: string }[] = [
+  { bg: "bg-emerald-100", fg: "text-emerald-700" },
+  { bg: "bg-sky-100",     fg: "text-sky-700" },
+  { bg: "bg-violet-100",  fg: "text-violet-700" },
+  { bg: "bg-amber-100",   fg: "text-amber-700" },
+  { bg: "bg-rose-100",    fg: "text-rose-700" },
+  { bg: "bg-indigo-100",  fg: "text-indigo-700" },
+  { bg: "bg-teal-100",    fg: "text-teal-700" },
+  { bg: "bg-fuchsia-100", fg: "text-fuchsia-700" },
+];
+
+function bankInitials(name: string): string {
+  const cleaned = name.replace(/bank/gi, "").replace(/[^a-zA-Z& ]/g, " ").trim();
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return name.slice(0, 2).toUpperCase();
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function bankTint(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  return BANK_AVATAR_TINTS[Math.abs(hash) % BANK_AVATAR_TINTS.length];
+}
+
+const normalizeSearch = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
 const COUNTRY_NAMES: Record<string, string> = {
   KES: "Kenya",
   NGN: "Nigeria",
@@ -98,6 +120,7 @@ export default function RecipientInput() {
   const [accountNumber, setAccountNumber] = useState(""); // Only for PAYBILL
   const [accountName, setAccountName] = useState("");
   const [selectedInstitution, setSelectedInstitution] = useState<string>("");
+  const [bankSearch, setBankSearch] = useState("");
   const isDesktop = useDesktopDetection();
 
   const currency = (paymentData.currency || "KES") as SupportedCurrency;
@@ -105,7 +128,19 @@ export default function RecipientInput() {
   const isKenya = currency === "KES";
   const isBrazil = currency === "BRL";
 
-  const institutions = INSTITUTIONS[currency] || [];
+  const isKenyaBank = currency === "KES" && paymentData.type === "BANK";
+  const { data: kenyaBanks = [], isLoading: banksLoading, error: banksError } =
+    useKenyaBankPaybills(isKenyaBank);
+
+  const institutions = useMemo(() => {
+    const base = INSTITUTIONS[currency] || [];
+    if (currency !== "KES") return base;
+    return [
+      ...base,
+      ...kenyaBanks.map((b) => ({ name: b.name, type: "bank" as const })),
+    ];
+  }, [currency, kenyaBanks]);
+
   const selectedInst = institutions.find((i) => i.name === selectedInstitution);
   const needsAccountName = selectedInst?.type === "bank" || (isKenya && paymentData.type === "BANK");
 
@@ -255,23 +290,137 @@ export default function RecipientInput() {
       )}
 
       {/* Kenya bank selector (for BANK type) */}
-      {isKenya && paymentData.type === "BANK" && (
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Bank <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={selectedInstitution}
-            onChange={(e) => setSelectedInstitution(e.target.value)}
-            className="w-full p-3 bg-surface-subtle border border-surface rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary text-base"
-          >
-            <option value="">Select bank</option>
-            {institutions.filter((i) => i.type === "bank").map((inst) => (
-              <option key={inst.name} value={inst.name}>{inst.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      {isKenya && paymentData.type === "BANK" && (() => {
+        const q = normalizeSearch(bankSearch);
+        const filtered = kenyaBanks.filter((b) => normalizeSearch(b.name).includes(q));
+        return (
+          <div>
+            <div className="flex items-baseline justify-between mb-2">
+              <label className="block text-sm font-medium">
+                Select bank <span className="text-red-500">*</span>
+              </label>
+              {!banksLoading && !banksError && (
+                <span className="text-[11px] text-text-subtle tabular-nums">
+                  {filtered.length} of {kenyaBanks.length}
+                </span>
+              )}
+            </div>
+
+            {/* Search input with leading icon and clear button */}
+            <div className="relative mb-3">
+              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-subtle pointer-events-none" />
+              <input
+                type="text"
+                inputMode="search"
+                value={bankSearch}
+                onChange={(e) => setBankSearch(e.target.value)}
+                placeholder="Search e.g. KCB, I&M, Equity"
+                className="w-full h-12 pl-10 pr-10 bg-white border border-surface rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary text-sm placeholder:text-text-subtle/70 transition-all"
+              />
+              {bankSearch && (
+                <button
+                  type="button"
+                  onClick={() => setBankSearch("")}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full hover:bg-surface-subtle text-text-subtle"
+                >
+                  <FiX className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {banksLoading ? (
+              <div className="rounded-2xl border border-surface bg-white overflow-hidden">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-surface last:border-b-0">
+                    <div className="w-10 h-10 rounded-full bg-surface-subtle animate-pulse" />
+                    <div className="flex-1 h-4 rounded bg-surface-subtle animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            ) : banksError ? (
+              <div className="p-4 rounded-2xl border border-red-200 bg-red-50 text-sm text-red-700">
+                Couldn't load bank list. Please retry.
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="p-6 rounded-2xl border border-dashed border-surface bg-surface-subtle/50 text-center">
+                <p className="text-sm text-text-default font-medium">No banks found</p>
+                <p className="text-xs text-text-subtle mt-1">
+                  Try a different name like "Equity" or "KCB"
+                </p>
+              </div>
+            ) : (
+              <div className="relative">
+                <div
+                  role="listbox"
+                  aria-label="Select your bank"
+                  className="max-h-[19rem] overflow-y-auto rounded-2xl border border-surface bg-white divide-y divide-surface/70 shadow-sm"
+                  style={{ scrollbarWidth: "thin" }}
+                >
+                  {filtered.map((bank, idx) => {
+                    const active = selectedInstitution === bank.name;
+                    const tint = bankTint(bank.id);
+                    return (
+                      <motion.button
+                        key={bank.id}
+                        type="button"
+                        role="option"
+                        aria-selected={active}
+                        onClick={() => setSelectedInstitution(bank.name)}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(idx * 0.02, 0.15), duration: 0.18 }}
+                        whileTap={{ scale: 0.985 }}
+                        className={`w-full flex items-center gap-3 text-left px-4 py-3 min-h-[56px] transition-colors duration-150 ${
+                          active
+                            ? "bg-accent-primary/5"
+                            : "hover:bg-surface-subtle/60 active:bg-surface-subtle"
+                        }`}
+                      >
+                        <span
+                          className={`relative flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold tracking-tight ${tint.bg} ${tint.fg}`}
+                        >
+                          {bankInitials(bank.name)}
+                          {active && (
+                            <motion.span
+                              layoutId="bank-ring"
+                              className="absolute inset-0 rounded-full ring-2 ring-accent-primary ring-offset-2 ring-offset-white"
+                              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            />
+                          )}
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-[14px] font-semibold text-text-default truncate">
+                            {bank.name}
+                          </span>
+                          <span className="block text-[11px] text-text-subtle">
+                            Direct bank deposit
+                          </span>
+                        </span>
+                        <AnimatePresence initial={false}>
+                          {active && (
+                            <motion.span
+                              initial={{ scale: 0.6, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              exit={{ scale: 0.6, opacity: 0 }}
+                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                              className="flex-shrink-0 w-6 h-6 rounded-full bg-accent-primary flex items-center justify-center shadow-sm"
+                            >
+                              <FiCheck className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+                {/* Subtle fade to hint scrollability */}
+                <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 rounded-b-2xl bg-gradient-to-t from-white to-transparent" />
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Kenya institution selector (Safaricom/Airtel for MOBILE) */}
       {isKenya && paymentData.type === "MOBILE" && (
