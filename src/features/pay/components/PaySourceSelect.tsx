@@ -106,12 +106,21 @@ export default function PaySourceSelect() {
       {/* Header */}
       <div className={`flex-shrink-0 ${isDesktop ? "mb-6" : "px-4 pt-4 pb-4"}`}>
         <div className="flex items-center gap-3">
-          <button onClick={handleBack} className="p-2 -ml-2 hover:bg-surface-subtle rounded-xl transition-colors">
+          <button
+            onClick={handleBack}
+            className="p-2 -ml-2 hover:bg-white/60 rounded-xl transition-colors cursor-pointer"
+            aria-label="Back"
+          >
             <FiArrowLeft className="w-5 h-5 text-text-default" />
           </button>
           <div>
-            <h1 className={`font-bold text-text-default ${isDesktop ? "text-2xl" : "text-lg"}`}>Pay With</h1>
-            <p className="text-xs text-text-subtle">Select source wallet</p>
+            <h1
+              className={`font-semibold text-text-default tracking-[-0.015em] ${isDesktop ? "text-[28px]" : "text-[17px]"}`}
+              style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+            >
+              Pay with
+            </h1>
+            <p className="text-[12px] text-text-subtle/80">Select a source wallet</p>
           </div>
         </div>
       </div>
@@ -119,17 +128,31 @@ export default function PaySourceSelect() {
       {/* Total Balance Card */}
       {!isLoading && sourcesWithBalance.length > 0 && (
         <div className={`flex-shrink-0 ${isDesktop ? "mb-6" : "mx-4 mb-4"}`}>
-          <div className="bg-gradient-to-br from-accent-primary to-accent-secondary rounded-2xl p-5 text-white">
-            <div className="flex items-center gap-2 mb-1">
-              <Wallet className="w-4 h-4 opacity-70" />
-              <span className="text-xs font-medium opacity-70">Total Available</span>
+          <div className="relative overflow-hidden rounded-2xl p-5 text-white bg-gradient-to-br from-accent-primary via-accent-primary to-[#1d5a60] shadow-[0_12px_30px_-10px_rgba(46,140,150,0.55)]">
+            {/* decorative blur circles */}
+            <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-16 -left-10 w-48 h-48 rounded-full bg-black/10 blur-2xl" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-3.5 h-3.5 opacity-80" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.1em] opacity-80">
+                  Total available
+                </span>
+              </div>
+              <p
+                className="text-[32px] font-semibold leading-none tabular-numeric tracking-[-0.02em]"
+                style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+              >
+                {totalMaxLocal > 0
+                  ? `${currencySymbol} ${totalMaxLocal.toLocaleString()}`
+                  : `$${totalDirect.toFixed(2)}`}
+              </p>
+              {totalMaxLocal > 0 && (
+                <p className="text-[12px] opacity-70 mt-2 tabular-numeric">
+                  ${totalDirect.toFixed(2)} USD &middot; {sourcesWithBalance.length} {sourcesWithBalance.length === 1 ? "wallet" : "wallets"}
+                </p>
+              )}
             </div>
-            <p className="text-3xl font-bold tracking-tight">
-              {totalMaxLocal > 0 ? `${currencySymbol} ${totalMaxLocal.toLocaleString()}` : `$${totalDirect.toFixed(2)}`}
-            </p>
-            {totalMaxLocal > 0 && (
-              <p className="text-xs opacity-60 mt-1">${totalDirect.toFixed(2)} USD across {sourcesWithBalance.length} {sourcesWithBalance.length === 1 ? "wallet" : "wallets"}</p>
-            )}
           </div>
         </div>
       )}
@@ -166,44 +189,52 @@ export default function PaySourceSelect() {
 
         {!isLoading && sourcesWithBalance.length > 0 && (
           <>
-            <p className="text-[11px] font-semibold text-text-subtle uppercase tracking-wider px-1">Select Wallet</p>
+            <p className="text-[11px] font-semibold text-text-subtle/70 uppercase tracking-[0.08em] px-1">Select wallet</p>
             <div className="space-y-2">
               {sourcesWithBalance.map((src, i) => (
                 <motion.button
                   key={src.id}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  transition={{ delay: i * 0.04 }}
                   onClick={() => handleSelect(src.id)}
-                  className="group flex items-center w-full p-3.5 rounded-2xl bg-surface-subtle hover:bg-surface border border-transparent hover:border-accent-primary/30 transition-all active:scale-[0.98]"
+                  className="group flex items-center w-full p-3.5 rounded-2xl bg-white border border-surface/80 hover:border-accent-primary/40 hover:shadow-md transition-all active:scale-[0.985] cursor-pointer"
                 >
                   <div className="relative mr-3 flex-shrink-0">
-                    <img src={src.icon} alt="" className="w-10 h-10 rounded-full ring-2 ring-surface" />
+                    <img src={src.icon} alt="" className="w-11 h-11 rounded-full ring-2 ring-white shadow-sm" />
                     {CHAIN_ICONS[src.chainLabel] && (
-                      <img src={CHAIN_ICONS[src.chainLabel]} alt="" className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full ring-2 ring-surface" />
+                      <img
+                        src={CHAIN_ICONS[src.chainLabel]}
+                        alt=""
+                        className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full ring-2 ring-white shadow-sm"
+                      />
                     )}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-text-default">{src.token}</p>
-                      <p className="text-sm font-bold text-text-default tabular-nums">
-                        {src.maxLocal > 0 ? `${currencySymbol} ${src.maxLocal.toLocaleString()}` : `$${src.balance.toFixed(2)}`}
+                      <p className="text-[14px] font-semibold text-text-default">{src.token}</p>
+                      <p className="text-[14px] font-semibold text-text-default tabular-numeric">
+                        {src.maxLocal > 0
+                          ? `${currencySymbol} ${src.maxLocal.toLocaleString()}`
+                          : `$${src.balance.toFixed(2)}`}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-0.5">
-                      <p className="text-xs text-text-subtle">{src.chainLabel}</p>
-                      <p className="text-[10px] text-text-subtle tabular-nums">${src.balance.toFixed(2)}</p>
+                      <p className="text-[12px] text-text-subtle/80">{src.chainLabel}</p>
+                      <p className="text-[11px] text-text-subtle/80 tabular-numeric">
+                        ${src.balance.toFixed(2)}
+                      </p>
                     </div>
                     <div className="mt-2 h-1 bg-surface rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.max((src.balance / maxBalance) * 100, 4)}%` }}
                         transition={{ delay: i * 0.05 + 0.2, duration: 0.4 }}
-                        className="h-full bg-accent-primary rounded-full"
+                        className="h-full bg-gradient-to-r from-accent-primary to-accent-primary/70 rounded-full"
                       />
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-text-subtle ml-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-text-subtle/40 ml-2 group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                 </motion.button>
               ))}
             </div>
@@ -243,7 +274,7 @@ export default function PaySourceSelect() {
 
   if (isDesktop) {
     return (
-      <DesktopPageLayout maxWidth="lg" className="h-full">
+      <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>
         <div className="w-full max-w-2xl mx-auto p-8">{inner}</div>
       </DesktopPageLayout>
     );

@@ -310,12 +310,19 @@ export default function Home() {
     return (
       <div className="h-full flex flex-col">
         {/* Desktop Header */}
-        <div className="flex-shrink-0 z-40 bg-white border-b border-gray-200">
-          <div className="w-full px-8 py-6">
+        <div className="flex-shrink-0 z-40 bg-white/90 backdrop-blur-sm border-b border-surface/80">
+          <div className="w-full px-8 py-5">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <p className="text-sm text-gray-500 mt-1">Welcome back</p>
+                <h1
+                  className="text-[24px] font-semibold text-text-default tracking-[-0.02em]"
+                  style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+                >
+                  {getGreeting()}
+                </h1>
+                <p className="text-[13px] text-text-subtle/80 mt-0.5">
+                  Welcome back to your wallet.
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 <CurrencySelector
@@ -331,63 +338,91 @@ export default function Home() {
           initial={{ x: 4, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-8"
+          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-6 lg:p-8"
         >
-          <div className="w-full max-w-7xl mx-auto space-y-6">
+          <div className="w-full max-w-6xl mx-auto space-y-5">
             {/* Desktop Balance Card */}
             <div
               id="balance-section"
-              className="bg-gradient-to-br from-accent-primary to-teal-700 rounded-2xl shadow-lg p-8"
+              className="relative overflow-hidden bg-gradient-to-br from-accent-primary via-[#2a7f89] to-[#184b52] rounded-3xl shadow-[0_20px_50px_-15px_rgba(46,140,150,0.4)] p-8 lg:p-10"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <p className="text-sm font-medium text-white/70">Total Balance</p>
+              {/* Decorative elements */}
+              <div className="pointer-events-none absolute -top-24 -right-16 w-80 h-80 rounded-full bg-white/8 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-black/15 blur-3xl" />
+              <div className="pointer-events-none absolute top-6 right-6 w-2 h-2 rounded-full bg-white/30" />
+              <div className="pointer-events-none absolute top-10 right-10 w-1 h-1 rounded-full bg-white/40" />
+
+              <div className="relative flex items-start justify-between gap-6">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/70">
+                      Total balance
+                    </p>
                     <button
                       onClick={() => {
                         setIsBalanceVisible(!isBalanceVisible);
                         logEvent("BALANCE_VISIBILITY_TOGGLED", { visible: !isBalanceVisible });
                       }}
-                      className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                      aria-label="Toggle balance visibility"
                     >
                       {isBalanceVisible ? (
-                        <IoEyeOutline className="w-4 h-4 text-white/60" />
+                        <IoEyeOutline className="w-4 h-4 text-white/70" />
                       ) : (
-                        <IoEyeOffOutline className="w-4 h-4 text-white/60" />
+                        <IoEyeOffOutline className="w-4 h-4 text-white/70" />
                       )}
                     </button>
                     <button
                       onClick={() => forceClearCacheAndRefresh()}
-                      className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                      aria-label="Refresh"
                     >
-                      <FiRefreshCw className="w-3.5 h-3.5 text-white/60" />
+                      <FiRefreshCw className="w-3.5 h-3.5 text-white/70" />
                     </button>
                   </div>
-                  <h1 className="text-5xl font-bold text-white">
+                  <h1
+                    className="text-[56px] font-semibold text-white leading-none tracking-[-0.03em] tabular-numeric"
+                    style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+                  >
                     {BALANCE_LOADING || countryLoading ? (
                       <RiftLoader message="Loading balance..." />
                     ) : !BALANCE ? (
                       <Skeleton className="h-12 w-40 inline-block" />
                     ) : isBalanceVisible ? (
-                      `${formatNumberWithCommas(BALANCE.localAmount)} ${selectedCurrency.code}`
+                      <>
+                        {formatNumberWithCommas(BALANCE.localAmount)}
+                        <span className="text-[22px] font-medium text-white/60 ml-2 tracking-normal">
+                          {selectedCurrency.code}
+                        </span>
+                      </>
                     ) : (
-                      `**** ${selectedCurrency.code}`
+                      <>
+                        &bull;&bull;&bull;&bull;
+                        <span className="text-[22px] font-medium text-white/60 ml-2 tracking-normal">
+                          {selectedCurrency.code}
+                        </span>
+                      </>
                     )}
                   </h1>
                   {BALANCE && isBalanceVisible && selectedCurrency.code !== "USD" && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-sm text-white/70">${BALANCE.totalUsd.toFixed(2)} USD</span>
-                      <IoSwapHorizontalOutline className="w-3.5 h-3.5 text-white/40" />
-                      <span className="text-xs text-white/50">1 USD = {BALANCE.exchangeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {selectedCurrency.code}</span>
+                    <div className="flex items-center gap-2 mt-4">
+                      <span className="text-[13px] text-white/70 tabular-numeric">
+                        ${BALANCE.totalUsd.toFixed(2)} USD
+                      </span>
+                      <span className="text-white/20">&middot;</span>
+                      <span className="text-[12px] text-white/50 tabular-numeric">
+                        1 USD = {BALANCE.exchangeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {selectedCurrency.code}
+                      </span>
                     </div>
                   )}
                 </div>
                 <button
                   id="topup-button"
                   onClick={handleTopUp}
-                  className="px-8 py-4 bg-white text-accent-primary rounded-xl text-base font-semibold hover:bg-gray-50 transition-colors shadow-md"
+                  className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3.5 bg-white text-accent-primary rounded-2xl text-[14px] font-semibold hover:bg-white/95 hover:shadow-xl transition-all cursor-pointer shadow-md active:scale-[0.98]"
                 >
-                  Top Up
+                  <IoAddCircleOutline className="w-[18px] h-[18px]" />
+                  Add money
                 </button>
               </div>
             </div>
@@ -476,96 +511,102 @@ export default function Home() {
             })}
 
             {/* Desktop Feature Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <motion.div
-                id="wallet-card"
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                onClick={() => {
-                  logEvent("WALLET_CARD_CLICKED");
-                  navigate("/app/wallet");
-                }}
-                className="group flex items-center gap-4 p-5 rounded-2xl bg-accent-primary/[0.04] border border-accent-primary/10 cursor-pointer hover:bg-accent-primary/[0.07] hover:shadow-md transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-accent-primary/15 flex items-center justify-center flex-shrink-0">
-                  <IoWalletOutline className="w-6 h-6 text-accent-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900">Wallet</h3>
-                  <p className="text-sm text-gray-500">Send, receive & manage money</p>
-                </div>
-                <IoChevronForward className="w-5 h-5 text-accent-primary/30 group-hover:text-accent-primary/60 group-hover:translate-x-0.5 transition-all" />
-              </motion.div>
+            <div>
+              <p className="text-[11px] font-semibold text-text-subtle/70 uppercase tracking-[0.08em] mb-3 px-1">
+                Get started
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <motion.div
+                  id="wallet-card"
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  onClick={() => {
+                    logEvent("WALLET_CARD_CLICKED");
+                    navigate("/app/wallet");
+                  }}
+                  className="group flex items-center gap-4 p-5 rounded-2xl bg-white border border-surface/80 cursor-pointer hover:border-accent-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-accent-primary/10 text-accent-primary flex items-center justify-center flex-shrink-0 group-hover:bg-accent-primary group-hover:text-white transition-colors">
+                    <IoWalletOutline className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[15px] font-semibold text-text-default mb-0.5">Wallet</h3>
+                    <p className="text-[12px] text-text-subtle/80">Send, receive & pay</p>
+                  </div>
+                  <IoChevronForward className="w-4 h-4 text-text-subtle/30 group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all" />
+                </motion.div>
 
-              <motion.div
-                id="assets-card"
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.12 }}
-                onClick={() => {
-                  navigate("/app/assets");
-                }}
-                className="group flex items-center gap-4 p-5 rounded-2xl bg-accent-primary/[0.04] border border-accent-primary/10 cursor-pointer hover:bg-accent-primary/[0.07] hover:shadow-md transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-accent-primary/15 flex items-center justify-center flex-shrink-0">
-                  <Coins className="w-6 h-6 text-accent-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900">Crypto Assets</h3>
-                  <p className="text-sm text-gray-500">View all your tokens</p>
-                </div>
-                <IoChevronForward className="w-5 h-5 text-accent-primary/30 group-hover:text-accent-primary/60 group-hover:translate-x-0.5 transition-all" />
-              </motion.div>
+                <motion.div
+                  id="assets-card"
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.12 }}
+                  onClick={() => navigate("/app/assets")}
+                  className="group flex items-center gap-4 p-5 rounded-2xl bg-white border border-surface/80 cursor-pointer hover:border-accent-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-accent-primary/10 text-accent-primary flex items-center justify-center flex-shrink-0 group-hover:bg-accent-primary group-hover:text-white transition-colors">
+                    <Coins className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[15px] font-semibold text-text-default mb-0.5">Crypto assets</h3>
+                    <p className="text-[12px] text-text-subtle/80">View all your tokens</p>
+                  </div>
+                  <IoChevronForward className="w-4 h-4 text-text-subtle/30 group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all" />
+                </motion.div>
 
-              <motion.div
-                id="earn-card"
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.14 }}
-                onClick={() => {
-                  logEvent("EARN_CARD_CLICKED");
-                  navigate("/app/invest");
-                }}
-                className="group flex items-center gap-4 p-5 rounded-2xl bg-accent-primary/[0.04] border border-accent-primary/10 cursor-pointer hover:bg-accent-primary/[0.07] hover:shadow-md transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-accent-primary/15 flex items-center justify-center flex-shrink-0">
-                  <IoSparkles className="w-6 h-6 text-accent-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900">Earn</h3>
-                  <p className="text-sm text-gray-500">Invest and grow your money</p>
-                </div>
-                <IoChevronForward className="w-5 h-5 text-accent-primary/30 group-hover:text-accent-primary/60 group-hover:translate-x-0.5 transition-all" />
-              </motion.div>
-
+                <motion.div
+                  id="earn-card"
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.14 }}
+                  onClick={() => {
+                    logEvent("EARN_CARD_CLICKED");
+                    navigate("/app/invest");
+                  }}
+                  className="group flex items-center gap-4 p-5 rounded-2xl bg-white border border-surface/80 cursor-pointer hover:border-accent-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-accent-primary/10 text-accent-primary flex items-center justify-center flex-shrink-0 group-hover:bg-accent-primary group-hover:text-white transition-colors">
+                    <IoSparkles className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[15px] font-semibold text-text-default mb-0.5">Earn</h3>
+                    <p className="text-[12px] text-text-subtle/80">Stable on-chain yield</p>
+                  </div>
+                  <IoChevronForward className="w-4 h-4 text-text-subtle/30 group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all" />
+                </motion.div>
+              </div>
             </div>
 
             {/* DeFi Section */}
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">DeFi</p>
+              <p className="text-[11px] font-semibold text-text-subtle/70 uppercase tracking-[0.08em] mb-3 px-1">DeFi</p>
               <motion.div
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.18 }}
                 onClick={() => navigate("/app/walletconnect")}
-                className="group flex items-center gap-4 p-5 rounded-2xl bg-accent-primary/[0.04] border border-accent-primary/10 cursor-pointer hover:bg-accent-primary/[0.07] hover:shadow-md transition-all"
+                className="group flex items-center gap-4 p-5 rounded-2xl bg-white border border-surface/80 cursor-pointer hover:border-accent-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all"
               >
-                <div className="w-12 h-12 rounded-xl bg-accent-primary/15 flex items-center justify-center flex-shrink-0">
-                  <Globe className="w-6 h-6 text-accent-primary" />
+                <div className="w-12 h-12 rounded-2xl bg-accent-primary/10 text-accent-primary flex items-center justify-center flex-shrink-0 group-hover:bg-accent-primary group-hover:text-white transition-colors">
+                  <Globe className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900">DeFi</h3>
-                  <p className="text-sm text-gray-500">Connect to Uniswap, Polymarket, Aave & other apps</p>
+                  <h3 className="text-[15px] font-semibold text-text-default mb-0.5">DeFi</h3>
+                  <p className="text-[12px] text-text-subtle/80">
+                    Connect to Uniswap, Polymarket, Aave &amp; other apps
+                  </p>
                 </div>
-                <IoChevronForward className="w-5 h-5 text-accent-primary/30 group-hover:text-accent-primary/60 group-hover:translate-x-0.5 transition-all" />
+                <IoChevronForward className="w-4 h-4 text-text-subtle/30 group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all" />
               </motion.div>
             </div>
 
             {/* Desktop Coming Soon */}
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Coming Soon</p>
-              <div className="grid grid-cols-3 gap-4">
+              <p className="text-[11px] font-semibold text-text-subtle/70 uppercase tracking-[0.08em] mb-3 px-1">
+                Coming soon
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {COMING_SOON_FEATURES.map((item, index) => {
                   const Icon = item.icon;
                   return (
@@ -574,15 +615,20 @@ export default function Home() {
                       initial={{ y: 10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.2 + index * 0.05 }}
-                      className="flex items-center gap-3 p-4 rounded-2xl bg-accent-primary/[0.02] border border-accent-primary/[0.06]"
+                      className="flex items-center gap-3 p-4 rounded-2xl bg-white/60 border border-dashed border-surface/80"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-accent-primary/[0.06] flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-accent-primary/30" />
+                      <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-4.5 h-4.5 text-text-subtle/50" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-gray-500">{item.title}</h3>
-                        <p className="text-xs text-gray-400">{item.description}</p>
+                        <h3 className="text-[13px] font-semibold text-text-subtle/80">
+                          {item.title}
+                        </h3>
+                        <p className="text-[11px] text-text-subtle/60">{item.description}</p>
                       </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-subtle/40 bg-surface px-2 py-0.5 rounded-full">
+                        Soon
+                      </span>
                     </motion.div>
                   );
                 })}
@@ -604,11 +650,14 @@ export default function Home() {
   return (
     <div className="h-full flex flex-col bg-app-background">
       {/* Mobile Header */}
-      <div className="flex-shrink-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-black/[0.04]">
+      <div className="flex-shrink-0 z-40 bg-app-background/85 backdrop-blur-xl border-b border-black/[0.04]">
         <div className="flex justify-between items-center px-5 py-3">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <img src="/rift.png" alt="Rift" className="w-8 h-8" />
-            <span className="text-base font-bold text-text-default">
+            <span
+              className="text-[17px] font-semibold text-text-default tracking-[-0.015em]"
+              style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+            >
               Rift
             </span>
           </div>
@@ -628,7 +677,9 @@ export default function Home() {
       >
         {/* Balance Section */}
         <div id="balance-section" className="mb-6 mt-6 text-center">
-          <p className="text-xs text-text-subtle/50 mb-2">{getGreeting()}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-subtle/60 mb-2">
+            {getGreeting()}
+          </p>
 
           {/* Balance amount */}
           {BALANCE_LOADING || countryLoading ? (
@@ -636,14 +687,24 @@ export default function Home() {
           ) : !BALANCE ? (
             <Skeleton className="h-10 w-36 mx-auto" />
           ) : isBalanceVisible ? (
-            <h1 className="text-[2.25rem] font-bold text-text-default leading-none tracking-tight">
+            <h1
+              className="text-[40px] font-semibold text-text-default leading-none tracking-[-0.03em] tabular-numeric"
+              style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+            >
               {formatNumberWithCommas(BALANCE.localAmount)}
-              <span className="text-base font-medium text-text-subtle/60 ml-1">{selectedCurrency.code}</span>
+              <span className="text-[16px] font-medium text-text-subtle/60 ml-1.5 tracking-normal">
+                {selectedCurrency.code}
+              </span>
             </h1>
           ) : (
-            <h1 className="text-[2.25rem] font-bold text-text-default leading-none">
-              ****
-              <span className="text-base font-medium text-text-subtle/60 ml-1">{selectedCurrency.code}</span>
+            <h1
+              className="text-[40px] font-semibold text-text-default leading-none tracking-[-0.03em]"
+              style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+            >
+              &bull;&bull;&bull;&bull;
+              <span className="text-[16px] font-medium text-text-subtle/60 ml-1.5">
+                {selectedCurrency.code}
+              </span>
             </h1>
           )}
 

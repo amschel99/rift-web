@@ -111,8 +111,8 @@ export default function ForgotPassword() {
       className="w-full h-full bg-app-background"
     >
       <div
-        className={`flex flex-col h-full ${
-          isDesktop ? "max-w-md mx-auto justify-center px-6" : "p-4"
+        className={`h-full overflow-y-auto overscroll-contain flex flex-col ${
+          isDesktop ? "max-w-md mx-auto justify-center px-6 py-8" : "p-4 pb-8"
         }`}
       >
         {/* Header */}

@@ -25,22 +25,16 @@ export default function AppShell() {
   return (
     <ShellContextProvider>
       {isDesktop ? (
-        /* Desktop Layout - Full width, no constraints */
+        /* Desktop Layout - Full width with sidebar shell handled downstream */
         <div className="fixed inset-0 bg-app-background overflow-hidden">
           <AnimatePresence mode="wait">
             <PageContainer />
           </AnimatePresence>
         </div>
       ) : (
-        /* Mobile Layout - Centered, max-width container */
-        <div className="fixed inset-0 flex flex-col items-center bg-surface-subtle overflow-hidden">
-          {/* 
-            Responsive container:
-            - Mobile: full width
-            - Tablet (md): centered with max-width 448px  
-            - Desktop (lg+): centered with max-width 448px, with subtle background pattern
-          */}
-          <div className="w-full h-full max-w-md mx-auto relative bg-app-background md:rounded-none lg:shadow-2xl lg:border-x lg:border-surface-subtle overflow-hidden">
+        /* Mobile / narrow-viewport layout — centered card on wide screens */
+        <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-br from-[#E9F1F4] via-[#E9F1F4] to-[#DDEBF0] overflow-hidden">
+          <div className="w-full h-full max-w-md mx-auto relative bg-app-background overflow-hidden md:my-4 md:h-[calc(100dvh-2rem)] md:rounded-[28px] md:shadow-[0_20px_60px_-15px_rgba(15,42,56,0.2)] md:border md:border-white/60">
             <AnimatePresence mode="wait">
               <PageContainer />
             </AnimatePresence>

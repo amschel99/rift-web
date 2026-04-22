@@ -347,20 +347,24 @@ export default function Profile() {
         initial={{ x: -4, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className={`flex-shrink-0 z-20 border-b ${
+        className={`flex-shrink-0 z-20 ${
           isDesktop
-            ? "bg-white border-gray-200 px-8 py-8"
-            : "bg-app-background border-surface-subtle"
+            ? "bg-app-background/85 backdrop-blur-sm border-b border-surface/60 px-8 py-4"
+            : "bg-app-background border-b border-surface-subtle"
         }`}
       >
         <div
           className={`${
-            isDesktop ? "max-w-4xl mx-auto" : "px-4"
-          } ${isDesktop ? "pt-0 pb-6" : "pt-6 pb-4"}`}
+            isDesktop ? "max-w-3xl mx-auto" : "px-4"
+          } ${isDesktop ? "" : "pt-6 pb-4"}`}
         >
           <div className="flex items-center gap-4">
             {isTelegram ? (
-              <Avatar className="w-14 h-14 min-w-14 min-h-14 border-2 border-accent-primary/20">
+              <Avatar
+                className={`${
+                  isDesktop ? "w-12 h-12 min-w-12 min-h-12" : "w-14 h-14 min-w-14 min-h-14"
+                } border-2 border-accent-primary/20`}
+              >
                 <AvatarImage
                   className="rounded-full"
                   src={telegramUser?.photoUrl}
@@ -371,8 +375,12 @@ export default function Profile() {
                 </AvatarFallback>
               </Avatar>
             ) : (
-              <div className="w-14 h-14 min-w-14 min-h-14 rounded-full bg-accent-primary/10 border-2 border-accent-primary/20 flex items-center justify-center flex-shrink-0">
-                <HiMiniUser className="text-2xl text-accent-primary" />
+              <div
+                className={`${
+                  isDesktop ? "w-12 h-12 min-w-12 min-h-12" : "w-14 h-14 min-w-14 min-h-14"
+                } rounded-full bg-accent-primary/10 border-2 border-accent-primary/20 flex items-center justify-center flex-shrink-0`}
+              >
+                <HiMiniUser className={`${isDesktop ? "text-xl" : "text-2xl"} text-accent-primary`} />
               </div>
             )}
 
@@ -424,17 +432,22 @@ export default function Profile() {
 
       {/* Scrollable Content */}
       <div
-        className={`flex-1 overflow-y-auto overflow-x-hidden overscroll-contain space-y-6 ${
+        className={`flex-1 overflow-y-auto overflow-x-hidden overscroll-contain ${
           isDesktop
-            ? "px-8 py-8 max-w-4xl mx-auto bg-gray-50"
+            ? "px-8 py-6"
             : "px-4 py-4 pb-24 space-y-4"
         }`}
       >
+        <div
+          className={`${
+            isDesktop ? "max-w-3xl mx-auto space-y-4" : ""
+          }`}
+        >
         {/* Settings Sections */}
         <div
           className={`rounded-2xl overflow-hidden ${
             isDesktop
-              ? "bg-white border border-gray-200 shadow-sm"
+              ? "bg-white border border-surface/70 shadow-sm"
               : "bg-surface-alt"
           }`}
         >
@@ -717,6 +730,7 @@ export default function Profile() {
         <p className="text-center text-xs text-text-subtle/50 pt-2 pb-6">
           Rift Wallet v{APP_VERSION}
         </p>
+        </div>
       </div>
 
       <Drawer
@@ -1114,14 +1128,8 @@ export default function Profile() {
   );
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      {isDesktop ? (
-        <DesktopPageLayout maxWidth="lg" className="h-full">
-          {content}
-        </DesktopPageLayout>
-      ) : (
-        content
-      )}
+    <div className="h-full flex flex-col overflow-hidden bg-app-background">
+      {content}
     </div>
   );
 }

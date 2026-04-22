@@ -22,6 +22,16 @@ interface ReceiptData {
   type: "withdrawal" | "deposit";
   transactionCode: string;
   amount: number | string;
+  /**
+   * USD equivalent of the transaction amount. Optional.
+   *
+   * - For withdrawals, callers should pass the backend-provided
+   *   `usdcDeducted` value (exact).
+   * - For deposits, callers may pass an approximation based on the
+   *   current exchange rate, or omit it and let `downloadReceipt`
+   *   fetch the rate itself via the payment preview endpoint.
+   */
+  amountUsd?: number | null;
   currency?: string;
   chain?: string | null;
   token?: string | null;
@@ -32,7 +42,48 @@ interface ReceiptData {
   status?: string;
 }
 
-export function downloadReceipt(data: ReceiptData) {
+const PREVIEW_BASE_URL = "https://payment.riftfi.xyz";
+
+async function fetchUsdApproximation(amount: number, currency: string): Promise<number | null> {
+  if (!currency || currency === "USD") return amount;
+  try {
+    const authToken = localStorage.getItem("token");
+    if (!authToken) return null;
+    const apiKey = (import.meta as any)?.env?.VITE_SDK_API_KEY || "";
+    const res = await fetch(`${PREVIEW_BASE_URL}/offramp/preview_exchange_rate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({ currency }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Use buying_rate for offramp-style rate; fall back to rate.
+    const rate = Number(data?.buying_rate ?? data?.rate);
+    if (!rate || !Number.isFinite(rate) || rate <= 0) return null;
+    return amount / rate;
+  } catch {
+    return null;
+  }
+}
+
+export async function downloadReceipt(data: ReceiptData) {
+  // Resolve USD amount: use the provided value when present, otherwise try to
+  // derive it from the current exchange rate. Non-USD only.
+  let amountUsd = data.amountUsd ?? null;
+  if (amountUsd == null && data.currency && data.currency !== "USD") {
+    amountUsd = await fetchUsdApproximation(Number(data.amount) || 0, data.currency);
+  }
+  if (amountUsd == null && data.currency === "USD") {
+    amountUsd = Number(data.amount) || 0;
+  }
+  renderReceiptCanvas({ ...data, amountUsd });
+}
+
+function renderReceiptCanvas(data: ReceiptData & { amountUsd: number | null }) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
 
@@ -84,17 +135,34 @@ export function downloadReceipt(data: ReceiptData) {
     ctx.fillText(data.currency, w / 2, 268);
   }
 
+  // USD approximation — shown below local amount when currency != USD
+  const hasUsd =
+    typeof data.amountUsd === "number" &&
+    Number.isFinite(data.amountUsd) &&
+    data.amountUsd > 0;
+  const showUsdBelow = hasUsd && data.currency && data.currency !== "USD";
+  if (showUsdBelow) {
+    ctx.fillStyle = "#0d9488";
+    ctx.font = "600 16px system-ui, -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    const usdStr = `≈ $${(data.amountUsd as number).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} USD`;
+    ctx.fillText(usdStr, w / 2, 292);
+  }
+
   // Divider
   ctx.strokeStyle = "#e5e7eb";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(60, 295);
-  ctx.lineTo(w - 60, 295);
+  ctx.moveTo(60, showUsdBelow ? 315 : 295);
+  ctx.lineTo(w - 60, showUsdBelow ? 315 : 295);
   ctx.stroke();
 
   // Details
   ctx.textAlign = "left";
-  let y = 335;
+  let y = showUsdBelow ? 355 : 335;
   const lineHeight = 48;
   const labelX = 80;
   const valueX = w - 80;
@@ -135,6 +203,18 @@ export function downloadReceipt(data: ReceiptData) {
 
   // Transaction Code
   drawRow("Transaction Code", data.transactionCode);
+
+  // USD Equivalent (shown explicitly in details when we have it and the
+  // transaction wasn't already priced in USD)
+  if (hasUsd && data.currency && data.currency !== "USD") {
+    drawRow(
+      "Amount (USD)",
+      `$${(data.amountUsd as number).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+    );
+  }
 
   // Public Name
   if (data.public_name) {

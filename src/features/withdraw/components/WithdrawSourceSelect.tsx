@@ -250,7 +250,7 @@ export default function WithdrawSourceSelect() {
 
   if (isDesktop) {
     return (
-      <DesktopPageLayout maxWidth="lg" className="h-full">
+      <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>
         <div className="w-full max-w-2xl mx-auto p-8">{inner}</div>
       </DesktopPageLayout>
     );

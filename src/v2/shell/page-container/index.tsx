@@ -170,23 +170,23 @@ export default function PageContainer() {
           </Shell>
         }
       />
-      <Route path="/app/agent" element={<Agent />} />
+      <Route path="/app/agent" element={<Shell><Agent /></Shell>} />
       <Route
         path="/app/token/:tokenId/:chain/:balance"
-        element={<TokenInfo />}
+        element={<Shell><TokenInfo /></Shell>}
       />
-      <Route path="/app/receive/address" element={<ReceiveFromAddress />} />
-      <Route path="/app/receive/link" element={<ReceiveFromLink />} />
-      <Route path="/app/send/address" element={<SendToAddress />} />
-      <Route path="/app/send/open-link" element={<SendOpenLink />} />
-      <Route path="/app/send/specific-link" element={<SendSpecificLink />} />
-      <Route path="/app/buy" element={<BuyCrypto />} />
-      <Route path="/app/request" element={<Request />} />
-      <Route path="/app/pay" element={<Pay />} />
-      <Route path="/app/withdraw" element={<Withdraw />} />
-      <Route path="/app/markets" element={<PredictionMarkets />} />
-      <Route path="/app/markets/:id" element={<PredictionMarketDetails />} />
-      <Route path="/app/profile/recovery/:method" element={<Recovery />} />
+      <Route path="/app/receive/address" element={<Shell><ReceiveFromAddress /></Shell>} />
+      <Route path="/app/receive/link" element={<Shell><ReceiveFromLink /></Shell>} />
+      <Route path="/app/send/address" element={<Shell><SendToAddress /></Shell>} />
+      <Route path="/app/send/open-link" element={<Shell><SendOpenLink /></Shell>} />
+      <Route path="/app/send/specific-link" element={<Shell><SendSpecificLink /></Shell>} />
+      <Route path="/app/buy" element={<Shell><BuyCrypto /></Shell>} />
+      <Route path="/app/request" element={<Shell><Request /></Shell>} />
+      <Route path="/app/pay" element={<Shell><Pay /></Shell>} />
+      <Route path="/app/withdraw" element={<Shell><Withdraw /></Shell>} />
+      <Route path="/app/markets" element={<Shell><PredictionMarkets /></Shell>} />
+      <Route path="/app/markets/:id" element={<Shell><PredictionMarketDetails /></Shell>} />
+      <Route path="/app/profile/recovery/:method" element={<Shell><Recovery /></Shell>} />
       <Route
         path="/app/invest/sail-vault"
         element={

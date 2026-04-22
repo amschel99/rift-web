@@ -105,6 +105,8 @@ export default function WithdrawalCard({ order }: WithdrawalCardProps) {
                 type: "withdrawal",
                 transactionCode: order.transactionCode,
                 amount: order.amount,
+                // Backend returns usdcDeducted — the exact USD equivalent.
+                amountUsd: order.usdcDeducted ?? null,
                 currency: order.currency,
                 chain: order.chain,
                 token: order.token,
