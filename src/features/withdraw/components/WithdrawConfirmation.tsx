@@ -232,7 +232,7 @@ export default function WithdrawConfirmation() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`flex flex-col h-full overflow-hidden ${isDesktop ? "p-8" : ""}`}
+      className={`h-full overflow-y-auto overscroll-contain ${isDesktop ? "p-8" : ""}`}
     >
       {isDesktop ? (
         <div className="w-full max-w-2xl mx-auto">
@@ -300,7 +300,7 @@ export default function WithdrawConfirmation() {
 
   return (
     <div className="h-full flex flex-col">
-      {isDesktop ? <DesktopPageLayout maxWidth="lg" className="h-full">{content}</DesktopPageLayout> : content}
+      {isDesktop ? <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>{content}</DesktopPageLayout> : content}
       <TransactionVerification
         isOpen={showVerification}
         onClose={() => setShowVerification(false)}

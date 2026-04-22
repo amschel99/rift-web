@@ -234,7 +234,7 @@ export default function PaymentConfirmation() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`flex flex-col h-full overflow-hidden ${isDesktop ? "p-8" : ""}`}
+      className={`h-full ${isDesktop ? "overflow-y-auto overscroll-contain p-6 md:p-8" : "flex flex-col overflow-hidden"}`}
     >
       {isDesktop ? (
         <div className="w-full max-w-2xl mx-auto">
@@ -306,7 +306,7 @@ export default function PaymentConfirmation() {
 
   return (
     <div className="h-full flex flex-col">
-      {isDesktop ? <DesktopPageLayout maxWidth="lg" className="h-full">{content}</DesktopPageLayout> : content}
+      {isDesktop ? <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>{content}</DesktopPageLayout> : content}
       <TransactionVerification
         isOpen={showVerification}
         onClose={() => setShowVerification(false)}

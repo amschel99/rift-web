@@ -190,18 +190,24 @@ export default function Wallet() {
             logEvent(action.event as any);
             navigate(action.route);
           }}
-          className={`flex flex-col items-center justify-center gap-2 active:scale-95 transition-all ${
+          className={`group flex flex-col items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all ${
             desktop
-              ? "p-4 bg-white rounded-xl border border-gray-100 hover:border-accent-primary/30 hover:bg-accent-primary/5 shadow-sm hover:shadow-md"
-              : "py-3"
+              ? "p-5 bg-white rounded-2xl border border-surface hover:border-accent-primary/30 hover:shadow-md hover:-translate-y-0.5"
+              : "py-3 px-2 rounded-2xl hover:bg-white/40"
           }`}
         >
-          <div className="rounded-2xl flex items-center justify-center bg-accent-primary/10 w-12 h-12">
-            <Icon className="text-accent-primary w-6 h-6" />
+          <div
+            className={`rounded-2xl flex items-center justify-center transition-colors ${
+              desktop
+                ? "bg-accent-primary/10 w-12 h-12 group-hover:bg-accent-primary group-hover:text-white text-accent-primary"
+                : "bg-accent-primary/12 w-12 h-12 text-accent-primary"
+            }`}
+          >
+            <Icon className="w-[22px] h-[22px]" />
           </div>
           <span
-            className={`font-medium text-center leading-tight ${
-              desktop ? "text-sm text-gray-700" : "text-xs text-text-default"
+            className={`font-semibold text-center leading-tight ${
+              desktop ? "text-[13px] text-text-default" : "text-[11px] text-text-default"
             }`}
           >
             {action.label}
@@ -211,7 +217,7 @@ export default function Wallet() {
     };
 
     return (
-      <div className={desktop ? "grid grid-cols-3 gap-4" : "grid grid-cols-3 gap-1"}>
+      <div className={desktop ? "grid grid-cols-3 gap-3" : "grid grid-cols-3 gap-1"}>
         {row1.map(renderButton)}
         {row2.map(renderButton)}
       </div>
@@ -236,30 +242,36 @@ export default function Wallet() {
 
   if (isDesktop) {
     return (
-      <DesktopPageLayout maxWidth="lg" className="h-full">
+      <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>
         <div className="h-full flex flex-col overflow-hidden bg-app-background">
           {/* Desktop Header */}
-          <div className="flex-shrink-0 bg-white rounded-2xl p-6 mx-8 mt-8 mb-4 border border-gray-200">
+          <div className="flex-shrink-0 mx-8 mt-8 mb-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate("/app")}
-                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                className="p-2 hover:bg-white rounded-xl transition-colors cursor-pointer"
+                aria-label="Back"
               >
-                <IoChevronBack className="w-5 h-5" />
+                <IoChevronBack className="w-5 h-5 text-text-default" />
               </button>
-              <h1 className="text-2xl font-semibold text-gray-900">Wallet</h1>
+              <h1
+                className="text-[28px] font-semibold text-text-default tracking-[-0.02em]"
+                style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+              >
+                Wallet
+              </h1>
             </div>
           </div>
 
           {/* Desktop Content */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-8">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-8 pb-8">
             <div className="max-w-4xl mx-auto space-y-6">
               {actionGrid(true)}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                  Transaction History
+                <h2 className="text-[15px] font-semibold text-text-default mb-3 tracking-[-0.005em]">
+                  Transaction history
                 </h2>
-                <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div className="bg-white rounded-2xl border border-surface/80 shadow-sm overflow-hidden">
                   {historySection}
                 </div>
               </div>
@@ -275,15 +287,21 @@ export default function Wallet() {
   return (
     <div className="h-full flex flex-col bg-app-background">
       {/* Mobile Header */}
-      <div className="flex-shrink-0 z-40 bg-surface backdrop-blur-sm border-b border-surface-alt">
+      <div className="flex-shrink-0 z-40 bg-app-background/85 backdrop-blur-xl border-b border-black/[0.04]">
         <div className="flex items-center gap-3 p-4">
           <button
             onClick={() => navigate("/app")}
-            className="p-1.5 hover:bg-surface-subtle rounded-xl transition-colors"
+            className="p-1.5 -ml-1 hover:bg-white/60 rounded-xl transition-colors cursor-pointer"
+            aria-label="Back"
           >
             <IoChevronBack className="w-5 h-5 text-text-default" />
           </button>
-          <h1 className="text-lg font-semibold text-text-default">Wallet</h1>
+          <h1
+            className="text-[17px] font-semibold text-text-default tracking-[-0.015em]"
+            style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+          >
+            Wallet
+          </h1>
         </div>
       </div>
 

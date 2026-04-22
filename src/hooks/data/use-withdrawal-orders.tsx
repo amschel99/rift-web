@@ -13,6 +13,12 @@ export interface OfframpOrder {
   chain?: string | null;
   token?: string | null;
   public_name?: string | null;
+  /** USDC amount deducted from user's wallet (exact USD equivalent). */
+  usdcDeducted?: number;
+  /** Total local-currency amount deducted (includes fee). */
+  totalDeducted?: number;
+  fee?: number;
+  feePercentage?: number;
 }
 
 async function getWithdrawalOrders(): Promise<OfframpOrder[]> {

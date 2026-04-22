@@ -172,7 +172,7 @@ export default function WithdrawAmountInput() {
         initial={{ x: -4, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="flex flex-col h-full p-4 items-center justify-center"
+        className="h-full overflow-y-auto overscroll-contain flex flex-col p-4 pb-8 items-center justify-center"
       >
         <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6">
           <FiAlertCircle className="w-8 h-8 text-yellow-500" />
@@ -343,7 +343,7 @@ export default function WithdrawAmountInput() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex flex-col h-full overflow-hidden"
+      className="h-full overflow-y-auto overscroll-contain"
     >
       {isDesktop ? (
         <div className="w-full max-w-2xl mx-auto p-8">

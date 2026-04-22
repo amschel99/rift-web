@@ -89,52 +89,84 @@ export default function CountrySelector() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex flex-col h-full p-4"
+      className="h-full overflow-y-auto overscroll-contain p-4 pb-8 md:p-8"
     >
-      <div className="flex items-center justify-between mb-8">
-        <button onClick={() => navigate("/app")} className="p-2">
-          <FiArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-xl font-semibold">Send Money</h1>
-        <div className="w-5 h-5" />
-      </div>
-
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-accent-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FiGlobe className="w-8 h-8 text-accent-primary" />
+      <div className="w-full max-w-3xl mx-auto flex flex-col flex-1">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <button
+            onClick={() => navigate("/app")}
+            className="p-2 -ml-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer"
+            aria-label="Back"
+          >
+            <FiArrowLeft className="w-5 h-5 text-text-default" />
+          </button>
+          <h1
+            className="text-[17px] md:text-[18px] font-semibold text-text-default tracking-[-0.015em]"
+            style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+          >
+            Send Money
+          </h1>
+          <div className="w-9 h-9" />
         </div>
-        <h2 className="text-2xl font-medium mb-2">Send money across borders</h2>
-        <p className="text-text-subtle">Pay bills, send to mobile money, banks, and more</p>
-      </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-3 max-w-sm mx-auto w-full">
-          {SUPPORTED_COUNTRIES.map((country) => (
-            <button
-              key={country.currency}
-              onClick={() => handleCountrySelect(country.currency)}
-              className="w-full p-4 rounded-lg border-2 transition-all text-left bg-surface-subtle border-surface hover:border-accent-primary hover:bg-surface cursor-pointer"
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-4xl">{country.flag}</span>
-                <div className="flex-1">
-                  <h3 className="font-medium text-lg mb-1">{country.name}</h3>
-                  <p className="text-sm text-text-subtle">{country.description}</p>
-                </div>
-              </div>
-            </button>
-          ))}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 md:w-16 md:h-16 bg-accent-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 ring-1 ring-accent-primary/15">
+            <FiGlobe className="w-7 h-7 md:w-8 md:h-8 text-accent-primary" />
+          </div>
+          <h2
+            className="text-[24px] md:text-[32px] font-semibold text-text-default mb-2 leading-[1.1] tracking-[-0.02em]"
+            style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+          >
+            Send money across borders
+          </h2>
+          <p className="text-[14px] md:text-[15px] text-text-subtle/90 max-w-md mx-auto">
+            Pay bills, send to mobile money, banks, and more — powered by on-chain rails.
+          </p>
         </div>
-      </div>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-text-subtle">
-          {detectedCountry && (
-            <>
-              You're currently in {detectedCountry.name}
-            </>
-          )}
-        </p>
+        <div className="flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+            {SUPPORTED_COUNTRIES.map((country) => {
+              const isDetected =
+                detectedCountry?.currency === country.currency;
+              return (
+                <button
+                  key={country.currency}
+                  onClick={() => handleCountrySelect(country.currency)}
+                  className="group relative w-full p-4 rounded-2xl border bg-white border-surface hover:border-accent-primary/40 hover:shadow-md transition-all text-left cursor-pointer active:scale-[0.99]"
+                >
+                  {isDetected && (
+                    <span className="absolute top-2.5 right-2.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent-primary text-white">
+                      You
+                    </span>
+                  )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-[32px] leading-none">{country.flag}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-[15px] text-text-default mb-0.5 truncate">
+                        {country.name}
+                      </h3>
+                      <p className="text-[12px] text-text-subtle/80 truncate">
+                        {country.description}
+                      </p>
+                    </div>
+                    <span className="text-text-subtle/40 group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all">
+                      &rarr;
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-[12px] text-text-subtle/70">
+            {detectedCountry && (
+              <>Detected location: {detectedCountry.name}</>
+            )}
+          </p>
+        </div>
       </div>
     </motion.div>
   );
