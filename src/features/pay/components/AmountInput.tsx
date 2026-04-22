@@ -170,135 +170,172 @@ export default function AmountInput() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`flex flex-col h-full ${isDesktop ? "p-8" : "p-4"}`}
+      className={`h-full overflow-y-auto overscroll-contain flex flex-col ${isDesktop ? "p-6 md:p-8" : "p-4 pb-8"}`}
     >
       {isDesktop ? (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-3xl mx-auto">
           {/* Desktop Header */}
-          <div className="flex items-center p-6 border-b border-gray-200 mb-6">
+          <div className="flex items-center justify-between mb-8">
             <button
               onClick={handleBack}
-              className="mr-4 p-2 rounded-2xl hover:bg-accent-primary/10 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] font-medium text-text-subtle hover:bg-white hover:text-text-default transition-colors cursor-pointer"
             >
-              <FiArrowLeft className="w-5 h-5 text-accent-primary" />
+              <FiArrowLeft className="w-4 h-4" />
+              Back
             </button>
-            <h1 className="text-xl font-semibold text-text-default">
-              {getPaymentTypeLabel()}
-            </h1>
+            <div className="px-3 py-1.5 rounded-full bg-white border border-surface text-[11px] font-semibold uppercase tracking-[0.08em] text-text-subtle">
+              Step 3 of 5
+            </div>
           </div>
 
-          {/* Desktop Amount Input */}
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="w-full max-w-md">
+          <div className="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
+            <div>
+              <h1
+                className="text-[32px] font-semibold text-text-default leading-[1.1] mb-2 tracking-[-0.02em]"
+                style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+              >
+                {getPaymentTypeLabel()}
+              </h1>
+              <p className="text-[15px] text-text-subtle/90 mb-6">
+                Enter how much you want to send in {currency}.
+              </p>
+
               {/* Selected source card */}
               {sourceConfig && (
-                <div className="flex items-center gap-3 bg-accent-primary/5 border border-accent-primary/20 rounded-xl p-3 mb-6">
-                  <img src={sourceConfig.icon} alt="" className="w-8 h-8 rounded-full" />
+                <div className="flex items-center gap-3 bg-white border border-surface rounded-2xl p-3 mb-5 shadow-sm">
+                  <img src={sourceConfig.icon} alt="" className="w-9 h-9 rounded-full" />
                   <div className="flex-1">
-                    <p className="text-sm font-semibold">
+                    <p className="text-[14px] font-semibold text-text-default">
                       {sourceConfig.token} on {sourceConfig.chainLabel}
                     </p>
-                    <p className="text-xs text-text-subtle">
+                    <p className="text-[12px] text-text-subtle/80 tabular-numeric">
                       ${sourceBalance.toFixed(2)} available
                       {currency !== "USD" &&
-                        ` (~${currencySymbol} ${Math.floor(sourceLocalBalance).toLocaleString()})`}
+                        ` · ${currencySymbol} ${Math.floor(sourceLocalBalance).toLocaleString()}`}
                     </p>
                   </div>
                   <button
                     onClick={handleBack}
-                    className="text-xs text-accent-primary font-medium hover:underline"
+                    className="text-[12px] font-semibold text-accent-primary hover:underline px-2 py-1"
                   >
                     Change
                   </button>
                 </div>
               )}
 
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-semibold text-text-default mb-2">Enter Amount</h2>
-                <p className="text-text-subtle">How much do you want to send?</p>
-              </div>
-
-              {/* Currency Info */}
-              <div className="text-center mb-6">
-                <span className="text-sm text-text-subtle bg-accent-primary/10 px-3 py-1.5 rounded-full">
-                  Sending in {currency}
-                </span>
-                {buyingRate && currency !== "USD" && (
-                  <div className="flex items-center justify-center gap-1 mt-3">
-                    <IoSwapHorizontalOutline className="w-3 h-3 text-text-subtle/50" />
-                    <p className="text-xs text-text-subtle">1 USD = {buyingRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {currency}</p>
-                  </div>
-                )}
-              </div>
-
               {/* Amount Input Field */}
-              <div className="bg-white rounded-2xl border-2 border-accent-primary/20 p-8 mb-6">
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-2xl font-medium text-accent-primary">{currencySymbol}</span>
+              <div className="bg-white rounded-2xl border border-surface shadow-sm p-8 mb-5">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-subtle/70 mb-3 text-center">
+                  Sending in {currency}
+                </div>
+                <div className="flex items-baseline justify-center gap-2">
+                  <span
+                    className="text-[28px] font-semibold text-accent-primary/70 tabular-numeric"
+                    style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+                  >
+                    {currencySymbol}
+                  </span>
                   <input
                     type="number"
                     value={localAmount}
                     onChange={(e) => setLocalAmount(e.target.value)}
                     placeholder="0"
-                    className="text-5xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-text-default placeholder:text-gray-300"
-                    style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
+                    className="text-[56px] font-semibold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-text-default placeholder:text-text-subtle/25 tabular-numeric tracking-[-0.02em]"
+                    style={{
+                      width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch`,
+                      fontFamily: '"Clash Display", "Satoshi", sans-serif',
+                    }}
                     autoFocus
                   />
-                  {buyingRate && currency !== "USD" && parseFloat(localAmount) > 0 && (
-                    <span className="text-xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / buyingRate).toFixed(2)}</span>
-                  )}
                 </div>
+                {buyingRate && currency !== "USD" && parseFloat(localAmount) > 0 && (
+                  <div className="text-center mt-3 text-[12px] text-text-subtle tabular-numeric">
+                    &asymp; ${(parseFloat(localAmount) / buyingRate).toFixed(2)} USD
+                  </div>
+                )}
+                {buyingRate && currency !== "USD" && (
+                  <div className="flex items-center justify-center gap-1 mt-4 text-[11px] text-text-subtle/70">
+                    <IoSwapHorizontalOutline className="w-3 h-3" />
+                    <span className="tabular-numeric">
+                      1 USD = {buyingRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} {currency}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* Fee Breakdown (hidden for Onramp Money) */}
+              {/* Quick amounts */}
+              <div className="grid grid-cols-6 gap-2 mb-5">
+                {getQuickAmounts()
+                  .filter((amount, index, arr) => arr.indexOf(amount) === index)
+                  .sort((a, b) => a - b)
+                  .slice(0, 6)
+                  .map((amount) => {
+                    const isActive = localAmount === amount.toString();
+                    return (
+                      <button
+                        key={amount}
+                        onClick={() => setLocalAmount(amount.toString())}
+                        className={`h-10 rounded-xl text-[13px] font-semibold tabular-numeric transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-accent-primary text-white shadow-sm"
+                            : "bg-white border border-surface text-text-default hover:border-accent-primary/30"
+                        }`}
+                      >
+                        {amount.toLocaleString()}
+                      </button>
+                    );
+                  })}
+              </div>
+
+              {/* Fee Breakdown */}
               {feeBreakdown && parseFloat(localAmount) > 0 && (
-                <div className="bg-accent-primary/5 rounded-2xl border border-accent-primary/20 p-5 mb-6 space-y-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <FiInfo className="w-5 h-5 text-accent-primary" />
-                    <span className="text-sm font-semibold text-text-default">Fee Breakdown</span>
+                <div className="bg-white rounded-2xl border border-surface shadow-sm p-5 mb-5 space-y-2.5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FiInfo className="w-4 h-4 text-accent-primary" />
+                    <span className="text-[13px] font-semibold text-text-default">Breakdown</span>
                   </div>
-                  
-                  <div className="flex justify-between text-sm">
+
+                  <div className="flex justify-between text-[14px]">
                     <span className="text-text-subtle">Recipient receives</span>
-                    <span className="font-medium text-text-default">{currencySymbol} {feeBreakdown.localAmount.toLocaleString()}</span>
+                    <span className="font-semibold text-text-default tabular-numeric">
+                      {currencySymbol} {feeBreakdown.localAmount.toLocaleString()}
+                    </span>
                   </div>
-                  
-                  <div className="flex justify-between text-sm">
+
+                  <div className="flex justify-between text-[14px]">
                     <span className="text-text-subtle">Fee ({feeBreakdown.feePercentage}%)</span>
-                    <span className="font-medium text-accent-primary">+ {currencySymbol} {feeBreakdown.feeLocal.toLocaleString()}</span>
+                    <span className="font-semibold text-accent-primary tabular-numeric">
+                      + {currencySymbol} {feeBreakdown.feeLocal.toLocaleString()}
+                    </span>
                   </div>
-                  
-                  <div className="border-t border-accent-primary/20 pt-3 mt-3">
-                    <div className="flex justify-between text-sm">
+
+                  <div className="border-t border-surface pt-3 mt-1">
+                    <div className="flex justify-between text-[14px]">
                       <span className="font-semibold text-text-default">Total deducted</span>
-                      <span className="font-bold text-accent-primary text-base">{currencySymbol} {feeBreakdown.totalLocalDeducted.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-xs mt-2">
-                      <span className="text-text-subtle">Your balance</span>
-                      <span className={hasInsufficientBalance ? "text-red-500 font-medium" : "text-green-600"}>
-                        {currencySymbol} {sourceLocalBalance.toLocaleString()}
+                      <span className="font-bold text-accent-primary text-[15px] tabular-numeric">
+                        {currencySymbol} {feeBreakdown.totalLocalDeducted.toLocaleString()}
                       </span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Insufficient Balance Warning (hidden for Onramp Money) */}
               {hasInsufficientBalance && feeBreakdown && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6">
-                  <p className="text-sm text-red-700 dark:text-red-300">
-                    ⚠️ Insufficient balance. You need {currencySymbol} {feeBreakdown.totalLocalDeducted.toLocaleString()}{" "}
-                    but only have {currencySymbol} {sourceLocalBalance.toLocaleString()}.
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5">
+                  <p className="text-[13px] text-red-700 leading-relaxed">
+                    Insufficient balance. You need {currencySymbol}{" "}
+                    {feeBreakdown.totalLocalDeducted.toLocaleString()} but only have{" "}
+                    {currencySymbol} {sourceLocalBalance.toLocaleString()}.
                   </p>
                 </div>
               )}
 
               {/* Desktop Next Button */}
-              <div className="mt-8">
+              <div>
                 <button
                   onClick={handleNext}
                   disabled={!isValidAmount || loadingRate}
-                  className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-semibold bg-accent-primary text-white hover:bg-accent-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto min-w-[220px] inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-semibold bg-accent-primary text-white shadow-sm hover:bg-accent-primary/92 hover:shadow-md active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loadingRate ? (
                     <>
@@ -308,84 +345,127 @@ export default function AmountInput() {
                   ) : hasInsufficientBalance ? (
                     "Insufficient Balance"
                   ) : (
-                    "Next"
+                    "Continue"
                   )}
                 </button>
               </div>
             </div>
+
+            {/* Summary sidebar */}
+            <aside className="lg:sticky lg:top-0 space-y-4">
+              <div className="bg-white rounded-2xl border border-surface/70 shadow-sm p-5">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-subtle/70 mb-3">
+                  Quick amounts
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {getQuickAmounts()
+                    .filter((amount, index, arr) => arr.indexOf(amount) === index)
+                    .sort((a, b) => a - b)
+                    .slice(0, 6)
+                    .map((amount) => (
+                      <button
+                        key={`aside-${amount}`}
+                        onClick={() => setLocalAmount(amount.toString())}
+                        className="h-9 rounded-lg text-[12px] font-semibold tabular-numeric bg-surface/70 text-text-default hover:bg-accent-primary/10 hover:text-accent-primary transition-colors cursor-pointer"
+                      >
+                        {amount >= 1000 ? `${(amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1)}k` : amount}
+                      </button>
+                    ))}
+                </div>
+                {maxPayableLocal > 0 && (
+                  <button
+                    onClick={() => setLocalAmount(maxPayableLocal.toString())}
+                    className="w-full mt-3 py-2 rounded-lg text-[12px] font-semibold text-accent-primary hover:bg-accent-primary/5 transition-colors cursor-pointer tabular-numeric"
+                  >
+                    Max: {currencySymbol} {maxPayableLocal.toLocaleString()}
+                  </button>
+                )}
+              </div>
+            </aside>
           </div>
         </div>
       ) : (
         <>
           {/* Mobile Header */}
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={handleBack} className="p-2">
-              <FiArrowLeft className="w-5 h-5" />
+          <div className="flex items-center justify-between mb-5">
+            <button
+              onClick={handleBack}
+              className="p-2 -ml-2 rounded-xl hover:bg-white/60 transition-colors cursor-pointer"
+              aria-label="Back"
+            >
+              <FiArrowLeft className="w-5 h-5 text-text-default" />
             </button>
-            <h1 className="text-xl font-semibold">{getPaymentTypeLabel()}</h1>
-            <div className="w-5 h-5" />
+            <h1
+              className="text-[17px] font-semibold text-text-default tracking-[-0.015em]"
+              style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+            >
+              {getPaymentTypeLabel()}
+            </h1>
+            <div className="w-9 h-9" />
           </div>
 
           {/* Mobile Source Card */}
           {sourceConfig && (
-            <div className="flex items-center gap-3 bg-accent-primary/5 border border-accent-primary/20 rounded-xl p-3 mb-4">
-              <img src={sourceConfig.icon} alt="" className="w-8 h-8 rounded-full" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold">
+            <div className="flex items-center gap-3 bg-white border border-surface/70 rounded-2xl p-3 mb-4 shadow-sm">
+              <img src={sourceConfig.icon} alt="" className="w-9 h-9 rounded-full" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-text-default truncate">
                   {sourceConfig.token} on {sourceConfig.chainLabel}
                 </p>
-                <p className="text-xs text-text-subtle">
+                <p className="text-[11px] text-text-subtle/80 tabular-numeric">
                   ${sourceBalance.toFixed(2)} available
                   {currency !== "USD" &&
-                    ` (~${currencySymbol} ${Math.floor(sourceLocalBalance).toLocaleString()})`}
+                    ` · ${currencySymbol} ${Math.floor(sourceLocalBalance).toLocaleString()}`}
                 </p>
               </div>
               <button
                 onClick={handleBack}
-                className="text-xs text-accent-primary font-medium hover:underline"
+                className="text-[12px] font-semibold text-accent-primary hover:underline px-2 py-1"
               >
                 Change
               </button>
             </div>
           )}
 
-          {/* Mobile Content */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-medium mb-2">Enter Amount</h2>
-            <p className="text-text-subtle">How much do you want to send?</p>
-          </div>
-
-          <div className="w-full max-w-sm mx-auto">
+          {/* Mobile Amount Input */}
+          <div className="w-full">
             <div className="text-center mb-4">
-              <div className="flex items-baseline justify-center gap-1 mb-2">
-                <span className="text-lg font-medium">{currencySymbol}</span>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-subtle/70 mb-2">
+                Sending in {currency}
+              </div>
+              <div className="flex items-baseline justify-center gap-1.5 mb-2">
+                <span
+                  className="text-[22px] font-semibold text-accent-primary/70 tabular-numeric"
+                  style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+                >
+                  {currencySymbol}
+                </span>
                 <input
                   type="number"
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
                   placeholder="0"
-                  className="text-4xl font-bold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  style={{ width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch` }}
+                  className="text-[48px] font-semibold bg-transparent border-none outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-text-default placeholder:text-text-subtle/25 tabular-numeric tracking-[-0.02em]"
+                  style={{
+                    width: `${Math.max(2, (localAmount || "0").length + 0.5)}ch`,
+                    fontFamily: '"Clash Display", "Satoshi", sans-serif',
+                  }}
                   autoFocus
                 />
-                {buyingRate && currency !== "USD" && parseFloat(localAmount) > 0 && (
-                  <span className="text-2xs text-text-subtle whitespace-nowrap">≈ ${(parseFloat(localAmount) / buyingRate).toFixed(2)}</span>
-                )}
               </div>
-              <div className="flex items-center justify-center gap-3">
-                <p className="text-sm text-text-subtle">Sending in {currency}</p>
-                {maxPayableLocal > 0 && (
-                  <>
-                    <span className="text-xs text-text-subtle">·</span>
-                    <button
-                      onClick={() => setLocalAmount(maxPayableLocal.toString())}
-                      className="text-xs font-semibold text-accent-primary hover:underline"
-                    >
-                      Max {currencySymbol} {maxPayableLocal.toLocaleString()}
-                    </button>
-                  </>
-                )}
-              </div>
+              {buyingRate && currency !== "USD" && parseFloat(localAmount) > 0 && (
+                <div className="text-[12px] text-text-subtle tabular-numeric">
+                  &asymp; ${(parseFloat(localAmount) / buyingRate).toFixed(2)} USD
+                </div>
+              )}
+              {maxPayableLocal > 0 && (
+                <button
+                  onClick={() => setLocalAmount(maxPayableLocal.toString())}
+                  className="mt-2 text-[12px] font-semibold text-accent-primary hover:underline tabular-numeric"
+                >
+                  Use max &middot; {currencySymbol} {maxPayableLocal.toLocaleString()}
+                </button>
+              )}
             </div>
 
             {/* Mobile Quick Amount Buttons */}
@@ -394,67 +474,72 @@ export default function AmountInput() {
                 .filter((amount, index, arr) => arr.indexOf(amount) === index)
                 .sort((a, b) => a - b)
                 .slice(0, 6)
-                .map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => setLocalAmount(amount.toString())}
-                    className="p-3 bg-surface-subtle rounded-lg hover:bg-surface transition-colors text-sm font-medium"
-                  >
-                    {amount.toLocaleString()}
-                  </button>
-                ))}
+                .map((amount) => {
+                  const isActive = localAmount === amount.toString();
+                  return (
+                    <button
+                      key={amount}
+                      onClick={() => setLocalAmount(amount.toString())}
+                      className={`h-10 rounded-xl text-[13px] font-semibold tabular-numeric transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-accent-primary text-white shadow-sm"
+                          : "bg-white border border-surface text-text-default hover:border-accent-primary/30"
+                      }`}
+                    >
+                      {amount.toLocaleString()}
+                    </button>
+                  );
+                })}
             </div>
 
-            {/* Mobile Fee Breakdown (hidden for Onramp Money) */}
+            {/* Mobile Fee Breakdown */}
             {feeBreakdown && parseFloat(localAmount) > 0 && (
-              <div className="bg-surface-subtle rounded-lg p-4 mb-4 space-y-2">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="bg-white border border-surface/70 shadow-sm rounded-2xl p-4 mb-4 space-y-2">
+                <div className="flex items-center gap-2 mb-1">
                   <FiInfo className="w-4 h-4 text-accent-primary" />
-                  <span className="text-sm font-medium">Fee Breakdown</span>
+                  <span className="text-[13px] font-semibold text-text-default">Breakdown</span>
                 </div>
-                
-                <div className="flex justify-between text-sm">
-                  <span className="text-text-subtle">Recipient receives</span>
-                  <span className="font-medium">{currencySymbol} {feeBreakdown.localAmount.toLocaleString()}</span>
+
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-text-subtle">Recipient gets</span>
+                  <span className="font-semibold text-text-default tabular-numeric">
+                    {currencySymbol} {feeBreakdown.localAmount.toLocaleString()}
+                  </span>
                 </div>
-                
-                <div className="flex justify-between text-sm">
+
+                <div className="flex justify-between text-[13px]">
                   <span className="text-text-subtle">Fee ({feeBreakdown.feePercentage}%)</span>
-                  <span className="font-medium text-yellow-600">+ {currencySymbol} {feeBreakdown.feeLocal.toLocaleString()}</span>
+                  <span className="font-semibold text-accent-primary tabular-numeric">
+                    + {currencySymbol} {feeBreakdown.feeLocal.toLocaleString()}
+                  </span>
                 </div>
-                
-                <div className="border-t border-surface pt-2 mt-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-subtle">Total deducted</span>
-                    <span className="font-bold">{currencySymbol} {feeBreakdown.totalLocalDeducted.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-xs mt-1">
-                    <span className="text-text-subtle">Your balance</span>
-                    <span className={hasInsufficientBalance ? "text-red-500 font-medium" : "text-green-600"}>
-                      {currencySymbol} {sourceLocalBalance.toLocaleString()}
-                    </span>
-                  </div>
+
+                <div className="border-t border-surface pt-2 mt-1 flex justify-between text-[13px]">
+                  <span className="font-semibold text-text-default">Total</span>
+                  <span className="font-bold text-accent-primary tabular-numeric">
+                    {currencySymbol} {feeBreakdown.totalLocalDeducted.toLocaleString()}
+                  </span>
                 </div>
               </div>
             )}
 
-            {/* Mobile Insufficient Balance Warning (hidden for Onramp Money) */}
             {hasInsufficientBalance && feeBreakdown && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-                <p className="text-sm text-red-700 dark:text-red-300">
-                  ⚠️ Insufficient balance. You need {currencySymbol} {feeBreakdown.totalLocalDeducted.toLocaleString()}{" "}
-                  but only have {currencySymbol} {sourceLocalBalance.toLocaleString()}.
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-3 mb-4">
+                <p className="text-[12px] text-red-700 leading-relaxed">
+                  Insufficient balance. You need {currencySymbol}{" "}
+                  {feeBreakdown.totalLocalDeducted.toLocaleString()} but only have{" "}
+                  {currencySymbol} {sourceLocalBalance.toLocaleString()}.
                 </p>
               </div>
             )}
           </div>
 
           {/* Mobile Next Button */}
-          <div className="mt-auto">
+          <div className="mt-auto pt-5">
             <button
               onClick={handleNext}
               disabled={!isValidAmount || loadingRate}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-medium bg-accent-primary text-white hover:bg-accent-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full inline-flex items-center justify-center gap-2 h-12 px-4 rounded-2xl font-semibold bg-accent-primary text-white shadow-sm hover:bg-accent-primary/92 active:scale-[0.985] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loadingRate ? (
                 <>
@@ -464,7 +549,7 @@ export default function AmountInput() {
               ) : hasInsufficientBalance ? (
                 "Insufficient Balance"
               ) : (
-                "Next"
+                "Continue"
               )}
             </button>
           </div>
@@ -476,7 +561,7 @@ export default function AmountInput() {
   return (
     <div className="h-full flex flex-col">
       {isDesktop ? (
-        <DesktopPageLayout maxWidth="lg" className="h-full">
+        <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>
           {content}
         </DesktopPageLayout>
       ) : (

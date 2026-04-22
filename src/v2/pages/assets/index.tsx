@@ -101,7 +101,7 @@ export default function Assets() {
 
   if (isDesktop) {
     return (
-      <DesktopPageLayout maxWidth="lg" className="h-full">
+      <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>
         {content}
       </DesktopPageLayout>
     );

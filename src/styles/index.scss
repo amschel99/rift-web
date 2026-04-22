@@ -1,12 +1,16 @@
-// @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+// Fonts are loaded from index.html via Fontshare (Satoshi + Clash Display)
+// and Google Fonts (JetBrains Mono). Using index.html for preconnect priority.
 
 @mixin useBaseFont() {
-  // font-family: "Quicksand", sans-serif;
-  font-family: "Outfit", sans-serif;
+  font-family: "Satoshi", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-optical-sizing: auto;
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
+  font-feature-settings: "ss01", "ss02", "cv11"; // Satoshi stylistic sets for modern look
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
   color: #1F2D3A;
 }
 
@@ -43,6 +47,25 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display typeface for headings when `.font-display` is applied */
+.font-display,
+[data-display] {
+  font-family: "Clash Display", "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Monospace/tabular for amounts, addresses, hashes */
+.font-mono-numeric,
+.tabular-numeric {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 #root {
@@ -53,4 +76,9 @@ body {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+/* Global smoother focus ring */
+*:focus-visible {
+  outline: none;
 }

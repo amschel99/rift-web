@@ -168,9 +168,9 @@ export default function DescriptionInput() {
       initial={{ x: -4, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`w-full h-full ${isDesktop ? "p-8" : "p-4"} flex flex-col`}
+      className={`w-full h-full overflow-y-auto overscroll-contain ${isDesktop ? "p-8" : "p-4 pb-8"}`}
     >
-      <div className={`w-full h-full flex flex-col ${isDesktop ? "max-w-2xl mx-auto" : ""}`}>
+      <div className={`w-full flex flex-col ${isDesktop ? "max-w-2xl mx-auto" : ""}`}>
         {/* Header - Stripe-like minimal */}
         <div className={`flex items-center ${isDesktop ? "mb-10" : "mb-6"}`}>
           <button
@@ -257,7 +257,7 @@ export default function DescriptionInput() {
       </div>
 
         {/* Create Request Button - Stripe-like */}
-        <div className={`mt-auto ${isDesktop ? "max-w-md mx-auto w-full" : "pb-24"}`}>
+        <div className={`mt-6 ${isDesktop ? "max-w-md mx-auto w-full" : ""}`}>
           <button
             onClick={handleCreateInvoice}
             disabled={!isValidDescription || loadingRate || createInvoiceMutation.isPending}

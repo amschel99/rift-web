@@ -79,65 +79,74 @@ export default function DesktopShell(props: Props) {
 
   return (
     <div className="w-full h-full flex overflow-hidden bg-app-background">
-      {/* Sidebar Navigation - Stripe-like */}
-      <aside className="w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      {/* Sidebar Navigation */}
+      <aside className="w-[260px] flex-shrink-0 bg-white/80 backdrop-blur-sm border-r border-surface/80 flex flex-col">
         {/* Logo/Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <img src="/rift.png" alt="Rift" className="w-8 h-8" />
-            <span className="text-lg font-semibold text-text-default">Rift</span>
+        <div className="px-6 pt-7 pb-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-accent-primary/10 flex items-center justify-center">
+              <img src="/rift.png" alt="Rift" className="w-7 h-7" />
+            </div>
+            <span
+              className="text-[19px] font-semibold text-text-default tracking-[-0.02em]"
+              style={{ fontFamily: '"Clash Display", "Satoshi", sans-serif' }}
+            >
+              Rift
+            </span>
           </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 px-3 space-y-0.5">
+          <div className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-subtle/60">
+            Menu
+          </div>
           <button
             onClick={() => handleTabClick("home")}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors text-left",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left cursor-pointer",
               activeTab === "home"
-                ? "bg-accent-primary/10 text-accent-primary font-medium"
-                : "text-gray-600 hover:bg-accent-primary/5 hover:text-accent-primary"
+                ? "bg-accent-primary/12 text-accent-primary font-semibold shadow-[inset_0_0_0_1px_rgba(46,140,150,0.15)]"
+                : "text-text-default/75 hover:bg-surface/80 hover:text-text-default"
             )}
           >
             {activeTab === "home" ? (
-              <GoHomeFill className="w-5 h-5" />
+              <GoHomeFill className="w-[18px] h-[18px]" />
             ) : (
-              <GoHome className="w-5 h-5" />
+              <GoHome className="w-[18px] h-[18px]" />
             )}
-            <span className="text-sm">Home</span>
+            <span className="text-[14px]">Home</span>
           </button>
 
           <button
             id="tab-settings"
             onClick={() => handleTabClick("profile")}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors text-left",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left cursor-pointer",
               activeTab === "profile"
-                ? "bg-accent-primary/10 text-accent-primary font-medium"
-                : "text-gray-600 hover:bg-accent-primary/5 hover:text-accent-primary"
+                ? "bg-accent-primary/12 text-accent-primary font-semibold shadow-[inset_0_0_0_1px_rgba(46,140,150,0.15)]"
+                : "text-text-default/75 hover:bg-surface/80 hover:text-text-default"
             )}
           >
             {activeTab === "profile" ? (
-              <IoSettings className="w-5 h-5" />
+              <IoSettings className="w-[18px] h-[18px]" />
             ) : (
-              <IoSettingsOutline className="w-5 h-5" />
+              <IoSettingsOutline className="w-[18px] h-[18px]" />
             )}
-            <span className="text-sm">Settings</span>
+            <span className="text-[14px]">Settings</span>
           </button>
         </nav>
 
         {/* Footer/Bottom Section */}
-        <div className="p-4 border-t border-gray-200">
-          <div className="text-xs text-gray-400 text-center">
-            Rift Wallet
+        <div className="px-5 py-4 border-t border-surface/80">
+          <div className="text-[11px] text-text-subtle/60 tracking-wide">
+            &copy; {new Date().getFullYear()} Rift Wallet
           </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-gray-50">
-        {/* Page Content */}
+      <main className="flex-1 flex flex-col overflow-hidden bg-app-background">
         <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
           {children}
         </div>

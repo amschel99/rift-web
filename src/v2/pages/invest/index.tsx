@@ -220,7 +220,7 @@ export default function Invest() {
   return (
     <div className="h-full flex flex-col overflow-hidden bg-app-background">
       {isDesktop ? (
-        <DesktopPageLayout maxWidth="lg" className="h-full">
+        <DesktopPageLayout maxWidth="lg" className="h-full" noScroll>
           {content}
         </DesktopPageLayout>
       ) : (
