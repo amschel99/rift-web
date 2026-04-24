@@ -4,23 +4,55 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { BiCopy } from "react-icons/bi";
-import { ExternalLink, ChevronDown } from "lucide-react";
+import { ExternalLink, ChevronDown, AlertTriangle } from "lucide-react";
 import { FiX } from "react-icons/fi";
 import useAnalytics from "@/hooks/use-analytics";
 import { Button } from "@/components/ui/button";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
 
+// Chains Rift supports for USDC / USDT deposits. Sending assets on any
+// other chain (or any other token) will result in permanent loss.
+const SUPPORTED_CHAINS = ["Base", "Ethereum", "Polygon", "Arbitrum", "Celo"] as const;
+
 const EXPLORERS = [
   { name: "Base", url: "https://basescan.org/address/" },
   { name: "Ethereum", url: "https://etherscan.io/address/" },
   { name: "Polygon", url: "https://polygonscan.com/address/" },
-  { name: "Celo", url: "https://celoscan.io/address/" },
   { name: "Arbitrum", url: "https://arbiscan.io/address/" },
-  { name: "Lisk", url: "https://blockscout.lisk.com/address/" },
-  { name: "Optimism", url: "https://optimistic.etherscan.io/address/" },
-  { name: "Avalanche", url: "https://snowtrace.io/address/" },
-  { name: "BSC", url: "https://bscscan.com/address/" },
+  { name: "Celo", url: "https://celoscan.io/address/" },
 ] as const;
+
+function DepositWarning() {
+  return (
+    <div className="w-full rounded-2xl border border-amber-300 bg-amber-50 p-4">
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+          <AlertTriangle className="w-4 h-4 text-amber-700" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-semibold text-amber-900 leading-tight">
+            Only send USDC or USDT on supported chains
+          </p>
+          <p className="text-[12px] text-amber-800/90 mt-1 leading-snug">
+            Deposits are only supported on these five chains. Any other token,
+            or any other chain, will be{" "}
+            <span className="font-semibold">permanently lost</span>.
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {SUPPORTED_CHAINS.map((chain) => (
+              <span
+                key={chain}
+                className="inline-flex items-center px-2.5 py-1 rounded-full bg-white border border-amber-300/70 text-[11px] font-semibold text-amber-900"
+              >
+                {chain}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ReceiveFromAddress() {
   const navigate = useNavigate();
@@ -75,6 +107,11 @@ export default function ReceiveFromAddress() {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
+            {/* Supported-chains warning — must be read before copying address */}
+            <div className="mb-5">
+              <DepositWarning />
+            </div>
+
             <div className="w-full flex flex-row items-center justify-center mb-6">
               <div className="w-fit bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                 <QRCodeSVG value={address as string} size={200} />
@@ -124,12 +161,8 @@ export default function ReceiveFromAddress() {
               </div>
             </div>
 
-            <p className="text-center text-xs text-text-subtle mt-2">
-              Supports all EVM chains: Base, Ethereum, Polygon, Celo, Arbitrum, Lisk, Optimism, Avalanche, BSC
-            </p>
-
             <p className="text-center text-sm text-gray-600 mt-3">
-              Use your address to check your onchain history and topup your wallet
+              Use your address to top up your wallet or check your on-chain history.
             </p>
           </div>
         </motion.div>
@@ -145,7 +178,7 @@ export default function ReceiveFromAddress() {
       transition={{ duration: 0.2, ease: "easeInOut" }}
       className="w-full p-4"
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-medium">Your Address</h2>
         <button
           onClick={onClose}
@@ -155,7 +188,10 @@ export default function ReceiveFromAddress() {
         </button>
       </div>
 
-      <div className="w-full flex flex-row items-center justify-center mt-8">
+      {/* Supported-chains warning — must be read before copying address */}
+      <DepositWarning />
+
+      <div className="w-full flex flex-row items-center justify-center mt-6">
         <div className="w-fit bg-white p-4 rounded-2xl border border-border shadow-sm">
           <QRCodeSVG value={address as string} size={200} />
         </div>
@@ -204,12 +240,8 @@ export default function ReceiveFromAddress() {
         </div>
       </div>
 
-      <p className="text-center text-xs text-text-subtle mt-3">
-        Supports all EVM chains: Base, Ethereum, Polygon, Celo, Arbitrum, Lisk, Optimism, Avalanche, BSC
-      </p>
-
       <p className="mt-4 mb-12 text-center text-sm text-gray-600">
-        Use your address to check your onchain history and topup your wallet
+        Use your address to top up your wallet or check your on-chain history.
       </p>
 
       <div className="h-fit fixed bottom-0 left-0 right-0 p-4 py-2 border-t border-gray-200 bg-app-background">
