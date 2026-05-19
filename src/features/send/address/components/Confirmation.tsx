@@ -256,47 +256,25 @@ export default function Confirmation(
                   : "Use your password to confirm the transaction"}
               </p>
 
-              {/* Fee breakdown — surfaces paymaster gas in the SAME token
-                  being sent. Without this users on Ethereum mainnet hit
-                  silent "paymaster rejected" failures when they have just
-                  enough to send but not enough for the gas. */}
+              {/* Send is a pure on-chain transfer (no Pretium / project
+                  fee). On-chain gas + service-fee markup are kept off
+                  the UI by product decision — intimidating. The
+                  insufficient-balance gate still uses the real total
+                  via `INSUFFICIENT`, so users with too little balance
+                  still see a clear error and the Confirm button stays
+                  disabled. We just don't itemise the fees here. */}
               <div className="w-full mt-5 rounded-xl border border-border bg-app-background/60 p-3 text-sm">
                 <div className="flex items-center justify-between py-1">
-                  <span className="text-muted-foreground">Send</span>
-                  <span className="font-medium">
-                    {formatFloatNumber(parseFloat(AMOUNT || "0"))} {resolvedTokenName}
+                  <span className="text-muted-foreground">You're sending</span>
+                  <span className="font-semibold">
+                    {formatFloatNumber(parseFloat(AMOUNT || "0"))}{" "}
+                    {resolvedTokenName}
                   </span>
                 </div>
-                <div className="flex items-center justify-between py-1">
-                  <span className="text-muted-foreground">Network fee</span>
-                  <span className="font-medium">
-                    {feeQuery.isLoading || !FEE_BREAKDOWN ? (
-                      <span className="text-muted-foreground">…</span>
-                    ) : feeQuery.isError ? (
-                      <span className="text-danger text-xs">Couldn't estimate</span>
-                    ) : (
-                      <>
-                        ~{formatFloatNumber(parseFloat(FEE_BREAKDOWN.gasFeeInToken))}{" "}
-                        {FEE_BREAKDOWN.token || resolvedTokenName}
-                      </>
-                    )}
-                  </span>
-                </div>
-                {FEE_BREAKDOWN && !feeQuery.isError && (
-                  <div className="flex items-center justify-between py-1 mt-1 pt-2 border-t border-border">
-                    <span className="text-muted-foreground">Total needed</span>
-                    <span className="font-semibold">
-                      {formatFloatNumber(parseFloat(FEE_BREAKDOWN.totalNeeded))}{" "}
-                      {FEE_BREAKDOWN.token || resolvedTokenName}
-                    </span>
-                  </div>
-                )}
-                {INSUFFICIENT && FEE_BREAKDOWN && (
+                {INSUFFICIENT && (
                   <div className="mt-2 text-xs text-danger">
-                    Insufficient {FEE_BREAKDOWN.token || resolvedTokenName} on{" "}
-                    {FEE_BREAKDOWN.chain || CHAIN_INFO?.backend_id}. Need{" "}
-                    {formatFloatNumber(parseFloat(FEE_BREAKDOWN.deficit))} more to
-                    cover the network fee.
+                    Insufficient {resolvedTokenName}. Top up your wallet to
+                    continue.
                   </div>
                 )}
               </div>
