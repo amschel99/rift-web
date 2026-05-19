@@ -36,6 +36,12 @@ import useBaseUSDCBalance from "@/hooks/data/use-base-usdc-balance";
 import rift from "@/lib/rift";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
 
+// Feature flag — flip back to `true` when the Senior Vault is ready to ship.
+// While `false`, the page renders a "Coming Soon" screen regardless of how
+// the user arrived (direct URL, browser history, deep link). Keep at the top
+// so the underlying vault hooks/effects never run for a disabled product.
+const SENIOR_VAULT_ENABLED = false;
+
 // Fee constants
 const WITHDRAWAL_FEE_PERCENT = 0.002; // 0.2%
 const PERFORMANCE_FEE_PERCENT = 0.02; // 2%
@@ -96,7 +102,69 @@ function getCountdownTo29th(): {
   return { days, hours, minutes, seconds };
 }
 
+function SeniorVaultComingSoon() {
+  const navigate = useNavigate();
+  const isDesktop = useDesktopDetection();
+  return (
+    <div className="h-full flex flex-col bg-app-background">
+      <div
+        className={`flex-shrink-0 ${
+          isDesktop
+            ? "px-8 py-6 bg-white border-b border-gray-200"
+            : "bg-surface backdrop-blur-sm border-b border-surface-alt"
+        }`}
+      >
+        <div className={isDesktop ? "max-w-4xl mx-auto flex items-center gap-3" : "flex items-center gap-3 px-4 py-4"}>
+          <button
+            onClick={() => navigate("/app/invest")}
+            className="p-1.5 rounded-xl transition-colors hover:bg-surface-subtle"
+            aria-label="Back"
+          >
+            <FiArrowLeft className="w-5 h-5 text-text-default" />
+          </button>
+          <h1 className={`${isDesktop ? "text-2xl" : "text-lg"} font-semibold text-text-default`}>
+            Senior Vault
+          </h1>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-6">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-accent-primary/10 flex items-center justify-center">
+            <IoTimeOutline className="w-8 h-8 text-accent-primary" />
+          </div>
+          <span className="inline-block px-3 py-1 mb-3 text-[11px] font-semibold tracking-wider uppercase bg-gray-100 text-gray-600 rounded-full">
+            Coming Soon
+          </span>
+          <h2 className="text-2xl font-semibold text-text-default mb-2 tracking-[-0.01em]">
+            Senior Vault isn't live yet
+          </h2>
+          <p className="text-[15px] text-text-subtle leading-relaxed mb-6">
+            We're finalising the audit and on-chain plumbing for the
+            Dollar-denominated savings vault. It'll be available to all users
+            shortly.
+          </p>
+          <button
+            onClick={() => navigate("/app/invest")}
+            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-accent-primary text-white text-sm font-semibold hover:bg-accent-primary/92 transition-colors"
+          >
+            Back to Earn
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SailVault() {
+  if (!SENIOR_VAULT_ENABLED) {
+    return <SeniorVaultComingSoon />;
+  }
+
+  return <SailVaultInner />;
+}
+
+function SailVaultInner() {
   const navigate = useNavigate();
   const { logEvent, updatePersonProperties } = useAnalytics();
   const isDesktop = useDesktopDetection();
