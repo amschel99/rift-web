@@ -25,6 +25,7 @@ const ASSETS: Asset[] = [
     name: "Senior Vault",
     tagline: "Dollar-denominated savings with around 10% APY. Beat inflation.",
     imageUrl: "https://www.liquidroyalty.com/sailr_logo.svg",
+    comingSoon: true,
     apy: "~10%",
   },
   {
