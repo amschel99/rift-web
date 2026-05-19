@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import ShellContextProvider from "./shell-context";
 import PageContainer from "./page-container";
 import useDesktopDetection from "@/hooks/use-desktop-detection";
+import WhatsAppSupportButton from "@/components/ui/whatsapp-support-button";
 
 export default function AppShell() {
   const isDesktop = useDesktopDetection();
@@ -30,6 +31,7 @@ export default function AppShell() {
           <AnimatePresence mode="wait">
             <PageContainer />
           </AnimatePresence>
+          <WhatsAppSupportButton position="desktop" />
         </div>
       ) : (
         /* Mobile / narrow-viewport layout — centered card on wide screens */
@@ -38,6 +40,7 @@ export default function AppShell() {
             <AnimatePresence mode="wait">
               <PageContainer />
             </AnimatePresence>
+            <WhatsAppSupportButton position="mobile" />
           </div>
         </div>
       )}
