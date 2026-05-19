@@ -225,7 +225,11 @@ export default function WithdrawConfirmation() {
   const localAmount = withdrawData.amount || 0;
   const isLoading = balanceLoading || feeLoading;
 
-  // Fee card
+  // Fee card — by product decision the on-chain gas + service-fee
+  // markup are NOT shown to the user (intimidating UX). The gate still
+  // uses the real total (gas + markup included) via `balanceInsufficient`
+  // — see `gasFeeInToken` / `totalUsdcRequired` above which feed it.
+  // We display only the Pretium 1.5% service fee here.
   const feeCard = displayFeeBreakdown && (
     <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-3">
@@ -241,41 +245,20 @@ export default function WithdrawConfirmation() {
           <span className="text-text-subtle">Service fee ({displayFeeBreakdown.feePercentage}%)</span>
           <span className="font-semibold text-amber-600">+ {currencySymbol} {displayFeeBreakdown.feeLocal.toLocaleString()}</span>
         </div>
-        {gasFeeInToken > 0 && (
-          <div className="flex justify-between text-sm">
-            <span className="text-text-subtle">
-              Network gas
-              {gasFeeQuery.data?.degraded ? " (approx)" : ""}
-            </span>
-            <span className="font-semibold text-amber-600">
-              + {currencySymbol} {Math.ceil(gasFeeInLocal).toLocaleString()}
-              <span className="ml-1 text-xs font-normal text-text-subtle">
-                (~{gasFeeInToken.toFixed(4)} {sourceConfig.token})
-              </span>
-            </span>
-          </div>
-        )}
         <div className="border-t border-amber-500/30 pt-2 mt-2">
           <div className="flex justify-between">
             <span className="font-medium">Total deducted</span>
             <span className="font-bold text-lg">
               {currencySymbol}{" "}
-              {Math.ceil(totalLocalWithGas).toLocaleString()}
+              {displayFeeBreakdown.totalLocalDeducted.toLocaleString()}
             </span>
           </div>
-          {gasFeeInToken > 0 && (
-            <div className="flex justify-between text-xs text-text-subtle mt-1">
-              <span>≈ {totalUsdcRequired.toFixed(4)} {sourceConfig.token} from your wallet</span>
-              <span>${totalUsdcRequired.toFixed(2)}</span>
-            </div>
-          )}
         </div>
       </div>
       {balanceInsufficient && (
         <div className="mt-3 text-sm text-danger font-medium">
-          Insufficient {sourceConfig.token} on {sourceConfig.chainLabel}. You
-          have ${sourceBalance.toFixed(4)} but need ${totalUsdcRequired.toFixed(4)} to
-          cover the withdrawal plus network gas.
+          Insufficient {sourceConfig.token} on {sourceConfig.chainLabel}.
+          Top up your wallet to continue.
         </div>
       )}
     </div>
