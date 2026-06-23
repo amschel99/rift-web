@@ -12,7 +12,7 @@ export interface KenyaBankPaybill {
 
 async function fetchKenyaBankPaybills(): Promise<KenyaBankPaybill[]> {
   const authToken = localStorage.getItem("token");
-  const res = await fetch(`${BASE_URL}/reference/kenya-bank-paybills`, {
+  const res = await fetch(`${BASE_URL}/v1/reference/kenya/bank-paybills`, {
     headers: {
       "Content-Type": "application/json",
       "x-api-key": SDK_API_KEY || "",

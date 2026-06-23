@@ -18,7 +18,7 @@ async function fetchKYCStatus(): Promise<KYCStatusResponse> {
   }
 
   try {
-    const fullUrl = `${apiUrl}/api/kyc/verified`;
+    const fullUrl = `${apiUrl}/v1/kyc/status`;
 
     const response = await fetch(fullUrl, {
       method: "GET",
