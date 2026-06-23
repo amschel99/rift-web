@@ -50,7 +50,7 @@ export default function SumsubVerification({
       const identifier =
         user?.email || user?.phoneNumber || user?.externalId || user?.id;
 
-      const response = await fetch(`${apiBaseUrl}/api/kyc/token`, {
+      const response = await fetch(`${apiBaseUrl}/v1/kyc/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

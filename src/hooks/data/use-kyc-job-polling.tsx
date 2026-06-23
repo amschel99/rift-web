@@ -46,7 +46,7 @@ async function fetchJobStatus(jobId: string): Promise<KYCJobStatusResponse> {
     throw new Error("No authentication token found");
   }
 
-  const response = await fetch(`${apiUrl}/api/kyc/job/${jobId}`, {
+  const response = await fetch(`${apiUrl}/v1/kyc/jobs/${jobId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

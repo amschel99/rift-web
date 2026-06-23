@@ -215,7 +215,7 @@ export default function SmileIDVerification({
 
         // Send images to backend for Smile ID verification
         const apiKey = import.meta.env.VITE_SDK_API_KEY;
-        const response = await fetch(`${apiBaseUrl}/api/kyc/verify`, {
+        const response = await fetch(`${apiBaseUrl}/v1/kyc/submissions`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
