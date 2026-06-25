@@ -27,7 +27,7 @@
     <link rel="icon" type="image/png" href="/rift.png" />
     <link rel="apple-touch-icon" href="/rift.png" />
 
-    <!-- Fonts -->
+    <!-- Fonts: Satoshi (body) + Clash Display (headings) via Fontshare, JetBrains Mono (numerics) via Google Fonts -->
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,10 +41,12 @@
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
     />
 
+    <!-- Farcaster Mini App Embed Meta Tags (for sharing in social feeds) -->
     <meta
       name="fc:miniapp"
       content='{"version":"1","imageUrl":"https://wallet.riftfi.xyz/hero.png","button":{"title":"💰 Open Wallet","action":{"type":"launch_miniapp","name":"Rift Wallet","url":"https://wallet.riftfi.xyz","splashImageUrl":"https://wallet.riftfi.xyz/rift.png","splashBackgroundColor":"#2E8C96"}}}'
     />
+    <!-- For backward compatibility -->
     <meta
       name="fc:frame"
       content='{"version":"1","imageUrl":"https://wallet.riftfi.xyz/hero.png","button":{"title":"💰 Open Wallet","action":{"type":"launch_frame","name":"Rift Wallet","url":"https://wallet.riftfi.xyz","splashImageUrl":"https://wallet.riftfi.xyz/rift.png","splashBackgroundColor":"#2E8C96"}}}'
@@ -54,12 +56,6 @@
   </head>
   <body oncontextmenu="return false">
     <div id="root"></div>
-
     <script type="module" src="/src/main.tsx"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>
-      eruda.init();
-    </script>
   </body>
 </html>
