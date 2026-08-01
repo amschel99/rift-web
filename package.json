@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
     "dev:browser": "VITE_TEST_BROWSER_MODE=true vite --host 0.0.0.0 --port 5173",
+    "dev:sandbox": "vite --host 0.0.0.0 --port 5173 --mode sandbox",
     "build": "tsc -b && vite build",
+    "build:sandbox": "tsc -b && vite build --mode sandbox",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -78,6 +80,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.12.0",
+    "jose": "^6.2.3",
     "sass-embedded": "^1.88.0",
     "tailwindcss": "^4.1.7",
     "tw-animate-css": "^1.2.9",

@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import rift from "../../lib/rift";
 import { transactionsApi } from "../../lib/prediction-market";
 import { ChainName } from "@rift-finance/wallet";
+import { sendChainTx as sendChainTxShared } from "../../lib/nonCustodial";
 
 // Transaction data is provided by the backend API, no manual encoding needed
 
@@ -37,6 +38,14 @@ interface TransactionHookReturn {
 }
 
 // Note: Manual encoding functions removed since we get transaction data from backend API
+
+// Shared two-phase tx helper. Uses the imported `sendChainTxShared` —
+// branches between non-custodial preview+sign and legacy one-phase
+// internally. Aliased so the existing call sites read naturally.
+const sendChainTx = (
+  chain: ChainName,
+  transactionData: Parameters<typeof sendChainTxShared>[1]
+) => sendChainTxShared(chain, transactionData, rift);
 
 // Hook for handling complete transaction flow with allowance checking
 export const useTransaction = (
@@ -169,19 +178,17 @@ export const useTransaction = (
 
             const approvalTxData = approvalResponse.data.data;
 
-            // Send approval transaction via Sphere SDK
-            await (rift as any).proxyWallet.sendTransaction({
-              chain: CHAIN,
-              transactionData: {
-                to: approvalTxData.to,
-                data: approvalTxData.data,
-                value: approvalTxData.value,
-                gasLimit: approvalTxData.gasLimit,
-                maxFeePerGas: approvalTxData.maxFeePerGas,
-                maxPriorityFeePerGas: approvalTxData.maxPriorityFeePerGas,
-                nonce: approvalTxData.nonce,
-                chainId: approvalTxData.chainId,
-              },
+            // Send approval transaction — one-phase for v1/v2,
+            // two-phase preview+passkey for v3.
+            await sendChainTx(CHAIN, {
+              to: approvalTxData.to,
+              data: approvalTxData.data,
+              value: approvalTxData.value,
+              gasLimit: approvalTxData.gasLimit,
+              maxFeePerGas: approvalTxData.maxFeePerGas,
+              maxPriorityFeePerGas: approvalTxData.maxPriorityFeePerGas,
+              nonce: approvalTxData.nonce,
+              chainId: approvalTxData.chainId,
             });
           }
         } catch (allowanceError) {
@@ -241,19 +248,17 @@ export const useTransaction = (
 
       const txData = txResponse.data.data || txResponse.data;
 
-      // Send transaction using Sphere's proxy wallet with proper data handling
-      const finalTxResponse = await (rift as any).proxyWallet.sendTransaction({
-        chain: CHAIN,
-        transactionData: {
-          to: txData.to,
-          data: txData.data,
-          value: txData.value,
-          gasLimit: txData.gasLimit,
-          maxFeePerGas: txData.maxFeePerGas,
-          maxPriorityFeePerGas: txData.maxPriorityFeePerGas,
-          nonce: txData.nonce,
-          chainId: txData.chainId,
-        },
+      // Submit final transaction — one-phase legacy or two-phase
+      // preview/sign/submit if non-custodial.
+      const finalTxResponse = await sendChainTx(CHAIN, {
+        to: txData.to,
+        data: txData.data,
+        value: txData.value,
+        gasLimit: txData.gasLimit,
+        maxFeePerGas: txData.maxFeePerGas,
+        maxPriorityFeePerGas: txData.maxPriorityFeePerGas,
+        nonce: txData.nonce,
+        chainId: txData.chainId,
       });
 
       const finalTxHash = finalTxResponse.hash;
