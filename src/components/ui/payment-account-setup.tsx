@@ -367,7 +367,7 @@ export default function PaymentAccountSetup({
     return (
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center md:left-[calc((100vw-28rem)/2)] md:right-[calc((100vw-28rem)/2)]">
+          <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -380,7 +380,7 @@ export default function PaymentAccountSetup({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 500 }}
-              className="relative w-full max-w-md bg-app-background rounded-t-xl p-6"
+              className="relative w-full max-w-md bg-card border border-hairline shadow-modal rounded-t-xl md:rounded-lg p-6"
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Setup Withdrawal Account</h2>
@@ -418,7 +418,7 @@ export default function PaymentAccountSetup({
             animate={isDesktop ? { opacity: 1, scale: 1 } : { y: 0 }}
             exit={isDesktop ? { opacity: 0, scale: 0.95 } : { y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 500 }}
-            className={`relative w-full max-w-md bg-app-background ${isDesktop ? "rounded-xl" : "rounded-t-xl"} p-6 max-h-[80vh] overflow-y-auto ${isDesktop ? "" : "pb-24"} shadow-2xl`}
+            className={`relative w-full max-w-md bg-card border border-hairline shadow-modal ${isDesktop ? "rounded-lg" : "rounded-t-xl"} p-6 max-h-[80vh] overflow-y-auto ${isDesktop ? "" : "pb-24"} shadow-2xl`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -563,7 +563,7 @@ export default function PaymentAccountSetup({
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">
-                        PIX Key <span className="text-red-500">*</span>
+                        PIX Key <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -681,7 +681,7 @@ export default function PaymentAccountSetup({
                     {/* Primary Input */}
                     <div>
                       <label className="block text-sm font-medium mb-2">
-                        {labels.primary} <span className="text-red-500">*</span>
+                        {labels.primary} <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -696,7 +696,7 @@ export default function PaymentAccountSetup({
                     {isKenyaFlow && selectedType === "PAYBILL" && (
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          Account Number <span className="text-red-500">*</span>
+                          Account Number <span className="text-danger">*</span>
                         </label>
                         <input
                           type="text"
@@ -713,7 +713,7 @@ export default function PaymentAccountSetup({
                       <label className="block text-sm font-medium mb-2">
                         Account Name{" "}
                         {needsAccountName ? (
-                          <span className="text-red-500">*</span>
+                          <span className="text-danger">*</span>
                         ) : (
                           <span className="text-text-subtle">(optional)</span>
                         )}

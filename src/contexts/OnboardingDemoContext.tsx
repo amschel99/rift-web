@@ -16,65 +16,52 @@ import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 const DEMO_STEPS = [
   {
     id: "welcome",
-    title: "Welcome to Rift! 👋",
+    title: "Welcome to Rift",
     description:
-      "Your global USD account for payments, transfers & wealth building. Let me show you around!",
+      "Collect, hold and pay out stablecoins and local currency from one console. Here's a quick tour.",
     targetId: null,
     route: "/app",
   },
   {
     id: "balance",
-    title: "Your Balance 💰",
+    title: "Your balance",
     description:
-      "This shows your total balance in your local currency. Tap the eye icon to hide it for privacy.",
+      "Your available balance in USD, with a breakdown by stablecoin. Choose a local currency to see the equivalent.",
     targetId: "balance-section",
     route: "/app",
   },
   {
     id: "topup",
-    title: "Top Up ➕",
-    description:
-      "Tap here to add money via mobile money, bank transfer, or card payment.",
+    title: "Add funds",
+    description: "Top up from mobile money, or receive stablecoins to your account address.",
     targetId: "topup-button",
     route: "/app",
   },
   {
-    id: "wallet",
-    title: "Your Wallet 💰",
-    description:
-      "Send money, receive payments, and withdraw to your bank or mobile money. You can withdraw from your USDC or USDT balance.",
-    targetId: "wallet-card",
+    id: "send",
+    title: "Send money",
+    description: "Pay out to mobile money, bank accounts or any wallet address. Every payment is approved with your passkey.",
+    targetId: "nav-send",
     route: "/app",
   },
   {
-    id: "assets",
-    title: "Your Crypto 🪙",
-    description:
-      "See all your tokens across different networks. You can hold USDC, USDT, and more. Tap any asset to send it.",
-    targetId: "assets-card",
-    route: "/app",
-  },
-  {
-    id: "earn",
-    title: "Earn ✨",
-    description:
-      "Invest your money and earn monthly dividends from real businesses!",
-    targetId: "earn-card",
+    id: "payments",
+    title: "Payments",
+    description: "Every deposit, payout and transfer with its status, fees and a downloadable receipt.",
+    targetId: "nav-payments",
     route: "/app",
   },
   {
     id: "settings",
-    title: "Settings ⚙️",
-    description:
-      "Manage your profile, withdrawal accounts, notifications, and security settings here.",
-    targetId: "tab-settings",
-    route: "/app/profile",
+    title: "Settings",
+    description: "Manage your profile, payout account, passkeys and connected apps.",
+    targetId: "nav-settings",
+    route: "/app",
   },
   {
     id: "complete",
-    title: "You're Ready! 🎉",
-    description:
-      "That's it! Start exploring. You can replay this tutorial anytime from Settings → App Tutorial.",
+    title: "You're ready",
+    description: "That's the tour. Start by receiving or sending your first payment.",
     targetId: null,
     route: "/app",
   },
@@ -258,7 +245,9 @@ function DemoOverlay({
     }
 
     const updatePosition = () => {
-      const element = document.getElementById(step.targetId!);
+      const element =
+        document.getElementById(step.targetId!) ||
+        document.getElementById(step.targetId!.replace(/^nav-/, "tab-"));
       if (element) {
         const rect = element.getBoundingClientRect();
         setTargetRect(rect);
@@ -409,7 +398,7 @@ function DemoOverlay({
         initial={{ opacity: 0, scale: 0.9, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        className="absolute w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-visible"
+        className="absolute w-80 max-w-[calc(100vw-2rem)] bg-card dark:bg-gray-900 rounded-2xl shadow-2xl overflow-visible"
         style={{
           top: tooltipPos.top,
           left: Math.max(16, Math.min(tooltipPos.left, window.innerWidth - 320 - 16)),
@@ -419,7 +408,7 @@ function DemoOverlay({
         {/* Arrow pointing to target */}
         {targetRect && (
           <div
-            className="absolute w-4 h-4 bg-white dark:bg-gray-900 rotate-45 -z-10"
+            className="absolute w-4 h-4 bg-card dark:bg-gray-900 rotate-45 -z-10"
             style={{
               [tooltipPos.arrowPosition]: -8,
               left: `${tooltipPos.arrowLeft}%`,
@@ -438,7 +427,7 @@ function DemoOverlay({
                   ? "w-6 bg-accent-primary"
                   : idx < currentStep
                   ? "w-1.5 bg-accent-primary/60"
-                  : "w-1.5 bg-gray-200 dark:bg-gray-700"
+                  : "w-1.5 bg-surface-subtle dark:bg-gray-700"
               }`}
             />
           ))}
@@ -446,10 +435,10 @@ function DemoOverlay({
 
         {/* Content */}
         <div className="px-5 pb-5">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-bold text-ink dark:text-white mb-2">
             {step.title}
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-5">
+          <p className="text-ink-3 dark:text-ink-3 text-sm leading-relaxed mb-5">
             {step.description}
           </p>
 
@@ -458,7 +447,7 @@ function DemoOverlay({
             {!isFirstStep && (
               <button
                 onClick={onPrev}
-                className="flex items-center justify-center gap-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-800 rounded-2xl text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95"
+                className="flex items-center justify-center gap-1 px-4 py-2.5 bg-surface-subtle dark:bg-gray-800 rounded-2xl text-ink dark:text-gray-200 text-sm font-medium hover:bg-surface-subtle dark:hover:bg-gray-700 transition-colors active:scale-95"
               >
                 <IoChevronBack className="w-4 h-4" />
                 Back
@@ -478,7 +467,7 @@ function DemoOverlay({
           {!isLastStep && (
             <button
               onClick={onSkip}
-              className="w-full mt-3 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="w-full mt-3 text-xs text-ink-3 hover:text-ink-3 dark:hover:text-ink-3 transition-colors"
             >
               Skip tutorial
             </button>

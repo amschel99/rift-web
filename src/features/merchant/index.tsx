@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 
 const QUICK_AMOUNTS = [5, 10, 25, 50, 100, 250];
 const MONO = '"JetBrains Mono", monospace';
-const DISPLAY = 'var(--app-font-display)';
 
 type Tab = "qr" | "amount";
 
@@ -175,7 +174,7 @@ export default function Merchant() {
           className={cn(
             "relative py-2 text-[13px] font-semibold rounded-sm border transition-colors duration-150 cursor-pointer",
             activeTab === tab.id
-              ? "bg-white border-border text-text-default shadow-xs"
+              ? "bg-card border-border text-text-default shadow-xs"
               : "border-transparent text-text-muted hover:text-text-default"
           )}
         >
@@ -187,13 +186,13 @@ export default function Merchant() {
 
   // ── Your QR tab ──────────────────────────────────────────────────────
   const yourQrTab = (
-    <div className="rounded-lg bg-white border border-border p-5">
+    <div className="rounded-lg bg-card border border-border p-5">
       {bootstrapping ? (
         <div className="flex flex-col items-center py-10">
           <div className="h-[220px] w-[220px] rounded-2xl bg-app-background/60 flex items-center justify-center">
             <span className="h-7 w-7 rounded-full border-2 border-accent-primary border-t-transparent animate-spin" />
           </div>
-          <p className="mt-5 text-[13px] text-text-subtle/80">
+          <p className="mt-5 text-[13px] text-ink-3">
             Setting up your QR…
           </p>
         </div>
@@ -202,7 +201,7 @@ export default function Merchant() {
           <p className="text-[14px] font-medium text-text-default">
             Couldn't set up your QR
           </p>
-          <p className="text-[12.5px] text-text-subtle/80 mt-1 max-w-[280px]">
+          <p className="text-[12.5px] text-ink-3 mt-1 max-w-[280px]">
             We hit a snag creating your payment link. Try reloading the page.
           </p>
           <button
@@ -221,7 +220,7 @@ export default function Merchant() {
             Your payment QR
           </p>
 
-          <div className="rounded-md bg-white border border-border p-4 mb-4">
+          <div className="rounded-md bg-[#ffffff] border border-border p-4 mb-4">
             <QRCodeSVG
               ref={persistentQrRef}
               value={persistentUrl}
@@ -245,21 +244,21 @@ export default function Merchant() {
             {copiedPersistent ? (
               <Check className="h-4 w-4 flex-shrink-0 text-accent-primary" />
             ) : (
-              <BiCopy className="h-4 w-4 flex-shrink-0 text-text-subtle/60" />
+              <BiCopy className="h-4 w-4 flex-shrink-0 text-ink-3" />
             )}
           </button>
 
           <div className="grid w-full grid-cols-3 gap-2.5">
             <button
               onClick={() => handleCopy(persistentUrl, "persistent")}
-              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-white border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
+              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-card border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
             >
               <BiCopy className="h-[18px] w-[18px]" />
               <span className="text-[11.5px] font-semibold">Copy link</span>
             </button>
             <button
               onClick={() => handleShare(persistentUrl, "persistent")}
-              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-white border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
+              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-card border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
             >
               <Share2 className="h-[18px] w-[18px]" />
               <span className="text-[11.5px] font-semibold">Share</span>
@@ -271,7 +270,7 @@ export default function Merchant() {
                   "rift-payment-qr.png"
                 )
               }
-              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-white border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
+              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-card border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
             >
               <Download className="h-[18px] w-[18px]" />
               <span className="text-[11.5px] font-semibold">Save image</span>
@@ -284,7 +283,7 @@ export default function Merchant() {
 
   // ── Specific amount tab ──────────────────────────────────────────────
   const specificAmountTab = (
-    <div className="rounded-lg bg-white border border-border p-5">
+    <div className="rounded-lg bg-card border border-border p-5">
       {!specificUrl ? (
         <>
           <div className="rounded-md bg-surface-subtle border border-border p-5 mb-4">
@@ -321,7 +320,7 @@ export default function Merchant() {
                       "py-2 rounded-md border text-[12.5px] font-semibold tabular-nums transition-colors cursor-pointer",
                       active
                         ? "bg-accent-primary border-accent-primary text-white"
-                        : "bg-white border-border text-text-default hover:border-text-default/25"
+                        : "bg-card border-border text-text-default hover:border-text-default/25"
                     )}
                   >
                     ${amt}
@@ -345,7 +344,7 @@ export default function Merchant() {
             Charge for ${specificAmount!.toFixed(2)}
           </p>
 
-          <div className="rounded-md bg-white border border-border p-4 mb-4">
+          <div className="rounded-md bg-[#ffffff] border border-border p-4 mb-4">
             <QRCodeSVG
               ref={specificQrRef}
               value={specificUrl}
@@ -369,21 +368,21 @@ export default function Merchant() {
             {copiedSpecific ? (
               <Check className="h-4 w-4 flex-shrink-0 text-accent-primary" />
             ) : (
-              <BiCopy className="h-4 w-4 flex-shrink-0 text-text-subtle/60" />
+              <BiCopy className="h-4 w-4 flex-shrink-0 text-ink-3" />
             )}
           </button>
 
           <div className="grid w-full grid-cols-3 gap-2.5">
             <button
               onClick={() => handleCopy(specificUrl, "specific")}
-              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-white border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
+              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-card border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
             >
               <BiCopy className="h-[18px] w-[18px]" />
               <span className="text-[11.5px] font-semibold">Copy link</span>
             </button>
             <button
               onClick={() => handleShare(specificUrl, "specific")}
-              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-white border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
+              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-card border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
             >
               <Share2 className="h-[18px] w-[18px]" />
               <span className="text-[11.5px] font-semibold">Share</span>
@@ -395,7 +394,7 @@ export default function Merchant() {
                   `rift-charge-${specificAmount}.png`
                 )
               }
-              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-white border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
+              className="flex flex-col items-center gap-1.5 py-3 rounded-md bg-card border border-border text-text-default hover:bg-surface-subtle hover:border-text-default/25 transition-colors cursor-pointer"
             >
               <Download className="h-[18px] w-[18px]" />
               <span className="text-[11.5px] font-semibold">Save image</span>
@@ -413,47 +412,22 @@ export default function Merchant() {
     </div>
   );
 
+  // Rendered inside the console's Payment links page, which owns the
+  // page header; this is just the collection panel.
   return (
-    <div className="relative w-full h-full overflow-y-auto overflow-x-hidden bg-app-background">
-      <div className="relative z-10 mx-auto w-full max-w-md md:max-w-lg px-4 pt-6 pb-12 md:px-8 md:pt-8">
-        <div className="mb-6">
-          <h1
-            className="text-[22px] leading-[1.2] font-semibold tracking-[-0.015em] text-text-default"
-            style={{ fontFamily: DISPLAY }}
-          >
-            Collections
-          </h1>
-          <p className="text-[13px] text-text-muted mt-1">
-            Collect payments by QR code or payment link. Payers can settle from any crypto wallet.
-          </p>
-        </div>
-
-        {tabBar}
-
-        <AnimatePresence mode="wait">
-          {activeTab === "qr" ? (
-            <motion.div
-              key="qr"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
-            >
-              {yourQrTab}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="amount"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
-            >
-              {specificAmountTab}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+    <div className="w-full">
+      {tabBar}
+      <AnimatePresence mode="wait">
+        {activeTab === "qr" ? (
+          <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+            {yourQrTab}
+          </motion.div>
+        ) : (
+          <motion.div key="amount" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+            {specificAmountTab}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

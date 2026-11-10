@@ -271,7 +271,73 @@ test.describe("transactions", () => {
     expectBound(state.submits.find((s) => s.path.endsWith("submit-prepared")), cred.credentialId);
   });
 
-  test("LiFi swap: the router call is passkey-approved as a user op", async ({ page }) => {
+  test("console send form: wallet address → review (fee + total) → passkey → receipt", async ({ page }) => {
+    const state = newState();
+    const { cred } = await bootWallet(page, state, "/app/send?method=wallet");
+
+    await page.getByLabel("Wallet address").fill("0x000000000000000000000000000000000000dead");
+    await page.getByLabel("Amount", { exact: true }).fill("5");
+    await page.getByRole("button", { name: "Review transfer" }).click();
+    const summary = page.getByRole("region", { name: "Summary" }).or(page.locator("[aria-label=Summary]"));
+    await expect(summary.first()).toContainText("0.01 USDC", { timeout: 20_000 });
+    await expect(summary.first()).toContainText("5.01 USDC");
+    await page.getByRole("button", { name: "Approve with passkey" }).click();
+    const receipt = page.getByTestId("receipt");
+    await expect(receipt).toContainText("Transfer sent", { timeout: 20_000 });
+    await expect(receipt).toContainText("5.00 USDC");
+
+    const preview = state.requests.find((r) => r.path.endsWith("/v1/transactions/preview"));
+    expect(preview?.body).toMatchObject({ chain: "BASE", token: "USDC", amount: "5" });
+    expectBound(state.submits.find((s) => s.path.endsWith("submit-prepared")), cred.credentialId);
+  });
+
+  test("console payout form: mobile money → review → passkey → receipt (offramp init → finalize)", async ({ page }) => {
+    const state = newState();
+    const { cred } = await bootWallet(page, state, "/app/send?method=mobile");
+
+    await page.getByRole("button", { name: /Kenya/ }).click({ timeout: 20_000 });
+    await page.getByRole("button", { name: /Send Money/ }).click();
+    await page.getByRole("button", { name: "Safaricom" }).click();
+    await page.getByPlaceholder("0712 345 678").fill("0700000000");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    // One funded wallet (USDC on Base) is picked automatically.
+    await page.getByLabel("Recipient gets").fill("1290");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    const review = page.getByRole("region", { name: "Review and confirm" });
+    await expect(review).toContainText("Total deducted", { timeout: 20_000 });
+    await expect(review).toContainText("Service fee");
+    await review.getByRole("button", { name: /with passkey/ }).click();
+    const receipt = page.getByTestId("receipt");
+    await expect(receipt).toContainText("Payout submitted", { timeout: 20_000 });
+    await expect(receipt).toContainText("KSh 1,290");
+    await expect(receipt).toContainText("TX123");
+
+    const init = state.requests.find((r) => r.path.endsWith("/v1/offramps/init"));
+    expect(init?.body).toMatchObject({ currency: "KES", token: "USDC" });
+    expect(JSON.parse(init?.body.recipient)).toMatchObject({ accountIdentifier: "0700000000", institution: "Safaricom", type: "MOBILE" });
+    expectBound(state.submits.find((s) => s.path.endsWith("/v1/offramps/finalize")), cred.credentialId);
+  });
+
+  test("console withdraw form: saved account → amount → review → passkey → receipt", async ({ page }) => {
+    const state = newState();
+    const { cred } = await bootWallet(page, state, "/app/withdraw");
+
+    await expect(page.getByTestId("section-account-summary")).toContainText("0700000000", { timeout: 20_000 });
+    await page.getByLabel("You receive").fill("1290");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    const review = page.getByRole("region", { name: "Review and confirm" });
+    await expect(review).toContainText("Total deducted", { timeout: 20_000 });
+    await review.getByRole("button", { name: /with passkey/ }).click();
+    await expect(page.getByTestId("receipt")).toContainText("Withdrawal submitted", { timeout: 20_000 });
+
+    const init = state.requests.find((r) => r.path.endsWith("/v1/offramps/init"));
+    expect(JSON.parse(init?.body.recipient)).toMatchObject({ accountIdentifier: "0700000000", currency: "KES" });
+    expectBound(state.submits.find((s) => s.path.endsWith("/v1/offramps/finalize")), cred.credentialId);
+  });
+
+  // WalletConnect dapps (not the removed in-app swap UI) still send
+  // arbitrary router calls; each is passkey-approved as a user op.
+  test("arbitrary contract call (approve + router tx) is passkey-approved as a user op", async ({ page }) => {
     const state = newState();
     const { cred } = await bootWallet(page, state);
     await page.waitForLoadState("networkidle");

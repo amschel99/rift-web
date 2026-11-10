@@ -50,8 +50,8 @@ export default function IriisChatPanel({ open, onClose, variant }: Props) {
   const isMobile = variant === "mobile";
 
   const panelClass = isMobile
-    ? "absolute inset-x-0 bottom-0 z-50 flex h-[88%] flex-col rounded-t-[28px] border-t border-surface/60 bg-white shadow-[0_-24px_60px_-12px_rgba(15,42,56,0.24)]"
-    : "fixed bottom-6 right-6 z-50 flex h-[640px] max-h-[calc(100vh-4rem)] w-[400px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-[24px] border border-surface/60 bg-white shadow-[0_32px_80px_-12px_rgba(15,42,56,0.28)]";
+    ? "absolute inset-x-0 bottom-0 z-50 flex h-[88%] flex-col rounded-t-[28px] border-t border-surface/60 bg-card shadow-[0_-24px_60px_-12px_rgba(15,42,56,0.24)]"
+    : "fixed bottom-6 right-6 z-50 flex h-[640px] max-h-[calc(100vh-4rem)] w-[400px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-[24px] border border-surface/60 bg-card shadow-[0_32px_80px_-12px_rgba(15,42,56,0.28)]";
 
   const backdropClass = isMobile
     ? "absolute inset-0 z-40 bg-[#0F2A38]/45 backdrop-blur-[3px]"
@@ -141,7 +141,7 @@ function Header({
         <h2 className="truncate text-[17px] font-semibold leading-none tracking-[-0.01em] text-text-default">
           Iriis
         </h2>
-        <p className="mt-1 text-[12.5px] leading-none text-text-subtle/70">
+        <p className="mt-1 text-[12.5px] leading-none text-ink-3">
           CEO in training
         </p>
       </div>
@@ -150,7 +150,7 @@ function Header({
         onClick={handleReset}
         aria-label="Delete this conversation"
         title="Delete conversation"
-        className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full text-text-subtle/70 transition-colors hover:bg-surface hover:text-text-default"
+        className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface hover:text-text-default"
       >
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
           <path
@@ -166,7 +166,7 @@ function Header({
         type="button"
         onClick={onClose}
         aria-label="Close Iriis chat"
-        className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full text-text-subtle/70 transition-colors hover:bg-surface hover:text-text-default"
+        className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface hover:text-text-default"
       >
         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
           <path
@@ -221,7 +221,7 @@ function MessageBubble({ message }: { message: Message }) {
         className={`max-w-[80%] rounded-[18px] rounded-bl-md border px-3.5 py-2.5 text-[14.5px] leading-[1.45] text-text-default ${
           message.error
             ? "border-danger/30 bg-tint-danger/40"
-            : "border-surface bg-white shadow-[0_1px_2px_rgba(15,42,56,0.04)]"
+            : "border-surface bg-card shadow-[0_1px_2px_rgba(15,42,56,0.04)]"
         }`}
       >
         {renderContent(message.content)}
@@ -243,7 +243,7 @@ function TypingIndicator() {
   return (
     <div className="flex items-end gap-2">
       <IriisAvatar size={28} />
-      <div className="rounded-[18px] rounded-bl-md border border-surface bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,42,56,0.04)]">
+      <div className="rounded-[18px] rounded-bl-md border border-surface bg-card px-4 py-3 shadow-[0_1px_2px_rgba(15,42,56,0.04)]">
         <span className="flex items-center gap-1">
           {[0, 0.15, 0.3].map((delay, i) => (
             <span
@@ -283,8 +283,8 @@ function Composer({
   }, [value, inputRef]);
 
   return (
-    <div className="border-t border-surface/70 bg-white px-3 py-3">
-      <div className="flex items-end gap-2 rounded-[20px] border border-surface bg-surface/40 px-3 py-2 focus-within:border-accent-primary/50 focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(46,140,150,0.12)]">
+    <div className="border-t border-surface/70 bg-card px-3 py-3">
+      <div className="flex items-end gap-2 rounded-[20px] border border-surface bg-surface/40 px-3 py-2 focus-within:border-accent-primary/50 focus-within:bg-card focus-within:shadow-[0_0_0_3px_rgba(46,140,150,0.12)]">
         <textarea
           ref={inputRef}
           value={value}
@@ -318,7 +318,7 @@ function Composer({
           </svg>
         </button>
       </div>
-      <p className="mt-1.5 px-1 text-center text-[10.5px] text-text-subtle/50">
+      <p className="mt-1.5 px-1 text-center text-[10.5px] text-ink-3">
         Iriis is an AI assistant. Answers may be imperfect — don't share
         passwords or seed phrases.
       </p>

@@ -9,14 +9,14 @@ const actionButtonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-accent-primary hover:bg-accent-secondary active:bg-accent-secondary",
+          "bg-accent-solid hover:bg-accent-solid-hover active:bg-accent-solid-hover",
         secondary:
           "bg-accent-secondary hover:bg-accent-secondary/90",
         danger: "bg-danger hover:bg-danger/90",
         success: "bg-success hover:bg-success/90",
         disabled: "bg-surface !text-text-muted",
         ghost:
-          "bg-white border border-border !text-text-default hover:bg-surface-subtle",
+          "bg-card border border-border !text-text-default hover:bg-surface-subtle",
       },
       size: {
         default: "w-full",
