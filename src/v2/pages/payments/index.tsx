@@ -1,9 +1,12 @@
+import { Picker } from "@/v2/ui/picker";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { ArrowDownLeft, ArrowUpRight, ListOrdered, Search } from "lucide-react";
+import { FileDown, ListOrdered, Search } from "lucide-react";
+import { APP_STATUSES, STATUS_LABEL, type AppStatus } from "@/v2/lib/status";
+import { StatementSheet } from "@/v2/pages/statements/statement-sheet";
 import useAnalytics from "@/hooks/use-analytics";
 import { usePayments, type Payment } from "@/v2/lib/payments";
-import { Button, Card, EmptyState, INPUT_CLASS, Page, PageHeader, Segmented, SkeletonRows, type Status } from "@/v2/ui";
+import { Button, Card, EmptyState, INPUT_CLASS, Page, PageHeader, Segmented, SkeletonRows } from "@/v2/ui";
 import { PaymentDrawer, PaymentListItem, PaymentsTable } from "./components";
 
 type Direction = "all" | "in" | "out";
@@ -15,7 +18,8 @@ export default function Payments() {
   const [params, setParams] = useSearchParams();
   const { data, isLoading } = usePayments();
   const [direction, setDirection] = useState<Direction>("all");
-  const [status, setStatus] = useState<Status | "all">("all");
+  const [status, setStatus] = useState<AppStatus | "all">("all");
+  const [statementOpen, setStatementOpen] = useState(false);
   const [query, setQuery] = useState(params.get("q") || "");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [open, setOpen] = useState<Payment | null>(null);
@@ -48,18 +52,11 @@ export default function Payments() {
     <Page width="wide">
       <PageHeader
         title="Activity"
-        description="Every deposit, payout and transfer on your account."
         actions={
-          <>
-            <Button variant="secondary" onClick={() => navigate("/app/receive")}>
-              <ArrowDownLeft className="h-4 w-4" aria-hidden="true" />
-              Receive
-            </Button>
-            <Button onClick={() => navigate("/app/send")}>
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              Send
-            </Button>
-          </>
+          <Button variant="secondary" onClick={() => setStatementOpen(true)} data-testid="open-statement">
+            <FileDown className="h-4 w-4" aria-hidden="true" />
+            Statement
+          </Button>
         }
       />
 
@@ -100,22 +97,19 @@ export default function Payments() {
                 className={`${INPUT_CLASS} !h-10 pl-9 text-[14px]`}
               />
             </label>
-            <label className="w-[140px] flex-shrink-0">
-              <span className="sr-only">Status</span>
-              <select
+            <div className="w-[150px] flex-shrink-0">
+              <Picker
                 value={status}
-                onChange={(e) => {
-                  setStatus(e.target.value as Status | "all");
+                onChange={(v) => {
+                  setStatus(v as AppStatus | "all");
                   setLimit(PAGE_SIZE);
                 }}
-                className={`${INPUT_CLASS} !h-10 cursor-pointer text-[14px]`}
-              >
-                <option value="all">All statuses</option>
-                <option value="succeeded">Succeeded</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
-            </label>
+                label="Status"
+                size="sm"
+                testId="status-filter"
+                options={[{ value: "all", label: "All statuses" }, ...APP_STATUSES.map((st) => ({ value: st, label: STATUS_LABEL[st] }))]}
+              />
+            </div>
           </div>
         </div>
 
@@ -146,7 +140,7 @@ export default function Payments() {
               icon={<ListOrdered className="h-5 w-5" />}
               title="No payments yet"
               description="Payments you send, receive or pay out will appear here with their status and receipts."
-              action={<Button onClick={() => navigate("/app/receive")}>Receive your first payment</Button>}
+              action={<Button onClick={() => navigate("/app/add-funds")}>Add funds</Button>}
             />
           )
         ) : (
@@ -174,6 +168,7 @@ export default function Payments() {
       </Card>
 
       <PaymentDrawer payment={open} onClose={() => setOpen(null)} />
+      <StatementSheet open={statementOpen} onClose={() => setStatementOpen(false)} />
     </Page>
   );
 }

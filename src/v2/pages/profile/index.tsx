@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import posthog from "posthog-js";
-import { Check, ChevronRight, KeyRound, LogOut, Pencil, Plug, Wallet, X } from "lucide-react";
+import { BadgeCheck, Check, ChevronRight, FileDown, KeyRound, LogOut, Pencil, Wallet, X } from "lucide-react";
+import { StatementSheet } from "@/v2/pages/statements/statement-sheet";
+import { IdentitySheet } from "@/v2/pages/kyc/identity-sheet";
+import { BeneficiariesCard } from "./beneficiaries";
+import useKYCStatus from "@/hooks/data/use-kyc-status";
 import useUser from "@/hooks/data/use-user";
 import useUpdateUser from "@/hooks/data/use-update-user";
 import useAnalytics from "@/hooks/use-analytics";
@@ -20,6 +24,9 @@ export default function Settings() {
   const { data: user, isLoading: userLoading } = useUser();
   const updateUserMutation = useUpdateUser();
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
+  const [statementOpen, setStatementOpen] = useState(false);
+  const [identityOpen, setIdentityOpen] = useState(false);
+  const kyc = useKYCStatus();
   const [displayName, setDisplayName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
 
@@ -143,6 +150,8 @@ export default function Settings() {
           />
         </Card>
 
+        <BeneficiariesCard />
+
         <Card aria-labelledby="settings-security-title">
           <SettingsHeader id="settings-security-title" title="Security" />
           <SettingsRow
@@ -151,6 +160,36 @@ export default function Settings() {
             title="Passkeys"
             description="Approve payments and recover your wallet"
             onClick={() => navigate("/app/settings/security/passkeys")}
+          />
+        </Card>
+
+        <Card aria-labelledby="settings-identity-title">
+          <SettingsHeader id="settings-identity-title" title="Identity" />
+          <SettingsRow
+            id="settings-identity"
+            icon={<BadgeCheck className="h-4 w-4" />}
+            title="Identity verification"
+            description={kyc.isLoading ? "Checking…" : kyc.isKYCVerified ? "Verified" : kyc.isUnderReview ? "Under review" : "Not verified"}
+            badge={
+              kyc.isLoading ? undefined : (
+                <StatusPill
+                  status={kyc.isKYCVerified ? "completed" : kyc.isUnderReview ? "processing" : "expired"}
+                  label={kyc.isKYCVerified ? "Verified" : kyc.isUnderReview ? "Under review" : "Not verified"}
+                />
+              )
+            }
+            onClick={() => !kyc.isKYCVerified && !kyc.isUnderReview && setIdentityOpen(true)}
+          />
+        </Card>
+
+        <Card aria-labelledby="settings-statements-title">
+          <SettingsHeader id="settings-statements-title" title="Statements" />
+          <SettingsRow
+            id="settings-statement"
+            icon={<FileDown className="h-4 w-4" />}
+            title="Download statement"
+            description="PDF or CSV, by email or download"
+            onClick={() => setStatementOpen(true)}
           />
         </Card>
 
@@ -164,6 +203,8 @@ export default function Settings() {
         </div>
       </div>
 
+      <StatementSheet open={statementOpen} onClose={() => setStatementOpen(false)} />
+      <IdentitySheet open={identityOpen} onClose={() => setIdentityOpen(false)} />
       <PaymentAccountSetup
         isOpen={showPaymentSetup}
         onClose={() => setShowPaymentSetup(false)}

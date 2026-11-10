@@ -1,20 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supportsRail, useCountries } from "@/v2/lib/countries";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { AlertTriangle, Fingerprint, Loader2 } from "lucide-react";
 import { PayProvider, usePay, type PayMethod, type PayStep } from "./context";
 import CountrySelector from "./components/CountrySelector";
-import PaymentTypeSelector from "./components/PaymentTypeSelector";
 import RecipientInput from "./components/RecipientInput";
 import usePayment from "@/hooks/data/use-payment";
 import type { SupportedCurrency } from "@/hooks/data/use-base-usdc-balance";
 import { checkAndSetTransactionLock } from "@/utils/transaction-lock";
 import { markAccountDeployed } from "@/hooks/wallet/use-account-deployed";
 import { addPendingWithdrawal } from "@/lib/pending-withdrawal";
-import { downloadReceipt } from "@/lib/receipt";
+import { useOfframpStatus } from "@/v2/lib/offramp-status";
 import { Button, Row } from "@/v2/ui";
 import { FlowSection, SectionActions, type SectionState } from "@/v2/ui/flow";
 import { ReceiptCard } from "@/v2/ui/receipt";
+import { SaveBeneficiaryOffer } from "@/v2/pages/send/saved";
+import type { NewBeneficiary } from "@/v2/lib/beneficiaries";
+import type { RecipientData } from "./context";
+
+function beneficiaryDraft(r: RecipientData, currency: string, country?: string): NewBeneficiary {
+  const type: NewBeneficiary["type"] =
+    r.type === "BUY_GOODS" ? "till" : r.type === "PAYBILL" ? "paybill" : r.type === "BANK" || currency === "NGN" || currency === "BRL" ? "bank" : "mobile";
+  const name = r.validatedName ?? r.accountName;
+  return {
+    label: name ?? r.accountIdentifier,
+    type,
+    country,
+    currency,
+    identifier: r.accountIdentifier,
+    ...(r.accountNumber ? { accountNumber: r.accountNumber } : {}),
+    ...(type === "mobile" && r.institution ? { network: r.institution } : {}),
+    ...(type === "bank" && r.institution ? { bankName: r.institution } : {}),
+    ...(r.bankCode ? { bankCode: r.bankCode } : {}),
+    ...(name ? { accountName: name } : {}),
+  };
+}
 import { AmountStep, COUNTRY_NAMES, OfframpSourceStep, QuoteRows, money, sourceLabel, useOfframpQuote } from "@/v2/pages/send/offramp";
 
 type SectionKey = "destination" | "recipient" | "source" | "amount" | "review";
@@ -47,6 +68,8 @@ interface PayReceipt {
   totalDeducted: number;
   fee: number;
   source: string;
+  beneficiaryId?: string;
+  draft?: NewBeneficiary;
 }
 
 /**
@@ -57,8 +80,20 @@ interface PayReceipt {
 function PayFlow() {
   const navigate = useNavigate();
   const { paymentData, updatePaymentData, currentStep, setCurrentStep, resetPayment, method } = usePay();
+  const { countries } = useCountries();
+
+  // Till and paybill exist in one country (Kenya): skip the country step.
+  useEffect(() => {
+    if ((method !== "till" && method !== "paybill") || currentStep !== "country") return;
+    const only = countries.filter((c) => c.offrampActive && supportsRail(c, method));
+    if (only.length === 1) {
+      updatePaymentData({ currency: only[0].currency as SupportedCurrency, type: method === "till" ? "BUY_GOODS" : "PAYBILL" });
+      setCurrentStep("recipient");
+    }
+  }, [method, countries, currentStep]);
   const paymentMutation = usePayment();
   const [receipt, setReceipt] = useState<PayReceipt | null>(null);
+  const live = useOfframpStatus(receipt?.orderId, receipt?.status);
 
   const currency = (paymentData.currency || "KES") as SupportedCurrency;
   const quote = useOfframpQuote({
@@ -115,6 +150,7 @@ function PayFlow() {
         currency: currency as any,
         chain: sourceConfig.sdkChain as any,
         recipient: recipientString,
+        ...(paymentData.recipient.beneficiaryId ? { beneficiaryId: paymentData.recipient.beneficiaryId } : {}),
         ...verification,
       } as any);
       markAccountDeployed(sourceConfig.chain);
@@ -131,6 +167,8 @@ function PayFlow() {
         totalDeducted: quote.displayedTotal,
         fee: quote.serviceFeeLocal + quote.networkFeeInLocal,
         source: sourceLabel(paymentData.selectedSource),
+        beneficiaryId: paymentData.recipient.beneficiaryId,
+        draft: beneficiaryDraft(paymentData.recipient, currency, countries.find((c) => c.currency === currency)?.country),
       });
     } catch (error: any) {
       toast.error(error.message || "Failed to process payment. Please try again.");
@@ -141,11 +179,13 @@ function PayFlow() {
     return (
       <div className="mx-auto w-full max-w-[520px]">
         <ReceiptCard
-          title="Payout submitted"
+          title={live.status === "completed" ? "Payout completed" : "Payout submitted"}
           amount={money(receipt.currency, receipt.amount)}
-          status={/complete|success/i.test(receipt.status) ? "succeeded" : "pending"}
+          status={live.status}
           date={receipt.at}
           from={receipt.source}
+          toText={receipt.recipient}
+          reference={receipt.reference}
           to={
             <>
               {receipt.recipient}
@@ -156,22 +196,12 @@ function PayFlow() {
             { label: "Recipient gets", value: money(receipt.currency, receipt.amount) },
             { label: "Fees", value: money(receipt.currency, receipt.fee) },
             { label: "Total deducted", value: money(receipt.currency, receipt.totalDeducted), strong: true },
-            ...(receipt.reference ? [{ label: "Reference", value: <span className="font-mono text-[13px]">{receipt.reference}</span> }] : []),
+            ...(receipt.reference ? [{ label: "Reference", value: <span className="font-mono text-[13px]">{receipt.reference}</span>, text: receipt.reference }] : []),
           ]}
           shareText={`Rift payout: ${money(receipt.currency, receipt.amount)} to ${receipt.recipient}${receipt.reference ? ` (ref ${receipt.reference})` : ""}`}
-          onDownload={() =>
-            downloadReceipt({
-              type: "withdrawal",
-              transactionCode: receipt.reference || receipt.orderId || "payout",
-              amount: receipt.amount,
-              currency: receipt.currency,
-              public_name: receipt.recipient,
-              createdAt: receipt.at.toISOString(),
-              status: receipt.status,
-            })
-          }
         />
-        <p className="mt-3 text-center text-[12.5px] text-ink-3">Most payouts arrive within a few minutes. Track it in Payments.</p>
+        <SaveBeneficiaryOffer draft={receipt.draft ?? null} alreadySavedId={receipt.beneficiaryId} />
+        <p className="mt-3 text-center text-[12.5px] text-ink-3">Most payouts arrive within a few minutes. Track it in Activity.</p>
         <div className="mt-4 flex gap-2">
           <Button variant="secondary" block onClick={() => navigate("/app/payments")}>
             View payments
@@ -198,7 +228,7 @@ function PayFlow() {
     <div className="space-y-3" data-testid="payout-flow">
       <FlowSection
         step={1}
-        title="Destination"
+        title="Country"
         testId="section-destination"
         description={
           method === "bank" ? "Where the receiving bank account is held" : method === "mobile" ? "Where the mobile money wallet is registered" : "Where the money is going"
@@ -207,7 +237,7 @@ function PayFlow() {
         summary={destinationSummary}
         onEdit={() => setCurrentStep("country")}
       >
-        {currentStep === "type" ? <PaymentTypeSelector /> : <CountrySelector />}
+        <CountrySelector />
       </FlowSection>
 
       <FlowSection
