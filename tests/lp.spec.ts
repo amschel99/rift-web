@@ -32,29 +32,57 @@ async function noHorizontalOverflow(page: Page) {
 }
 
 test.describe("public /lp", () => {
-  test("shows live pool stats, how it works, risks and the terms link without login", async ({ page }) => {
+  test("terminal: stats strip, chart, ticket, activity table and risks without login", async ({ page }) => {
     await openPublic(page);
     await page.goto("/lp");
     await expect(page).toHaveURL(/\/lp$/);
-    await expect(page.getByRole("heading", { level: 1, name: /Earn from the payments/ })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Yield Pool" })).toBeVisible();
     await expect(page.getByTestId("lp-stat-total")).toContainText("$184,251");
     await expect(page.getByTestId("lp-stat-providers")).toContainText("23");
-    await expect(page.getByTestId("lp-stat-volume")).toContainText("$412,800");
+    await expect(page.getByTestId("lp-stat-volume")).toContainText("$500,000");
     await expect(page.getByTestId("lp-stat-fees")).toContainText("$1,238.40");
-    await expect(page.getByTestId("lp-stat-turnover")).toContainText("2.24×");
-    await expect(page.getByTestId("lp-stat-apy")).toContainText("8.1%");
-    await expect(page.getByTestId("lp-stat-apy")).toContainText(/estimate/i);
-    await expect(page.getByTestId("lp-how").getByRole("listitem")).toHaveCount(3);
-    await expect(page.getByTestId("lp-risks")).toContainText(/third party/i);
-    await expect(page.getByTestId("lp-risks")).toContainText(/Currency risk/i);
-    await expect(page.getByTestId("lp-risks")).toContainText(/not insured/i);
-    await expect(page.getByTestId("lp-risks")).toContainText(/lose money/i);
-    await expect(page.getByTestId("lp-formula")).toContainText("your deposit × 0.30% × monthly turnover");
-    await expect(page.getByText(/locked for\s*30 days/i).first()).toBeVisible();
-    await expect(page.getByText(/paid monthly/i).first()).toBeVisible();
-    await expect(page.getByTestId("lp-pool-activity").getByRole("listitem")).toHaveCount(3);
+    await expect(page.getByTestId("lp-stat-apy")).toContainText("9.77%"); // 0.003 × 12 × 500,000 ÷ 184,250.50
+    await expect(page.getByTestId("lp-stat-lock")).toContainText("30d");
+    await expect(page.locator("body")).not.toContainText(/pretium/i);
+
+    // Chart: real series from /pool/history, switchable metric + range.
+    const chart = page.getByTestId("lp-chart");
+    await expect(chart.locator("canvas").first()).toBeVisible();
+    await expect(page.getByTestId("lp-chart-empty")).toHaveCount(0);
+    await page.getByTestId("lp-chart-volume").click();
+    await expect(page.getByTestId("lp-chart-volume")).toHaveAttribute("aria-selected", "true");
+    await page.getByTestId("lp-range-90").click();
+    await expect(page.getByTestId("lp-range-90")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("lp-chart-headline")).toContainText("$");
+
+    // One-line formula behind the info button, not paragraphs.
+    await page.getByTestId("lp-formula-info").click();
+    await expect(page.getByTestId("lp-formula")).toBeVisible();
+    await expect(page.getByTestId("lp-formula")).toContainText("0.30%");
+
+    await expect(page.getByTestId("lp-activity-row")).toHaveCount(3);
+    await page.getByTestId("lp-tab-risks").click();
+    const risks = page.getByTestId("lp-risks");
+    await expect(risks).toContainText(/third party/i);
+    await expect(risks).toContainText(/Currency risk/i);
+    await expect(risks).toContainText(/not insured/i);
+    await expect(risks).toContainText(/lose money/i);
     await expect(page.getByTestId("lp-cta-connect")).toBeVisible();
+    await expect(page.getByTestId("lp-cta-rift")).toBeVisible();
     expect(await noHorizontalOverflow(page)).toBe(true);
+  });
+
+  test("no history yet: flat chart with a 'No activity yet' note, no made-up numbers", async ({ page }) => {
+    await openPublic(page, { history: "empty" });
+    await page.goto("/lp");
+    await expect(page.getByTestId("lp-chart-empty")).toHaveText("No activity yet");
+  });
+
+  test("history API down: retry line inside the chart panel", async ({ page }) => {
+    await openPublic(page, { history: "error" });
+    await page.goto("/lp");
+    await expect(page.getByTestId("lp-chart-error")).toContainText("Retry", { timeout: 15_000 });
+    await expect(page.getByTestId("lp-stat-total")).toContainText("$184,251");
   });
 
   test("pool API down: no made-up numbers", async ({ page }) => {
@@ -63,6 +91,7 @@ test.describe("public /lp", () => {
     await page.goto("/lp");
     await expect(page.getByTestId("lp-pool-error")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId("lp-stat-total")).toHaveCount(0);
+    await expect(page.getByTestId("lp-chart-error")).toBeVisible({ timeout: 15_000 });
   });
 
   test("terms page renders the markdown safely", async ({ page }) => {
@@ -85,28 +114,32 @@ test.describe("public /lp", () => {
 });
 
 test.describe("calculator", () => {
-  test("monthly = amount × 0.003 × turnover, yearly = 12 × monthly, zero turnover = zero", async ({ page }) => {
+  test("amount only: monthly = 0.30% × 30-day volume × amount ÷ (pool + amount)", async ({ page }) => {
     await openPublic(page);
     await page.goto("/lp");
-    const calc = page.getByTestId("lp-calculator");
-    // Starts from the live pool turnover (2.24 → 2.2).
-    await expect(page.getByTestId("lp-calc-turnover")).toHaveValue("2.2");
-    await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$6.60"); // 1000 × 0.003 × 2.2
-
-    await page.getByTestId("lp-calc-amount").fill("2500");
-    await page.getByTestId("lp-calc-turnover").fill("2");
-    await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$15.00");
-    await expect(page.getByTestId("lp-calc-yearly")).toHaveText("$180.00");
+    // Pool $184,250.50, payments $500,000 → LPs share $1,500 a month.
+    await expect(page.getByTestId("lp-calc-turnover")).toHaveCount(0);
+    await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$8.10"); // 1500 × 1000 / 185,250.50
+    await expect(page.getByTestId("lp-calc-yearly")).toHaveText("$97.17");
+    await expect(page.getByTestId("lp-calc-apy")).toHaveText("9.72%");
+    await expect(page.getByTestId("lp-calc-share")).toHaveText("0.54%");
 
     await page.getByTestId("lp-calc-amount").fill("10000");
-    await page.getByTestId("lp-calc-turnover").fill("3.5");
-    await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$105.00");
-    await expect(page.getByTestId("lp-calc-yearly")).toHaveText("$1,260.00");
-    await expect(calc).toContainText("12.6% a year");
+    await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$77.22");
+    await expect(page.getByTestId("lp-calc-yearly")).toHaveText("$926.64");
+    await expect(page.getByTestId("lp-calc-share")).toHaveText("5.15%");
 
-    await page.getByTestId("lp-calc-turnover").fill("0");
+    await page.getByTestId("lp-calc-quick-50000").click();
+    await expect(page.getByTestId("lp-calc-amount")).toHaveValue("50000");
+    await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$320.17");
+    await expect(page.getByTestId("lp-calc-note")).toContainText(/not a promise/i);
+  });
+
+  test("no payments in 30 days → estimate is zero, and says why", async ({ page }) => {
+    await openPublic(page, { pool: { eligibleVolume30dUsd: 0, volume30dUsd: 0 } } as any);
+    await page.goto("/lp");
     await expect(page.getByTestId("lp-calc-monthly")).toHaveText("$0.00");
-    await expect(page.getByTestId("lp-calc-note")).toContainText(/earn nothing/i);
+    await expect(page.getByTestId("lp-calc-note")).toContainText(/estimate is zero/i);
   });
 });
 
@@ -170,49 +203,48 @@ test.describe("wallet sign-in", () => {
 });
 
 test.describe("dashboard (wallet session)", () => {
-  test("renders principal, share, earnings, lock schedule, accruals and history", async ({ page }) => {
+  test("account rows in the ticket; earnings, deposits, payouts, withdrawals and locks as tabs", async ({ page }) => {
     await seedWalletSession(page);
     await openPublic(page, { termsAccepted: true });
     await page.goto("/lp");
-    const dash = page.getByTestId("lp-dashboard");
-    await expect(dash).toBeVisible();
+    await expect(page.getByTestId("lp-dashboard")).toBeVisible();
     await expect(page.getByTestId("lp-principal")).toContainText("$7,500.00");
     await expect(page.getByTestId("lp-share")).toContainText("4.07%");
     await expect(page.getByTestId("lp-earned-total")).toContainText("$48.21");
     await expect(page.getByTestId("lp-earned-month")).toContainText("$9.87");
     await expect(page.getByTestId("lp-unpaid")).toContainText("$9.87");
     await expect(page.getByTestId("lp-unpaid")).toContainText("Next payout");
+    await expect(page.getByTestId("lp-withdrawable")).toHaveText("$5,000.00");
     await expect(page.getByTestId("lp-terms-banner")).toHaveCount(0);
 
-    const locks = page.getByTestId("lp-lock-row");
-    await expect(locks).toHaveCount(2);
-    await expect(locks.nth(0)).toContainText("Unlocked");
-    await expect(locks.nth(1)).toContainText("Unlocks");
-    await expect(page.getByTestId("lp-withdrawable")).toHaveText("$5,000.00");
-
+    // Earnings is the first tab once signed in.
     const accruals = page.getByTestId("lp-accruals");
     await expect(accruals).toContainText("Cash out · TZS");
     await expect(accruals).toContainText("+$0.15");
     await expect(accruals).toContainText("+$0.0049"); // sub-cent earnings keep their precision
 
+    await page.getByTestId("lp-tab-deposits").click();
     await expect(page.getByTestId("lp-deposit-row")).toHaveCount(2);
     await page.getByTestId("lp-tab-payouts").click();
     await expect(page.getByTestId("lp-payout-row")).toContainText("October 2026");
     await expect(page.getByTestId("lp-payout-row")).toContainText("$38.34");
     await page.getByTestId("lp-tab-withdrawals").click();
     await expect(page.getByTestId("lp-withdrawal-row")).toContainText("Paid");
+    await page.getByTestId("lp-tab-locks").click();
+    const locks = page.getByTestId("lp-lock-row");
+    await expect(locks).toHaveCount(2);
+    await expect(locks.nth(0)).toContainText("Unlocked");
+    await expect(locks.nth(1)).toContainText("Unlocks");
+    // Pool activity stays one tab away.
+    await page.getByTestId("lp-tab-activity").click();
+    await expect(page.getByTestId("lp-activity-row")).toHaveCount(3);
+
     expect(await noHorizontalOverflow(page)).toBe(true);
-    // Every card stays inside the viewport (overflow-x-hidden would mask a wide grid).
     const vw = page.viewportSize()!.width;
-    for (const id of ["lp-accruals", "lp-history", "lp-lock-schedule"]) {
+    for (const id of ["lp-tables", "lp-ticket", "lp-chart", "lp-pool-stats"]) {
       const box = await page.getByTestId(id).boundingBox();
       expect(box!.x + box!.width).toBeLessThanOrEqual(vw + 1);
     }
-
-    // Pool view is one tab away.
-    await page.getByTestId("lp-view-pool").click();
-    await expect(page.getByTestId("lp-overview")).toBeVisible();
-    expect(await noHorizontalOverflow(page)).toBe(true);
   });
 });
 
@@ -285,6 +317,7 @@ test.describe("deposits", () => {
     await expect(sheet.getByTestId("lp-crypto-done")).toHaveAttribute("data-status", "pending");
     expect(lp.requests.find((r) => r.path === "/deposits/crypto")?.body).toEqual({ chain: "POLYGON", txHash: tx });
     await sheet.getByRole("button", { name: "Done" }).click();
+    await page.getByTestId("lp-tab-deposits").click();
     await expect(page.getByTestId("lp-deposit-row")).toHaveCount(3);
   });
 
@@ -341,6 +374,7 @@ test.describe("withdraw", () => {
     await seedWalletSession(page);
     const lp = await openPublic(page, { termsAccepted: true });
     await page.goto("/lp");
+    await page.getByTestId("lp-ticket-withdraw").click();
     await page.getByTestId("lp-withdraw").click();
     const sheet = page.getByTestId("lp-withdraw-sheet");
     await expect(sheet.getByTestId("lp-withdraw-max")).toHaveText("$5,000.00");
@@ -364,6 +398,7 @@ test.describe("withdraw", () => {
     await seedWalletSession(page);
     await openPublic(page, { termsAccepted: true, withdrawable: 0 });
     await page.goto("/lp");
+    await page.getByTestId("lp-ticket-withdraw").click();
     await page.getByTestId("lp-withdraw").click();
     const sheet = page.getByTestId("lp-withdraw-sheet");
     await expect(sheet.getByTestId("lp-withdraw-submit")).toBeDisabled();
@@ -421,19 +456,23 @@ test.describe("screenshots", () => {
   for (const scheme of ["light", "dark"] as const) {
     test(`public page (${scheme})`, async ({ page }, info) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.addInitScript((t) => localStorage.setItem("rift_theme", t), scheme);
       await openPublic(page);
       await page.goto("/lp");
       await expect(page.getByTestId("lp-stat-total")).toContainText("$");
-      await expect(page.getByTestId("lp-pool-activity").getByRole("listitem")).toHaveCount(3);
+      await expect(page.getByTestId("lp-activity-row")).toHaveCount(3);
+      await page.waitForTimeout(400); // chart paints
       await fullShot(page, `public-${info.project.name === "mobile" ? 390 : 1440}-${scheme}.png`);
     });
 
     test(`dashboard (${scheme})`, async ({ page }, info) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.addInitScript((t) => localStorage.setItem("rift_theme", t), scheme);
       await seedWalletSession(page);
       await openPublic(page, { termsAccepted: true });
       await page.goto("/lp");
       await expect(page.getByTestId("lp-accruals")).toContainText("TZS");
+      await page.waitForTimeout(400);
       await fullShot(page, `dashboard-${info.project.name === "mobile" ? 390 : 1440}-${scheme}.png`);
     });
   }
@@ -468,9 +507,6 @@ test.describe("screenshots", () => {
     await page.goto("/lp");
     await expect(page.getByTestId("lp-accruals")).toContainText("TZS");
     expect(await noHorizontalOverflow(page)).toBe(true);
-    await fullShot(page, "dashboard-768-light.png");
-    await page.goto("/lp?view=pool");
-    await expect(page.getByTestId("lp-overview")).toBeVisible();
-    expect(await noHorizontalOverflow(page)).toBe(true);
+    await fullShot(page, "dashboard-768-dark.png");
   });
 });

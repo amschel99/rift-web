@@ -11,7 +11,7 @@ import { riftRequest } from "@/lib/nonCustodial";
 /* ── Constants ─────────────────────────────────────────────────────── */
 
 export const LP_DEPOSIT_ADDRESS = "0x98a4BA4dea75F43a617E9753c0e38521391021b8";
-export const LP_TERMS_VERSION = "lp-2026-11-v1";
+export const LP_TERMS_VERSION = "lp-2026-11-v2";
 export const LP_FEE_RATE = 0.003; // 0.30% of pool-using volume
 export const LP_LOCK_DAYS = 30;
 
@@ -32,12 +32,24 @@ export const chainLabel = (id?: string | null) => LP_CHAINS.find((c) => c.id ===
 
 /* ── Earnings math ─────────────────────────────────────────────────── */
 
-/** monthly ≈ amount × 0.003 × monthly turnover; yearly = 12 × monthly. */
-export function estimateEarnings(amountUsd: number, monthlyTurnover: number, feeRate = LP_FEE_RATE) {
+/**
+ * What a deposit of `amountUsd` would earn, from the live pool alone:
+ *
+ *   share      = amount ÷ (pool + amount)
+ *   lp fees    = 0.30% × 30-day payment volume the pool earns on
+ *   monthly    = lp fees × share
+ *   yearly     = 12 × monthly;  apy = yearly ÷ amount
+ *
+ * Assumes the next 30 days look like the last 30 and the pool stays the same size.
+ */
+export function estimateEarnings(amountUsd: number, pool: { totalUsd?: number | null; volumeUsd?: number | null }, feeRate = LP_FEE_RATE) {
   const a = Number.isFinite(amountUsd) && amountUsd > 0 ? amountUsd : 0;
-  const t = Number.isFinite(monthlyTurnover) && monthlyTurnover > 0 ? monthlyTurnover : 0;
-  const monthly = a * feeRate * t;
-  return { monthly, yearly: monthly * 12, apy: a > 0 ? (monthly * 12) / a : 0 };
+  const poolNow = Math.max(0, Number(pool.totalUsd) || 0);
+  const volume = Math.max(0, Number(pool.volumeUsd) || 0);
+  const share = a > 0 ? a / (poolNow + a) : 0;
+  const lpFeesMonthly = volume * feeRate;
+  const monthly = lpFeesMonthly * share;
+  return { share, poolAfter: poolNow + a, volume, lpFeesMonthly, monthly, yearly: monthly * 12, apy: a > 0 ? (monthly * 12) / a : 0 };
 }
 
 /* ── Types ─────────────────────────────────────────────────────────── */
@@ -46,6 +58,8 @@ export interface LpPool {
   totalUsd: number | null;
   providers: number | null;
   volume30dUsd: number | null;
+  /** 30-day payment volume the pool earns on (counted even before any LP joined). */
+  eligibleVolume30dUsd: number | null;
   lpFees30dUsd: number | null;
   turnover30d: number | null;
   /** Fraction (0.072 = 7.2%). */
@@ -58,6 +72,39 @@ export interface LpPool {
   riftFeeBps: number;
   termsVersion: string;
   updatedAt: string | null;
+}
+
+/** One UTC day of pool history (GET /pool/history). */
+export interface LpHistoryDay {
+  date: string; // YYYY-MM-DD
+  poolUsd: number;
+  volumeUsd: number;
+  lpFeesUsd: number;
+}
+export type LpHistoryRange = 30 | 90 | 365;
+
+/** Est. APY from the last 30 days: 0.30% × 12 × payments ÷ pool. null with an empty pool. */
+export function poolApy(pool?: Pick<LpPool, "totalUsd" | "eligibleVolume30dUsd" | "volume30dUsd" | "lpFeeBps"> | null): number | null {
+  const total = Number(pool?.totalUsd) || 0;
+  if (!(total > 0)) return null;
+  const vol = Number(pool?.eligibleVolume30dUsd ?? pool?.volume30dUsd) || 0;
+  const rate = (pool?.lpFeeBps ?? LP_FEE_RATE * 10_000) / 10_000;
+  return (rate * 12 * vol) / Math.max(total, 1);
+}
+
+export function normaliseHistory(raw: any): LpHistoryDay[] {
+  const r = unwrap(raw);
+  const days = arr(Array.isArray(r) ? r : r?.days);
+  return days
+    .map((d: any) => ({
+      date: str(d?.date).slice(0, 10),
+      poolUsd: num0(d?.poolUsd),
+      volumeUsd: num0(d?.volumeUsd),
+      lpFeesUsd: num0(d?.lpFeesUsd),
+    }))
+    .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d.date))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+    .filter((d, i, all) => i === 0 || d.date !== all[i - 1].date);
 }
 
 export interface LpActivity {
@@ -164,6 +211,7 @@ export function normalisePool(raw: any): LpPool {
     totalUsd: num(p.totalUsd),
     providers: num(p.providers),
     volume30dUsd: num(p.volume30dUsd),
+    eligibleVolume30dUsd: num(p.eligibleVolume30dUsd) ?? num(p.volume30dUsd),
     lpFees30dUsd: num(p.lpFees30dUsd),
     turnover30d: num(p.turnover30d),
     estApy: num(p.estApy),
@@ -347,9 +395,15 @@ export function useLpSession() {
 
 /* ── API ───────────────────────────────────────────────────────────── */
 
+/**
+ * The pool exists only on production. Pinned so a preview / local build
+ * (which may point the rest of the app at sandbox) still shows real figures.
+ */
+const LP_API_BASE = String(import.meta.env.VITE_LP_API_BASE || "https://payment.riftfi.xyz").replace(/\/$/, "");
+
 async function lpCall<T>(method: "GET" | "POST", path: string, body?: unknown, session?: LpSession | null): Promise<T> {
   try {
-    const { data } = await riftRequest<T>(method, `/v1/lp${path}`, body, session?.token ?? null);
+    const { data } = await riftRequest<T>(method, `${LP_API_BASE}/v1/lp${path}`, body, session?.token ?? null);
     return data;
   } catch (e: any) {
     // An expired wallet session: drop it so the page offers sign-in again.
@@ -360,6 +414,7 @@ async function lpCall<T>(method: "GET" | "POST", path: string, body?: unknown, s
 
 export const lpApi = {
   pool: async () => normalisePool(await lpCall<any>("GET", "/pool")),
+  history: async (days: LpHistoryRange): Promise<LpHistoryDay[]> => normaliseHistory(await lpCall<any>("GET", `/pool/history?days=${days}`)),
   activity: async (limit = 8): Promise<LpActivity[]> => {
     const raw = unwrap(await lpCall<any>("GET", `/pool/activity?limit=${limit}`));
     return arr(Array.isArray(raw) ? raw : raw?.activity ?? raw?.items).map(normActivity);
@@ -400,6 +455,10 @@ export const lpApi = {
 
 export function useLpPool() {
   return useQuery({ queryKey: ["lp", "pool"], queryFn: lpApi.pool, staleTime: 60_000, retry: 1 });
+}
+
+export function useLpHistory(days: LpHistoryRange) {
+  return useQuery({ queryKey: ["lp", "history", days], queryFn: () => lpApi.history(days), staleTime: 5 * 60_000, retry: 1 });
 }
 
 export function useLpActivity() {
